@@ -94,6 +94,7 @@ export const WEAPON_TRAITS = makeTraits({
     [TRAIT_CONCUSSIVE]: {
         display_name: 'Concussive',
         description: 'If any damage is inflicted by this attack, roll 1D6. Add +1 to the roll for each Class Size larger that the Active Unit is than the target Unit. Subtract -1 from the roll for each Class Size smaller the Active Unit is than the target Unit. On a result of 4+, move the target Unit up to X” directly away from the Active Unit. If, when the target Unit is moved, it contacts any blocking terrain feature or another Unit, the target Unit stops in base contact with the terrain or Unit. If the target Unit stops in this manner, it receives an additional 1 point of Damage with no additional defense roll. A Unit that is contacted by the Target Unit also receives 1 point of Damage with no defense roll. This trait has no effect on Targets with the “Fortification” trait.',
+        formatter: numberFormater,
     },
     [TRAIT_DRAG]: {
         display_name: 'Drag',
