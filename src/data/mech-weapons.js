@@ -434,12 +434,6 @@ export const MECH_WEAPONS = makeFrozenStaticListIds({
     [SHOCK_NET]: makeWeapon({
         display_name: 'Shock Net',
         damage: 0,
-        damage_by_size: {
-            [SIZE_LIGHT]: 1,
-            [SIZE_MEDIUM]: 4,
-            [SIZE_HEAVY]: 6,
-            [SIZE_ULTRA]: 8,
-        },
         cost_by_size: {
             [SIZE_LIGHT]: 3,
             [SIZE_MEDIUM]: 4,
