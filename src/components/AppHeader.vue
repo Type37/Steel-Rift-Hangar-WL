@@ -78,7 +78,7 @@ const resetModal = ref(false);
                 variant="danger"
                 class="ms-1"
             >
-              Reset
+              New List
             </BButton>
             <div class="btn-group d-inline-block ms-1 mt-2 mt-xl-0" role="group">
               <router-link
@@ -106,10 +106,10 @@ const resetModal = ref(false);
       centered
       @ok="resetStores()"
       ok-variant="danger"
-      title="Reset Army List?"
+      title="Start New List?"
   >
     <div class="lead">
-      Are you sure you want to clear all army list data?
+      Start a new blank list? Any unsaved changes will be lost.
     </div>
   </BModal>
 </template>
