@@ -94,7 +94,6 @@ export const MECH_UPGRADES = makeFrozenStaticListIds({
             [SIZE_HEAVY]: 2,
             [SIZE_ULTRA]: 2,
         },
-        upgrade_required: [SUBMUNITIONS],
     }),
     [OPTIC_CAMO]: makeUpgrade({
         display_name: 'Optic Camouflage',
