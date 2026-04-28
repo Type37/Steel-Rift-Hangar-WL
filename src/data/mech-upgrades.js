@@ -48,7 +48,7 @@ export const MECH_UPGRADES = makeFrozenStaticListIds({
     }),
     [HEAVY_REACTOR]: makeUpgrade({
         display_name: 'Heavy Reactor',
-        description: 'Roll 1D6 when this model would take Structure damage from Redlining, on a 4+ this damage is ignored.',
+        description: 'Roll 1D6 when this Unit would take Structure damage from Overdrive or from receiving a Redline Marker, on a 4+ this damage is ignored.',
         cost_by_size: {
             [SIZE_LIGHT]: 1,
             [SIZE_MEDIUM]: 1,
@@ -68,18 +68,19 @@ export const MECH_UPGRADES = makeFrozenStaticListIds({
     }),
     [MINEFIELD_DRONE_CARRIER_SYSTEM]: makeUpgrade({
         display_name: 'Minefield Drone Carrier System',
-        description: 'ORDER: Place a Mine Drone token (as per the Support Asset) within 3” of the Active model and not within 6” of another Mine Drone token.',
+        description: 'This Unit has the Minelayer (MOVE) trait.',
         cost_by_size: {
+            [SIZE_LIGHT]: 2,
             [SIZE_MEDIUM]: 3,
-            [SIZE_HEAVY]: 6,
-            [SIZE_ULTRA]: 6,
+            [SIZE_HEAVY]: 5,
+            [SIZE_ULTRA]: 5,
         },
         traits_by_size: {
-            [SIZE_MEDIUM]: [trait(TRAIT_UPGRADE_LIMITED, 1)],
-            [SIZE_HEAVY]: [trait(TRAIT_UPGRADE_LIMITED, 2)],
-            [SIZE_ULTRA]: [trait(TRAIT_UPGRADE_LIMITED, 2)],
+            [SIZE_LIGHT]: [trait(TRAIT_UPGRADE_LIMITED, 1)],
+            [SIZE_MEDIUM]: [trait(TRAIT_UPGRADE_LIMITED, 2)],
+            [SIZE_HEAVY]: [trait(TRAIT_UPGRADE_LIMITED, 3)],
+            [SIZE_ULTRA]: [trait(TRAIT_UPGRADE_LIMITED, 3)],
         },
-        limited_size_ids: [SIZE_MEDIUM, SIZE_HEAVY, SIZE_ULTRA],
     }),
     [MINEFIELD_DRONE_TRACKING_SYSTEM]: makeUpgrade({
         display_name: 'Minefield Drone Tracking Submunitions',
@@ -104,12 +105,17 @@ export const MECH_UPGRADES = makeFrozenStaticListIds({
     }),
     [TARGET_DESIGNATOR]: makeUpgrade({
         display_name: 'Target Designator',
-        description: 'Once per turn, friendly models in the same force may use this vehicle to draw Line of Sight for Weapon Systems using the Smart trait. Use this model for determining the AttackPool and Line of Sight. This Upgrade may also be required for certain Support Assets. Its use can be canceled by Electronic Counter measures.',
-        cost: 1,
+        description: 'Once this Unit has completed an Activation, place a Target Designator Marker on it. This Marker may not be placed if this Unit performed a JUMP Order during its Activation. Remove this Marker at the start of the Unit\'s next Activation. Friendly Units may use this Unit\'s Target Designator Marker when resolving attacks with the Smart trait.',
+        cost_by_size: {
+            [SIZE_LIGHT]: 2,
+            [SIZE_MEDIUM]: 1,
+            [SIZE_HEAVY]: 1,
+            [SIZE_ULTRA]: 1,
+        },
     }),
     [COOLANT_TANKS]: makeUpgrade({
         display_name: 'Coolant Tanks',
-        description: 'Twice per game, before issuing an Order you may remove a Redline Marker from this HE-V.',
+        description: 'At any point during a turn, this Unit may remove one Redline Marker it currently has. Limited (2).',
         traits: [
             trait(TRAIT_UPGRADE_LIMITED, 2),
         ],
@@ -149,7 +155,7 @@ export const MECH_UPGRADES = makeFrozenStaticListIds({
     }),
     [HIGH_SPEED_SERVOS]: makeUpgrade({
         display_name: 'High Speed Servos',
-        description: 'After performing a Smash Order, this Unit may perform a second Smash Order for free.',
+        description: 'After performing a Smash Order, this Unit may perform a second Smash Order for free. The second SMASH Order is preceded by a SMASH Order and not a MOVE or JUMP Order, and thus gets no bonuses for those conditions.',
         cost_by_size: {
             [SIZE_LIGHT]: 2,
             [SIZE_MEDIUM]: 3,
@@ -186,7 +192,7 @@ export const MECH_UPGRADES = makeFrozenStaticListIds({
     }),
     [COMBAT_SHIELD]: makeUpgrade({
         display_name: 'Combat Shield',
-        description: 'When this HE-V is damaged by an Attack originating from its front or side arcs, and it has more than 0 Armor remaining, roll 1D6 for each point of Damage it would receive. On a 5+, that point of Damage is ignored. Damage negated by this rule is treated as not having happened for the purposes of other weapon Trait effects, such as AP. If this HE-V performs an Engage Order, all of its Weapon Systems receive a -1 to their Damage Rating.',
+        description: 'When this HE-V is damaged by an Attack originating from its front or side arcs, or by a Blast effect, and it has more than 0 Armor remaining, roll 1D6 for each point of Damage it would receive. On a 5+, that point of Damage is ignored. Damage negated by this rule is treated as not having happened for the purposes of other weapon Trait effects, such as AP. If this HE-V performs an Engage Order, all of its Weapon Systems receive a -1 to their Damage Rating.',
         cost_by_size: {
             [SIZE_LIGHT]: 0,
             // only available in medium with TEAM_PERK_COMBAT_BUCKLER
