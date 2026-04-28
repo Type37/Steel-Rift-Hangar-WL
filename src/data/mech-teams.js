@@ -1,5 +1,5 @@
 import {MECH_SIZES, SIZE_HEAVY, SIZE_LIGHT, SIZE_MEDIUM, SIZE_ULTRA} from './unit-sizes.js';
-import {DIRECTIONAL_THRUSTER, HAPTIC_SUIT, NITRO_BOOST, TARGET_DESIGNATOR} from './mech-upgrades.js';
+import {DIRECTIONAL_THRUSTER, HAPTIC_SUIT, MINE_DIRECTOR_DRONE, NITRO_BOOST, TACTICAL_AWARENESS_DRONE, TARGET_DESIGNATOR, TARGETING_SUPPORT_DRONE} from './mech-upgrades.js';
 import {HOWITZER, MELEE_WEAPON, MISSILES, ROCKET_PACK} from './mech-weapons.js';
 import {
     TEAM_PERK_0_SLOT_ARMOR_UPGRADES,
@@ -14,6 +14,9 @@ import {
     TEAM_PERK_CLUSTER_ROCKETS_AMMO,
     TEAM_PERK_COMBAT_BUCKLER,
     TEAM_PERK_COMBINED_ACTIVATION,
+    TEAM_PERK_DRONE_MULTI,
+    TEAM_PERK_DRONE_NETWORK_SHARE,
+    TEAM_PERK_NETWORKED_POSITION,
     TEAM_PERK_COUNTER_ATTACK,
     TEAM_PERK_DRAINING_REDLINE_AVOIDANCE,
     TEAM_PERK_EXTRA_DEF_CONFIG,
@@ -49,6 +52,7 @@ import {
 } from './mech-armor-upgrades.js';
 import {
     SA_COMBINED_ARMS_ASSAULT,
+    SA_EXPAND_THE_NETWORK,
     SA_DEATH_FROM_ABOVE,
     SA_DONT_GIVE_AN_INCH,
     SA_DRIVE_THEM_OUT,
@@ -75,6 +79,7 @@ export const TEAM_ASSASSIN = 'TEAM_ASSASSIN';
 export const TEAM_BERSERKER = 'TEAM_BERSERKER';
 export const TEAM_GUNSLINGER = 'TEAM_GUNSLINGER';
 export const TEAM_COORDINATED_ASSETS = 'TEAM_COORDINATED_ASSETS';
+export const TEAM_NETWORKED_AI = 'TEAM_NETWORKED_AI';
 
 export const MECH_TEAM_SIZES = makeFrozenStaticListIds({
     [TEAM_SIZE_SMALL]: {
@@ -545,6 +550,52 @@ export const MECH_TEAMS = makeFrozenStaticListIds({
             ],
         },
     },
+    [TEAM_NETWORKED_AI]: {
+        display_name: 'Networked AI Team',
+        display_name_short: 'Networked AI',
+        icon: 'team-tactical',
+        secondary_agenda_id: SA_EXPAND_THE_NETWORK,
+        groups: makeStaticListIds({
+            'A': makeGroup({
+                min_count: 0,
+                max_count: 2,
+                size_ids: [SIZE_LIGHT],
+                required_at_least_one_of_upgrade_ids: [TARGETING_SUPPORT_DRONE, TACTICAL_AWARENESS_DRONE, MINE_DIRECTOR_DRONE],
+            }),
+            'B': makeGroup({
+                min_count: 1,
+                max_count: 2,
+                size_ids: [SIZE_MEDIUM],
+                required_at_least_one_of_upgrade_ids: [TARGETING_SUPPORT_DRONE, TACTICAL_AWARENESS_DRONE, MINE_DIRECTOR_DRONE],
+            }),
+            'C': makeGroup({
+                min_count: 1,
+                max_count: 2,
+                size_ids: [SIZE_HEAVY],
+                required_at_least_one_of_upgrade_ids: [TARGETING_SUPPORT_DRONE, TACTICAL_AWARENESS_DRONE, MINE_DIRECTOR_DRONE],
+            }),
+            'D': makeGroup({
+                min_count: 0,
+                max_count: 1,
+                size_ids: [SIZE_ULTRA],
+                required_at_least_one_of_upgrade_ids: [TARGETING_SUPPORT_DRONE, TACTICAL_AWARENESS_DRONE, MINE_DIRECTOR_DRONE],
+            }),
+        }),
+        team_size_perk_columns: [
+            [SIZE_LIGHT, SIZE_MEDIUM, SIZE_HEAVY, SIZE_ULTRA],
+        ],
+        team_size_perk_rows: {
+            2: [
+                [TEAM_PERK_DRONE_MULTI],
+            ],
+            3: [
+                [TEAM_PERK_DRONE_NETWORK_SHARE],
+            ],
+            4: [
+                [TEAM_PERK_NETWORKED_POSITION],
+            ],
+        },
+    },
 });
 
 export const MECH_TEAM_ARRAY = deepFreeze(Object.values(MECH_TEAMS));
@@ -555,6 +606,7 @@ function makeGroup(obj) {
         required_weapon_ids: [],
         required_upgrade_ids: [],
         required_at_least_one_of_weapon_ids: [],
+        required_at_least_one_of_upgrade_ids: [],
         required_at_least_one_weapon_with_trait_id: null,
         required_armor_or_structure_mod_id_once: null,
         prohibited_weapons_with_trait_ids: [],
