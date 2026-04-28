@@ -41,10 +41,9 @@ provide('color_mode', mode);
       <div class="container text-center">
         <div class="lead">
           Created by <a href="https://github.com/unstoppablecarl" class="link-primary">UnstoppableCarl</a>
-        </div>
-        <div>Steel Rift: Hangar <a href="https://github.com/deathraydesigns/Steel-Rift-Hangar" class="link-primary">GitHub
-          Project</a></div>
-        <div class="mt-2 small">
+          &nbsp;&middot;&nbsp;
+          Steel Rift: Hangar <a href="https://github.com/deathraydesigns/Steel-Rift-Hangar" class="link-primary">GitHub Project</a>
+          &nbsp;&middot;&nbsp;
           Updated unofficially and without permission to 1.5 by
           <a href="https://linktr.ee/warlore" target="_blank" class="warlore-credit">WarLore</a>
         </div>
