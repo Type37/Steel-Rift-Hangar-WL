@@ -1,5 +1,6 @@
 import {VEH_AUTO_CANNON} from '../unit-weapons.js';
 import {
+    TRAIT_AUXILIARY_UNIT,
     TRAIT_MSOE_DEPLOYER,
     TRAIT_OUTRIDER,
     TRAIT_SQUADRON,
@@ -34,6 +35,7 @@ export const SUPPORT_VEHICLE_SQUADRON_DATA = {
         defense: 4,
         traits: [
             trait(TRAIT_UNIT_SIZE_AND_TYPE, null, 'Medium Vehicle'),
+            trait(TRAIT_AUXILIARY_UNIT, null, 'Medium'),
             trait(TRAIT_SQUADRON),
             trait(TRAIT_SUPPORT_ORDERS),
         ],
@@ -89,9 +91,9 @@ export const SUPPORT_VEHICLE_SQUADRON_DATA = {
                     trait(TRAIT_SUPPORT_MINE_DRONE_LAYER, 4),
                 ],
             },
-            SCRAMBLER_VEHICLE: {
+            OBSCURATION_VEHICLE: {
                 ...baseStats,
-                display_name: 'Scrambler Projector Vehicle',
+                display_name: 'Obscuration Projection Vehicle',
                 weapon_ids: [
                     VEH_AUTO_CANNON,
                 ],
