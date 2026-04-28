@@ -46,7 +46,6 @@ import {
     EXTRA_PLATING_ARMOR_UPGRADE,
     HEAVY_PLATING_ARMOR_UPGRADE,
     REACTIVE_ARMOR_UPGRADE,
-    REDUNDANT_INTERNALS_ARMOR_UPGRADE,
 } from './mech-armor-upgrades.js';
 import {
     SA_COMBINED_ARMS_ASSAULT,
@@ -70,8 +69,8 @@ export const TEAM_GENERAL = 'TEAM_GENERAL';
 export const TEAM_FIRE_SUPPORT = 'TEAM_FIRE_SUPPORT';
 export const TEAM_RECON = 'TEAM_RECON';
 export const TEAM_SECURITY = 'TEAM_SECURITY';
-export const TEAM_TACTICAL = 'TEAM_TACTICAL'; // now Multirole Team
-export const TEAM_MULTIROLE = TEAM_TACTICAL;  // alias
+export const TEAM_TACTICAL = 'TEAM_TACTICAL'; // deprecated — use TEAM_MULTIROLE
+export const TEAM_MULTIROLE = 'TEAM_MULTIROLE';
 export const TEAM_ASSASSIN = 'TEAM_ASSASSIN';
 export const TEAM_BERSERKER = 'TEAM_BERSERKER';
 export const TEAM_GUNSLINGER = 'TEAM_GUNSLINGER';
@@ -216,7 +215,6 @@ export const MECH_TEAMS = makeFrozenStaticListIds({
                     CLAYMORE_ARMOR_UPGRADE,
                     EXTRA_PLATING_ARMOR_UPGRADE,
                     HEAVY_PLATING_ARMOR_UPGRADE,
-                    REDUNDANT_INTERNALS_ARMOR_UPGRADE,
                 ],
                 required_armor_or_structure_mod_id_once: MOD_REINFORCED,
                 limited_structure_mod_ids: [MOD_STANDARD, MOD_REINFORCED],
@@ -276,8 +274,7 @@ export const MECH_TEAMS = makeFrozenStaticListIds({
             ],
         },
     },
-    // TEAM_TACTICAL is now the Multirole Team (TEAM_MULTIROLE = TEAM_TACTICAL)
-    [TEAM_TACTICAL]: {
+    [TEAM_MULTIROLE]: {
         display_name: 'Multirole Team',
         display_name_short: 'Multirole',
         icon: 'team-tactical',
@@ -287,19 +284,19 @@ export const MECH_TEAMS = makeFrozenStaticListIds({
                 min_count: 1,
                 max_count: 1,
                 size_ids: [SIZE_LIGHT],
-                // Requirement: No Duplicate Weapons on any Team Member
+                no_duplicate_weapons: true,
             }),
             'B': makeGroup({
                 min_count: 1,
                 max_count: 2,
                 size_ids: [SIZE_MEDIUM],
-                // Requirement: No Duplicate Weapons on any Team Member
+                no_duplicate_weapons: true,
             }),
             'C': makeGroup({
                 min_count: 0,
                 max_count: 1,
                 size_ids: [SIZE_HEAVY],
-                // Requirement: No Duplicate Weapons on any Team Member
+                no_duplicate_weapons: true,
             }),
         }),
         team_size_perk_columns: [
@@ -322,6 +319,52 @@ export const MECH_TEAMS = makeFrozenStaticListIds({
                 [TEAM_PERK_BARREL_EXTENSIONS, TEAM_PERK_BLAST_PLUS_ONE],
                 [TEAM_PERK_LIGHT_WEAPON_EFFECT, TEAM_PERK_MELEE_PLUS_ONE],
                 [TEAM_PERK_DRAINING_REDLINE_AVOIDANCE, TEAM_PERK_KINETIC_PLUS_ONE],
+            ],
+        },
+    },
+    // TEAM_TACTICAL kept as deprecated alias for backwards compat with saved lists
+    [TEAM_TACTICAL]: {
+        display_name: 'Tactical Team',
+        display_name_short: 'Tactical',
+        icon: 'team-tactical',
+        secondary_agenda_id: SA_MISSION_MOMENTUM,
+        groups: makeStaticListIds({
+            'A': makeGroup({
+                min_count: 1,
+                max_count: 1,
+                size_ids: [SIZE_LIGHT],
+                required_upgrade_ids: [TARGET_DESIGNATOR],
+            }),
+            'B': makeGroup({
+                min_count: 1,
+                max_count: 2,
+                size_ids: [SIZE_MEDIUM],
+                required_weapon_ids: [MELEE_WEAPON],
+                limited_structure_mod_ids: [MOD_STANDARD, MOD_REINFORCED],
+                limited_armor_mod_ids: [MOD_STANDARD, MOD_REINFORCED],
+            }),
+            'C': makeGroup({
+                min_count: 1,
+                max_count: 1,
+                size_ids: [SIZE_HEAVY],
+                required_at_least_one_of_weapon_ids: [ROCKET_PACK, MISSILES],
+            }),
+        }),
+        team_size_perk_columns: [
+            [SIZE_LIGHT],
+            [SIZE_MEDIUM],
+            [SIZE_HEAVY],
+        ],
+        team_size_perk_rows: {
+            3: [
+                [TEAM_PERK_0_SLOT_TARGET_DESIGNATORS],
+                [TEAM_PERK_EXTRA_TONNAGE],
+                [],
+            ],
+            4: [
+                [],
+                [TEAM_PERK_SIDE_DEFENSE],
+                [],
             ],
         },
     },
@@ -417,9 +460,15 @@ export const MECH_TEAMS = makeFrozenStaticListIds({
             [SIZE_LIGHT, SIZE_MEDIUM, SIZE_HEAVY],
         ],
         team_size_perk_rows: {
-            2: [[TEAM_PERK_QUICKDRAW]],
-            3: [[TEAM_PERK_BARREL_EXTENSIONS]],
-            4: [[TEAM_PERK_RETURN_SMASH]],
+            2: [
+                [TEAM_PERK_QUICKDRAW],
+            ],
+            3: [
+                [TEAM_PERK_BARREL_EXTENSIONS],
+            ],
+            4: [
+                [TEAM_PERK_RETURN_SMASH],
+            ],
         },
     },
     [TEAM_ASSASSIN]: {
@@ -470,11 +519,9 @@ export const MECH_TEAMS = makeFrozenStaticListIds({
     },
     [TEAM_COORDINATED_ASSETS]: {
         display_name: 'Coordinated Assets Team',
-        display_name_short: 'Coord. Assets',
+        display_name_short: 'Coordinated',
         icon: 'team-tactical',
         secondary_agenda_id: SA_COMBINED_ARMS_ASSAULT,
-        // Note: This team also requires 1-2 UL HE-V Squadrons or Assault Vehicle Squadrons
-        // as members. Support asset membership is not yet modeled in the team schema.
         groups: makeStaticListIds({
             'A': makeGroup({
                 min_count: 1,
@@ -487,9 +534,15 @@ export const MECH_TEAMS = makeFrozenStaticListIds({
             [SIZE_LIGHT, SIZE_MEDIUM, SIZE_HEAVY, SIZE_ULTRA],
         ],
         team_size_perk_rows: {
-            2: [[TEAM_PERK_MOVE_THROUGH_TEAM]],
-            3: [[TEAM_PERK_EXTRA_SUPPORT_ASSET_SLOT]],
-            4: [[TEAM_PERK_COMBINED_ACTIVATION]],
+            2: [
+                [TEAM_PERK_MOVE_THROUGH_TEAM],
+            ],
+            3: [
+                [TEAM_PERK_EXTRA_SUPPORT_ASSET_SLOT],
+            ],
+            4: [
+                [TEAM_PERK_COMBINED_ACTIVATION],
+            ],
         },
     },
 });
@@ -497,6 +550,7 @@ export const MECH_TEAMS = makeFrozenStaticListIds({
 export const MECH_TEAM_ARRAY = deepFreeze(Object.values(MECH_TEAMS));
 
 function makeGroup(obj) {
+
     const defaults = {
         required_weapon_ids: [],
         required_upgrade_ids: [],
@@ -508,6 +562,7 @@ function makeGroup(obj) {
         limited_structure_mod_ids: [],
         limited_armor_mod_ids: [],
         limited_armor_upgrade_ids: [],
+        no_duplicate_weapons: false,
     };
     const result = Object.assign(defaults, obj);
 
