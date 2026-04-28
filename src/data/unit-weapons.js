@@ -13,7 +13,6 @@ import {
     TRAIT_SMART,
     TRAIT_STAGGER,
 } from './weapon-traits.js';
-import {TRAIT_SMASHER} from './unit-traits.js';
 import {makeFrozenStaticListIds, trait} from './data-helpers.js';
 import {getRangeFromShortTrait} from './mech-weapons.js';
 
@@ -103,7 +102,7 @@ export const UNIT_WEAPONS = makeFrozenStaticListIds({
         display_name: 'Dozer Blade',
         damage: null,
         traits: [
-            trait(TRAIT_SMASHER, 'X', 'Medium'),
+            trait(TRAIT_MELEE, 'X'),
             trait(TRAIT_CONCUSSIVE, 2),
         ],
     }),
@@ -111,7 +110,7 @@ export const UNIT_WEAPONS = makeFrozenStaticListIds({
         display_name: 'Dozer Blade',
         damage: null,
         traits: [
-            trait(TRAIT_SMASHER, 1, 'Heavy'),
+            trait(TRAIT_MELEE, 1),
             trait(TRAIT_CONCUSSIVE, 2),
         ],
     }),
@@ -244,7 +243,7 @@ export const UNIT_WEAPONS = makeFrozenStaticListIds({
         display_name: 'UL Melee Weapon',
         damage: null,
         traits: [
-            trait(TRAIT_SMASHER, 'X', 'Light'),
+            trait(TRAIT_MELEE, 'X'),
             trait(TRAIT_AP, 'X'),
         ],
     }),
