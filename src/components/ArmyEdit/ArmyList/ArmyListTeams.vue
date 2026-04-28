@@ -21,7 +21,7 @@ const teamSizeInfo = computed(() => {
   >
     <div class="fw-bold">Team Limits</div>
     <div v-for="(item) in teamSizeInfo">
-      {{ item.max_instance_count }} team(s) of {{ item.description }} <Icon name="hev"/>
+      Up to {{ item.max_instance_count }}, max {{ item.description }} <Icon name="hev"/>
     </div>
 
     <div
