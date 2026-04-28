@@ -16,7 +16,7 @@ export const useArmyListStore = defineScopeableStore('army-list', ({scope}) => {
         const supportAssetUnitStore = useSupportAssetUnitsStore(scope);
 
         const defaultArmyName = '';
-        const defaultMaxTons = 100;
+        const defaultMaxTons = 150;
 
         const name = ref(defaultArmyName);
         const max_tons = ref(defaultMaxTons);
