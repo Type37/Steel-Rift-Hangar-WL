@@ -1,7 +1,9 @@
 import {SIZE_HEAVY, SIZE_LIGHT, SIZE_MEDIUM, SIZE_ULTRA} from './unit-sizes.js';
 import {
+    TRAIT_ANTI_AIR,
     TRAIT_AP,
     TRAIT_BLAST,
+    TRAIT_BULKY,
     TRAIT_CONCUSSIVE,
     TRAIT_DISRUPTIVE,
     TRAIT_DRAG,
@@ -44,6 +46,9 @@ export const MEGA_GLAIVE = 'MEGA_GLAIVE';
 export const PLASMA_BLADE = 'PLASMA_BLADE';
 export const PULSE_SALVO = 'PULSE_SALVO';
 export const SHOCK_NET = 'SHOCK_NET';
+export const AA_CANNON = 'AA_CANNON';
+export const AA_MISSILES = 'AA_MISSILES';
+export const CLUSTER_ROCKETS = 'CLUSTER_ROCKETS';
 
 export const MECH_WEAPONS = makeFrozenStaticListIds({
     [AUTO_CANNON]: makeWeapon({
@@ -67,12 +72,13 @@ export const MECH_WEAPONS = makeFrozenStaticListIds({
     [HOWITZER]: makeWeapon({
         display_name: 'Howitzer',
         damage_by_size: {
-            [SIZE_LIGHT]: 1,
-            [SIZE_MEDIUM]: 2,
-            [SIZE_HEAVY]: 3,
-            [SIZE_ULTRA]: 4,
+            [SIZE_LIGHT]: 2,
+            [SIZE_MEDIUM]: 3,
+            [SIZE_HEAVY]: 4,
+            [SIZE_ULTRA]: 5,
         },
         traits: [
+            trait(TRAIT_SMART),
             trait(TRAIT_BLAST, 3),
             trait(TRAIT_KINETIC),
         ],
@@ -98,7 +104,7 @@ export const MECH_WEAPONS = makeFrozenStaticListIds({
         cost_by_size: {
             [SIZE_LIGHT]: 3,
             [SIZE_MEDIUM]: 4,
-            [SIZE_HEAVY]: 5,
+            [SIZE_HEAVY]: 6,
             [SIZE_ULTRA]: 7,
         },
     }),
@@ -122,10 +128,10 @@ export const MECH_WEAPONS = makeFrozenStaticListIds({
         display_name: 'Missiles',
         damage: 0,
         damage_by_size: {
-            [SIZE_LIGHT]: 2,
+            [SIZE_LIGHT]: 3,
             [SIZE_MEDIUM]: 4,
-            [SIZE_HEAVY]: 6,
-            [SIZE_ULTRA]: 8,
+            [SIZE_HEAVY]: 5,
+            [SIZE_ULTRA]: 7,
         },
         traits: [
             trait(TRAIT_SMART),
@@ -183,8 +189,8 @@ export const MECH_WEAPONS = makeFrozenStaticListIds({
         damage_by_size: {
             [SIZE_LIGHT]: 2,
             [SIZE_MEDIUM]: 4,
-            [SIZE_HEAVY]: 6,
-            [SIZE_ULTRA]: 8,
+            [SIZE_HEAVY]: 5,
+            [SIZE_ULTRA]: 7,
         },
         cost_by_size: {
             [SIZE_LIGHT]: 2,
@@ -193,18 +199,17 @@ export const MECH_WEAPONS = makeFrozenStaticListIds({
             [SIZE_ULTRA]: 5,
         },
         traits: [
-            trait(TRAIT_SMART),
             trait(TRAIT_BLAST, 3),
-            trait(TRAIT_LIMITED, 2),
+            trait(TRAIT_LIMITED, 3),
         ],
     }),
     [ROTARY_CANNON]: makeWeapon({
         display_name: 'Rotary Cannon',
         damage_by_size: {
-            [SIZE_LIGHT]: 5,
-            [SIZE_MEDIUM]: 7,
-            [SIZE_HEAVY]: 11,
-            [SIZE_ULTRA]: 13,
+            [SIZE_LIGHT]: 6,
+            [SIZE_MEDIUM]: 9,
+            [SIZE_HEAVY]: 12,
+            [SIZE_ULTRA]: 15,
         },
         traits: [
             trait(TRAIT_SHORT, 12),
@@ -221,9 +226,9 @@ export const MECH_WEAPONS = makeFrozenStaticListIds({
         display_name: 'Shot Cannon',
         damage_by_size: {
             [SIZE_LIGHT]: 6,
-            [SIZE_MEDIUM]: 8,
-            [SIZE_HEAVY]: 10,
-            [SIZE_ULTRA]: 12,
+            [SIZE_MEDIUM]: 9,
+            [SIZE_HEAVY]: 11,
+            [SIZE_ULTRA]: 13,
         },
         traits: [
             trait(TRAIT_SHORT, 6),
@@ -240,10 +245,10 @@ export const MECH_WEAPONS = makeFrozenStaticListIds({
     [SUBMUNITIONS]: makeWeapon({
         display_name: 'Submunitions',
         damage_by_size: {
-            [SIZE_LIGHT]: 1,
-            [SIZE_MEDIUM]: 2,
-            [SIZE_HEAVY]: 3,
-            [SIZE_ULTRA]: 4,
+            [SIZE_LIGHT]: 2,
+            [SIZE_MEDIUM]: 3,
+            [SIZE_HEAVY]: 4,
+            [SIZE_ULTRA]: 5,
         },
         traits: [
             trait(TRAIT_SHORT, 6),
@@ -326,6 +331,7 @@ export const MECH_WEAPONS = makeFrozenStaticListIds({
             [SIZE_ULTRA]: 6,
         },
         traits: [
+            trait(TRAIT_BULKY),
             trait(TRAIT_CONCUSSIVE, 4),
         ],
         traits_by_size: {
@@ -365,6 +371,7 @@ export const MECH_WEAPONS = makeFrozenStaticListIds({
             [SIZE_ULTRA]: 6,
         },
         traits: [
+            trait(TRAIT_BULKY),
             trait(TRAIT_CONCUSSIVE, 2),
         ],
         traits_by_size: {
@@ -384,7 +391,9 @@ export const MECH_WEAPONS = makeFrozenStaticListIds({
             [SIZE_HEAVY]: 6,
             [SIZE_ULTRA]: 7,
         },
-        traits: [],
+        traits: [
+            trait(TRAIT_BULKY),
+        ],
         traits_by_size: {
             [SIZE_LIGHT]: [trait(TRAIT_MELEE, 3), trait(TRAIT_REACH, 1)],
             [SIZE_MEDIUM]: [trait(TRAIT_MELEE, 3), trait(TRAIT_REACH, 2)],
@@ -415,7 +424,7 @@ export const MECH_WEAPONS = makeFrozenStaticListIds({
         display_name: 'Pulse Salvo',
         damage: 0,
         damage_by_size: {
-            [SIZE_LIGHT]: 1,
+            [SIZE_LIGHT]: 2,
             [SIZE_MEDIUM]: 4,
             [SIZE_HEAVY]: 6,
             [SIZE_ULTRA]: 8,
@@ -444,6 +453,68 @@ export const MECH_WEAPONS = makeFrozenStaticListIds({
             trait(TRAIT_MELEE, 1),
             trait(TRAIT_STAGGER),
             trait(TRAIT_TETHER),
+        ],
+    }),
+    [AA_CANNON]: makeWeapon({
+        display_name: 'AA Cannon',
+        damage_by_size: {
+            [SIZE_LIGHT]: 5,
+            [SIZE_MEDIUM]: 8,
+            [SIZE_HEAVY]: 11,
+            [SIZE_ULTRA]: 13,
+        },
+        cost_by_size: {
+            [SIZE_LIGHT]: 3,
+            [SIZE_MEDIUM]: 5,
+            [SIZE_HEAVY]: 6,
+            [SIZE_ULTRA]: 8,
+        },
+        traits: [
+            trait(TRAIT_ANTI_AIR),
+            trait(TRAIT_FLAK),
+            trait(TRAIT_LIGHT),
+            trait(TRAIT_SHORT, 24),
+        ],
+    }),
+    [AA_MISSILES]: makeWeapon({
+        display_name: 'AA Missiles',
+        damage_by_size: {
+            [SIZE_LIGHT]: 3,
+            [SIZE_MEDIUM]: 5,
+            [SIZE_HEAVY]: 7,
+            [SIZE_ULTRA]: 9,
+        },
+        cost_by_size: {
+            [SIZE_LIGHT]: 2,
+            [SIZE_MEDIUM]: 3,
+            [SIZE_HEAVY]: 4,
+            [SIZE_ULTRA]: 5,
+        },
+        traits: [
+            trait(TRAIT_ANTI_AIR),
+            trait(TRAIT_LIGHT),
+            trait(TRAIT_SMART),
+            trait(TRAIT_LIMITED, 2),
+        ],
+    }),
+    [CLUSTER_ROCKETS]: makeWeapon({
+        display_name: 'Cluster Rockets',
+        damage_by_size: {
+            [SIZE_LIGHT]: 4,
+            [SIZE_MEDIUM]: 8,
+            [SIZE_HEAVY]: 11,
+            [SIZE_ULTRA]: 15,
+        },
+        cost_by_size: {
+            [SIZE_LIGHT]: 2,
+            [SIZE_MEDIUM]: 4,
+            [SIZE_HEAVY]: 6,
+            [SIZE_ULTRA]: 8,
+        },
+        traits: [
+            trait(TRAIT_BLAST, 3),
+            trait(TRAIT_LIGHT),
+            trait(TRAIT_LIMITED, 2),
         ],
     }),
 });
