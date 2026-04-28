@@ -11,6 +11,7 @@ import {
 } from '../unit-weapons.js';
 import {
     TRAIT_ALL_TERRAIN,
+    TRAIT_AUXILIARY_UNIT,
     TRAIT_CLOSE_SUPPORT,
     TRAIT_INFERNO_GEAR,
     TRAIT_MAGNETIC_GRAPPLES,
@@ -26,8 +27,8 @@ import {TYPE_HEV} from '../unit-types.js';
 export const ULTRA_LIGHT_HEV_SQUADRON = 'ULTRA_LIGHT_HEV_SQUADRON';
 
 const baseStats = {
-    armor: 3,
-    structure: 0,
+    armor: 2,
+    structure: 1,
 };
 
 export const ULTRA_LIGHT_HEV_SQUADRON_DATA = {
@@ -40,6 +41,7 @@ export const ULTRA_LIGHT_HEV_SQUADRON_DATA = {
         defense: 2,
         traits: [
             trait(TRAIT_UNIT_SIZE_AND_TYPE, null, 'UL HE-V'),
+            trait(TRAIT_AUXILIARY_UNIT, null, 'Ultralight'),
             trait(TRAIT_SQUADRON),
             trait(TRAIT_CLOSE_SUPPORT),
             trait(TRAIT_ALL_TERRAIN),
@@ -96,7 +98,7 @@ export const ULTRA_LIGHT_HEV_SQUADRON_DATA = {
                 ],
             },
             RIFLEMAN: {
-                move: 8,
+                move: 6,
                 jump: 0,
                 ...baseStats,
                 display_name: 'Rifleman',
