@@ -16,7 +16,8 @@ import {ORDER_INFANTRY_MUSTER} from './orders/infantry-orders.js';
 export const TRAIT_ALL_TERRAIN = 'TRAIT_ALL_TERRAIN';
 export const TRAIT_CLOSE_SUPPORT = 'TRAIT_CLOSE_SUPPORT';
 export const TRAIT_GARRISON = 'TRAIT_GARRISON';
-export const TRAIT_GROUP_COMMAND = 'TRAIT_GROUP_COMMAND';
+export const TRAIT_GROUP_COMMAND = 'TRAIT_GROUP_COMMAND'; // deprecated — use TRAIT_ASSET_COMMAND
+export const TRAIT_ASSET_COMMAND = 'TRAIT_ASSET_COMMAND';
 export const TRAIT_MAGNETIC_GRAPPLES = 'TRAIT_MAGNETIC_GRAPPLES';
 export const TRAIT_MINE_SWEEPER = 'TRAIT_MINE_SWEEPER';
 export const TRAIT_SHIELD_PROJECTOR = 'TRAIT_SHIELD_PROJECTOR';
@@ -35,14 +36,24 @@ export const TRAIT_SUPPRESSIVE_FIRE = 'TRAIT_SUPPRESSIVE_FIRE';
 export const TRAIT_UL_HEV_LAUNCH_GEAR = 'TRAIT_UL_HEV_LAUNCH_GEAR';
 export const TRAIT_FORTIFICATION = 'TRAIT_FORTIFICATION';
 export const TRAIT_COMMAND = 'TRAIT_COMMAND';
-export const TRAIT_BUNKER_MINE_DRONES = 'TRAIT_BUNKER_MINE_DRONES';
+export const TRAIT_BUNKER_MINE_DRONES = 'TRAIT_BUNKER_MINE_DRONES'; // deprecated — use TRAIT_MINELAYER
 export const TRAIT_SQUADRON = 'TRAIT_SQUADRON';
 export const TRAIT_FLYING = 'TRAIT_FLYING';
 export const TRAIT_FLYING_SQUADRON = 'TRAIT_FLYING_SQUADRON';
 export const TRAIT_SUPPORT_ORDERS = 'TRAIT_SUPPORT_ORDERS';
-export const TRAIT_HEAVY_SUPPORT_ASSET = 'TRAIT_HEAVY_SUPPORT_ASSET';
-export const TRAIT_HAULER = 'TRAIT_HAULER';
+export const TRAIT_HEAVY_SUPPORT_ASSET = 'TRAIT_HEAVY_SUPPORT_ASSET'; // deprecated
+export const TRAIT_HAULER = 'TRAIT_HAULER'; // deprecated — use TRAIT_SQUADRON_GARRISON
 export const TRAIT_UNIT_SIZE_AND_TYPE = 'TRAIT_UNIT_SIZE_AND_TYPE';
+
+// Ch17 additions
+export const TRAIT_AUXILIARY_UNIT = 'TRAIT_AUXILIARY_UNIT';
+export const TRAIT_VULNERABLE = 'TRAIT_VULNERABLE';
+export const TRAIT_YIELDING = 'TRAIT_YIELDING';
+export const TRAIT_INFANTRY = 'TRAIT_INFANTRY';
+export const TRAIT_MINELAYER = 'TRAIT_MINELAYER';
+export const TRAIT_SMASHER = 'TRAIT_SMASHER';
+export const TRAIT_GUIDANCE_SUITE = 'TRAIT_GUIDANCE_SUITE';
+export const TRAIT_SQUADRON_GARRISON = 'TRAIT_SQUADRON_GARRISON';
 
 export const UNIT_TRAITS = makeTraits({
     [TRAIT_ALL_TERRAIN]: {
@@ -51,29 +62,33 @@ export const UNIT_TRAITS = makeTraits({
     },
     [TRAIT_CLOSE_SUPPORT]: {
         display_name: 'Close Support',
-        description: 'If a friendly unit with this trait is within 6” of an enemy target of an Engage or Smash Order, add one to the Damage Rating of each weapon used in that Engage or Smash Order. This bonus is only applied once, regardless of the number of units with this Trait in range.',
+        description: 'If a friendly Unit with this trait is within 6" of an enemy target of an ENGAGE or SMASH Order, add one to the Damage Rating of each weapon used in that ENGAGE or SMASH Order. This bonus is only applied once, regardless of the number of Units with this Trait in range.',
     },
     [TRAIT_GARRISON]: {
         display_name: 'Garrison',
         formatter: (name, number, type = null) => `${name}(${number} ${type})`,
-        description: 'A model with this Trait contains assigned Units, Models and/or Tokens as listed in its (X). For example, a model with the trait Garrison (2 Air Infantry models, 2 Mine Drone tokens) may contain 2 models from the Air Infantry table and 2 Mine Drone tokens. Note what specific models are selected when this model is recruited during the Recruit Forces step. The selected Units, Models and/or Tokens are known as its Garrisoned Units, Garrisoned Models and/or Garrisoned Tokens, respectively. The Garrisoned Units/Models/Tokens will not be Deployed during the Deploy Forces step, and will instead be placed on the table during the game. If a model with the Garrison trait is destroyed, and its Garrisoned Units/Models/Tokens have not yet Mustered, those Units/Models/Tokens are considered destroyed as well.',
+        description: 'A Model with this Trait contains an assigned Unit as listed in its (X). Note what specific Models are selected for the Garrison Unit when this Model is recruited during the Recruit Forces step. These Units will not be Deployed during the Deploy Forces step, and will instead be placed to the side. Such a Unit is "Garrisoned" until it performs the MUSTER Order. Garrisoned Units may not perform any Order except the MUSTER Order. MUSTER: The Garrisoned Unit is placed within 1" of its Garrison. This Unit is no longer considered Garrisoned, and is now "Mustered". If a Model with the Garrison trait is Destroyed, and its Garrisoned Unit has not yet performed the MUSTER Order, that Unit is considered Destroyed as well.',
     },
     [TRAIT_GROUP_COMMAND]: {
-        display_name: 'Group Command',
-        description: 'All Units in this Asset are issued Orders during the same activation. Select one Unit from this Asset, perform its Orders as normal until it has finished. Then select another Unit from this Asset, perform its Orders until it has finished, and so on until all Units from this Asset have activated. The opponent Commander then becomes the Active Player as normal. If this Unit is no longer in play, any other Units from its Asset will still activate with Group Command.',
+        display_name: 'Asset Command',
+        description: 'All Units in this Asset are issued Orders during the same Activation. When Activating one of these Units, select one Unit from this Asset, resolve its Activation as normal. Then, immediately select another Unit from this Asset, perform its Orders until it has finished, and so on until all Units from this Asset have Activated. The opponent Commander then becomes the Active Commander as normal. If a Unit from this Asset is no longer in play, any other Units from its Asset will still activate with Asset Command.',
+    },
+    [TRAIT_ASSET_COMMAND]: {
+        display_name: 'Asset Command',
+        description: 'All Units in this Asset are issued Orders during the same Activation. When Activating one of these Units, select one Unit from this Asset, resolve its Activation as normal. Then, immediately select another Unit from this Asset, perform its Orders until it has finished, and so on until all Units from this Asset have Activated. The opponent Commander then becomes the Active Commander as normal. If a Unit from this Asset is no longer in play, any other Units from its Asset will still activate with Asset Command.',
     },
     [TRAIT_MAGNETIC_GRAPPLES]: {
         display_name: 'Magnetic Grapples',
-        description: 'When an enemy Unit attempts to Move or Jump out of contact with one or more Units with this Trait, before moving, that model rolls 1D6, adding +1 for each additional model with this Trait in contact after the first. On a 1-2 result, reduce the Speed distance that the Unit may move by 50%. On a 3-4 result, reduce the distance by 75%. On a 5-6 result, the Active Unit may only move 1” regardless of how far it would normally be allowed to go during that Order.',
+        description: 'When this Unit MOVEs or JUMPs into base contact with an Enemy Unit, that Enemy Unit receives a Tether Marker and the Active Unit receives a corresponding Anchor Marker.',
     },
     [TRAIT_MINE_SWEEPER]: {
         display_name: 'Mine Sweeper',
-        description: '',
+        description: 'A Unit with this Trait may not be Targeted by a Mine Drone Token. This Unit may ENGAGE Mine Drone Tokens as if it had the Mine Drone Tracking Munitions Upgrade.',
         granted_order_ids: [ORDER_CLEAR_MINEFIELD],
     },
     [TRAIT_SHIELD_PROJECTOR]: {
         display_name: 'Shield Projector',
-        description: 'When a friendly or enemy unit within 6” is damaged by an Attack, and it has more than 0 Armor remaining, roll 1D6 for each point of Damage it would receive. On a 5+, that point of Damage is ignored. Damage negated by this rule is treated as not having happened for the purposes of other weapon Trait effects, such as AP. This effect is not cumulative with the effect of a Combat Shield.',
+        description: 'When a friendly Unit within 6" of the model with this trait makes a Defense Roll, it counts as carrying a Combat Shield Upgrade. This is not cumulative with an existing Combat Shield Upgrade on that Unit.',
     },
     [TRAIT_TARGET_DESIGNATOR]: {
         display_name: 'Target Designator',
@@ -81,11 +96,11 @@ export const UNIT_TRAITS = makeTraits({
     },
     [TRAIT_OUTRIDER]: {
         display_name: 'Outrider',
-        description: 'If these models are part of a Squadron, they may be deployed and end moves within 12” of the Squadron Leader (instead of 3”). However, all models with this Trait in a Squadron must deploy and end moves within 3” of all other models with this Trait in the Squadron.',
+        description: 'If these Models are part of a Squadron, they may be deployed and end moves within 12" of the Squadron Leader (instead of 3"). However, all Models with this Trait in a Squadron must deploy and end moves within 3" of all other Models with this Trait in the Squadron.',
     },
     [TRAIT_SUPPORT_ORDERS]: {
         display_name: 'Support Orders',
-        description: 'Units with this trait possess unusual equipment that is intended to support other units, but must be actively operated to take effect. These traits will be prefixed with the term “Support:”. Units with these traits may perform the Support Order. Support: The unit may activate the effect of any or all “Support:” traits. See each trait entry for the effects of the “Support:” trait. Note that if a model (or models) in a Squadron have a “Support:” trait, the entire Squadron must perform the Support Order. However, each model with a “Support:” will activate that trait during the Order, in any order its Commander wishes.',
+        description: 'Units with this trait possess unusual equipment that is intended to support other units, but must be actively operated to take effect. These traits will be prefixed with the term "SUPPORT:". Units with these traits may perform the SUPPORT Order. SUPPORT: The Unit may activate the effect of any or all "SUPPORT:" traits. See each trait entry for the effects of the "SUPPORT:" trait. Note that if a model (or models) in a Squadron have a "SUPPORT:" trait, the entire Squadron must perform the SUPPORT Order. However, each model with a "SUPPORT:" will activate that trait during the Order, in any order its Commander wishes.',
         granted_order_ids: [ORDER_SUPPORT],
     },
     [TRAIT_SUPPORT_ORDER_CNC]: {
@@ -116,7 +131,8 @@ export const UNIT_TRAITS = makeTraits({
     },
     [TRAIT_MSOE_LAUNCHER]: {
         display_name: 'MSOE Launcher',
-        description: 'Immediately before or after this model performs a Move Order, you may place an Obscuration Emitter Marker within 6” of this model.',
+        formatter: (name, number, type = null) => type ? `${name} (${type})` : name,
+        description: 'At the beginning or end of the Order listed in (X), you may place an Obscuration Emitter Token within 6" of this model. Obscuration Emitter Token: An Obscuration Emitter is a 25mm circle. Any Unit, regardless of Commander, within 3" of this Token counts as being within Covering Terrain. Additionally, these Units count as being equipped with Anti-Missile System and Electronic Countermeasures Upgrades, if they are not already. Remove the Token when the Unit that placed this Token is Activated again.',
     },
     [TRAIT_MSOE_DEPLOYER]: {
         display_name: 'Support: MSOE Deployer',
@@ -125,23 +141,23 @@ export const UNIT_TRAITS = makeTraits({
     },
     [TRAIT_SCRAMBLERS]: {
         display_name: 'Scramblers',
-        description: 'No Unit within 6” of a model equipped with a Scrambler may be targeted by an Off-Table Support Asset, nor may they have Line of Sight drawn to them by a Target Designator. They may not be the target of Lock Orders.',
+        description: 'All Units within 6" of a model equipped with Scramblers, including its own Unit, count as being equipped with Anti-Missile Systems and Electronic Countermeasures.',
     },
     [TRAIT_INFERNO_GEAR]: {
         display_name: 'Inferno Gear',
-        description: 'If 50% or more of the Units in a Squadron have this Trait, the Squadron ignores the effects of the Disruptive Trait.',
+        description: 'If a Model or Models in the Unit have this Trait, the Unit ignores the effects of the Disruptive Trait.',
     },
     [TRAIT_SUPPRESSIVE_FIRE]: {
         display_name: 'Suppressive Fire',
-        description: 'If an enemy Unit within 6” of a friendly model with this Trait performs an Engage Order, the target of that Order receives +1 to their Defense Rolls.',
+        description: 'If an enemy Unit within 6" of a friendly model with this Trait performs an ENGAGE Order, the target of that Order receives +1 to their Defense Rolls.',
     },
     [TRAIT_UL_HEV_LAUNCH_GEAR]: {
         display_name: 'Launch Gear',
-        description: 'This Unit may perform the Jump Order at distance of +2” to their Speed value.',
+        description: 'This Unit may perform the JUMP Order at distance of +2" to their Speed value.',
     },
     [TRAIT_FORTIFICATION]: {
         display_name: 'Fortification',
-        description: 'A Unit with this Trait will only ever perform the following Orders (if eligible): Engage, Lock On, Return Fire. Units with this Trait only ever pass Defense rolls on an unmodifiable roll of 6. Units with this Trait count as Light in Class for the purposes of the Kinetic Trait. Units with this Trait are always targeted as if from the Front Arc. If a Mission uses table quadrants then Units with this Trait must be deployed completely inside of one quadrant and cannot extend into others. For the purposes of calculating Tonnage destroyed or in a Zone, each Fortification contributes 5 Tons for the respective Commander.',
+        description: 'Once placed in Deployment, this Unit may not be moved or placed by any Order or effect, voluntarily or involuntarily.',
     },
     [TRAIT_COMMAND]: {
         display_name: 'Command',
@@ -149,6 +165,7 @@ export const UNIT_TRAITS = makeTraits({
         description: 'Units with the Command Trait issue Orders to their Garrison. Once per Activation, when this Unit is issued an Order, instead of performing an Order itself, it will instead issue one of the following Orders to up to (X) Units within its Garrison, or currently deployed on the Battlefield.',
     },
     [TRAIT_BUNKER_MINE_DRONES]: {
+        // Deprecated — replaced by TRAIT_MINELAYER with type='ENGAGE'
         display_name: 'Garrison',
         formatter: (name, number, type = null) => `${name}(${number} ${type})`,
         type: 'Mine Drones',
@@ -160,20 +177,22 @@ export const UNIT_TRAITS = makeTraits({
     },
     [TRAIT_FLYING]: {
         display_name: 'Flying',
-        description: 'When this unit performs a Move Order, it instead performs a Flying Move Order.',
+        description: 'When this unit performs a MOVE Order, it instead performs a FLYING MOVE Order. FLYING MOVE: Place the unit within its Speed horizontally of its current position. This ignores any restrictions for moving through Terrain or other Units provided it can be placed in range. The unit must be able to end its move in a place where its Base will fit, and may face any direction. Targeting a Flying Unit: This Unit gains a +1 to Defense Rolls when targeted by ENGAGE Orders. Weapons Targeting this Unit are not modified for Covered or Blocked modifiers. LoS is still required to Target this Unit. If this Unit is Targeted by a Weapon with the Blast (X) trait, Units without the Flying Trait are not affected. If this Unit is in the range of a Blast effect, it does not make a Defense Roll. This Unit may not perform a SMASH Order, or be the Target of SMASH Orders. The Silhouette of a Flying Unit extends from bottom of the base to 4" above the bottom of the base, regardless of the actual Model\'s dimensions.',
     },
     [TRAIT_FLYING_SQUADRON]: {
         display_name: 'Flying Squadron',
-        description: 'This unit has all rules from the Squadron trait, with the following exceptions: All other models in the Squadron must end their deployment or movement within 6” of the Leader Model. When targeted by an engage order, If enough damage is dealt by a Weapon to destroy the Target Model, do not apply any remaining damage to another Model of the squadron. Do not add 2 to the Attack Pool of a Blast Weapon during an Engage Order against a unit with this trait.',
+        description: 'This unit has all rules from the Squadron trait, with the following exceptions: All other models in the Squadron must end their deployment or movement within 6" of the Leader Model. When targeted by an ENGAGE Order, if enough damage is dealt by a Weapon to destroy the Target Model, do not apply any remaining damage to another Model of the squadron. Do not add 2 to the Attack Pool of a Blast Weapon during an ENGAGE Order against a unit with this trait.',
         dependent_trait_ids: [TRAIT_SQUADRON],
     },
     [TRAIT_HEAVY_SUPPORT_ASSET]: {
+        // Deprecated in 1.5 — replaced by Asset Command
         display_name: 'Heavy Support Asset',
-        description: 'When a Heavy Support Asset is deployed, all units of the Heavy Support Asset must deploy within 3” of another Model from the same Heavy Support Asset. They must deploy in the same area as HE-Vs, and may not use any extended range available to other Support Assets. Note: member models of a Heavy Support Asset are not necessarily a Squadron.',
+        description: 'When a Heavy Support Asset is deployed, all units of the Heavy Support Asset must deploy within 3" of another Model from the same Heavy Support Asset.',
     },
     [TRAIT_HAULER]: {
+        // Deprecated in 1.5 — replaced by Squadron Garrison for UL HEV transport
         display_name: 'Hauler',
-        description: `This unit Garrisons a Unit from a separate Asset, and is not in its Group Command. The Garrisoned Unit must be purchased as a separate Asset, following all rules for its selection. The Garrisoned Unit must still be Activated during the turn, but it may not perform any order other than the following until it has performed this order: Muster: This is the only order that a Garrisoned Unit may perform. The Garrisoned Unit is placed within 1” of its Garrison. If the Garrisoned Unit has the Squadron Trait, place one model within 1” of the Garrison, then place the other models within 3” of that initial model. This Unit is no longer considered Garrisoned, and is now “Mustered”.`,
+        description: `This unit Garrisons a Unit from a separate Asset, and is not in its Group Command. The Garrisoned Unit must be purchased as a separate Asset, following all rules for its selection.`,
         granted_order_ids: [ORDER_INFANTRY_MUSTER],
     },
     // temporary until unit types and sizes are separate stats
@@ -182,10 +201,46 @@ export const UNIT_TRAITS = makeTraits({
         description: null,
         formatter: (name, number, type) => `${name} ${type}`,
     },
-    // [FOO]: {
-    //     display_name: '',
-    //     description: '',
-    // },
+
+    // ── Ch17 additions ──────────────────────────────────────────────────────
+
+    [TRAIT_AUXILIARY_UNIT]: {
+        display_name: 'Auxiliary Unit',
+        formatter: (name, number, type = null) => type ? `${name} (${type})` : name,
+        description: 'This Unit will Defend against ENGAGE and SMASH Orders as if it were the Weight Class indicated by (X). Attack Pools against this Unit are never modified for Side or Rear Arc. This Unit does not suffer Critical Damage. This Unit never suffers or benefits from Fragile Internals or Backup Systems Engage. This Unit will count as the Weight Class indicated by (X) when making Rolls for other Weapons, Upgrades, and other traits when relevant. This Unit may never perform a SMASH Order, unless it has a weapon with the Smasher (X,Y) Trait. This Unit may never Overdrive. If this Unit would be marked with a Redline Marker from an effect, it suffers 1 point of Structure damage, but do not mark it with a Redline Marker. Units with the Auxiliary Unit (X) Trait do not count as HE-Vs unless otherwise specified.',
+    },
+    [TRAIT_VULNERABLE]: {
+        display_name: 'Vulnerable',
+        description: 'This Unit receives full Damage to Armor and Structure from Weapons or effects with the Light trait.',
+    },
+    [TRAIT_YIELDING]: {
+        display_name: 'Yielding',
+        description: 'Any Model without the Yielding trait may move through any Model with the Yielding trait. If such a Model ends its move on top of a Model with the Yielding trait, move any Models with the Yielding trait the minimum distance possible to permit this.',
+    },
+    [TRAIT_INFANTRY]: {
+        display_name: 'Infantry',
+        description: 'When Infantry Units are activated, do not select their orders from the usual list. Instead, select two orders from the list below: MUSTER (see Garrison rules), MOVE (as normal, except this unit may perform this order twice in one Activation), LOCK ON (as normal), ENGAGE (as normal), DIG IN (this unit counts as being in Rough Terrain until the beginning of their next activation). Infantry suffers a -1 penalty to Defense Rolls when not in Rough or Covering Terrain. Infantry Units count as 0 tons for Scoring Objectives or Agendas.',
+    },
+    [TRAIT_MINELAYER]: {
+        display_name: 'Minelayer',
+        formatter: (name, number, type = null) => type ? `${name} (${type})` : name,
+        description: 'Immediately before or after resolving (X) Order, place one friendly Mine Drone Token within 3" of the Active Model and not within 6" of another friendly Mine Drone Token.',
+    },
+    [TRAIT_SMASHER]: {
+        display_name: 'Smasher',
+        formatter: (name, number, type = null) => type ? `${name} (${type}, ${number})` : name,
+        description: 'This Unit is permitted to make the SMASH Order, even if it has the Auxiliary Unit Trait. The Unit is considered of Weight Class (X) when making a SMASH Order. Add (Y) dice to the Attack Pool when performing a SMASH Order.',
+    },
+    [TRAIT_GUIDANCE_SUITE]: {
+        display_name: 'Guidance Suite',
+        formatter: (name, number, type = null) => type ? `${name} (${type})` : name,
+        description: 'At the beginning or end of the Order listed in (X), select one enemy unit within LOS of this Model. Place a Guidance Marker on this unit. When a Unit with a Guidance Marker is the Target of an ENGAGE Order, the Unit performing the ENGAGE selects one of the following effects: (a) All weapons used in this ENGAGE Order count as having the benefit of a LOCK ON Order. (b) One weapon used in this ENGAGE Order may have +2 added to its Damage Rating. When the ENGAGE Order is complete, remove the Guidance Marker. If the Marker has not been otherwise removed, remove the Marker when this Unit is activated again.',
+    },
+    [TRAIT_SQUADRON_GARRISON]: {
+        display_name: 'Squadron Garrison',
+        formatter: (name, number, type = null) => type ? `${name}(${number} ${type})` : name,
+        description: 'This unit follows all of the rules of the Garrison (X) trait, with the following exceptions: The Unit (not Models) with the Squadron Garrison (X) trait carry the Garrisoned Unit collectively. Select one member Model of the Unit to count as the Garrison when the Garrisoned Unit performs the MUSTER Order. If the Unit with this trait loses a member Model, its Commander removes Garrisoned models proportionately, rounding up the number of Models removed.',
+    },
 });
 
 export function unitTraitDisplayName({id, number, type}) {
