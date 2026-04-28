@@ -193,6 +193,7 @@ export const useMechStore = defineScopeableStore('mech', ({scope}) => {
                 id,
                 upgrade_id: upgradeId,
                 display_order: null,
+                assigned_weapon_id: null,
             };
             mech.upgrades.push(upgrade);
             upgrade.display_order = findItemIndex(mech.upgrades, upgrade);
@@ -752,11 +753,22 @@ export const useMechStore = defineScopeableStore('mech', ({scope}) => {
 
             const upgradeId = upgradeAttachment.upgrade_id;
             const info = getUpgradeInfo(mechId, upgradeId);
+            const upgradeData = MECH_UPGRADES[upgradeId];
 
             return {
                 id: mechUpgradeAttachmentId,
+                assigned_weapon_id: upgradeAttachment.assigned_weapon_id ?? null,
+                requires_weapon_assignment: upgradeData?.requires_weapon_assignment ?? false,
                 ...info,
             };
+        }
+
+        function setMechUpgradeAssignedWeapon(mechId, upgradeAttachmentId, weaponId) {
+            const mech = getMech(mechId);
+            const attachment = findById(mech.upgrades, upgradeAttachmentId);
+            if (attachment) {
+                attachment.assigned_weapon_id = weaponId || null;
+            }
         }
 
         function getMechAvailableUpgradesInfo(mechId) {
@@ -959,6 +971,7 @@ export const useMechStore = defineScopeableStore('mech', ({scope}) => {
             removeMechWeaponAttachment,
             removeInvalidMechAttachments,
             removeMechUpgradeAttachment,
+            setMechUpgradeAssignedWeapon,
             addMechUpgradeAttachment,
             addMechWeaponAttachment,
             moveMechWeaponAttachment,
