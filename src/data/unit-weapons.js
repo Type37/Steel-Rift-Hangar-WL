@@ -37,6 +37,7 @@ export const TANK_MISSILES = 'TANK_MISSILES';
 export const TANK_HOWITZER = 'TANK_HOWITZER';
 export const MISSILE_POD = 'MISSILE_POD';
 export const CLUSTER_ROCKETS = 'CLUSTER_ROCKETS';
+export const LV_AUTO_CANNON = 'LV_AUTO_CANNON';
 export const UL_MELEE_WEAPON = 'UL_MELEE_WEAPON';
 export const UL_GRENADES = 'UL_GRENADES';
 export const UL_INCINERATORS = 'UL_INCINERATORS';
@@ -237,6 +238,14 @@ export const UNIT_WEAPONS = makeFrozenStaticListIds({
             trait(TRAIT_BLAST, 3),
             trait(TRAIT_LIGHT),
             trait(TRAIT_LIMITED, 2),
+        ],
+    }),
+    [LV_AUTO_CANNON]: makeWeapon({
+        display_name: 'Auto-Cannon',
+        damage: 2,
+        traits: [
+            trait(TRAIT_SHORT, 12),
+            trait(TRAIT_KINETIC),
         ],
     }),
     [UL_MELEE_WEAPON]: makeWeapon({
