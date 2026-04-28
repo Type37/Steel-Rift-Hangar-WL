@@ -55,12 +55,12 @@ export const GAME_SIZES = makeFrozenStaticListIds({
     [GAME_SIZE_WAR]: {
         min_tons: 350,
         max_support_assets: 4,
-        max_teams: 3,
-        max_secondary_agendas: 3,
+        max_teams: 4,
+        max_secondary_agendas: 4,
         max_team_sizes: {
-            [TEAM_SIZE_SMALL]: 1,
+            [TEAM_SIZE_SMALL]: 0,
             [TEAM_SIZE_MEDIUM]: 2,
-            [TEAM_SIZE_LARGE]: 1,
+            [TEAM_SIZE_LARGE]: 2,
         },
     },
 });
