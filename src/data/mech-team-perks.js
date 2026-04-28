@@ -55,6 +55,11 @@ export const TEAM_PERK_MOVE_THROUGH_TEAM = 'TEAM_PERK_MOVE_THROUGH_TEAM';
 export const TEAM_PERK_EXTRA_SUPPORT_ASSET_SLOT = 'TEAM_PERK_EXTRA_SUPPORT_ASSET_SLOT';
 export const TEAM_PERK_COMBINED_ACTIVATION = 'TEAM_PERK_COMBINED_ACTIVATION';
 
+// Networked AI Team perks
+export const TEAM_PERK_DRONE_MULTI = 'TEAM_PERK_DRONE_MULTI';
+export const TEAM_PERK_DRONE_NETWORK_SHARE = 'TEAM_PERK_DRONE_NETWORK_SHARE';
+export const TEAM_PERK_NETWORKED_POSITION = 'TEAM_PERK_NETWORKED_POSITION';
+
 export const MECH_TEAM_PERKS = makeTeamPerks({
     [TEAM_PERK_0_SLOT_TARGET_DESIGNATORS]: makeMini(upgradeDisplayName(TARGET_DESIGNATOR)),
     [TEAM_PERK_0_TON_TARGET_DESIGNATORS]: makeLightWeight(upgradeDisplayName(TARGET_DESIGNATOR)),
@@ -181,6 +186,21 @@ export const MECH_TEAM_PERKS = makeTeamPerks({
     [TEAM_PERK_MELEE_PLUS_ONE]: {
         display_name: 'Melee +1',
         description: 'Melee (X) weapons add +1 to their X value.',
+        visible_on_card: true,
+    },
+    [TEAM_PERK_DRONE_MULTI]: {
+        display_name: 'Drone Proliferation',
+        description: 'All Companion Drones may be taken more than once on each member HE-V (ignore the restriction on the number of Compact upgrades). No Weapon or Upgrade on an HE-V may be assigned more than one Companion Drone.',
+        visible_on_card: true,
+    },
+    [TEAM_PERK_DRONE_NETWORK_SHARE]: {
+        display_name: 'Network Share',
+        description: 'If a Weapon or Upgrade on this HE-V is assigned to a Companion Drone, and any other member of this team has the same Weapon or Upgrade assigned to a Companion Drone, this Weapon or Upgrade receives the benefit of all Companion Drones assigned to the same Weapon or Upgrade in this team.',
+        visible_on_card: true,
+    },
+    [TEAM_PERK_NETWORKED_POSITION]: {
+        display_name: 'Network Position',
+        description: 'When this HE-V performs an ENGAGE Order, if another member of this team has LoS to the Target and is within 12" of this HE-V, this HE-V may be counted as in either member\'s position for the purposes of determining Side or Rear modifiers for that ENGAGE Order.',
         visible_on_card: true,
     },
     [TEAM_PERK_MOVE_THROUGH_TEAM]: {
