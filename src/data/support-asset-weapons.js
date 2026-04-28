@@ -9,7 +9,7 @@ export const ORBITAL_LASER = 'ORBITAL_LASER';
 export const SUPPORT_ASSET_WEAPONS = makeFrozenStaticListIds({
     [ARTILLERY_BARRAGE]: {
         display_name: 'Artillery Barrage',
-        description: 'Once per Game Round, instead of activating or Overdriving a Unit, a Commander may call down an Artillery Barrage from off-table. This Barrage is an Engage Order. The target must be in Line of Sight of a Model with a Target Designator Marker or this Support Asset may not be used.',
+        description: 'Select an enemy Unit within LoS of a friendly Unit with a Target Designator Marker, and remove the friendly Unit\'s Marker. Perform an ENGAGE Order Targeting the enemy Unit. Do not apply modifiers for Side or Rear Arc, Covered, Blocking, Secondary Target or Bypassing Shot. LoS is drawn from the top of the Target Model\'s Silhouette for any other purposes.',
         cost: 10,
         off_table_weapon: {
             damage: 4,
@@ -21,10 +21,10 @@ export const SUPPORT_ASSET_WEAPONS = makeFrozenStaticListIds({
     },
     [MASS_DRIVER]: {
         display_name: 'Mass Driver',
-        description: 'Once per Game Round, instead of activating or Overdriving a Unit, a Commander may drop a tungsten mass rod from orbit. This is an Engage Order. Use the center of the Active Commander’s Deployment Edge as the origin of the attack. The target must be in Line of Sight of a Model with a Target Designator Marker or this Support Asset may not be used. Treat the size of the attacker as Ultra-Heavy for the purposes of the Kinetic trait.',
+        description: 'Select an enemy Unit within LoS of a friendly Unit with a Target Designator Marker, and remove the friendly Unit\'s Marker. Perform an ENGAGE Order Targeting the enemy Unit. Do not apply modifiers for Bypassing Shot or Secondary Target. LoS is drawn from any point on the Active Commander\'s Deployment Edge or Corner, but is not blocked by Blocking Terrain. The Weapon counts as Ultraheavy for the purposes of Kinetic.',
         cost: 10,
         off_table_weapon: {
-            damage: 6,
+            damage: 7,
             traits: [
                 trait(TRAIT_KINETIC),
                 trait(TRAIT_LIMITED, 3),
@@ -32,18 +32,19 @@ export const SUPPORT_ASSET_WEAPONS = makeFrozenStaticListIds({
         },
     },
     [MINE_DRONE_BARRAGE]: {
-        display_name: 'Mine-Drone Barrage',
-        description: 'After Generating Terrain, but before Setting Up Forces, the Commander with this Support Asset may place Mine-Drone tokens (25mm) on the Battlefield not within 12” of an enemy deployment edge, and not within 6” of another friendly Mine-Drone token.',
+        display_name: 'Mine Drone Barrage',
+        description: 'Select 3 points on the table within LoS of one friendly Unit with a Target Designator Marker, and remove the friendly Unit\'s Marker. Place a Mine Drone Token on each point. No Mine Drone Token may be placed within 6\" of an existing Mine Drone Token. This Support Asset has the Limited (3) trait (i.e. a total of 9 Mine Drone Tokens placed during the game).',
         cost: 10,
         off_table_weapon: {
             traits: [
                 trait(TRAIT_MINE_TOKENS, 3),
+                trait(TRAIT_LIMITED, 3),
             ],
         },
     },
     [ORBITAL_LASER]: {
         display_name: 'Orbital Laser',
-        description: 'Once per Game Round, instead of activating or Overdriving a Unit, a Commander may request an orbital laser strike. This is an Engage Order. The target must be in the Line of Sight of a Model with a Target Designator Marker or this Support Asset may not be used. Line of Sight for this Attack is drawn from the Target Model to itself (therefore it is never obstructed).',
+        description: 'Select an enemy Unit within LoS of a friendly Unit with a Target Designator Marker, and remove the friendly Unit\'s Marker. Perform an ENGAGE Order Targeting the enemy Unit. Do not apply modifiers for Side or Rear Arc, Covered, Blocking, Secondary Target or Bypassing Shot. LoS is drawn from the top of the Target Model\'s Silhouette for any other purposes.',
         cost: 10,
         off_table_weapon: {
             damage: 3,
