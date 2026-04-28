@@ -1,72 +1,101 @@
 <script setup>
 import {storeToRefs} from 'pinia';
 import {useSecondaryAgendaStore} from '../../store/secondary-agenda-store.js';
-import {BCollapse} from 'bootstrap-vue-next';
-import {ref} from 'vue';
-import SecondaryAgendaDefinition from './SecondaryAgendas/SecondaryAgendaDefinition.vue';
 
 const {
-  universal_secondary_agendas,
-  secondary_agendas,
+  all_faction_agendas,
+  all_team_agendas,
+  all_universal_agendas,
   max_secondary_agendas,
 } = storeToRefs(useSecondaryAgendaStore());
-
-const universalOpen = ref(false);
-const agendaOpen = ref(false);
 </script>
 <template>
   <div class="card">
-    <div
-        class="card-header d-flex text-bg-primary"
-        style="cursor:pointer"
-        @click="agendaOpen = !agendaOpen"
-    >
-      <div class="flex-grow-1 py-1 ps-2">
-        <span class="fw-bold">Secondary Agendas</span>
-        <span class="ms-1 text-white-50">(Choose {{ max_secondary_agendas }} at game start)</span>
-      </div>
-      <div class="py-1 pe-1">
-        <span class="material-symbols-outlined" style="font-size:1.1rem; vertical-align:middle">
-          {{ agendaOpen ? 'expand_less' : 'expand_more' }}
-        </span>
-      </div>
+    <div class="card-header text-bg-primary py-2 ps-3">
+      <span class="fw-bold">Secondary Agendas</span>
+      <span class="ms-1 text-white-50">(Choose {{ max_secondary_agendas }} at game start)</span>
     </div>
 
-    <BCollapse v-model="agendaOpen">
-      <div class="card-body">
-        <SecondaryAgendaDefinition
-            v-for="item in secondary_agendas"
-            :key="item.display_name"
-            :type-display-name="item.type_display_name"
-            :subtype-display-name="item.subtype_display_name"
-            :display-name="item.display_name"
-            :description="item.description"
-        />
+    <div class="card-body pb-2">
 
-        <div class="mt-2">
-          <button
-              class="btn btn-sm btn-outline-secondary w-100 text-start"
-              @click.stop="universalOpen = !universalOpen"
-          >
-            <span class="material-symbols-outlined" style="font-size:0.9rem; vertical-align:middle">
-              {{ universalOpen ? 'expand_less' : 'expand_more' }}
-            </span>
-            Universal Agendas
-          </button>
-          <BCollapse v-model="universalOpen">
-            <div class="mt-2">
-              <SecondaryAgendaDefinition
-                  v-for="item in universal_secondary_agendas"
-                  :key="item.display_name"
-                  :type-display-name="item.type_display_name"
-                  :subtype-display-name="item.subtype_display_name"
-                  :display-name="item.display_name"
-                  :description="item.description"
-              />
-            </div>
-          </BCollapse>
+      <!-- Faction -->
+      <div class="agenda-section-heading">Faction</div>
+      <div
+          v-for="item in all_faction_agendas"
+          :key="item.id"
+          :class="['agenda-entry', { 'agenda-unqualified': !item.qualified }]"
+      >
+        <div class="agenda-name">
+          {{ item.display_name }}
+          <span class="agenda-source">({{ item.subtype_display_name }})</span>
         </div>
+        <div class="agenda-desc">{{ item.description }}</div>
       </div>
-    </BCollapse>
+
+      <!-- Team -->
+      <div class="agenda-section-heading mt-3">Team</div>
+      <div
+          v-for="item in all_team_agendas"
+          :key="item.id"
+          :class="['agenda-entry', { 'agenda-unqualified': !item.qualified }]"
+      >
+        <div class="agenda-name">
+          {{ item.display_name }}
+          <span class="agenda-source">({{ item.type_display_name }})</span>
+        </div>
+        <div class="agenda-desc">{{ item.description }}</div>
+      </div>
+
+      <!-- Universal -->
+      <div class="agenda-section-heading mt-3">Universal</div>
+      <div
+          v-for="item in all_universal_agendas"
+          :key="item.id"
+          :class="['agenda-entry', { 'agenda-unqualified': !item.qualified }]"
+      >
+        <div class="agenda-name">{{ item.display_name }}</div>
+        <div class="agenda-desc">{{ item.description }}</div>
+      </div>
+
+    </div>
   </div>
 </template>
+
+<style scoped>
+.agenda-section-heading {
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bs-secondary-color);
+  border-bottom: 1px solid var(--bs-border-color);
+  padding-bottom: 2px;
+  margin-bottom: 6px;
+}
+
+.agenda-entry {
+  margin-bottom: 8px;
+}
+
+.agenda-unqualified {
+  opacity: 0.38;
+}
+
+.agenda-name {
+  font-weight: 600;
+  font-size: 0.85rem;
+  line-height: 1.3;
+}
+
+.agenda-source {
+  font-weight: 400;
+  color: var(--bs-secondary-color);
+}
+
+.agenda-desc {
+  font-size: 0.8rem;
+  color: var(--bs-secondary-color);
+  line-height: 1.4;
+}
+</style>
