@@ -108,7 +108,7 @@ const notAvailableMessage = computed(() => validationStore.getNotAvailableToTeam
           :validation-message="notAvailableMessage"
       />
       <MechArmorUpgrades
-          label="Armor Upgrades"
+          label="Defensive Config"
           v-model="mech.armor_upgrade_id"
           :mech-id="mech.id"
       />
