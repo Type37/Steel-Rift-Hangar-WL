@@ -247,3 +247,7 @@ body[data-bs-theme="dark"] {
   top: 0;
   z-index: 99;
 }
+
+.dropdown-table .dropdown-menu {
+  min-width: 620px;
+}
