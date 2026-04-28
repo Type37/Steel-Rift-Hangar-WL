@@ -24,6 +24,9 @@ export const HIGH_SPEED_SERVOS = 'HIGH_SPEED_SERVOS';
 export const NEURAL_INPUT = 'NEURAL_INPUT';
 export const NITRO_BOOST = 'NITRO_BOOST';
 export const COMBAT_SHIELD = 'COMBAT_SHIELD';
+export const TARGETING_SUPPORT_DRONE = 'TARGETING_SUPPORT_DRONE';
+export const TACTICAL_AWARENESS_DRONE = 'TACTICAL_AWARENESS_DRONE';
+export const MINE_DIRECTOR_DRONE = 'MINE_DIRECTOR_DRONE';
 
 export const MECH_UPGRADES = makeFrozenStaticListIds({
     [ANTI_MISSILE_SYSTEM]: makeUpgrade({
@@ -201,6 +204,40 @@ export const MECH_UPGRADES = makeFrozenStaticListIds({
             [SIZE_ULTRA]: 5,
         },
         limited_size_ids: [SIZE_HEAVY, SIZE_ULTRA],
+    }),
+    [TARGETING_SUPPORT_DRONE]: makeUpgrade({
+        display_name: 'Targeting Support Drone',
+        description: 'Assign a Weapon on this HE-V to this Drone. When using the Weapon in an ENGAGE Order, this Weapon gains the benefits of having been preceded by a LOCK ON Order. If the Target has Electronic Countermeasures, they prevent the LOCK ON Order benefits.',
+        cost: 1,
+        slots: 0,
+        traits: [
+            trait(TRAIT_COMPACT),
+        ],
+        companion_drone: true,
+        companion_drone_assigns_to: 'weapon',
+    }),
+    [TACTICAL_AWARENESS_DRONE]: makeUpgrade({
+        display_name: 'Tactical Awareness Drone',
+        description: 'Assign a Weapon on this HE-V to this Drone. When selecting a Unit as a Target with the Weapon, Line of Sight may be drawn from any part of your silhouette, not just the nearest point on the front 180° Arc. This Weapon does not suffer the Secondary Target or Bypass Shot penalties.',
+        cost: 1,
+        slots: 0,
+        traits: [
+            trait(TRAIT_COMPACT),
+        ],
+        companion_drone: true,
+        companion_drone_assigns_to: 'weapon',
+    }),
+    [MINE_DIRECTOR_DRONE]: makeUpgrade({
+        display_name: 'Mine Director Drone',
+        description: 'Assign a Minefield Drone Carrier System equipped by this HE-V to this Drone. Mine Drone Tokens placed with this HE-V's trait may be placed within 6" of the Active Model. Once per turn during this HE-V's Activation, one Mine Drone Token within 12" of this HE-V may be placed within 6" of its current position. These abilities may not be used while this HE-V has a Redline Marker.',
+        cost: 1,
+        slots: 0,
+        traits: [
+            trait(TRAIT_COMPACT),
+        ],
+        companion_drone: true,
+        companion_drone_assigns_to: 'upgrade',
+        companion_drone_required_upgrade_id: 'MINEFIELD_DRONE_CARRIER_SYSTEM',
     }),
 });
 
