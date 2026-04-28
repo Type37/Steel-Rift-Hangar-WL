@@ -1,8 +1,6 @@
 <script setup>
 import {storeToRefs} from 'pinia';
 import {useSecondaryAgendaStore} from '../../store/secondary-agenda-store.js';
-import {BModal} from 'bootstrap-vue-next';
-import {ref} from 'vue';
 import SecondaryAgendaDefinition from './SecondaryAgendas/SecondaryAgendaDefinition.vue';
 
 const {
@@ -10,8 +8,6 @@ const {
   secondary_agendas,
   max_secondary_agendas,
 } = storeToRefs(useSecondaryAgendaStore());
-
-const secondaryAgendaModal = ref(false);
 </script>
 <template>
   <div class="card">
@@ -22,11 +18,6 @@ const secondaryAgendaModal = ref(false);
         </span>
         (Choose {{ max_secondary_agendas }} at game start)
       </div>
-      <div class="tex-end">
-        <button class="btn btn-secondary btn-sm" @click="secondaryAgendaModal = !secondaryAgendaModal">
-          Show Universal Secondary Agendas
-        </button>
-      </div>
     </div>
     <div class="card-body">
       <SecondaryAgendaDefinition
@@ -36,22 +27,18 @@ const secondaryAgendaModal = ref(false);
           :display-name="item.display_name"
           :description="item.description"
       />
+
+      <template v-if="universal_secondary_agendas.length">
+        <hr class="my-2"/>
+        <div class="small fw-bold text-muted mb-2">Universal Agendas</div>
+        <SecondaryAgendaDefinition
+            v-for="item in universal_secondary_agendas"
+            :type-display-name="item.type_display_name"
+            :subtype-display-name="item.subtype_display_name"
+            :display-name="item.display_name"
+            :description="item.description"
+        />
+      </template>
     </div>
   </div>
-  <BModal
-      v-model="secondaryAgendaModal"
-      centered
-      title="Universal Secondary Agendas"
-      size="lg"
-  >
-    <template #cancel>&nbsp;</template>
-    <SecondaryAgendaDefinition
-        v-for="item in universal_secondary_agendas"
-        :type-display-name="item.type_display_name"
-        :subtype-display-name="item.subtype_display_name"
-        :display-name="item.display_name"
-        :description="item.description"
-    />
-
-  </BModal>
 </template>
