@@ -44,8 +44,26 @@ provide('color_mode', mode);
         </div>
         <div>Steel Rift: Hangar <a href="https://github.com/deathraydesigns/Steel-Rift-Hangar" class="link-primary">GitHub
           Project</a></div>
+        <div class="mt-2 small">
+          Updated unofficially and without permission to 1.5 by
+          <a href="https://linktr.ee/warlore" target="_blank" class="warlore-credit">WarLore</a>
+        </div>
       </div>
     </div>
 
   </div>
 </template>
+
+<style>
+.warlore-credit {
+  font-family: 'VCR OSD Mono', monospace;
+  color: #FFD700;
+  background-color: #000;
+  padding: 0 4px;
+  text-decoration: none;
+}
+.warlore-credit:hover {
+  color: #FFF176;
+  background-color: #000;
+}
+</style>
