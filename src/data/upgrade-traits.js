@@ -14,7 +14,7 @@ export const UPGRADE_TRAITS = makeTraits({
     },
     [TRAIT_DASH]: {
         display_name: 'Dash',
-        description: 'This Unit may take the Dash order',
+        description: 'This Unit may be issued the DASH Order. DASH: This Unit may move up to (X)", ignoring Rough Terrain. At the end of this DASH Order, this Unit may immediately resolve a SMASH Order or ENGAGE Order. This secondary Order does not count towards the normal 2 Orders a Unit can perform during its Activation. DASH Orders count as a MOVE Order for the purposes of determining movement based bonuses for SMASH Orders.',
         formatter: inchFormater,
         granted_order_ids: [ORDER_DASH],
     },
