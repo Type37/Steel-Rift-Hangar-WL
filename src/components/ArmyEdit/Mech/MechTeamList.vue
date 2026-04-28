@@ -31,15 +31,16 @@ function addGeneralMech() {
       v-show="baseMechCount"
   />
 
-  <div class="text-end">
+  <div class="text-end mt-2">
     <BButton
-        variant="secondary"
-        class="me-1"
+        variant="primary"
+        size="lg"
+        class="me-1 add-hev-cta"
         @click="addGeneralMech"
         v-if="!baseMechCount"
     >
-      Add
-      <Icon name="hev"/>
+      <Icon name="hev" class="me-1"/>
+      Add HE-V
     </BButton>
     <BtnAddTeam/>
   </div>
