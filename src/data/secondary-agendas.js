@@ -14,6 +14,7 @@ export const SA_BRAWLERS = 'SA_BRAWLERS';
 export const SA_ENFORCERS = 'SA_ENFORCERS';
 export const SA_TITAN_KILLERS = 'SA_TITAN_KILLERS';
 export const SA_COMBINED_ARMS_ASSAULT = 'SA_COMBINED_ARMS_ASSAULT';
+export const SA_EXPAND_THE_NETWORK = 'SA_EXPAND_THE_NETWORK';
 
 export const SECONDARY_AGENDAS = makeSecondaryAgendas({
     [SA_MISSION_MOMENTUM]: {
@@ -70,6 +71,10 @@ export const SECONDARY_AGENDAS = makeSecondaryAgendas({
         display_name: 'Enforcers',
         description: 'You may select this Secondary Agenda if your Force contains two or more Heavy HE-Vs. Every time a Heavy HE-V Destroys an HE-V or Unit with the Fortification trait, mark a Kill. If Heavy HE-Vs you control have earned 3 or more Kills when you check for Victory, and at least one of your Heavy HE-Vs is not Destroyed, score 1 VP.',
         is_universal: true,
+    },
+    [SA_EXPAND_THE_NETWORK]: {
+        display_name: 'Expand the Network',
+        description: 'When checking for Victory, if a) at least 2 member Units of the team are not Destroyed and b) each remaining member of the team is in a different quarter of the Mission Area, score 1 VP.',
     },
     [SA_COMBINED_ARMS_ASSAULT]: {
         display_name: 'Combined Arms Assault',
