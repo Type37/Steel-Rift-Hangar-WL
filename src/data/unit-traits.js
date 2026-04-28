@@ -84,7 +84,6 @@ export const UNIT_TRAITS = makeTraits({
     [TRAIT_MINE_SWEEPER]: {
         display_name: 'Mine Sweeper',
         description: 'A Unit with this Trait may not be Targeted by a Mine Drone Token. This Unit may ENGAGE Mine Drone Tokens as if it had the Mine Drone Tracking Munitions Upgrade.',
-        granted_order_ids: [ORDER_CLEAR_MINEFIELD],
     },
     [TRAIT_SHIELD_PROJECTOR]: {
         display_name: 'Shield Projector',
