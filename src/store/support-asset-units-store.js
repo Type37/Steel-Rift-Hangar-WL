@@ -224,14 +224,18 @@ export const useSupportAssetUnitsStore = defineScopeableStore('support-asset-uni
         }
 
         function getUnitAttachmentAllGarrisonChoicesInfo(unitAttachmentId) {
-            const unitDef = getUnitAttachmentDef(unitAttachmentId);
+            const unitAttachment = getUnitAttachment(unitAttachmentId);
 
             let garrisonUnitIds = [];
-            each(unitDef.vehicles, vehicleDef => {
-                if (vehicleDef.garrison_choice_unit_ids) {
+            each(unitAttachment.vehicles, vehicleAttachment => {
+                const vehicleDef = getUnitAttachmentVehicleDef(unitAttachmentId, vehicleAttachment.id);
+                if (vehicleDef && vehicleDef.garrison_choice_unit_ids) {
                     garrisonUnitIds = garrisonUnitIds.concat(vehicleDef.garrison_choice_unit_ids);
                 }
             });
+
+            // Deduplicate — same infantry type can appear across multiple garrison vehicles
+            garrisonUnitIds = [...new Set(garrisonUnitIds)];
 
             return garrisonUnitIds.map(unitId => {
                 return _getGarrisonUnitInfo(unitId);
