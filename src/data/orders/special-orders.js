@@ -4,10 +4,10 @@ export const ORDER_DASH = 'ORDER_DASH';
 export const SPECIAL_ORDERS_DATA = {
     [ORDER_CLEAR_MINEFIELD]: {
         display_name: 'Clear Minefield',
-        description: 'Target a Mine Token of any type within 8” and Line of Sight of this Unit. Roll 1D6, adding +1 for each additional model with the Minesweeper Trait in this Unit. on a roll of 4+, the Mine Token is neutralized and removed from play.',
+        description: 'This Unit may ENGAGE Mine Drone Tokens as if it had the Mine Drone Tracking Munitions Upgrade.',
     },
     [ORDER_DASH]: {
         display_name: 'Dash',
-        description: 'This Unit may move up to X” ignoring rough terrain and may end facing any direction. At the end of this Dash Order, this Unit may execute a Smash Order or Engage Order. This secondary order does not count towards the normal 2 orders a Unit can take during its activation. Dash orders count as a Move Order for the purposes of determining movement based bonuses for Smash Orders.',
+        description: 'This Unit may move up to (X)", ignoring Rough Terrain. At the end of this DASH Order, this Unit may immediately resolve a SMASH Order or ENGAGE Order. This secondary Order does not count towards the normal 2 Orders a Unit can perform during its Activation. DASH Orders count as a MOVE Order for the purposes of determining movement based bonuses for SMASH Orders.',
     },
 };
