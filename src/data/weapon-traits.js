@@ -44,7 +44,7 @@ export const WEAPON_TRAITS = makeTraits({
     },
     [TRAIT_FLAK]: {
         display_name: 'Flak',
-        description: 'When a Unit with this Weapon is Targeted by a Weapon with the word "Missile" or "Rocket" in the name, and the Active Unit is in this Model's front 180°, reduce the Attack Pool from that Weapon by 1. If this Unit is Targeted by a Mine Drone, reduce the Attack Pool from that effect by 1.',
+        description: 'When a Unit with this Weapon is Targeted by a Weapon with the word "Missile" or "Rocket" in the name, and the Active Unit is in this Model\'s front 180°, reduce the Attack Pool from that Weapon by 1. If this Unit is Targeted by a Mine Drone, reduce the Attack Pool from that effect by 1.',
     },
     [TRAIT_FRAG]: {
         display_name: 'Frag',
@@ -89,7 +89,7 @@ export const WEAPON_TRAITS = makeTraits({
     },
     [TRAIT_BULKY]: {
         display_name: 'Bulky',
-        description: 'This Weapon/Upgrade takes two of an HE-V's Weapon/Upgrade Slots to equip, rather than one.',
+        description: 'This Weapon/Upgrade takes two of an HE-V\'s Weapon/Upgrade Slots to equip, rather than one.',
     },
     [TRAIT_CONCUSSIVE]: {
         display_name: 'Concussive',
@@ -102,7 +102,7 @@ export const WEAPON_TRAITS = makeTraits({
     },
     [TRAIT_PARRY]: {
         display_name: 'Parry',
-        description: 'Once per ENGAGE or SMASH Order where the Active Unit is in this Unit's LoS, this Unit may re-roll up to 2 Defense Dice.',
+        description: 'Once per ENGAGE or SMASH Order where the Active Unit is in this Unit\'s LoS, this Unit may re-roll up to 2 Defense Dice.',
     },
     [TRAIT_REACH]: {
         display_name: 'Reach',
