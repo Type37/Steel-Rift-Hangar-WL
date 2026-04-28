@@ -33,7 +33,7 @@ export const MECH_ARMOR_UPGRADES = makeFrozenStaticListIds({
         card_upgrade_display_name: 'Reactive Armor',
         cost: 1,
         slots: 1,
-        description: 'Reduce the Attack Pool for Missile and Rocket Pack attacks by 1, to a minimum of 1.',
+        description: 'Reduce the Attack Pool of Weapons with "Missile" or "Rocket" in the name Targeting this Unit by 1, to a minimum of 1.',
     }),
     [CERAMIC_ARMOR_UPGRADE]: makeArmorUpgrade({
         display_name: 'Ceramic',
@@ -50,14 +50,14 @@ export const MECH_ARMOR_UPGRADES = makeFrozenStaticListIds({
     [CLAYMORE_ARMOR_UPGRADE]: makeArmorUpgrade({
         display_name: 'Claymore',
         card_upgrade_display_name: 'Claymore Armor',
-        description: 'Reduce the Attack Pool of incoming Smash Orders by 1 to a minimum of 1. If a Unit equipped with Claymore Armor takes structure damage from a Smash Order, the attacking Unit is immediately targeted by an Engage Order with a damage value of (2/2/3/3) and the Frag trait.',
+        description: 'Reduce the Attack Pool of incoming SMASH Orders by 1 to a minimum of 1. If a Unit equipped with Claymore Armor takes Structure Damage from a SMASH Order, the Active Unit is immediately targeted by an ENGAGE Order with a damage value of (2/2/3/3) and the Frag trait.',
         cost: 1,
         slots: 1,
     }),
     [EXTRA_PLATING_ARMOR_UPGRADE]: makeArmorUpgrade({
         display_name: 'Extra Plating',
         card_upgrade_display_name: 'Extra Plating (+2 applied)',
-        description: 'This HE-V gains 2 additional Armor ',
+        description: 'This Unit gains 2 additional Armor.',
         cost: 1,
         slots: 1,
         armor_mod: 2,
@@ -65,7 +65,7 @@ export const MECH_ARMOR_UPGRADES = makeFrozenStaticListIds({
     [HEAVY_PLATING_ARMOR_UPGRADE]: makeArmorUpgrade({
         display_name: 'Heavy Plating',
         card_upgrade_display_name: 'Heavy Plating (+4 applied)',
-        description: 'This HE-V gains 4 additional Armor ',
+        description: 'This Unit gains 4 additional Armor.',
         cost: 2,
         slots: 1,
         armor_mod: 4,
