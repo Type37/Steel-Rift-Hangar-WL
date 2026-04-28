@@ -8,6 +8,6 @@ export const MOBILITY_ORDER_DATA = {
     },
     [ORDER_HUNKER_DOWN]: {
         display_name: 'Hunker Down',
-        description: 'Place a ‘Hunkered Down’ Token next to the HE-V. While this HE-V is ‘Hunkered Down’ any attacks on this Unit originating from attackers within Line of Sight must count the Hunkered Unit as being obscured by Covering Terrain. If the Hunkered Unit was already obscured by Covering Terrain, it must be treated as being obscured by Blocking Terrain. There is no additional benefit to a Unit already obscured by Blocking Terrain. The ‘Hunkered Down’ Token is removed if this Unit performs any Order other than an Engage Order, or is the target of a Smash Order.',
+        description: 'Move this HE-V following all rules for a MOVE Order, except the move distance is 10"/8"/6"/4". This Order counts as a MOVE Order. This Unit receives a Hunkered Down Marker next to the HE-V. When this Unit is the Target of an ENGAGE Order, the Attack Pool is modified for Covered. If this Unit would already benefit from Covered, modify for Blocked. If this Unit would already benefit from Blocked, there is no further modification. The Hunkered Down Marker is removed if this Unit is moved or placed in any way, or is the Target of a SMASH Order.',
     },
 };
