@@ -31,7 +31,7 @@ export const WEAPON_TRAITS = makeTraits({
     },
     [TRAIT_BLAST]: {
         display_name: 'Blast',
-        description: 'All Units (friend or foe) within (X)" of the Target Model must also make a Defense Roll. The total Attack Pool is equal to the total Attack Pool for this Weapon against the Target. Note: The Defense Roll for each Unit is based on that Unit's Weight Class, as usual for Engage Defense Rolls. Note: Units making these Defense Rolls are not considered \"Targeted\".',
+        description: 'All Units (friend or foe) within (X)" of the Target Model must also make a Defense Roll. The total Attack Pool is equal to the total Attack Pool for this Weapon against the Target. Note: The Defense Roll for each Unit is based on that Unit\'s Weight Class, as usual for Engage Defense Rolls. Note: Units making these Defense Rolls are not considered \'Targeted\'.',
         formatter: inchFormater,
     },
     [TRAIT_DISRUPTIVE]: {
