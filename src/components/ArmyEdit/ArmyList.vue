@@ -21,11 +21,11 @@ import SupportAssetUnits from './ArmyList/ArmyListSupportAssets/SupportAssetUnit
             </div>
           </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-7">
           <SupportAssetWeapons/>
           <SupportAssetUnits/>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
           <Faction/>
         </div>
       </div>
