@@ -15,30 +15,23 @@ export const ORDER_SUPPORT_DEFINITION = {
 export const SUPPORT_ORDERS_DATA = {
     [ORDER_SUPPORT_CNC_STATION]: makeSupportOrder({
         display_name: 'Command and Control Station',
-        description: 'When calculating Tonnage for the purpose of any Objective, if a friendly unit contributing Tonnage to that calculation is within 12” of this Model, the Commander controlling this Model may choose to win or lose any ties. When this model performs a Support Order, select a HE-V of weight class Light or heavier, and move that model up to 3” immediately. A Unit may not be moved by this trait more than once a turn.',
+        description: 'When calculating Tonnage for the purpose of any Objective, if a friendly Unit contributing Tonnage to that calculation is within 12" of this Model, the Commander controlling this Model may choose to win or lose any ties. When this Model performs a SUPPORT Order, select an HE-V and move that model up to 3" immediately. A Unit may not be moved by this trait more than once a turn.',
     }),
     [ORDER_SUPPORT_COMBAT_SUPPLIES]: makeSupportOrder({
         display_name: 'Combat Supplies',
-        description: 'When this model performs a Support Order, select one unit within 2" of this model, and select one of the benefits below:' +
-            '1) If the friendly model is a HE-V of weight class Light or heavier, 4 Armor may be restored. This may not increase the HE-V’s armor above the value the unit began the game with. ' +
-            '2) If the friendly model has a Weapon System, Upgrade or other Trait with the Limited Trait, one use of that system is restored. This may not increase its available uses above the initial Limited value. ' +
-            '3) If the friendly model has one of these upgrades, one use of Coolant Tanks or Nitro Boost may be restored. This may not increase the available uses above the number of uses the unit began with the game with. ' +
-            'Note: if multiple Models in a squadron have this trait, you may select the same or different target and benefit for each model with this trait. ',
+        description: 'When this model performs a SUPPORT Order, select one Unit within 2" of this Model, and select one of the benefits below: If the friendly Model is an HE-V, 4 Armor may be restored (this may not increase the HE-V\'s Armor above the value the Unit began the game with). If the friendly Model has a Weapon, Upgrade or other Trait with the Limited Trait, one use of that system is restored (this may not increase its available uses above the initial Limited value). Note: if multiple Models in a Squadron have this Trait, you may select the same or different Target and benefit for each Model with this trait.',
     }),
     [ORDER_SUPPORT_GUIDANCE_SUITE]: makeSupportOrder({
         display_name: 'Guidance Suite',
-        description: 'When this model performs a Support Order, select one enemy unit within LOS of this model. Place a Guidance Marker on this unit. Guidance Marker: When a unit with a Guidance Marker is the Target of an Engage Order, the unit performing the Engage selects one of the following effects: ' +
-            'All weapons used in this Engage Order count as having the benefit of a Lock On Order. (Note: the Engaging unit need not have a Target Designator to benefit from this). ' +
-            'One weapon used in this Engage Order may have +2 added to its Damage Rating.' +
-            'When the Engage Order is complete, remove the Guidance Marker. If the Marker has not been otherwise removed, remove the Marker when this model is activated again. ',
+        description: 'When this model performs a SUPPORT Order, it counts as having the Guidance Suite (SUPPORT) trait. Select one enemy unit within LOS of this model. Place a Guidance Marker on this unit. When a unit with a Guidance Marker is Targeted by an ENGAGE Order, the attacking unit selects one effect: (a) all weapons in this ENGAGE Order count as having a LOCK ON Order benefit, or (b) one weapon may have +2 added to its Damage Rating. Remove the Guidance Marker when the ENGAGE Order is complete, or when this model is activated again.',
     }),
     [ORDER_SUPPORT_MSOE]: makeSupportOrder({
         display_name: 'Multi-spectral Obscuration Emitter (MSOE) Deployer',
-        description: 'When this model performs a Support Order, place an Obscuration Emitter Marker (25mm) within 12”.',
+        description: 'When this model performs a SUPPORT Order, it counts as having the MSOE Launcher (SUPPORT) trait. Place an Obscuration Emitter Token within 6" of this model.',
     }),
     [ORDER_SUPPORT_MINE_DRONE_LAYER]: makeSupportOrder({
         display_name: 'Mine-Drone Layer',
-        description: 'When this model performs a Support Order, place a Mine Drone token within 3” of the Active model and not within 6” of another Mine Drone token.',
+        description: 'When this model performs a SUPPORT Order, it counts as having the Minelayer (SUPPORT) trait. Place one friendly Mine Drone Token within 3" of the Active Model and not within 6" of another friendly Mine Drone Token.',
     }),
 };
 
