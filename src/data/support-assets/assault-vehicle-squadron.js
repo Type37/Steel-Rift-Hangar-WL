@@ -9,9 +9,10 @@ import {
 } from '../unit-weapons.js';
 import {
     TRAIT_ALL_TERRAIN,
+    TRAIT_ASSET_COMMAND,
+    TRAIT_AUXILIARY_UNIT,
     TRAIT_CLOSE_SUPPORT,
     TRAIT_GARRISON,
-    TRAIT_GROUP_COMMAND,
     TRAIT_INFERNO_GEAR,
     TRAIT_MAGNETIC_GRAPPLES,
     TRAIT_MINE_SWEEPER,
@@ -46,6 +47,7 @@ export const ASSAULT_VEHICLE_SQUADRON_DATA = {
         defense: 4,
         traits: [
             trait(TRAIT_UNIT_SIZE_AND_TYPE, null, 'Medium Vehicle'),
+            trait(TRAIT_AUXILIARY_UNIT, null, 'Medium'),
             trait(TRAIT_SQUADRON),
             trait(TRAIT_ALL_TERRAIN),
         ],
@@ -82,7 +84,7 @@ export const ASSAULT_VEHICLE_SQUADRON_DATA = {
                     VEH_SUBMUNITIONS,
                 ],
                 traits: [
-                    trait(TRAIT_GROUP_COMMAND),
+                    trait(TRAIT_ASSET_COMMAND),
                     trait(TRAIT_GARRISON, 3, 'Infantry Squads'),
                 ],
                 garrison_choice_unit_ids: [
@@ -127,7 +129,7 @@ export const ASSAULT_VEHICLE_SQUADRON_DATA = {
             },
             AA_VEHICLE: {
                 ...baseStats,
-                display_name: 'Anti-Air Vehicle',
+                display_name: 'Anti-Aircraft Vehicle',
                 weapon_ids: [
                     AA_ARRAY,
                 ],
