@@ -1,13 +1,16 @@
 import {VEH_ROTARY_CANNON} from '../unit-weapons.js';
 import {
     TRAIT_ALL_TERRAIN,
+    TRAIT_ASSET_COMMAND,
+    TRAIT_AUXILIARY_UNIT,
     TRAIT_FLYING,
     TRAIT_FLYING_SQUADRON,
     TRAIT_GARRISON,
-    TRAIT_GROUP_COMMAND,
-    TRAIT_HAULER,
     TRAIT_SQUADRON,
+    TRAIT_SQUADRON_GARRISON,
     TRAIT_UNIT_SIZE_AND_TYPE,
+    TRAIT_VULNERABLE,
+    TRAIT_YIELDING,
 } from '../unit-traits.js';
 import {SIZE_LIGHT} from '../unit-sizes.js';
 import {makeStaticListIds, trait} from '../data-helpers.js';
@@ -25,8 +28,8 @@ export const LAS_WING_TRANSPORT_SQUADRON = 'LAS_WING_TRANSPORT_SQUADRON';
 
 const baseStats = {
     move: 12,
-    armor: 3,
-    structure: 0,
+    armor: 1,
+    structure: 2,
 };
 
 export const LAS_WING_TRANSPORT_SQUADRON_DATA = {
@@ -40,9 +43,11 @@ export const LAS_WING_TRANSPORT_SQUADRON_DATA = {
         defense: 3,
         traits: [
             trait(TRAIT_UNIT_SIZE_AND_TYPE, null, 'Light Vehicle'),
+            trait(TRAIT_AUXILIARY_UNIT, null, 'Light'),
             trait(TRAIT_FLYING),
             trait(TRAIT_FLYING_SQUADRON),
-            trait(TRAIT_HAULER),
+            trait(TRAIT_VULNERABLE),
+            trait(TRAIT_YIELDING),
         ],
         vehicles: makeStaticListIds({
             INFANTRY_AIR_TRANSPORT: {
@@ -52,8 +57,8 @@ export const LAS_WING_TRANSPORT_SQUADRON_DATA = {
                     VEH_ROTARY_CANNON,
                 ],
                 traits: [
-                    trait(TRAIT_GROUP_COMMAND),
-                    trait(TRAIT_GARRISON, 3, 'Air Infantry Squads'),
+                    trait(TRAIT_ASSET_COMMAND),
+                    trait(TRAIT_GARRISON, 3, 'Infantry Squads'),
                 ],
                 garrison_choice_unit_ids: [
                     INFANTRY_RIFLE_SQUAD,
@@ -72,7 +77,7 @@ export const LAS_WING_TRANSPORT_SQUADRON_DATA = {
                     VEH_ROTARY_CANNON,
                 ],
                 traits: [
-                    trait(TRAIT_GROUP_COMMAND),
+                    trait(TRAIT_ASSET_COMMAND),
                     trait(TRAIT_GARRISON, 2, 'Power Suit Squads'),
                 ],
                 garrison_choice_unit_ids: [
@@ -92,8 +97,7 @@ export const LAS_WING_TRANSPORT_SQUADRON_DATA = {
                     VEH_ROTARY_CANNON,
                 ],
                 traits: [
-                    trait(TRAIT_GROUP_COMMAND),
-                    trait(TRAIT_GARRISON, 1, 'UL HE-Vs'),
+                    trait(TRAIT_SQUADRON_GARRISON, 1, 'UL HE-V Squadron'),
                 ],
                 garrison_ul_hev: true,
             },
