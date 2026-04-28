@@ -282,7 +282,7 @@ export const MECH_TEAMS = makeFrozenStaticListIds({
     [TEAM_MULTIROLE]: {
         display_name: 'Multirole Team',
         display_name_short: 'Multirole',
-        icon: 'team-tactical',
+        icon: 'team-multirole',
         secondary_agenda_id: SA_MISSION_MOMENTUM,
         groups: makeStaticListIds({
             'A': makeGroup({
@@ -525,7 +525,7 @@ export const MECH_TEAMS = makeFrozenStaticListIds({
     [TEAM_COORDINATED_ASSETS]: {
         display_name: 'Coordinated Assets Team',
         display_name_short: 'Coordinated',
-        icon: 'team-tactical',
+        icon: 'team-coordinated-assets',
         secondary_agenda_id: SA_COMBINED_ARMS_ASSAULT,
         groups: makeStaticListIds({
             'A': makeGroup({
@@ -553,7 +553,7 @@ export const MECH_TEAMS = makeFrozenStaticListIds({
     [TEAM_NETWORKED_AI]: {
         display_name: 'Networked AI Team',
         display_name_short: 'Networked AI',
-        icon: 'team-tactical',
+        icon: 'team-networked-ai',
         secondary_agenda_id: SA_EXPAND_THE_NETWORK,
         groups: makeStaticListIds({
             'A': makeGroup({
