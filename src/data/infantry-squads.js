@@ -6,7 +6,15 @@ import {
     INFANTRY_MISSILE_LAUNCHER,
     INFANTRY_RIFLES,
 } from './unit-weapons.js';
-import {TRAIT_MINE_SWEEPER, TRAIT_SUPPRESSIVE_FIRE, TRAIT_TARGET_DESIGNATOR} from './unit-traits.js';
+import {
+    TRAIT_AUXILIARY_UNIT,
+    TRAIT_INFANTRY,
+    TRAIT_MINE_SWEEPER,
+    TRAIT_SUPPRESSIVE_FIRE,
+    TRAIT_TARGET_DESIGNATOR,
+    TRAIT_VULNERABLE,
+    TRAIT_YIELDING,
+} from './unit-traits.js';
 import {SIZE_ULTRA_LIGHT} from './unit-sizes.js';
 import {TYPE_INFANTRY} from './unit-types.js';
 
@@ -18,17 +26,27 @@ export const INFANTRY_ARC_SUIT_SQUAD = 'INFANTRY_ARC_SUIT_SQUAD';
 export const INFANTRY_REAPER_SUIT_SQUAD = 'INFANTRY_REAPER_SUIT_SQUAD';
 export const INFANTRY_VIPER_SUIT_SQUAD = 'INFANTRY_VIPER_SUIT_SQUAD';
 
+// Universal traits applied to all infantry and power suit squad models
+const universalInfantryTraits = [
+    trait(TRAIT_AUXILIARY_UNIT, null, 'Ultralight'),
+    trait(TRAIT_INFANTRY),
+    trait(TRAIT_VULNERABLE),
+    trait(TRAIT_YIELDING),
+];
+
 const baseInfantryStats = {
     unit_type_id: TYPE_INFANTRY,
     size_id: SIZE_ULTRA_LIGHT,
     move: 3,
     armor: 0,
-    structure: 3,
+    structure: 2,
 };
 
 const baseSuitStats = {
     unit_type_id: TYPE_INFANTRY,
     size_id: SIZE_ULTRA_LIGHT,
+    armor: 2,
+    structure: 2,
 };
 
 export const INFANTRY_SQUADS = makeFrozenStaticListIds({
@@ -39,6 +57,7 @@ export const INFANTRY_SQUADS = makeFrozenStaticListIds({
             INFANTRY_RIFLES,
         ],
         traits: [
+            ...universalInfantryTraits,
             trait(TRAIT_SUPPRESSIVE_FIRE),
         ],
     },
@@ -49,7 +68,9 @@ export const INFANTRY_SQUADS = makeFrozenStaticListIds({
             INFANTRY_RIFLES,
             INFANTRY_MISSILE_LAUNCHER,
         ],
-        traits: [],
+        traits: [
+            ...universalInfantryTraits,
+        ],
     },
     [INFANTRY_RECON_SQUAD]: {
         ...baseInfantryStats,
@@ -58,6 +79,7 @@ export const INFANTRY_SQUADS = makeFrozenStaticListIds({
             INFANTRY_RIFLES,
         ],
         traits: [
+            ...universalInfantryTraits,
             trait(TRAIT_TARGET_DESIGNATOR),
         ],
     },
@@ -68,45 +90,44 @@ export const INFANTRY_SQUADS = makeFrozenStaticListIds({
             INFANTRY_RIFLES,
         ],
         traits: [
+            ...universalInfantryTraits,
             trait(TRAIT_MINE_SWEEPER),
         ],
     },
     [INFANTRY_ARC_SUIT_SQUAD]: {
         ...baseSuitStats,
         move: 4,
-        armor: 0,
-        structure: 4,
         display_name: 'Arc Suits',
         weapon_ids: [
             INFANTRY_RIFLES,
             INFANTRY_ELECTRO_ARC_PULSERS,
         ],
         traits: [
+            ...universalInfantryTraits,
             trait(TRAIT_SUPPRESSIVE_FIRE),
         ],
     },
     [INFANTRY_REAPER_SUIT_SQUAD]: {
         ...baseSuitStats,
         move: 4,
-        armor: 0,
-        structure: 4,
         display_name: 'Reaper Suits',
         weapon_ids: [
             INFANTRY_RIFLES,
             INFANTRY_HEAVY_MISSILE_LAUNCHER,
         ],
-        traits: [],
+        traits: [
+            ...universalInfantryTraits,
+        ],
     },
     [INFANTRY_VIPER_SUIT_SQUAD]: {
         ...baseSuitStats,
         move: 5,
-        armor: 0,
-        structure: 4,
         display_name: 'Viper Suits',
         weapon_ids: [
             INFANTRY_HEAVY_RIFLES,
         ],
         traits: [
+            ...universalInfantryTraits,
             trait(TRAIT_TARGET_DESIGNATOR),
         ],
     },
