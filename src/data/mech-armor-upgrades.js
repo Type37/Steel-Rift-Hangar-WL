@@ -8,6 +8,7 @@ export const CERAMIC_ARMOR_UPGRADE = 'CERAMIC_ARMOR_UPGRADE';
 export const CLAYMORE_ARMOR_UPGRADE = 'CLAYMORE_ARMOR_UPGRADE';
 export const EXTRA_PLATING_ARMOR_UPGRADE = 'EXTRA_PLATING_ARMOR_UPGRADE';
 export const HEAVY_PLATING_ARMOR_UPGRADE = 'HEAVY_PLATING_ARMOR_UPGRADE';
+export const REDUNDANT_INTERNALS_ARMOR_UPGRADE = 'REDUNDANT_INTERNALS_ARMOR_UPGRADE';
 
 export const MECH_ARMOR_UPGRADES = makeFrozenStaticListIds({
     [NO_ARMOR_UPGRADE]: makeArmorUpgrade({
@@ -25,7 +26,7 @@ export const MECH_ARMOR_UPGRADES = makeFrozenStaticListIds({
             [SIZE_ULTRA]: 2,
         },
         slots: 1,
-        description: 'Reduce the Attack Pool for attacks using the Blast trait by 1, to a minimum of 1.',
+        description: 'This Unit may re-roll any failed Defense Rolls caused by the Blast effect.',
     }),
     [REACTIVE_ARMOR_UPGRADE]: makeArmorUpgrade({
         display_name: 'Reactive',
@@ -36,7 +37,7 @@ export const MECH_ARMOR_UPGRADES = makeFrozenStaticListIds({
     }),
     [CERAMIC_ARMOR_UPGRADE]: makeArmorUpgrade({
         display_name: 'Ceramic',
-        card_upgrade_display_name: 'Ceramic Armor',
+        card_upgrade_display_name: 'Ceramic Plating',
         cost_by_size: {
             [SIZE_LIGHT]: 2,
             [SIZE_MEDIUM]: 2,
@@ -44,7 +45,7 @@ export const MECH_ARMOR_UPGRADES = makeFrozenStaticListIds({
             [SIZE_ULTRA]: 1,
         },
         slots: 1,
-        description: 'Each time this unit would take damage from the AP trait of a Laser Weapon System roll 1D6 - on a 5+ that damage is negated.',
+        description: 'Each time this Unit would take Damage from the AP trait, roll a D6. On a 4+, ignore that Damage.',
     }),
     [CLAYMORE_ARMOR_UPGRADE]: makeArmorUpgrade({
         display_name: 'Claymore',
@@ -65,10 +66,18 @@ export const MECH_ARMOR_UPGRADES = makeFrozenStaticListIds({
         display_name: 'Heavy Plating',
         card_upgrade_display_name: 'Heavy Plating (+4 applied)',
         description: 'This HE-V gains 4 additional Armor ',
-        cost: 1,
+        cost: 2,
         slots: 1,
         armor_mod: 4,
         limited_size_ids: [SIZE_ULTRA],
+    }),
+    [REDUNDANT_INTERNALS_ARMOR_UPGRADE]: makeArmorUpgrade({
+        display_name: 'Redundant Internals',
+        card_upgrade_display_name: 'Redundant Internals',
+        description: 'This Unit no longer has the Fragile Internals rule applied when damaged.',
+        cost: 1,
+        slots: 1,
+        limited_size_ids: [SIZE_LIGHT],
     }),
 });
 
