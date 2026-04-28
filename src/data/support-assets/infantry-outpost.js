@@ -1,9 +1,11 @@
 import {BUNKER_AUTO_CANNON, BUNKER_MISSILE_PACK, BUNKER_ROCKET_PACK} from '../unit-weapons.js';
 import {
     TRAIT_ALL_TERRAIN,
-    TRAIT_BUNKER_MINE_DRONES,
+    TRAIT_ASSET_COMMAND,
+    TRAIT_AUXILIARY_UNIT,
+    TRAIT_FORTIFICATION,
     TRAIT_GARRISON,
-    TRAIT_GROUP_COMMAND,
+    TRAIT_MINELAYER,
     TRAIT_SQUADRON,
     TRAIT_UNIT_SIZE_AND_TYPE,
 } from '../unit-traits.js';
@@ -30,13 +32,14 @@ export const INFANTRY_OUTPOST_DATA = {
         defense: 6,
         traits: [
             trait(TRAIT_UNIT_SIZE_AND_TYPE, null, 'Fortification'),
-            trait(TRAIT_GROUP_COMMAND),
+            trait(TRAIT_AUXILIARY_UNIT, null, 'Ultraheavy'),
+            trait(TRAIT_ASSET_COMMAND),
         ],
         vehicles: makeStaticListIds({
             BUNKER: {
                 display_name: 'Bunker',
-                armor: 0,
-                structure: 10,
+                armor: 2,
+                structure: 8,
                 weapon_choice_ids: {
                     choice_1: [
                         BUNKER_AUTO_CANNON,
@@ -45,8 +48,9 @@ export const INFANTRY_OUTPOST_DATA = {
                     ],
                 },
                 traits: [
+                    trait(TRAIT_FORTIFICATION),
                     trait(TRAIT_GARRISON, 6, 'Infantry Squads'),
-                    trait(TRAIT_BUNKER_MINE_DRONES, 2),
+                    trait(TRAIT_MINELAYER, null, 'ENGAGE'),
                 ],
                 garrison_choice_unit_ids: [
                     INFANTRY_RIFLE_SQUAD,
