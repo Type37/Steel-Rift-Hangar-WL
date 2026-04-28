@@ -24,8 +24,17 @@ const {
 
 const upgrade = computed(() => mechStore.getMechUpgradeAttachmentInfo(mechId, mechUpgradeAttachmentId));
 
+const availableWeapons = computed(() => {
+  if (!upgrade.value.requires_weapon_assignment) return [];
+  return mechStore.getMechWeaponsAttachmentInfo(mechId);
+});
+
 function remove() {
   mechStore.removeMechUpgradeAttachment(mechId, mechUpgradeAttachmentId);
+}
+
+function onAssignedWeaponChange(event) {
+  mechStore.setMechUpgradeAssignedWeapon(mechId, mechUpgradeAttachmentId, event.target.value || null);
 }
 
 </script>
@@ -89,5 +98,25 @@ function remove() {
     </td>
     <td>
     </td>
+  </tr>
+  <tr v-if="upgrade.requires_weapon_assignment">
+    <td colspan="2" class="ps-4 pb-2">
+      <small class="text-muted d-block mb-1">Assign to weapon:</small>
+      <select
+          class="form-select form-select-sm"
+          :value="upgrade.assigned_weapon_id ?? ''"
+          @change="onAssignedWeaponChange"
+      >
+        <option value="">— unassigned —</option>
+        <option
+            v-for="w in availableWeapons"
+            :key="w.id"
+            :value="w.id"
+        >
+          {{ w.display_name }}
+        </option>
+      </select>
+    </td>
+    <td colspan="8"></td>
   </tr>
 </template>
