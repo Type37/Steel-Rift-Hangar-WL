@@ -105,28 +105,28 @@ export const UNIT_TRAITS = makeTraits({
     },
     [TRAIT_SUPPORT_ORDER_CNC]: {
         display_name: 'Support: Command and Control Station',
-        description: '',
+        description: 'When calculating Tonnage for the purpose of any Objective, if a friendly Unit contributing Tonnage to that calculation is within 12" of this Model, the Commander controlling this Model may choose to win or lose any ties. When this Model performs a SUPPORT Order, select an HE-V and move that model up to 3" immediately. A Unit may not be moved by this trait more than once a turn.',
         granted_order_ids: [ORDER_SUPPORT_CNC_STATION],
     },
     [TRAIT_SUPPORT_ORDER_COMBAT_SUPPLIES]: {
         display_name: 'Support: Combat Supplies',
-        description: '',
+        description: 'When this model performs a SUPPORT Order, select one Unit within 2" of this Model, and select one of the benefits below: If the friendly Model is an HE-V, 4 Armor may be restored (this may not increase the HE-V\'s Armor above the value the Unit began the game with). If the friendly Model has a Weapon, Upgrade or other Trait with the Limited Trait, one use of that system is restored (this may not increase its available uses above the initial Limited value). Note: if multiple Models in a Squadron have this Trait, you may select the same or different Target and benefit for each Model with this trait.',
         granted_order_ids: [ORDER_SUPPORT_COMBAT_SUPPLIES],
     },
     [TRAIT_SUPPORT_GUIDANCE_SUITE]: {
         display_name: 'Support: Guidance Suite',
-        description: '',
+        description: 'When this model performs a SUPPORT Order, it counts as having the Guidance Suite (SUPPORT) trait.',
         granted_order_ids: [ORDER_SUPPORT_GUIDANCE_SUITE],
     },
     [TRAIT_SUPPORT_MINE_DRONE_LAYER]: {
         display_name: 'Support: Mine Drone Layer',
         formatter: numberFormater,
-        description: '',
+        description: 'When this model performs a SUPPORT Order, it counts as having the Minelayer (SUPPORT) trait. Use of this Upgrade has the Limited (X) trait.',
         granted_order_ids: [ORDER_SUPPORT_MINE_DRONE_LAYER],
     },
     [TRAIT_SUPPORT_MOED]: {
         display_name: 'Support: Multi-spectral Obscuration Emitter Deployer',
-        description: '',
+        description: 'When this model performs a SUPPORT Order, it counts as having the MSOE Launcher (SUPPORT) trait.',
         granted_order_ids: [ORDER_SUPPORT_MSOE],
     },
     [TRAIT_MSOE_LAUNCHER]: {
@@ -136,7 +136,7 @@ export const UNIT_TRAITS = makeTraits({
     },
     [TRAIT_MSOE_DEPLOYER]: {
         display_name: 'Support: MSOE Deployer',
-        description: '',
+        description: 'When this model performs a SUPPORT Order, it counts as having the MSOE Launcher (SUPPORT) trait.',
         granted_order_ids: [ORDER_SUPPORT_MSOE],
     },
     [TRAIT_SCRAMBLERS]: {
