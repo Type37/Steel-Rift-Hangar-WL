@@ -216,3 +216,34 @@ body[data-bs-theme="dark"] {
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
 }
+// ── UX improvements ──────────────────────────────────────────────────────────
+
+// Condensed label font via Google Fonts (added to index.html separately)
+.stat-label {
+  font-family: 'Barlow Condensed', 'Oswald', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+// Big Add HE-V CTA button on empty state
+.add-hev-cta {
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 0.6rem 2rem;
+  letter-spacing: 0.03em;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+}
+
+// Army list config card sticky below the header
+.card-army-list {
+  position: sticky;
+  top: 0;
+  z-index: 99;
+}
