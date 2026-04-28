@@ -13,6 +13,7 @@ export const SA_STALKERS = 'SA_STALKERS';
 export const SA_BRAWLERS = 'SA_BRAWLERS';
 export const SA_ENFORCERS = 'SA_ENFORCERS';
 export const SA_TITAN_KILLERS = 'SA_TITAN_KILLERS';
+export const SA_COMBINED_ARMS_ASSAULT = 'SA_COMBINED_ARMS_ASSAULT';
 
 export const SECONDARY_AGENDAS = makeSecondaryAgendas({
     [SA_MISSION_MOMENTUM]: {
@@ -33,7 +34,7 @@ export const SECONDARY_AGENDAS = makeSecondaryAgendas({
     },
     [SA_WILDCARDS]: {
         display_name: 'Wildcards',
-        description: 'Score 1 VP at the end of the Mission if over the course of the game two or more enemy HE-Vs were destroyed during an Order while you are the Active Player under the effect of any of the following Perks: Unpredictable Gambits, Reckless Piloting, Network Hackers or Intimidation Tactics.',
+        description: 'Every time a friendly HE-V Destroys an enemy HE-V, and the friendly HE-V is under the effect of any of the following Perks: Unpredictable Gambits, Reckless Piloting, Network Hackers or Intimidation Tactics, mark a Wildcard Kill. When checking for Victory, if you have earned 2 or more Wildcard Kills, score 1 VP.',
     },
     [SA_ASSET_PROTECTION]: {
         display_name: 'Asset Protection',
@@ -57,18 +58,22 @@ export const SECONDARY_AGENDAS = makeSecondaryAgendas({
     },
     [SA_STALKERS]: {
         display_name: 'Stalkers',
-        description: 'You may select this Secondary Agenda if your Force contains two or more Light HE-Vs. Every time a Light HE-V destroys a non-Support Asset Unit, or any unit with the Unit Type: Fortification trait, mark a Kill. If Light HE-Vs you control have earned 2 or more Kills over the course of the MIssion, and at least one of your Light HE-Vs is still Operational, score 1 VP.',
+        description: 'You may select this Secondary Agenda if your Force contains two or more Light HE-Vs. Every time a Light HE-V Destroys an HE-V or Unit with the Fortification trait, mark a Kill. If Light HE-Vs you control have earned 2 or more Kills when you check for Victory, and at least one of your Light HE-Vs is not Destroyed, score 1 VP.',
         is_universal: true,
     },
     [SA_BRAWLERS]: {
         display_name: 'Brawlers',
-        description: 'You may select this Secondary Agenda if your Force contains two or more Medium HE-Vs. Every time a Medium HE-V destroys a non-Support Asset Unit or any Unit with the Unit Type: Fortification trait, mark a Kill. If Medium HE-Vs you control have earned 3 or more Kills over the course of the Mission, and at least one of your Medium HE-Vs is still operational, score 1 VP.',
+        description: 'You may select this Secondary Agenda if your Force contains two or more Medium HE-Vs. Every time a Medium HE-V Destroys an HE-V or Unit with the Fortification trait, mark a Kill. If Medium HE-Vs you control have earned 3 or more Kills when you check for Victory, and at least one of your Medium HE-Vs is not Destroyed, score 1 VP.',
         is_universal: true,
     },
     [SA_ENFORCERS]: {
         display_name: 'Enforcers',
-        description: 'You may select this Secondary Agenda if your Force contains two or more Heavy HE-Vs. Every time a Heavy HE-V destroys a non-Support Asset Unit or any Unit with the Unit Type: Fortification trait, mark a Kill. If Heavy HE-Vs you control have earned 3 or more Kills over the course of the Mission, and at least one of your Heavy HE-Vs is still operational, score 1 VP.',
+        description: 'You may select this Secondary Agenda if your Force contains two or more Heavy HE-Vs. Every time a Heavy HE-V Destroys an HE-V or Unit with the Fortification trait, mark a Kill. If Heavy HE-Vs you control have earned 3 or more Kills when you check for Victory, and at least one of your Heavy HE-Vs is not Destroyed, score 1 VP.',
         is_universal: true,
+    },
+    [SA_COMBINED_ARMS_ASSAULT]: {
+        display_name: 'Combined Arms Assault',
+        description: 'When any member of this team Destroys an enemy HE-V, before it is removed, place an Objective token in base contact with the Destroyed HE-V. If a Support Asset member Destroyed the HE-V, an HE-V member of this team may CAPTURE it. If an HE-V member Destroyed the HE-V, a Support Asset member of this team may CAPTURE it (that Support Asset member may Control and CAPTURE an Objective for the purpose of this Agenda only). No other units may CAPTURE it. If you CAPTURED this Objective token, when checking for Victory, score 1 VP.',
     },
     [SA_TITAN_KILLERS]: {
         display_name: 'Titan-Killers',
