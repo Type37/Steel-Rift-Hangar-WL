@@ -1,7 +1,7 @@
 import {SIZE_HEAVY} from '../unit-sizes.js';
 import {makeStaticListIds, trait} from '../data-helpers.js';
 import {
-    DOZER_BLADE,
+    TANK_DOZER_BLADE,
     TANK_AUTOCANNON,
     TANK_HOWITZER,
     TANK_LASER,
@@ -12,9 +12,9 @@ import {
 } from '../unit-weapons.js';
 import {
     TRAIT_ALL_TERRAIN,
+    TRAIT_ASSET_COMMAND,
+    TRAIT_AUXILIARY_UNIT,
     TRAIT_GARRISON,
-    TRAIT_GROUP_COMMAND,
-    TRAIT_HEAVY_SUPPORT_ASSET,
     TRAIT_UNIT_SIZE_AND_TYPE,
 } from '../unit-traits.js';
 import {
@@ -43,8 +43,8 @@ export const HEAVY_TANK_SQUADRON_DATA = {
         defense: 5,
         traits: [
             trait(TRAIT_UNIT_SIZE_AND_TYPE, null, 'Heavy Vehicle'),
-            trait(TRAIT_HEAVY_SUPPORT_ASSET),
-            trait(TRAIT_GROUP_COMMAND),
+            trait(TRAIT_AUXILIARY_UNIT, null, 'Heavy'),
+            trait(TRAIT_ASSET_COMMAND),
             trait(TRAIT_ALL_TERRAIN),
         ],
         vehicles: makeStaticListIds({
@@ -82,7 +82,7 @@ export const HEAVY_TANK_SQUADRON_DATA = {
                 weapon_ids: [
                     TANK_HOWITZER,
                     VEH_ROTARY_CANNON,
-                    DOZER_BLADE,
+                    TANK_DOZER_BLADE,
                     VEH_SUBMUNITIONS,
                 ],
                 traits: [
