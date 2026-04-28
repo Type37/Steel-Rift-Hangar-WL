@@ -145,7 +145,7 @@ export const MECH_WEAPONS = makeFrozenStaticListIds({
         },
     }),
     [PARTICLE_CANNON]: makeWeapon({
-        display_name: 'Particle Cannon ',
+        display_name: 'Particle Cannon',
         damage: 0,
         damage_by_size: {
             [SIZE_LIGHT]: 2,
@@ -166,7 +166,7 @@ export const MECH_WEAPONS = makeFrozenStaticListIds({
         },
     }),
     [RAIL_GUN]: makeWeapon({
-        display_name: 'Rail gun',
+        display_name: 'Rail Gun',
         damage: 1,
         cost_by_size: {
             [SIZE_LIGHT]: 2,
@@ -402,7 +402,7 @@ export const MECH_WEAPONS = makeFrozenStaticListIds({
         },
     }),
     [PLASMA_BLADE]: makeWeapon({
-        display_name: 'Plasma Blade ',
+        display_name: 'Plasma Blade',
         damage: 0,
         cost_by_size: {
             [SIZE_LIGHT]: 4,
