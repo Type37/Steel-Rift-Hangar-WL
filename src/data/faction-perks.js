@@ -38,15 +38,15 @@ const PERKS = makeStaticListIds({
     // Military Training
     [MT_COORDINATED_ASSAULTS]: {
         display_name: 'Coordinated Assaults',
-        description: 'Once per Game, after you have activated an HE-V (but not a Support Asset or Unit), you may remain the Active Player and immediately activate a different HE-V that does not have an Activated Marker. They may only complete a single Order. Play then passes as normal.',
+        description: 'Once per Game, after you have Activated an HE-V, you may remain the Active Commander and immediately Activate a different friendly HE-V that does not have an Activation Marker. It may only perform a single Order. Play then passes as normal.',
     },
     [MT_COVERED_ADVANCES]: {
         display_name: 'Covered Advances',
-        description: 'Once per Game Turn, if you are not the Active Player and an allied HE-V or Support Asset Unit is targeted by an Engage Order, another allied HE-V in Line of Sight of the Active Unit may Return Fire instead of the Target Unit. The targeted unit still makes the Defense Roll and may re-roll dice of 1 as if it were Returning Fire, but it is the covering HE-V which receives the Activated token and may interrupt to Engage the Active Unit once its Engage Order is resolved.',
+        description: 'Once per Game Turn, if you are not the Active Commander and one of your Units is Targeted by an ENGAGE Order, another friendly HE-V (but not Support Asset or other Unit) in Line of Sight of the Active Unit may Return Fire instead of the Target Unit. The Targeted Unit still makes the Defense Roll and may re-roll dice of 1 as if it were Returning Fire, but it is the Return Firing HE-V which receives the Activated Token and may interrupt to ENGAGE the Active Unit once the ENGAGE Order is resolved.',
     },
     [MT_ELITE_PILOT_PROGRAM]: {
         display_name: 'Elite Pilot Program',
-        description: 'Once per Game Turn, after the opposing Commander selects a unit to Activate and declares their Order, you may rotate a single HE-V up to 90°.',
+        description: 'Once per game turn, when the enemy selects a Unit to Activate but before any Orders are declared, select one of your HE-Vs, and move it up to 1". It may rotate at any point during this move.',
     },
     // Political Priority
     [PP_EXPANSIONIST]: {
@@ -59,7 +59,7 @@ const PERKS = makeStaticListIds({
     },
     [PP_IDEOLOGICAL]: {
         display_name: 'Ideological',
-        description: 'Once per Game, when the Enemy Commander selects a Unit or Support Asset to Activate, you may use faction propaganda to cause them to hesitate. All numerical values of Movement, Jump, Smash and Engage Damage Rating and Traits are halved, rounding up, for the duration of that Order. If the Order does not have any numeric values (such as Lock On), then its effects are simply canceled instead.',
+        description: 'Once per Game, when the enemy Commander selects a Unit to Activate, you may use faction propaganda to cause them to hesitate. The distance of all MOVE, JUMP, and any other Order that moves a Unit during that Activation is halved. The Damage Rating of any Weapon or SMASH during that Activation is halved, rounding up.',
     },
 
     // Old Infrastructure
@@ -74,7 +74,7 @@ const PERKS = makeStaticListIds({
     },
     [OI_MATERIEL_STOCKPILES]: {
         display_name: 'Materiel Stockpiles',
-        description: 'Increase the Limited trait of Mines, Rocket Packs and Missiles by 1 for all allied HE-Vs.',
+        description: 'When Loading out HE-Vs, you may spend 1 less ton to Reinforce Armor and/or Structure.',
         calculated_on_cards: true,
     },
     // Espionage
@@ -89,7 +89,7 @@ const PERKS = makeStaticListIds({
     },
     [E_EXHAUSTIVE_INTEL_GATHERING]: {
         display_name: 'Exhaustive Intel Gathering',
-        description: 'Once per Game Turn, an allied Unit may take the Lock On Order without requiring a Target Designator upgrade.',
+        description: 'Select one enemy HE-V. Once per game turn, an ENGAGE Order Targeting that HE-V is considered to have been preceded by a LOCK ON Order.',
     },
     // Research and Development
     [RD_ADVANCED_HARDPOINT_DESIGN]: {
@@ -99,7 +99,7 @@ const PERKS = makeStaticListIds({
     },
     [RD_ADVANCED_ENERGY_MANAGEMENT_SYSTEMS]: {
         display_name: 'Advanced Energy Management Systems',
-        description: 'Once per Game Turn, an allied HE-V may remove a Redline marker when it is selected to activate, but before declaring an Order. This may allow it to Redline again during the same turn.',
+        description: 'Once per turn, at any point during the turn, select a Unit. Remove a Redline Marker from that Unit.',
     },
     [RD_ADVANCED_STRUCTURAL_COMPONENTS]: {
         display_name: 'Advanced Structural Components',
@@ -125,11 +125,11 @@ const PERKS = makeStaticListIds({
     //rogue agency
     [RA_UNPREDICTABLE_GAMBITS]: {
         display_name: 'Unpredictable Gambits',
-        description: 'Once each Game Turn, the first time you are eligible to activate a unit, instead of selecting one yourself you may elect to randomly determine one of your active HE-Vs instead. You can simply number them and roll a dice, or place numbered counters in a bag and randomly draw one. The randomly selected unit must then be activated, but may perform an additional Order this turn, which may be a duplicate of a previously issued Order that same activation.',
+        description: 'Once each Game Turn, the first time you are eligible to activate a unit, instead of selecting one yourself you may elect to randomly determine one of your unactivated HE-Vs instead. You can simply number them and roll a dice, or place numbered counters in a bag and randomly draw one. The randomly selected unit must then be activated, but may perform an additional Order this turn, which may be a duplicate of a previously issued Order that same activation.',
     },
     [RA_RECKLESS_PILOTING]: {
         display_name: 'Reckless Piloting',
-        description: 'Once each Game Turn, when you have the option to Redline an HE-V, you may take two points of structural damage instead of one and perform two orders instead of the usual one. Heavy Reactors can reduce this damage as normal.',
+        description: 'Once each Game Turn, when Overdriving an HE-V, it may take a second point of Structure damage. If it does so, that HE-V may perform two Orders instead of the usual one during the Overdrive. Heavy Reactors can roll to reduce this Damage as well.',
     },
     [RA_BAIT_AND_SWITCH]: {
         display_name: 'Bait & Switch',
@@ -139,7 +139,7 @@ const PERKS = makeStaticListIds({
     // underworld affiliations
     [UA_NETWORK_HACKERS]: {
         display_name: 'Network Hackers',
-        description: 'Once per Mission, you may select to use one of your Opponent’s Off-Table Support Assets as if it was your own, without needing a Target Designator. The origin of the attack is considered to be any of your Deployment Edges. Alternatively, once per Mission you may use this Perk to roll an additional Dice in a Roll-Off and choose which result to apply.',
+        description: 'Once per Mission, you may select to use one of your Opponent’s Off-Table Support Assets as if it was your own, without needing a Target Designator. If LoS must be drawn for the Asset, draw it from your own Deployment Edge or Corners. Alternatively, once per Mission you may use this Perk to roll an additional Dice in a Roll-Off and choose which result to apply.',
     },
     [UA_INTIMIDATION_TACTICS]: {
         display_name: 'Intimidation Tactics',
