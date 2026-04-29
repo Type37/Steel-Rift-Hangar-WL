@@ -13,12 +13,14 @@ import Fraction from './functional/fraction.vue';
 import {resetStores} from '../store/helpers/store-save-load.js';
 import {BButton, BModal} from 'bootstrap-vue-next';
 import BtnArmyListValidation from './ArmyEdit/ArmyList/BtnArmyListValidation.vue';
+import {useVisualTheme} from '../composables/use-visual-theme.js';
 
 const {used_teams_count, max_teams_count} = storeToRefs(useTeamStore());
 const {used_support_assets, max_support_assets} = storeToRefs(useSupportAssetCountsStore());
 const {used_tons, max_tons, name} = storeToRefs(useArmyListStore());
 
 const resetModal = ref(false);
+const {isClean, toggle: toggleTheme} = useVisualTheme();
 
 </script>
 <template>
@@ -79,6 +81,15 @@ const resetModal = ref(false);
                 class="ms-1"
             >
               New List
+            </BButton>
+            <BButton
+                @click="toggleTheme"
+                size="sm"
+                variant="secondary"
+                class="ms-1"
+                :title="isClean() ? 'Switch to default theme' : 'Switch to clean theme'"
+            >
+              <span class="material-symbols-outlined">{{ isClean() ? 'brightness_alert' : 'brightness_high' }}</span>
             </BButton>
             <div class="btn-group d-inline-block ms-1 mt-2 mt-xl-0" role="group">
               <router-link
