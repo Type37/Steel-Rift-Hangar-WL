@@ -18,9 +18,13 @@ $green: #38c172;
 $teal: #4dc0b5;
 $cyan: #6cb2eb;
 
-$primary: #dc4427;
-$secondary: #3d5166;
-$border: shade-color($secondary, 20%);
+// Steel Rift palette
+// Accent:       #DC4427  Burnt Tangerine  — CTAs, errors, brand only
+// Primary:      #93B5C6  Powder Blue      — interactive chrome
+// Dark surface: #0A1128  Prussian Blue    — navbar, page background
+$primary: #93B5C6;
+$secondary: #0A1128;
+$border: shade-color(#93B5C6, 30%);
 $success: $green;
 $info: $cyan;
 $warning: $yellow;
@@ -46,7 +50,7 @@ $toast-background-color: #fff !default;
 $toast-header-background-color: #fff !default;
 
 $navbar-padding-y: 0.6rem;
-$navbar-dark-color: #de4000;
+$navbar-dark-color: rgba(#fff, 0.85);
 $nav-link-padding-y: 0;
 
 $accordion-icon-color-dark: #fff;
@@ -94,8 +98,8 @@ body {
   font-style: normal;
 }
 
-$body-bg-color: #602915;
-$body-bg-color-dark: mix($body-bg-color, #000, 50%);
+$body-bg-color: #0A1128;
+$body-bg-color-dark: mix($body-bg-color, #000, 60%);
 
 body {
   background-color: $body-bg-color;
@@ -165,7 +169,7 @@ body[data-bs-theme="dark"] {
 }
 
 .navbar-dark {
-  background-color: #000;
+  background-color: #0A1128;
 
   .nav-link {
     font-weight: $font-weight-medium;
@@ -227,7 +231,7 @@ body[data-bs-theme="dark"] {
   font-size: 0.75rem;
 }
 
-// Big Add Solo HE-V CTA button — Steel Rift red
+// Big Add Solo HE-V CTA button — Burnt Tangerine accent
 .add-hev-cta {
   background-color: #dc4427;
   border-color: #c23b21;
@@ -253,10 +257,10 @@ body[data-bs-theme="dark"] {
   }
 }
 
-// Add Team CTA button — dark steel slate
+// Add Team CTA button — Prussian Blue
 .add-team-cta {
-  background-color: #3d5166;
-  border-color: #324457;
+  background-color: #0A1128;
+  border-color: #131f3f;
   color: #fff;
   font-size: 1.1rem;
   font-weight: 700;
@@ -265,16 +269,16 @@ body[data-bs-theme="dark"] {
   box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 
   &:hover, &:focus {
-    background-color: #324457;
-    border-color: #273748;
+    background-color: #131f3f;
+    border-color: #1c2d57;
     color: #fff;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   }
 
   &:active {
-    background-color: #273748 !important;
-    border-color: #1c2a39 !important;
+    background-color: #1c2d57 !important;
+    border-color: #253b6f !important;
     color: #fff !important;
   }
 }
