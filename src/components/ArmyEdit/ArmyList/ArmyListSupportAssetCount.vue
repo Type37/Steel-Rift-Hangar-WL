@@ -1,5 +1,5 @@
 <script setup>
-import {BFormCheckbox, BFormInput} from 'bootstrap-vue-next';
+import {BFormCheckbox, BFormInput, BPopover} from 'bootstrap-vue-next';
 import {storeToRefs} from 'pinia';
 import {useSupportAssetCountsStore} from '../../../store/support-asset-count-store.js';
 
@@ -21,7 +21,6 @@ function updateCheck(value) {
     custom_max_support_assets.value = null;
   }
 }
-
 </script>
 <template>
   <div class="form-floating mb-1">
@@ -34,10 +33,18 @@ function updateCheck(value) {
     />
     <label for="list_max_support_assets">Support Assets</label>
   </div>
-  <BFormCheckbox
-      :model-value="custom_max_support_assets !== null"
-      @update:model-value="updateCheck"
-  >
-    Custom
-  </BFormCheckbox>
+  <BPopover placement="bottom" trigger="click focus">
+    <template #target>
+      <BFormCheckbox
+          :model-value="custom_max_support_assets !== null"
+          @update:model-value="updateCheck"
+      >
+        Custom
+        <span class="material-symbols-outlined text-secondary" style="font-size:0.85rem;vertical-align:-.15em">shield_question</span>
+      </BFormCheckbox>
+    </template>
+    <template #title>Custom Support Asset Limit</template>
+    By default your Support Asset limit is set by your game size.
+    Tick <strong>Custom</strong> to override it manually — useful for house rules or scenario play.
+  </BPopover>
 </template>
