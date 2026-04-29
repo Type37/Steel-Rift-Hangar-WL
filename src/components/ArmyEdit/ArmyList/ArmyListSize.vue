@@ -52,32 +52,29 @@ onMounted(() => {
 });
 </script>
 <template>
-  <div class="row g-1">
-    <div class="col">
-      <BFormFloatingLabel
-          label="Tonnage"
-          label-for="list-max-tons"
-          class="mb-1"
-      >
-        <BFormInput
-            id="list-max-tons"
-            v-model="max_tons"
-            type="number"
-            :disabled="disabled"
-            @blur="syncArmyType"
-        />
-      </BFormFloatingLabel>
-    </div>
-    <div class="col">
-      <div class="form-floating mb-1">
-        <BFormSelect
-            v-model="armyTypeMaxTons"
-            :options="options"
-            id="list-army-size-tons"
-        />
-        <label for="list-army-size-tons">Army Size</label>
-      </div>
+  <div class="col">
+    <BFormFloatingLabel
+        label="Tonnage"
+        label-for="list-max-tons"
+        class="mb-1"
+    >
+      <BFormInput
+          id="list-max-tons"
+          v-model="max_tons"
+          type="number"
+          :disabled="disabled"
+          @blur="syncArmyType"
+      />
+    </BFormFloatingLabel>
+  </div>
+  <div class="col">
+    <div class="form-floating mb-1">
+      <BFormSelect
+          v-model="armyTypeMaxTons"
+          :options="options"
+          id="list-army-size-tons"
+      />
+      <label for="list-army-size-tons">Army Size</label>
     </div>
   </div>
-
 </template>

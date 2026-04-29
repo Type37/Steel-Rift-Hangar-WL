@@ -31,7 +31,7 @@ function addGeneralMech() {
       v-show="baseMechCount"
   />
 
-  <div class="d-flex align-items-center mt-2">
+  <div class="d-flex align-items-center mt-2 gap-2">
     <BButton
         variant="primary"
         size="lg"
@@ -42,7 +42,7 @@ function addGeneralMech() {
       <Icon name="hev" class="me-1"/>
       Add Solo HE-V
     </BButton>
-    <BtnAddTeam class="ms-auto"/>
+    <BtnAddTeam/>
   </div>
   <MechTeam
       v-for="team in special_teams"

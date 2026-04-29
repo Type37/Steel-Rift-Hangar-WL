@@ -11,8 +11,8 @@ import SupportAssetUnits from './ArmyList/ArmyListSupportAssets/SupportAssetUnit
     <div class="card-body">
       <div class="row">
         <div class="col-md-3">
-          <ArmyListSize/>
-          <div class="row g-1">
+          <div class="row g-1 row-cols-2">
+            <ArmyListSize/>
             <div class="col">
               <ArmyListSupportAssetCount/>
             </div>
