@@ -7,9 +7,11 @@ import {
     INFANTRY_RIFLES,
 } from './unit-weapons.js';
 import {
+    TRAIT_ALL_TERRAIN,
     TRAIT_AUXILIARY_UNIT,
     TRAIT_INFANTRY,
     TRAIT_MINE_SWEEPER,
+    TRAIT_SQUADRON,
     TRAIT_SUPPRESSIVE_FIRE,
     TRAIT_TARGET_DESIGNATOR,
     TRAIT_VULNERABLE,
@@ -30,6 +32,8 @@ export const INFANTRY_VIPER_SUIT_SQUAD = 'INFANTRY_VIPER_SUIT_SQUAD';
 const universalInfantryTraits = [
     trait(TRAIT_AUXILIARY_UNIT, null, 'Ultralight'),
     trait(TRAIT_INFANTRY),
+    trait(TRAIT_SQUADRON),
+    trait(TRAIT_ALL_TERRAIN),
     trait(TRAIT_VULNERABLE),
     trait(TRAIT_YIELDING),
 ];

@@ -8,9 +8,9 @@ import {
     TRAIT_KINETIC,
     TRAIT_LIGHT,
     TRAIT_LIMITED,
-    TRAIT_MELEE,
     TRAIT_SHORT,
     TRAIT_SMART,
+    TRAIT_SMASHER,
     TRAIT_STAGGER,
 } from './weapon-traits.js';
 import {makeFrozenStaticListIds, trait} from './data-helpers.js';
@@ -60,10 +60,11 @@ export const UNIT_WEAPONS = makeFrozenStaticListIds({
         ],
     }),
     [VEH_LAS_AUTO_CANNON]: makeWeapon({
-        display_name: 'Veh. Auto-Cannon',
+        display_name: 'Autocannon',
         damage: 2,
         traits: [
-            trait(TRAIT_KINETIC, 'UL'),
+            trait(TRAIT_SHORT, 12),
+            trait(TRAIT_KINETIC),
         ],
     }),
     [BUNKER_AUTO_CANNON]: makeWeapon({
@@ -103,7 +104,7 @@ export const UNIT_WEAPONS = makeFrozenStaticListIds({
         display_name: 'Dozer Blade',
         damage: null,
         traits: [
-            trait(TRAIT_MELEE, 'X'),
+            trait(TRAIT_SMASHER, 'X', 'Medium'),
             trait(TRAIT_CONCUSSIVE, 2),
         ],
     }),
@@ -111,7 +112,7 @@ export const UNIT_WEAPONS = makeFrozenStaticListIds({
         display_name: 'Dozer Blade',
         damage: null,
         traits: [
-            trait(TRAIT_MELEE, 1),
+            trait(TRAIT_SMASHER, 1, 'Heavy'),
             trait(TRAIT_CONCUSSIVE, 2),
         ],
     }),
@@ -252,8 +253,8 @@ export const UNIT_WEAPONS = makeFrozenStaticListIds({
         display_name: 'UL Melee Weapon',
         damage: null,
         traits: [
-            trait(TRAIT_MELEE, 'X'),
-            trait(TRAIT_AP, 'X'),
+            trait(TRAIT_SMASHER, 'X', 'Light'),
+            trait(TRAIT_AP, 1),
         ],
     }),
     [UL_GRENADES]: makeWeapon({
@@ -328,7 +329,7 @@ export const UNIT_WEAPONS = makeFrozenStaticListIds({
         ],
     }),
     [INFANTRY_HEAVY_RIFLES]: makeWeapon({
-        display_name: 'Heavy Rifles',
+        display_name: 'Heavy Infantry Rifles',
         damage: 3,
         traits: [
             trait(TRAIT_LIGHT),

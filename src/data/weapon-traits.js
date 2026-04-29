@@ -22,6 +22,7 @@ export const TRAIT_REACH = 'TRAIT_REACH';
 export const TRAIT_STAGGER = 'TRAIT_STAGGER';
 export const TRAIT_TETHER = 'TRAIT_TETHER';
 export const TRAIT_ANTI_AIR = 'TRAIT_ANTI_AIR';
+export const TRAIT_SMASHER = 'TRAIT_SMASHER';
 
 export const WEAPON_TRAITS = makeTraits({
     [TRAIT_AP]: {
@@ -120,6 +121,11 @@ export const WEAPON_TRAITS = makeTraits({
     [TRAIT_ANTI_AIR]: {
         display_name: 'Anti-Air',
         description: 'When this Weapon targets a Unit with the Flying Trait, the Target is at -2 to Defense Rolls (i.e., if the Target Unit would normally remove damage from the Attack Pool on a 2+, it avoids Damage from this Weapon on a 4+). If a Weapon with this trait destroys the Target Model in a Squadron, you may apply remaining damage to another Model of the Squadron as if the Squadron was not a Flying Squadron.',
+    },
+    [TRAIT_SMASHER]: {
+        display_name: 'Smasher',
+        description: 'This Unit is permitted to make the SMASH Order, even if it has the Auxiliary Unit Trait. The Unit is considered of Weight Class (X) when making a SMASH Order. Add (Y) dice to the Attack Pool when performing a SMASH Order.',
+        formatter: (name, number, type) => `${name} (${type}, ${number})`,
     },
 });
 
