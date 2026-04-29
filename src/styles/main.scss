@@ -98,6 +98,15 @@ $dropdown-link-active-bg: darken(#f8f9fa, 7%);
 body {
   font-optical-sizing: auto;
   font-style: normal;
+  font-family: "Geist", system-ui, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6,
+.navbar-brand,
+.card-mech-team > .card-header,
+.card-mech-team-group > .card-header {
+  font-family: "Chakra Petch", sans-serif;
 }
 
 $body-bg-color: #0A1128;
@@ -224,9 +233,8 @@ body[data-bs-theme="dark"] {
 }
 // ── UX improvements ──────────────────────────────────────────────────────────
 
-// Condensed label font via Google Fonts (added to index.html separately)
 .stat-label {
-  font-family: 'Barlow Condensed', 'Oswald', sans-serif;
+  font-family: "Chakra Petch", sans-serif;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;

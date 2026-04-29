@@ -1,22 +1,24 @@
-@import url('https://fonts.googleapis.com/css2?family=Anta&family=Outfit:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Geist:wght@100..900&display=swap');
 
-$font-outfit: "Outfit", sans-serif;
-$font-anta: "Anta", sans-serif;
+$font-geist:  "Geist", system-ui, sans-serif;
+$font-chakra: "Chakra Petch", sans-serif;
+
+// legacy aliases so card output components still work
+$font-outfit: $font-geist;
+$font-anta:   $font-chakra;
 
 .text-muted-custom {
   opacity: 0.66;
 }
 
 .font-outfit {
-  font-family: $font-outfit;
+  font-family: $font-geist;
 }
 
 .font-anta {
-  font-family: $font-anta;
+  font-family: $font-chakra;
 }
-
 
 ul {
   padding-left: 1.5em;
 }
-
