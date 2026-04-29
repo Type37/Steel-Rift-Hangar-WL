@@ -7,7 +7,6 @@ import {
     GAME_SIZE_RECON,
     GAME_SIZE_STRIKE,
     GAME_SIZE_BATTLE,
-    GAME_SIZE_WAR,
 } from '../../../data/game-sizes.js';
 import {TEAM_SIZE_SMALL, TEAM_SIZE_MEDIUM, TEAM_SIZE_LARGE} from '../../../data/mech-teams.js';
 import {BPopover} from 'bootstrap-vue-next';
@@ -19,7 +18,6 @@ const rows = [
     {id: GAME_SIZE_RECON, label: 'Recon'},
     {id: GAME_SIZE_STRIKE, label: 'Strike'},
     {id: GAME_SIZE_BATTLE, label: 'Battle'},
-    {id: GAME_SIZE_WAR, label: 'War'},
 ];
 
 const cols = [
@@ -53,8 +51,7 @@ function getCount(sizeId, teamSizeId) {
         <strong>Sm</strong> = 2 HE-Vs &nbsp;
         <strong>Md</strong> = 2–3 HE-Vs &nbsp;
         <strong>Lg</strong> = 3–4 HE-Vs.<br><br>
-        Your current game size is shown in <span class="text-primary fw-bold">blue</span>.
-        A dash means that team size is not allowed at that game size.
+        Your active game size row is shown in bold.
       </BPopover>
     </div>
 
@@ -77,7 +74,7 @@ function getCount(sizeId, teamSizeId) {
         <tr
             v-for="row in rows"
             :key="row.id"
-            :class="{'fw-bold text-primary': row.id === game_size_id}"
+            :class="{'fw-bold': row.id === game_size_id}"
         >
           <td class="ps-0 py-0">{{ row.label }}</td>
           <td

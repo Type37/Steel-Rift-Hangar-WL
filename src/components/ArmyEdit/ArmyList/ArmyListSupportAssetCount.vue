@@ -44,7 +44,6 @@ function updateCheck(value) {
       </BFormCheckbox>
     </template>
     <template #title>Custom Support Asset Limit</template>
-    By default your Support Asset limit is set by your game size.
-    Tick <strong>Custom</strong> to override it manually — useful for house rules or scenario play.
+    Tick <strong>Custom</strong> to set your own support asset limit. Useful for house rules or scenario play.
   </BPopover>
 </template>

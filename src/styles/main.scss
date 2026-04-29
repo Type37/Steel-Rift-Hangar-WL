@@ -18,9 +18,9 @@ $green: #38c172;
 $teal: #4dc0b5;
 $cyan: #6cb2eb;
 
-$primary: #98b1c2;
-$secondary: shade-color($primary, 40%);
-$border: shade-color($primary, 40%);
+$primary: #dc4427;
+$secondary: #3d5166;
+$border: shade-color($secondary, 20%);
 $success: $green;
 $info: $cyan;
 $warning: $yellow;
@@ -227,10 +227,10 @@ body[data-bs-theme="dark"] {
   font-size: 0.75rem;
 }
 
-// Big Add Solo HE-V CTA button — burnt amber
+// Big Add Solo HE-V CTA button — Steel Rift red
 .add-hev-cta {
-  background-color: #b85c1a;
-  border-color: #9e4e15;
+  background-color: #dc4427;
+  border-color: #c23b21;
   color: #fff;
   font-size: 1.1rem;
   font-weight: 700;
@@ -239,24 +239,24 @@ body[data-bs-theme="dark"] {
   box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 
   &:hover, &:focus {
-    background-color: #9e4e15;
-    border-color: #8a4312;
+    background-color: #c23b21;
+    border-color: #a8331c;
     color: #fff;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   }
 
   &:active {
-    background-color: #8a4312 !important;
-    border-color: #7a3b0f !important;
+    background-color: #a8331c !important;
+    border-color: #8e2b17 !important;
     color: #fff !important;
   }
 }
 
-// Add Team CTA button — steel teal
+// Add Team CTA button — dark steel slate
 .add-team-cta {
-  background-color: #2e6b7a;
-  border-color: #265a67;
+  background-color: #3d5166;
+  border-color: #324457;
   color: #fff;
   font-size: 1.1rem;
   font-weight: 700;
@@ -265,16 +265,16 @@ body[data-bs-theme="dark"] {
   box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 
   &:hover, &:focus {
-    background-color: #265a67;
-    border-color: #1e4a55;
+    background-color: #324457;
+    border-color: #273748;
     color: #fff;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   }
 
   &:active {
-    background-color: #1e4a55 !important;
-    border-color: #163d46 !important;
+    background-color: #273748 !important;
+    border-color: #1c2a39 !important;
     color: #fff !important;
   }
 }
