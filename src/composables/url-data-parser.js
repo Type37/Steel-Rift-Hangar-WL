@@ -46,8 +46,7 @@ async function compressBytes(bytes) {
     const writer = stream.writable.getWriter();
     writer.write(bytes);
     writer.close();
-    const buf = await new Response(stream.readable).arrayBuffer();
-    return new Uint8Array(buf);
+    return readStream(stream.readable);
 }
 
 async function decompressBytes(bytes) {
@@ -55,8 +54,25 @@ async function decompressBytes(bytes) {
     const writer = stream.writable.getWriter();
     writer.write(bytes);
     writer.close();
-    const buf = await new Response(stream.readable).arrayBuffer();
-    return new Uint8Array(buf);
+    return readStream(stream.readable);
+}
+
+async function readStream(readable) {
+    const reader = readable.getReader();
+    const chunks = [];
+    while (true) {
+        const {done, value} = await reader.read();
+        if (done) break;
+        chunks.push(value);
+    }
+    const total = chunks.reduce((n, c) => n + c.length, 0);
+    const out = new Uint8Array(total);
+    let offset = 0;
+    for (const chunk of chunks) {
+        out.set(chunk, offset);
+        offset += chunk.length;
+    }
+    return out;
 }
 
 function bytesToBase64(bytes) {
