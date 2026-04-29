@@ -39,7 +39,7 @@ function addGeneralMech() {
         @click="addGeneralMech"
         v-if="!baseMechCount"
     >
-      <Icon name="hev" class="me-1"/>
+      <Icon name="hev" size="36px" class="me-2"/>
       Add Solo HE-V
     </BButton>
     <BtnAddTeam/>

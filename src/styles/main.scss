@@ -227,17 +227,55 @@ body[data-bs-theme="dark"] {
   font-size: 0.75rem;
 }
 
-// Big Add HE-V CTA button on empty state
+// Big Add Solo HE-V CTA button — burnt amber
 .add-hev-cta {
+  background-color: #b85c1a;
+  border-color: #9e4e15;
+  color: #fff;
   font-size: 1.1rem;
   font-weight: 700;
   padding: 0.6rem 2rem;
   letter-spacing: 0.03em;
   box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 
-  &:hover {
+  &:hover, &:focus {
+    background-color: #9e4e15;
+    border-color: #8a4312;
+    color: #fff;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  &:active {
+    background-color: #8a4312 !important;
+    border-color: #7a3b0f !important;
+    color: #fff !important;
+  }
+}
+
+// Add Team CTA button — steel teal
+.add-team-cta {
+  background-color: #2e6b7a;
+  border-color: #265a67;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 0.6rem 2rem;
+  letter-spacing: 0.03em;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+
+  &:hover, &:focus {
+    background-color: #265a67;
+    border-color: #1e4a55;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  &:active {
+    background-color: #1e4a55 !important;
+    border-color: #163d46 !important;
+    color: #fff !important;
   }
 }
 
