@@ -79,6 +79,8 @@ $dropdown-link-active-bg: darken(#f8f9fa, 7%);
 @import "page-cards-print";
 @import "page-reference-print";
 
+@import "fluent";
+
 
 :root {
   --bs-popover-header-color: var(--bs-body-color);
@@ -259,19 +261,19 @@ body[data-bs-theme="dark"] {
 
 // Add Team CTA button — Prussian Blue
 .add-team-cta {
-  background-color: #0A1128;
-  border-color: #131f3f;
-  color: #fff;
-  font-size: 1.1rem;
-  font-weight: 700;
-  padding: 0.6rem 2rem;
+  background-color: #0A1128 !important;
+  border-color: #131f3f !important;
+  color: #fff !important;
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  padding: 0.6rem 2rem !important;
   letter-spacing: 0.03em;
   box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 
   &:hover, &:focus {
-    background-color: #131f3f;
-    border-color: #1c2d57;
-    color: #fff;
+    background-color: #131f3f !important;
+    border-color: #1c2d57 !important;
+    color: #fff !important;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   }
