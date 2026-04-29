@@ -5,6 +5,7 @@ import ModalImportMechs from './Modal/ModalImportMechs.vue';
 import {loadSaveFileData} from '../../store/helpers/store-save-load.js';
 import {jsonFileParser} from '../../composables/file-upload.js';
 import ModalDataUrlImport from './Modal/ModalDataUrlImport.vue';
+import ModalShareCodeLoad from './Modal/ModalShareCodeLoad.vue';
 import {HEV_PACKS} from '../../data/hev-packs.js';
 import {useMechStore} from '../../store/mech-store.js';
 import {useTeamStore} from '../../store/team-store.js';
@@ -16,6 +17,7 @@ const modalImportMechs = useTemplateRef('modal-import-mechs');
 
 const importModalVisible = ref(false);
 const dataUrlModalVisible = ref(false);
+const shareCodeModalVisible = ref(false);
 
 const fileUploadChange = jsonFileParser((jsonData) => {
   loadSaveFileData(jsonData);
@@ -62,6 +64,10 @@ function importHevPack(quickBuild) {
       <span class="material-symbols-outlined">file_open</span>
       Load File
     </BDropdownItem>
+    <BDropdownItem @click="shareCodeModalVisible = true">
+      <span class="material-symbols-outlined">input</span>
+      Load Share Code
+    </BDropdownItem>
     <BDropdownItem @click="() => fileImport.click()">
       <span class="material-symbols-outlined">place_item</span>
       Import HE-Vs from File
@@ -78,6 +84,9 @@ function importHevPack(quickBuild) {
       {{ item.name }}
     </BDropdownItem>
   </BDropdown>
+
+  <ModalShareCodeLoad v-model="shareCodeModalVisible"/>
+
   <ModalDataUrlImport
       v-model="dataUrlModalVisible"
       @data-url-success="onImportFromUrlData"

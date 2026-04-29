@@ -18,6 +18,66 @@ export function urlDataStringToJson(dataString) {
     return JSON.parse(jsonString);
 }
 
+// ── Share Codes ───────────────────────────────────────────────────────────────
+// SR:<base64-gzip> — compact, pasteable in Discord, ~800-1200 chars for a
+// typical 150T list vs. 3000+ chars for the raw data URL.
+
+export async function makeShareCode(data) {
+    const jsonString = JSON.stringify(data);
+    const bytes = new TextEncoder().encode(jsonString);
+
+    const compressed = await compressBytes(bytes);
+    const base64 = bytesToBase64(compressed);
+
+    return 'SR:' + base64;
+}
+
+export async function shareCodeToJson(code) {
+    const raw = code.trim();
+    const base64 = raw.startsWith('SR:') ? raw.slice(3) : raw;
+    const bytes = base64ToBytes(base64);
+    const decompressed = await decompressBytes(bytes);
+    const jsonString = new TextDecoder().decode(decompressed);
+    return JSON.parse(jsonString);
+}
+
+async function compressBytes(bytes) {
+    const stream = new CompressionStream('gzip');
+    const writer = stream.writable.getWriter();
+    writer.write(bytes);
+    writer.close();
+    const buf = await new Response(stream.readable).arrayBuffer();
+    return new Uint8Array(buf);
+}
+
+async function decompressBytes(bytes) {
+    const stream = new DecompressionStream('gzip');
+    const writer = stream.writable.getWriter();
+    writer.write(bytes);
+    writer.close();
+    const buf = await new Response(stream.readable).arrayBuffer();
+    return new Uint8Array(buf);
+}
+
+function bytesToBase64(bytes) {
+    let binary = '';
+    for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary);
+}
+
+function base64ToBytes(base64) {
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 function encodeBase64(jsonData) {
     const jsonString = JSON.stringify(jsonData);
     const encoder = new TextEncoder();

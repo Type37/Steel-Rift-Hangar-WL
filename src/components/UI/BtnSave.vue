@@ -4,7 +4,7 @@ import {makeSaveFileData} from '../../store/helpers/store-save-load.js';
 import {useArmyListStore} from '../../store/army-list-store.js';
 import {storeToRefs} from 'pinia';
 import {BDropdown, BDropdownItem} from 'bootstrap-vue-next';
-import {makeArmyListDataUrl} from '../../composables/url-data-parser.js';
+import {makeArmyListDataUrl, makeShareCode} from '../../composables/url-data-parser.js';
 import {toaster} from '../../toaster.js';
 
 function saveFile(fileName, data) {
@@ -35,6 +35,17 @@ function saveToUrl() {
 
   toaster().info('Data URL Copied to clipboard', 'This URL contains your Army List and can be shared.');
 }
+
+async function copyShareCode() {
+  try {
+    const data = makeSaveFileData();
+    const code = await makeShareCode(data);
+    await navigator.clipboard.writeText(code);
+    toaster().info('Share code copied', `${code.length} characters — paste anywhere to share your list.`);
+  } catch (err) {
+    toaster().error('Failed to generate share code', err.message);
+  }
+}
 </script>
 <template>
   <BDropdown
@@ -52,6 +63,10 @@ function saveToUrl() {
     <BDropdownItem @click="saveToUrl">
       <span class="material-symbols-outlined">copy_all</span>
       To Data Url
+    </BDropdownItem>
+    <BDropdownItem @click="copyShareCode">
+      <span class="material-symbols-outlined">content_copy</span>
+      Copy Share Code
     </BDropdownItem>
   </BDropdown>
 </template>
