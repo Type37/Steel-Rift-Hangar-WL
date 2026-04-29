@@ -43,7 +43,7 @@ const resetModal = ref(false);
 
           <div class="col-md-6">
             <div class="col-form-label form-control-sm d-inline-block text-end">
-              <strong>Teams: </strong>
+              <strong><span class="material-symbols-outlined">groups</span> Teams: </strong>
               <fraction
                   :a="used_teams_count"
                   :b="max_teams_count"
@@ -51,7 +51,7 @@ const resetModal = ref(false);
               />
 
               <span class="ms-2">
-                <strong>Support Assets: </strong>
+                <strong><span class="material-symbols-outlined">military_tech</span> Support Assets: </strong>
                 <fraction
                     :a="used_support_assets"
                     :b="max_support_assets"
@@ -59,7 +59,7 @@ const resetModal = ref(false);
                 />
               </span>
               <span class="ms-2">
-                <strong>Tonnage: </strong>
+                <strong><span class="material-symbols-outlined">scale</span> Tonnage: </strong>
                 <fraction
                     :a="used_tons"
                     :b="max_tons"
