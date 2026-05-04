@@ -102,6 +102,100 @@ export const GLOSSARY = {
     text: 'Target receives a Tether Marker, the Active Unit a corresponding Anchor Marker. Tethered Units may not end MOVE or JUMP further from the Anchor. At end of a Tethered Unit\'s Activation, on a 4+ remove the Tether (and Anchor).',
   },
 
+  // -------- Advanced unit traits (for support assets, vehicles, infantry) --------
+  'all-terrain': {
+    title: 'All-Terrain',
+    text: 'Units with this Trait ignore the movement penalty for Rough Terrain.',
+  },
+  'asset command': {
+    title: 'Asset Command',
+    text: 'All Units in this Asset are issued Orders during the same Activation. Resolve each Unit\'s Activation in turn before passing Active Commander to the opponent. If a Unit is no longer in play, the rest still activate together.',
+  },
+  'auxiliary unit': {
+    title: 'Auxiliary Unit (X)',
+    text: 'Defends as Weight Class (X). Side/Rear Arc modifiers do not apply. Does not suffer Critical Damage, Fragile Internals, or Backup Systems Engage. Counts as Class (X) for other rolls (e.g. Kinetic). May not SMASH unless it has the Smasher trait. May not Overdrive; Redline triggers cause 1 Structure Damage instead. Does not count as an HE-V unless otherwise stated.',
+  },
+  'close support': {
+    title: 'Close Support',
+    text: 'If a friendly Unit with this trait is within 6" of an enemy target of an ENGAGE or SMASH Order, add 1 to the Damage Rating of each weapon used. Bonus applies once regardless of how many friendly Units have it.',
+  },
+  'flying': {
+    title: 'Flying',
+    text: 'MOVE Order is replaced by a FLYING MOVE: place the Unit within its Speed horizontally, ignoring Terrain and Unit movement restrictions provided the base fits and faces any direction. Targeting a Flying Unit gives +1 to Defense vs ENGAGE; not modified by Covered or Blocked. Blast Weapons targeting a Flying Unit do not affect non-Flying Units; Flying Units in Blast range of a non-Flying Target do not roll Defense. Cannot SMASH or be SMASHed. Silhouette extends 4" above the base.',
+  },
+  'flying squadron': {
+    title: 'Flying Squadron',
+    text: 'Has Squadron rules with two changes: other Models must end deployment or movement within 6" of the Leader (not 3"). On an ENGAGE, if a Weapon would destroy the Target Model, do not spill remaining damage to another Model. Blast does NOT add 2 to the Attack Pool against this Squadron.',
+  },
+  'fortification': {
+    title: 'Fortification',
+    text: 'Once placed in Deployment, this Unit may not be moved or placed by any Order or effect, voluntarily or otherwise.',
+  },
+  'garrison': {
+    title: 'Garrison (X)',
+    text: 'A Model with this Trait contains an assigned Unit (X). Garrisoned Units are not deployed; they wait off-table until they perform the MUSTER Order, which places them within 1" of the Garrison. If the Garrison Model is Destroyed before MUSTER, the Garrisoned Unit is also Destroyed.',
+  },
+  'guidance suite': {
+    title: 'Guidance Suite (X)',
+    text: 'At the beginning or end of the named Order, place a Guidance Marker on an enemy Unit in LoS. When that Unit is the Target of an ENGAGE, the attacker picks: (a) all weapons count as benefiting from LOCK ON, or (b) one weapon gets +2 to Damage Rating. Marker is removed after the ENGAGE or when the carrier reactivates.',
+  },
+  'inferno gear': {
+    title: 'Inferno Gear',
+    text: 'If any Model in this Unit has this Trait, the Unit ignores Disruptive effects.',
+  },
+  'magnetic grapples': {
+    title: 'Magnetic Grapples',
+    text: 'When this Unit MOVEs or JUMPs into base contact with an Enemy Unit, that Enemy receives a Tether Marker and the Active Unit gets a corresponding Anchor Marker.',
+  },
+  'minesweeper': {
+    title: 'Minesweeper',
+    text: 'May not be Targeted by Mine Drone Tokens. May ENGAGE Mine Drone Tokens as if equipped with the Mine Drone Tracking Munitions Upgrade.',
+  },
+  'msoe launcher': {
+    title: 'MSOE Launcher (X)',
+    text: 'At the beginning or end of the named Order, place an Obscuration Emitter Token (25 mm circle) within 6" of this Model. Units within 3" count as in Covering Terrain and as carrying Anti-Missile System and Electronic Countermeasures. Removed when the placer activates again.',
+  },
+  'outrider': {
+    title: 'Outrider',
+    text: 'Squadron Models with this trait may deploy and end moves within 12" of the Squadron Leader (instead of 3"). All Outrider Models in a Squadron must stay within 3" of one another.',
+  },
+  'scramblers': {
+    title: 'Scramblers',
+    text: 'All Units within 6" of a Model with Scramblers (including its own Unit) count as carrying Anti-Missile Systems and Electronic Countermeasures.',
+  },
+  'shield projector': {
+    title: 'Shield Projector',
+    text: 'A friendly Unit within 6" of this Model counts as carrying a Combat Shield Upgrade when making Defense Rolls. Does not stack with an existing Combat Shield.',
+  },
+  'smasher': {
+    title: 'Smasher (X, Y)',
+    text: 'This Unit may perform SMASH Orders even with the Auxiliary Unit Trait. It counts as Weight Class X when SMASHing and adds Y dice to the Attack Pool.',
+  },
+  'squadron': {
+    title: 'Squadron',
+    text: 'A Unit of multiple Models that activates together and shares Orders. On deploy or movement, nominate a Squadron Leader; all other Models must end within 3" of the Leader. Damage from ENGAGE spills to other Models if the Target is destroyed; Blast adds 2 to the Attack Pool when targeting the Squadron.',
+  },
+  'squadron garrison': {
+    title: 'Squadron Garrison (X)',
+    text: 'Like Garrison, but the whole Unit collectively carries the Garrisoned Unit. Pick one Member Model to count as the Garrison for MUSTER. If a Member is lost, drop a proportional number of Garrisoned Models, rounding up.',
+  },
+  'support orders': {
+    title: 'Support Orders',
+    text: 'Units with this trait may perform the SUPPORT Order to activate any number of their "SUPPORT:" prefixed traits. If a Squadron contains Support Orders Models, the whole Squadron performs SUPPORT, and each Support Model activates its trait in any order chosen.',
+  },
+  'suppressive fire': {
+    title: 'Suppressive Fire',
+    text: 'If an enemy Unit within 6" of this Model performs an ENGAGE Order, the target of that ENGAGE gains +1 to its Defense Rolls.',
+  },
+  'vulnerable': {
+    title: 'Vulnerable',
+    text: 'This Unit takes full Damage from Weapons or effects with the Light trait (Light damage is NOT halved against it).',
+  },
+  'yielding': {
+    title: 'Yielding',
+    text: 'Models without Yielding may move through Models with Yielding. If a non-Yielding Model ends its move on top of a Yielding Model, move the Yielding Model the minimum distance to permit the placement.',
+  },
+
   // Upgrade-specific keywords (some duplicated above for findability)
   'redline': {
     title: 'Redline Marker',

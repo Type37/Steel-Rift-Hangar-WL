@@ -29,8 +29,8 @@
 
   /* Chakra Petch is reserved for marquee headings */
   --font-display:   'Chakra Petch', 'Bahnschrift', sans-serif;
-  /* Space Grotesk handles sub-headings, labels, button text */
-  --font-stencil:   'Space Grotesk', system-ui, sans-serif;
+  /* Space Mono is the chrome font: buttons, labels, sub-heads */
+  --font-stencil:   'Space Mono', ui-monospace, monospace;
   /* Schibsted Grotesk is the body workhorse */
   --font-body:      'Schibsted Grotesk', system-ui, sans-serif;
   /* Data / mono */
@@ -227,18 +227,106 @@ button:not(:disabled):active {
   left: 130%;
 }
 
-/* HE-V silhouette icon used inline on Add HE-V buttons. Inherits color
-   via filter: light icon on rust button. */
+/* HE-V silhouette icon used inline on Add HE-V buttons. */
 .cta-mech-icon {
   width: 22px;
   height: 22px;
   display: inline-block;
-  /* invert dark SVG to match cream/surface text */
   filter: brightness(0) invert(1);
   flex-shrink: 0;
 }
 .cta-mech-icon.icon-dark {
-  filter: none; /* used on light buttons */
+  filter: none;
+}
+
+/* ============================================================
+   BOTTOM BAR. Force input + utilities + mission + tonnage + CTAs.
+   The topbar has been removed; this is the only chrome below the
+   navbar.
+   ============================================================ */
+.bottombar {
+  border-top: 2px solid var(--ink);
+  background: var(--surface);
+  padding: 10px 22px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bottombar-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.bottombar-row-force { gap: 10px; }
+.bottombar-force-input {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  border-bottom: 1.5px solid var(--rule-strong);
+  padding-bottom: 2px;
+  min-width: 0;
+}
+.bottombar-force-input input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 4px 0;
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+.bottombar-force-input input::placeholder {
+  color: var(--mute);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.bottombar-utilities {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.util-btn {
+  background: transparent;
+  border: 1.5px solid var(--rule-strong);
+  color: var(--ink);
+  padding: 6px 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-stencil);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+.util-btn-print {
+  background: var(--ink);
+  color: var(--surface);
+  border-color: var(--ink);
+}
+.bottombar-row-mission {
+  flex-wrap: wrap;
+}
+.bottombar-mission-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+.bottombar-ton-bar {
+  flex: 0 0 240px;
+}
+.bottombar-row-cta {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 10px;
 }
 
 /* Pulsing glow for empty-roster prompts that want attention */
@@ -278,6 +366,58 @@ button:not(:disabled):active {
   border-color: var(--steel);
 }
 .row-expand svg { display: block; }
+
+/* ============================================================
+   FACTION TILES. Three big buttons for picking a faction.
+   ============================================================ */
+.faction-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.faction-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 14px;
+  text-align: left;
+  background: var(--surface);
+  border: 2px solid var(--rule-strong);
+  cursor: pointer;
+  transition: background 110ms, border-color 110ms, color 110ms, transform 80ms;
+  min-height: 110px;
+}
+.faction-tile:hover {
+  border-color: var(--ink);
+  background: var(--bg);
+}
+.faction-tile.is-active {
+  background: var(--steel);
+  border-color: var(--steel);
+  color: var(--surface);
+}
+.faction-tile-name {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+.faction-tile-blurb {
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+.faction-tile.is-active .faction-tile-blurb {
+  color: rgba(241, 234, 218, 0.78);
+}
+@media (max-width: 540px) {
+  .faction-tiles { grid-template-columns: 1fr; }
+  .faction-tile { min-height: 0; padding: 12px 12px; }
+}
 
 /* Hover for trait token */
 .tok {
@@ -495,12 +635,11 @@ button:not(:disabled):active {
   }
 }
 
-/* Phones: trim header/footer chrome so the middle has more room */
+/* Phones: trim chrome so the middle has more room */
 @media (max-width: 760px) {
   body { font-size: 15px; }
 
-  /* Compact navbar: hide link list to keep header short.
-     Logo + Buy Now stay visible. */
+  /* Compact navbar: hide link list to keep header short. */
   .navbar-inner {
     padding: 8px 14px;
     gap: 12px;
@@ -514,54 +653,34 @@ button:not(:disabled):active {
     margin-left: auto;
   }
 
-  /* Compact topbar: drop the counter strip on phones (tonnage is in
-     the bottom bar, the rest is reachable via tabs). */
-  .topbar {
-    grid-template-columns: 1fr auto !important;
-    grid-template-rows: auto auto;
-    gap: 6px 12px !important;
-    padding: 8px 14px !important;
-  }
-  .topbar-wordmark { grid-column: 1; grid-row: 1; }
-  .topbar-wordmark > div:first-child { font-size: 16px !important; }
-  .topbar-tagline { display: none; }
-  .topbar-counters { display: none !important; }
-
-  .topbar-actions {
-    grid-column: 2;
-    grid-row: 1;
-    justify-self: end;
+  /* Bottom bar collapses to tighter rows on phone */
+  .bottombar {
+    padding: 8px 12px 10px !important;
     gap: 6px !important;
   }
-  .topbar-print-label { display: none; }
-  .topbar-print { padding: 7px 10px !important; }
+  .bottombar-row { gap: 8px; }
+  .bottombar-row-force { gap: 6px; }
+  .bottombar-force-input input { font-size: 16px !important; }
+  .util-btn { padding: 6px 9px; font-size: 11px; }
+  .util-label { display: none; }
 
-  .topbar-force {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    border-top: 1px dotted var(--rule);
-    padding-top: 6px !important;
-    gap: 0 !important;
+  .bottombar-row-mission {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
   }
-  .topbar-force input { font-size: 16px !important; }
+  .bottombar-mission-row { gap: 4px !important; }
+  .bottombar-ton-bar { flex: 1 1 auto; }
 
-  /* Bottom bar: 2-col grid for the CTAs, mission row spans full width */
-  .bottombar {
-    grid-template-columns: 1fr 1fr !important;
+  .bottombar-row-cta {
+    grid-template-columns: 1fr 1.3fr;
     gap: 8px !important;
-    padding: 8px 12px !important;
   }
-  .bottombar-mission-row { gap: 4px !important; margin-bottom: 6px !important; }
   .bottombar-add-support, .bottombar-add-mech {
-    padding: 11px 12px !important;
-    font-size: 12.5px !important;
-    letter-spacing: 0.10em !important;
-    justify-content: center !important;
-    width: 100%;
+    padding: 11px 10px !important;
+    font-size: 12px !important;
+    letter-spacing: 0.08em !important;
   }
-  .bottombar-add-support { grid-row: 3; grid-column: 1; }
-  .bottombar-add-mech { grid-row: 3; grid-column: 2; }
-  .bottombar-tonnage { grid-column: 1 / -1; grid-row: 1; }
 
   .sidebar { padding: 14px 12px 20px !important; }
   .editor-col { padding: 18px 14px 28px !important; }

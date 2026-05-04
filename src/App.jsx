@@ -2,7 +2,7 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { TEAMS, MISSIONS, MISSION_ORDER } from './data';
 import { calcMech, newMech, findAsset } from './calc';
 
-import { Navbar, TopBar, BottomBar, MechCard, EmptyRoster } from './components/chrome';
+import { Navbar, BottomBar, MechCard, EmptyRoster, SupportRosterCard } from './components/chrome';
 import { MechEditor } from './components/editor';
 import { SupportPanel, TeamPanel, FactionPanel } from './components/panels';
 import { AddMechModal, OptionsModal } from './components/modals';
@@ -130,15 +130,6 @@ export default function App() {
 
       <div className="app-shell no-print">
         <Navbar />
-        <TopBar
-          forceName={forceName} onForceName={setForceName}
-          onPrint={() => window.print()}
-          onOptions={() => setOptionsOpen(true)}
-          totalTons={totalTons} capTons={cap}
-          mechCount={mechs.length}
-          supportCount={supportAssets.length} supportLimit={supportLimit}
-          teamCount={selectedTeams.length} teamMax={teamMax}
-        />
 
         {/* Main two-column layout */}
         <div className="layout">
@@ -213,6 +204,20 @@ export default function App() {
                     </GhostButton>
                   </div>
                 )}
+
+                {/* Support roster: always visible alongside the HE-Vs */}
+                {supportAssets.length > 0 && (
+                  <div style={{ marginTop: 26 }}>
+                    <SectionTitle tag={`${supportAssets.length} taken`}>Support</SectionTitle>
+                    <div style={{ borderBottom: '1px solid var(--rule)', marginBottom: 10 }}>
+                      {supportAssets.map(name => {
+                        const a = findAsset(name);
+                        if (!a) return null;
+                        return <SupportRosterCard key={name} asset={a} onRemove={toggleSupport} />;
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -282,6 +287,9 @@ export default function App() {
         </div>
 
         <BottomBar
+          forceName={forceName} onForceName={setForceName}
+          onPrint={() => window.print()}
+          onOptions={() => setOptionsOpen(true)}
           mission={mission} customTons={customTons}
           onMission={setMission} onCustomTons={setCustomTons}
           totalTons={totalTons}

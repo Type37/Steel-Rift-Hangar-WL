@@ -5,6 +5,21 @@ import { checkTeamEligibility, slotsForBand } from '../calc';
 import { SectionTitle, Chip, TextButton, TraitList, RowExpand, InlineTraitGlossary, collectTraits } from './ui';
 import { Tooltip } from './tooltip';
 
+// Resolve absolute asset path through Vite's base
+const BASE = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '/');
+const asset = (p) => `${BASE}${p.replace(/^\//, '')}`;
+
+// Map team name to its silhouette icon. Icons live in /public/icons/.
+const TEAM_ICONS = {
+  'Reconnaissance Team':    'icons/team-recon.svg',
+  'Security Team':          'icons/team-security.svg',
+  'Assassination Team':     'icons/team-assassination.svg',
+  'Berserker Team':         'icons/team-berserker.svg',
+  'Multirole Team':         'icons/team-multirole.svg',
+  'Gunslinger Team':        'icons/team-gunslinger.svg',
+  'Coordinated Assets Team':'icons/team-coordinated-assets.svg',
+};
+
 // ============================================================
 // SUPPORT PANEL
 // ============================================================
@@ -186,33 +201,40 @@ export function TeamPanel({ mechs, selectedTeams, onToggleTeam, mission }) {
       <SectionTitle tag={`${selectedTeams.length} active`}>HE-V Teams</SectionTitle>
 
       <div style={{
-        display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4,
+        display: 'grid',
+        gridTemplateColumns: `repeat(${[
+          mission.teamCounts['2'],
+          mission.teamCounts['2-3'],
+          mission.teamCounts['3-4'],
+        ].filter(n => n > 0).length || 1}, 1fr)`,
+        gap: 4,
         background: 'var(--ink)', padding: 4, marginBottom: 16,
       }}>
         {[
           { label: 'Teams of 2', key: '2' },
           { label: 'Teams of 2-3', key: '2-3' },
           { label: 'Teams of 3-4', key: '3-4' },
-        ].map(b => {
-          const total = mission.teamCounts[b.key];
-          const left = slotsRemaining[b.key];
-          const used = total - left;
-          return (
-            <div key={b.key} style={{
-              background: total > 0 ? 'var(--surface)' : 'var(--bg-deep)',
-              padding: '10px 8px', textAlign: 'center',
-              opacity: total === 0 ? 0.4 : 1,
-            }}>
-              <div className="label" style={{ fontSize: 10.5, marginBottom: 2 }}>{b.label}</div>
-              <div className="mono" style={{
-                fontSize: 19, fontWeight: 700,
-                color: total === 0 ? 'var(--mute)' : (left === 0 ? 'var(--rust)' : 'var(--ink)'),
+        ]
+          .filter(b => mission.teamCounts[b.key] > 0)
+          .map(b => {
+            const total = mission.teamCounts[b.key];
+            const left = slotsRemaining[b.key];
+            const used = total - left;
+            return (
+              <div key={b.key} style={{
+                background: 'var(--surface)',
+                padding: '10px 8px', textAlign: 'center',
               }}>
-                {used}/{total}
+                <div className="label" style={{ fontSize: 10.5, marginBottom: 2 }}>{b.label}</div>
+                <div className="mono" style={{
+                  fontSize: 19, fontWeight: 700,
+                  color: left === 0 ? 'var(--rust)' : 'var(--ink)',
+                }}>
+                  {used}/{total}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
 
       <div>
@@ -304,10 +326,20 @@ function TeamRow({ team, eligible, minSize, canAssign, slotLeft, selected, onTog
       background: selected ? 'var(--surface)' : 'transparent',
     }}>
       <div style={{
-        display: 'grid', gridTemplateColumns: 'auto 1fr auto auto', alignItems: 'center', gap: 12,
+        display: 'grid', gridTemplateColumns: 'auto auto 1fr auto auto', alignItems: 'center', gap: 12,
         padding: '12px 12px',
       }}>
         <RowExpand open={open} onClick={() => setOpen(o => !o)} />
+        {TEAM_ICONS[team.name] ? (
+          <img src={asset(TEAM_ICONS[team.name])} alt=""
+            style={{
+              width: 32, height: 32,
+              opacity: canAssign ? 0.95 : 0.55,
+              filter: selected ? 'none' : 'grayscale(0.4)',
+              flexShrink: 0,
+            }}
+          />
+        ) : <span style={{ width: 32 }} />}
         <div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
             <span className="stencil" style={{ fontSize: 14 }}>{team.name}</span>
@@ -412,14 +444,23 @@ export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk, facti
     <div>
       <SectionTitle tag={faction ? `${perks.length}/2 perks` : 'none'}>Faction</SectionTitle>
 
-      <div style={{ display: 'flex', gap: 6, marginBottom: 14, flexWrap: 'wrap' }}>
+      <div className="faction-tiles">
         {Object.keys(FACTIONS).map(f => (
-          <Chip key={f} active={faction === f} onClick={() => onSetFaction(f)} accent="steel">
-            {f}
-          </Chip>
+          <button
+            key={f}
+            onClick={() => onSetFaction(f)}
+            className={`faction-tile add-btn ${faction === f ? 'is-active' : ''}`}
+          >
+            <span className="faction-tile-name">{f}</span>
+            <span className="faction-tile-blurb">{FACTIONS[f].blurb.split('.')[0]}.</span>
+          </button>
         ))}
-        {faction && <TextButton onClick={() => onSetFaction(null)}>clear</TextButton>}
       </div>
+      {faction && (
+        <div style={{ marginTop: 8, marginBottom: 16 }}>
+          <TextButton onClick={() => onSetFaction(null)}>clear faction</TextButton>
+        </div>
+      )}
 
       {data && (
         <>

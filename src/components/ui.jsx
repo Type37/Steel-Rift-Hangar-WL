@@ -318,7 +318,6 @@ export function InlineTraitGlossary({ traits }) {
   if (defs.length === 0) return null;
   return (
     <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px dotted var(--rule)' }}>
-      <div className="label" style={{ marginBottom: 8 }}>Rules in play</div>
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
