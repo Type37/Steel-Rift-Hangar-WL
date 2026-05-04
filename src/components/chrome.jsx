@@ -313,7 +313,7 @@ export function MechCard({ mech, index, active, onSelect }) {
 // SUPPORT ROSTER CARD: compact summary of a chosen support asset.
 // Shown alongside HE-V cards so the user always sees their force.
 // ============================================================
-export function SupportRosterCard({ asset: a, onRemove }) {
+export function SupportRosterCard({ asset: a, onRemove, onClick, active }) {
   // Pull a short stats string out of the stats object if present
   const statsLine = (() => {
     if (!a.stats) return null;
@@ -323,14 +323,19 @@ export function SupportRosterCard({ asset: a, onRemove }) {
   })();
 
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: 'auto 1fr auto',
-      gap: 10,
-      padding: '11px 14px',
-      borderTop: '1px solid var(--rule)',
-      alignItems: 'center',
-    }}>
+    <div
+      onClick={onClick}
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'auto 1fr auto',
+        gap: 10,
+        padding: '11px 14px',
+        borderTop: '1px solid var(--rule)',
+        alignItems: 'center',
+        cursor: onClick ? 'pointer' : 'default',
+        background: active ? 'var(--surface-2)' : 'transparent',
+      }}
+    >
       <span className="stencil" style={{
         fontSize: 10, padding: '2px 6px', border: '1.5px solid var(--steel)',
         color: 'var(--steel)',
@@ -355,7 +360,7 @@ export function SupportRosterCard({ asset: a, onRemove }) {
         )}
       </div>
       <button
-        onClick={() => onRemove(a.name)}
+        onClick={(e) => { e.stopPropagation(); onRemove(a.name); }}
         title={`Remove ${a.name}`}
         className="add-btn"
         style={{

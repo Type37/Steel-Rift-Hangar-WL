@@ -162,12 +162,29 @@ export function OptionsModal({
   callsignPool, setCallsignPool,
   customCallsigns, setCustomCallsigns,
   simpleMode, setSimpleMode,
+  factionLogo, setFactionLogo,
 }) {
   const [draft, setDraft] = useState(customCallsigns.join('\n'));
 
   useEffect(() => {
     if (open) setDraft(customCallsigns.join('\n'));
   }, [open, customCallsigns]);
+
+  const handleLogoUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      alert('Pick an image file (PNG, JPG, SVG, or WebP).');
+      return;
+    }
+    if (file.size > 1024 * 1024) {
+      alert('Image is larger than 1 MB. Compress it or pick a smaller one.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => setFactionLogo(reader.result);
+    reader.readAsDataURL(file);
+  };
 
   const save = () => {
     const list = draft.split('\n').map(s => s.trim()).filter(Boolean);
@@ -259,6 +276,69 @@ export function OptionsModal({
         </div>
         <div style={{ fontSize: 12, color: 'var(--mute)', marginBottom: 22, lineHeight: 1.5 }}>
           Switching modes hides the optional sections. Your choices in those sections are kept and reapplied if you switch back.
+        </div>
+
+        {/* Faction logo upload. Shown next to your force name when printing. */}
+        <FieldLabel>Faction Logo</FieldLabel>
+        <div style={{
+          border: '1.5px dashed var(--rule-strong)',
+          background: 'var(--bg-deep)',
+          padding: '12px 14px',
+          marginBottom: 8,
+          display: 'flex', alignItems: 'center', gap: 14,
+        }}>
+          <div style={{
+            width: 60, height: 60, flexShrink: 0,
+            background: 'var(--surface)',
+            border: '1px solid var(--rule)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            overflow: 'hidden',
+          }}>
+            {factionLogo ? (
+              <img src={factionLogo} alt="Faction logo"
+                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+            ) : (
+              <span className="mono" style={{ fontSize: 9.5, color: 'var(--mute)', letterSpacing: '0.18em' }}>
+                NO LOGO
+              </span>
+            )}
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 12.5, color: 'var(--ink-2)', lineHeight: 1.45, marginBottom: 6 }}>
+              Optional. Appears next to your force name on printed sheets.
+            </div>
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              <label className="add-btn" style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                border: '1.5px solid var(--ink)', background: 'transparent',
+                color: 'var(--ink)', padding: '6px 12px', cursor: 'pointer',
+                fontFamily: 'var(--font-stencil)', fontSize: 11.5, fontWeight: 700,
+                letterSpacing: '0.10em', textTransform: 'uppercase',
+              }}>
+                {factionLogo ? 'Replace' : 'Upload'}
+                <input
+                  type="file"
+                  accept="image/png, image/jpeg, image/svg+xml, image/webp"
+                  onChange={handleLogoUpload}
+                  style={{ display: 'none' }}
+                />
+              </label>
+              {factionLogo && (
+                <button onClick={() => setFactionLogo(null)} className="add-btn"
+                  style={{
+                    border: '1.5px solid var(--rust)', background: 'transparent',
+                    color: 'var(--rust)', padding: '6px 12px', cursor: 'pointer',
+                    fontFamily: 'var(--font-stencil)', fontSize: 11.5, fontWeight: 700,
+                    letterSpacing: '0.10em', textTransform: 'uppercase',
+                  }}>
+                  Remove
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+        <div style={{ fontSize: 12, color: 'var(--mute)', marginBottom: 22, lineHeight: 1.5 }}>
+          Default logos for each faction are coming soon.
         </div>
 
         {/* Callsign pool */}

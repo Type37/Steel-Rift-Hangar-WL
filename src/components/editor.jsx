@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, Shield, Activity } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { WC, WC_ORDER, RANGED, MELEE, UPGRADES, DEFENSIVE } from '../data';
 import { calcMech, valForClass, copyCost, totalWeaponCost, resetMechToClass } from '../calc';
 import { SectionTitle, FieldLabel, StepButton, TraitList, RowExpand, InlineTraitGlossary, collectTraits } from './ui';
@@ -158,25 +158,25 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete }) {
 
       <TonBreakdown stats={stats} cls={cls} wc={wc} />
 
-      {/* Armor / structure adjusters */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 18 }}>
+      {/* Armor / structure adjusters. Each Reinforce step adds 2 points
+          and costs 2 tons; each Strip step removes 2 points and refunds
+          2 tons. (v1.5 rules p. 18.) */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 22 }}>
         <Adjuster
-          label="Armor"
+          kind="armor"
           value={mech.armor}
           base={wc.baseArmor}
           min={Math.max(0, wc.baseArmor - 4)}
           max={wc.baseArmor + 6}
           onChange={(v) => update({ armor: v })}
-          icon={Shield}
         />
         <Adjuster
-          label="Structure"
+          kind="structure"
           value={mech.structure}
           base={wc.baseStructure}
           min={Math.max(0, wc.baseStructure - 4)}
           max={wc.baseStructure + 6}
           onChange={(v) => update({ structure: v })}
-          icon={Activity}
         />
       </div>
 
@@ -318,58 +318,142 @@ function TonBreakdown({ stats, cls, wc }) {
 
 // ============================================================
 // ARMOR / STRUCTURE ADJUSTER
+// Each step is +/- 2 points and 2 tons, per v1.5 rules.
+// Up = "Reinforce", Down = "Strip".
 // ============================================================
 
-function Adjuster({ label, value, base, min, max, onChange, icon: Icon, step = 2 }) {
+function Adjuster({ kind, value, base, min, max, onChange }) {
   const delta = value - base;
+  const tonsSpent = value; // 1 ton per point of armor/structure equipped
+  const isArmor = kind === 'armor';
+  const stepLabel = (dir) => dir === 'up' ? 'Reinforce' : 'Strip';
+  const canUp = value < max;
+  const canDown = value > min;
+
   return (
     <div style={{
-      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-      padding: '11px 14px',
-      border: '1px solid var(--rule)',
+      border: `2px solid ${isArmor ? 'var(--steel)' : 'var(--olive-deep)'}`,
       background: 'var(--surface)',
+      padding: '14px 14px 12px',
+      position: 'relative',
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        {Icon && <Icon size={20} color="var(--steel)" strokeWidth={2} />}
-        <div>
-          <div className="stencil" style={{ fontSize: 13 }}>{label}</div>
-          <div className="mono" style={{ fontSize: 11.5, color: 'var(--mute)' }}>
-            base {base}
-            {delta !== 0 && (
-              <span style={{ color: delta > 0 ? 'var(--olive)' : 'var(--rust)', fontWeight: 700, marginLeft: 4 }}>
+      {/* Heading row */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 10,
+        borderBottom: '1px solid var(--rule)',
+        paddingBottom: 10, marginBottom: 10,
+      }}>
+        {isArmor ? <ArmorIcon /> : <StructureIcon />}
+        <div style={{ flex: 1 }}>
+          <div className="stencil" style={{
+            fontSize: 14, letterSpacing: '0.14em', color: 'var(--ink)',
+          }}>
+            {isArmor ? 'Armor' : 'Structure'}
+          </div>
+          <div className="mono" style={{ fontSize: 11, color: 'var(--mute)', marginTop: 1 }}>
+            base {base}{delta !== 0 && (
+              <span style={{ color: delta > 0 ? 'var(--olive)' : 'var(--rust)', fontWeight: 700, marginLeft: 5 }}>
                 ({delta > 0 ? '+' : ''}{delta})
               </span>
             )}
-            <span style={{ marginLeft: 6 }}>{value}t</span>
           </div>
         </div>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <button onClick={() => onChange(Math.max(min, value - step))} disabled={value <= min}
-          className="step-hover" style={stepBtnStyle(value <= min)}>−</button>
-        <div style={{
-          minWidth: 42, height: 36, border: '2px solid var(--ink)', background: 'var(--bg)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'var(--font-mono)', fontSize: 19, fontWeight: 700,
+        <div className="mono" style={{
+          fontSize: 36, fontWeight: 700, lineHeight: 1, color: 'var(--ink)',
+          fontVariantNumeric: 'tabular-nums',
         }}>
           {value}
         </div>
-        <button onClick={() => onChange(Math.min(max, value + step))} disabled={value >= max}
-          className="step-hover" style={stepBtnStyle(value >= max)}>+</button>
+      </div>
+
+      {/* Tonnage strip */}
+      <div className="mono" style={{
+        fontSize: 11, color: 'var(--mute)', marginBottom: 10, letterSpacing: '0.04em',
+      }}>
+        costs <strong style={{ color: 'var(--ink)' }}>{tonsSpent}t</strong> of this HE-V's tonnage
+      </div>
+
+      {/* Reinforce / Strip controls */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+        <button
+          onClick={() => onChange(Math.max(min, value - 2))}
+          disabled={!canDown}
+          title={canDown ? `Strip ${isArmor ? 'Armor' : 'Structure'}: -2 points, refund 2 tons.` : 'At minimum.'}
+          className="add-btn"
+          style={adjusterBtn('down', canDown)}
+        >
+          <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 16 }}>−2</span>
+          <span>Strip</span>
+          <span className="mono" style={{ opacity: 0.7, fontSize: 10 }}>+2t</span>
+        </button>
+        <button
+          onClick={() => onChange(Math.min(max, value + 2))}
+          disabled={!canUp}
+          title={canUp ? `Reinforce ${isArmor ? 'Armor' : 'Structure'}: +2 points, costs 2 tons.` : 'At maximum.'}
+          className="add-btn"
+          style={adjusterBtn('up', canUp)}
+        >
+          <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 16 }}>+2</span>
+          <span>Reinforce</span>
+          <span className="mono" style={{ opacity: 0.7, fontSize: 10 }}>-2t</span>
+        </button>
       </div>
     </div>
   );
 }
 
-const stepBtnStyle = (disabled) => ({
-  width: 34, height: 34,
-  border: '1.5px solid var(--rule-strong)',
-  background: disabled ? 'var(--bg-deep)' : 'var(--surface-2)',
-  cursor: disabled ? 'not-allowed' : 'pointer',
-  fontFamily: 'var(--font-mono)', fontSize: 19, fontWeight: 700, color: 'var(--ink)',
-  opacity: disabled ? 0.4 : 1,
-  padding: 0,
-});
+function adjusterBtn(dir, enabled) {
+  const isUp = dir === 'up';
+  return {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 1,
+    padding: '8px 6px',
+    background: enabled
+      ? (isUp ? 'var(--olive)' : 'var(--bg-deep)')
+      : 'var(--bg-deep)',
+    color: enabled
+      ? (isUp ? 'var(--surface)' : 'var(--ink)')
+      : 'var(--mute)',
+    border: enabled
+      ? `1.5px solid ${isUp ? 'var(--olive-deep)' : 'var(--rule-strong)'}`
+      : '1.5px solid var(--rule)',
+    fontFamily: 'var(--font-stencil)',
+    fontSize: 11,
+    fontWeight: 700,
+    letterSpacing: '0.10em',
+    textTransform: 'uppercase',
+    cursor: enabled ? 'pointer' : 'not-allowed',
+    opacity: enabled ? 1 : 0.5,
+  };
+}
+
+// Armor icon. Custom inline SVG: a chevron-shield with horizontal armor bands.
+// Conveys layered plating better than a generic shield.
+function ArmorIcon({ size = 38 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M16 2 L28 6 L28 16 C28 23 22 28 16 30 C10 28 4 23 4 16 L4 6 Z"
+        fill="var(--steel)" stroke="var(--ink)" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M7 11 L25 11" stroke="rgba(255,255,255,0.55)" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M7 16 L25 16" stroke="rgba(255,255,255,0.55)" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M9 21 L23 21" stroke="rgba(255,255,255,0.55)" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+// Structure icon. A solid hexagon (game terminology + visual reference).
+function StructureIcon({ size = 38 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M16 3 L27 9 L27 23 L16 29 L5 23 L5 9 Z"
+        fill="var(--olive)" stroke="var(--ink)" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M16 9 L22 12 L22 20 L16 23 L10 20 L10 12 Z"
+        stroke="rgba(255,255,255,0.55)" strokeWidth="1.5" fill="none" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
 // ============================================================
 // CATALOG ROWS

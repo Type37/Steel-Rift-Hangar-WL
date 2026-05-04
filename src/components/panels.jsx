@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Check } from 'lucide-react';
 import { OFF_TABLE_ASSETS, ADVANCED_ASSETS, FACTIONS, TEAMS } from '../data';
-import { checkTeamEligibility, slotsForBand } from '../calc';
+import { checkTeamEligibility, slotsForBand, findAsset } from '../calc';
 import { SectionTitle, Chip, TextButton, TraitList, RowExpand, InlineTraitGlossary, collectTraits } from './ui';
 import { Tooltip } from './tooltip';
 
@@ -418,27 +418,92 @@ function TeamRow({ team, eligible, minSize, canAssign, slotLeft, selected, onTog
 }
 
 // ============================================================
-// FACTION PANEL
+// SUPPORT DETAIL VIEW
+// Right-pane content when a support asset is added or clicked.
+// Shows everything: full description, statline as a table, and an
+// inline glossary of any traits referenced.
 // ============================================================
 
-export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk, factionLogo, onSetFactionLogo }) {
-  const data = faction ? FACTIONS[faction] : null;
+export function SupportDetailView({ assetName }) {
+  const a = findAsset(assetName);
+  if (!a) return null;
+  const traitNames = collectTraits(a.stats?.Traits || '');
 
-  const handleLogoUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      alert('Please pick an image file.');
-      return;
-    }
-    if (file.size > 1024 * 1024) {
-      alert('Image is larger than 1 MB. Pick a smaller file or compress it first.');
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => onSetFactionLogo(reader.result);
-    reader.readAsDataURL(file);
-  };
+  return (
+    <div style={{ maxWidth: 760 }}>
+      <div className="stencil" style={{
+        fontSize: 12, color: 'var(--rust)', letterSpacing: '0.22em', marginBottom: 6,
+      }}>
+        SUPPORT ASSET · {a.kind.toUpperCase()}
+      </div>
+      <h1 style={{
+        fontFamily: 'var(--font-display)',
+        fontSize: 32, fontWeight: 700, letterSpacing: '0.03em',
+        textTransform: 'uppercase', margin: '0 0 12px',
+        lineHeight: 1.05,
+      }}>
+        {a.name}
+      </h1>
+      <div className="mono" style={{
+        fontSize: 14, color: 'var(--rust)', fontWeight: 700, marginBottom: 16,
+      }}>
+        {a.cost} tons
+      </div>
+
+      <div style={{
+        borderLeft: '3px solid var(--steel)',
+        paddingLeft: 14,
+        marginBottom: 18,
+        fontSize: 14, color: 'var(--ink-2)', fontStyle: 'italic',
+      }}>
+        {a.summary}
+      </div>
+
+      <div className="label" style={{ marginBottom: 6 }}>Rules</div>
+      <div style={{ fontSize: 14, color: 'var(--ink)', lineHeight: 1.6, marginBottom: 18 }}>
+        {a.fullDesc}
+      </div>
+
+      {a.stats && (
+        <>
+          <div className="label" style={{ marginBottom: 6 }}>Statline</div>
+          <table style={{
+            borderCollapse: 'collapse', width: '100%', maxWidth: 560,
+            background: 'var(--surface)', border: '1px solid var(--rule)',
+            marginBottom: 18,
+          }}>
+            <tbody>
+              {Object.entries(a.stats).map(([k, v]) => (
+                <tr key={k}>
+                  <td className="label" style={{
+                    padding: '8px 12px', fontSize: 11,
+                    borderBottom: '1px solid var(--rule)',
+                    background: 'var(--bg)',
+                    width: '32%', verticalAlign: 'top',
+                  }}>
+                    {k}
+                  </td>
+                  <td style={{
+                    padding: '8px 12px', fontSize: 13,
+                    borderBottom: '1px solid var(--rule)',
+                    fontFamily: /Per|Stat|SPD|ARM|STR/i.test(k) ? 'var(--font-mono)' : 'var(--font-body)',
+                  }}>
+                    {/Trait/i.test(k) ? <TraitList traits={v} /> : v}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+
+      {traitNames.length > 0 && <InlineTraitGlossary traits={traitNames} />}
+    </div>
+  );
+}
+
+export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
+  const data = faction ? FACTIONS[faction] : null;
 
   return (
     <div>
@@ -479,66 +544,7 @@ export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk, facti
             </div>
           </div>
 
-          {/* Logo upload — appears only when a faction is picked.
-              Stored as data URL in state and embedded in the print header. */}
-          <div style={{
-            border: '1.5px dashed var(--rule-strong)',
-            background: 'var(--bg-deep)',
-            padding: '12px 14px',
-            marginBottom: 18,
-            display: 'flex', alignItems: 'center', gap: 14,
-          }}>
-            <div style={{
-              width: 56, height: 56, flexShrink: 0,
-              background: 'var(--surface)',
-              border: '1px solid var(--rule)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              overflow: 'hidden',
-            }}>
-              {factionLogo ? (
-                <img src={factionLogo} alt="Faction logo"
-                  style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
-              ) : (
-                <span className="mono" style={{ fontSize: 10, color: 'var(--mute)', letterSpacing: '0.18em' }}>
-                  NO LOGO
-                </span>
-              )}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div className="label" style={{ marginBottom: 2 }}>Faction Logo</div>
-              <div style={{ fontSize: 12.5, color: 'var(--ink-2)', lineHeight: 1.45, marginBottom: 6 }}>
-                Optional. Shown next to your force name when you print.
-              </div>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                <label className="add-btn" style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 6,
-                  border: '1.5px solid var(--ink)', background: 'transparent',
-                  color: 'var(--ink)', padding: '6px 12px', cursor: 'pointer',
-                  fontFamily: 'var(--font-stencil)', fontSize: 11.5, fontWeight: 700,
-                  letterSpacing: '0.12em', textTransform: 'uppercase',
-                }}>
-                  {factionLogo ? 'Replace' : 'Upload'}
-                  <input
-                    type="file"
-                    accept="image/png, image/jpeg, image/svg+xml, image/webp"
-                    onChange={handleLogoUpload}
-                    style={{ display: 'none' }}
-                  />
-                </label>
-                {factionLogo && (
-                  <button onClick={() => onSetFactionLogo(null)} className="add-btn"
-                    style={{
-                      border: '1.5px solid var(--rust)', background: 'transparent',
-                      color: 'var(--rust)', padding: '6px 12px', cursor: 'pointer',
-                      fontFamily: 'var(--font-stencil)', fontSize: 11.5, fontWeight: 700,
-                      letterSpacing: '0.12em', textTransform: 'uppercase',
-                    }}>
-                    Remove
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
+          {/* Logo upload moved to Options. */}
 
           <div className="label" style={{ marginBottom: 8 }}>Perks (pick 2, max 1 per group)</div>
           {Object.entries(data.perks).map(([group, opts]) => {

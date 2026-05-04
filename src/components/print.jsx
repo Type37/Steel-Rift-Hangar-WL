@@ -2,11 +2,14 @@ import React from 'react';
 import { WC, MISSIONS, RANGED, MELEE, UPGRADES, DEFENSIVE, FACTIONS, TEAMS } from '../data';
 import { calcMech, valForClass, totalWeaponCost, findAsset, findWeapon } from '../calc';
 import { GLOSSARY } from '../glossary';
+import { collectTraits } from './ui';
 
 // ============================================================
 // PRINT VIEW
-// One game card per HE-V with HP/Armor track boxes for play.
-// Reference page after with traits, factions, teams, support assets.
+// 2.5" x 3.5" game cards arranged 3 x 3 per Letter page, matching
+// the original Death Ray Designs Hangar layout. After all the cards,
+// a reference section prints faction perks, teams, traits, and upgrade
+// rules on full-width pages.
 // ============================================================
 
 export function PrintView({
@@ -20,15 +23,31 @@ export function PrintView({
     mechs.reduce((s, m) => s + calcMech(m).totalUsed, 0) +
     supportAssets.reduce((s, n) => s + (findAsset(n)?.cost || 0), 0);
 
+  // Build the deck: HE-V cards first, then a card per support asset.
+  const deck = [];
+  mechs.forEach((m, i) => deck.push({ kind: 'hev', mech: m, idx: i }));
+  supportAssets.forEach((name) => {
+    const a = findAsset(name);
+    if (a) deck.push({ kind: 'support', asset: a });
+  });
+
+  // Chunk into pages of 9.
+  const pages = [];
+  for (let i = 0; i < deck.length; i += 9) pages.push(deck.slice(i, i + 9));
+
+  // Collect every trait used in this force for the reference section.
+  const traitsUsed = new Set();
+  mechs.forEach(m => {
+    m.weapons.forEach(w => collectTraits(findWeapon(w)?.traits || '').forEach(t => traitsUsed.add(t)));
+  });
+  supportAssets.forEach(n => {
+    const a = findAsset(n);
+    collectTraits(a?.stats?.Traits || '').forEach(t => traitsUsed.add(t));
+  });
+
   return (
-    <div className="print-only" style={{
-      fontFamily: "'Schibsted Grotesk', system-ui, sans-serif",
-      color: '#000',
-      fontSize: 11.5,
-      lineHeight: 1.45,
-    }}>
-      {/* Page 1: Force header + game cards */}
-      <div className="print-page">
+    <div className="print-only">
+      <div className="print-page print-cover">
         <ForceHeader
           forceName={forceName}
           mission={mission}
@@ -42,422 +61,400 @@ export function PrintView({
           teams={selectedTeams}
           factionLogo={factionLogo}
         />
+      </div>
 
-        {mechs.map((m, i) => (
-          <HEVCard key={m.id} mech={m} index={i} />
-        ))}
-
-        {supportAssets.length > 0 && (
-          <div style={{ marginTop: 8 }}>
-            <h2 style={cardSectionTitle}>Support Assets</h2>
-            {supportAssets.map(n => {
-              const a = findAsset(n);
-              if (!a) return null;
-              return <SupportCard key={n} asset={a} />;
-            })}
+      {pages.map((page, pi) => (
+        <div key={pi} className="print-page print-cards-page">
+          <div className="page-card-grid">
+            {page.map((slot, ci) => (
+              <div key={ci} className="game-card">
+                {slot.kind === 'hev'
+                  ? <HEVCard mech={slot.mech} index={slot.idx} />
+                  : <SupportCard asset={slot.asset} />}
+              </div>
+            ))}
+            {Array.from({ length: 9 - page.length }).map((_, i) => (
+              <div key={`pad-${i}`} className="game-card game-card-blank" />
+            ))}
           </div>
-        )}
-      </div>
+        </div>
+      ))}
 
-      {/* Page 2: reference sheet */}
-      <div className="print-page">
-        <ReferenceSheet
-          faction={faction}
-          perks={perks}
-          teams={selectedTeams}
-          mechs={mechs}
-          simpleMode={simpleMode}
-        />
-      </div>
+      {(traitsUsed.size > 0 || (faction && perks.length > 0) || selectedTeams.length > 0) && (
+        <div className="print-page print-ref-page">
+          <ReferencePage
+            faction={faction}
+            perks={perks}
+            teams={selectedTeams}
+            traits={Array.from(traitsUsed).sort()}
+            mechs={mechs}
+          />
+        </div>
+      )}
     </div>
   );
 }
 
-// ----- Force header -----
-function ForceHeader({ forceName, mission, useCustom, cap, totalTons, mechCount, supportCount, faction, perks, teams, factionLogo }) {
+// ============================================================
+// FORCE HEADER (cover sheet)
+// ============================================================
+function ForceHeader({
+  forceName, mission, useCustom, cap, totalTons,
+  mechCount, supportCount, faction, perks, teams, factionLogo,
+}) {
   return (
-    <div style={{
-      borderBottom: '3px double #000',
-      paddingBottom: 8,
-      marginBottom: 14,
-      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-      gap: 16,
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        {factionLogo && (
-          <div style={{
-            width: 64, height: 64, flexShrink: 0,
-            border: '1px solid #000',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            overflow: 'hidden',
-          }}>
-            <img src={factionLogo} alt={faction || 'faction logo'}
-              style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
-          </div>
-        )}
-        <div>
-          <div style={{
-            fontFamily: "'Chakra Petch', sans-serif",
-            fontSize: 28, fontWeight: 700, letterSpacing: '0.04em',
-            textTransform: 'uppercase',
-          }}>
-            {forceName || 'Unnamed Force'}
-          </div>
-          <div className="mono" style={{ fontSize: 10, color: '#444', marginTop: 4, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
-            THE FORGE · v1.5 · {new Date().toLocaleDateString()}
-          </div>
-          {(faction || teams.length > 0) && (
-            <div style={{ fontSize: 11, marginTop: 6 }}>
-              {faction && (
-                <span><strong>{faction}</strong>{perks.length > 0 && `; ${perks.join(' · ')}`}</span>
-              )}
-              {teams.length > 0 && <span> · <strong>Teams:</strong> {teams.join(', ')}</span>}
+    <div className="print-cover-inner">
+      {factionLogo && (
+        <img src={factionLogo} alt="" className="print-faction-logo" />
+      )}
+      <div className="print-force-id">
+        <div className="print-force-eyebrow">FORCE ROSTER</div>
+        <div className="print-force-name">
+          {forceName || 'Unnamed Force'}
+        </div>
+        <div className="print-force-meta">
+          {mission}{useCustom ? '' : ' Mission'} · {totalTons} / {cap} tons · {mechCount} HE-V{mechCount === 1 ? '' : 's'} · {supportCount} support
+        </div>
+      </div>
+
+      {faction && (
+        <div className="print-block">
+          <div className="print-block-label">Faction</div>
+          <div className="print-block-value">{faction}</div>
+          {perks.length > 0 && (
+            <div className="print-block-sub">
+              Perks: {perks.join(' · ')}
+            </div>
+          )}
+          {FACTIONS[faction]?.agenda && (
+            <div className="print-block-sub print-italic">
+              Agenda: {FACTIONS[faction].agenda}
             </div>
           )}
         </div>
-      </div>
-      <div style={{ textAlign: 'right' }}>
-        <div className="stencil" style={{
-          fontSize: 13, letterSpacing: '0.18em', fontWeight: 700,
-          textTransform: 'uppercase',
-        }}>
-          {useCustom ? 'CUSTOM' : mission}
+      )}
+
+      {teams.length > 0 && (
+        <div className="print-block">
+          <div className="print-block-label">HE-V Teams</div>
+          <div className="print-block-value">{teams.join(' · ')}</div>
         </div>
-        <div className="mono" style={{ fontSize: 16, fontWeight: 700, marginTop: 2 }}>
-          {totalTons} / {cap}t
-        </div>
-        <div className="mono" style={{ fontSize: 10, color: '#444' }}>
-          {mechCount} HE-V · {supportCount} support
-        </div>
-      </div>
+      )}
     </div>
   );
 }
 
-// ----- HE-V game card -----
+// ============================================================
+// HE-V CARD (2.5" x 3.5")
+// ============================================================
 function HEVCard({ mech, index }) {
-  const stats = calcMech(mech);
   const wc = WC[mech.weightClass];
-  const armor = stats.effectiveArmor;
-  const structure = mech.structure;
-  const baseArmor = mech.armor;
-  const extraArmor = stats.defensiveArmorBonus;
+  const cls = mech.weightClass;
+  const move = movDefault(cls);
+  const jumpVal = jumpDefault(cls, mech);
+  const def = defDefault(cls);
+
+  const weapons = mech.weapons.map(name => {
+    const w = findWeapon(name);
+    if (!w) return null;
+    const dmg = valForClass(w.dmg, cls);
+    const cost = valForClass(w.cost, cls);
+    if (cost === '-') return null;
+    const range = inferRange(w.traits);
+    return {
+      name,
+      dmg: w.kind === 'melee' ? meleeDamage(w, cls) : `${dmg}`,
+      range,
+      traits: filterDisplayTraits(w.traits),
+    };
+  }).filter(Boolean);
+
+  const upgrades = mech.upgrades
+    .map(n => UPGRADES.find(u => u.name === n))
+    .filter(u => u && valForClass(u.cost, cls) !== '-');
+  const defensive = mech.defensive
+    .map(n => DEFENSIVE.find(d => d.name === n))
+    .filter(d => d && valForClass(d.cost, cls) !== '-');
 
   return (
-    <div className="game-card">
-      {/* Card header */}
-      <div style={{
-        display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
-        borderBottom: '1.5px solid #000', paddingBottom: 6, marginBottom: 8,
-      }}>
-        <div>
-          <div className="mono" style={{ fontSize: 10, color: '#666', letterSpacing: '0.18em' }}>
-            {String(index + 1).padStart(2, '0')} · {mech.weightClass.toUpperCase()} · {wc.tons}t
+    <div className="game-card-inner">
+      <header className="card-header">
+        <div className="card-header-name">{mech.name}</div>
+        <div className="card-header-class">{cls} HE-V</div>
+      </header>
+
+      <table className="card-stats-table">
+        <thead>
+          <tr><th>Tng</th><th>Mov</th><th>Jmp</th><th>Def</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{wc.baseTons}</td>
+            <td>{move}"</td>
+            <td>{jumpVal != null ? `${jumpVal}"` : '—'}</td>
+            <td>{def}+</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <HpRow label="Armor" total={mech.armor} />
+      <HpRow label="Structure" total={mech.structure} structure />
+
+      <table className="card-weapons-table">
+        <thead>
+          <tr>
+            <th>Weapon</th>
+            <th className="num">Dmg</th>
+            <th className="num">Rng</th>
+            <th>Traits</th>
+          </tr>
+        </thead>
+        <tbody>
+          {weapons.map((w, i) => (
+            <tr key={i}>
+              <td>{w.name}</td>
+              <td className="num">{w.dmg}</td>
+              <td className="num">{w.range}</td>
+              <td className="card-traits">{w.traits}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {(upgrades.length > 0 || defensive.length > 0) && (
+        <div className="card-upgrades">
+          <div className="card-upgrades-label">Upgrades</div>
+          <div className="card-upgrades-list">
+            {[...upgrades, ...defensive].map(u => u.name).join(' · ')}
           </div>
-          <div style={{
-            fontFamily: "'Chakra Petch', sans-serif",
-            fontSize: 22, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em',
-            marginTop: 2,
-          }}>
-            {mech.name || 'Unnamed'}
-          </div>
-          {mech.description && (
-            <div style={{ fontSize: 10.5, fontStyle: 'italic', color: '#555', marginTop: 2 }}>
-              {mech.description}
-            </div>
-          )}
-        </div>
-        <div className="mono" style={{ fontSize: 14, fontWeight: 700, textAlign: 'right' }}>
-          {stats.totalUsed}/{wc.tons}t
-        </div>
-      </div>
-
-      {/* Stat strip */}
-      <div style={{
-        display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: 0,
-        border: '1px solid #000',
-        marginBottom: 8,
-      }}>
-        <Stat label="Armor" value={armor} />
-        <Stat label="Structure" value={structure} />
-        <Stat label="Slots" value={`${stats.totalSlotsUsed}/${stats.capSlots}`} />
-        <Stat label="Move" value={moveForClass(mech.weightClass)} last />
-      </div>
-
-      {/* HP track */}
-      <div style={{ marginBottom: 8 }}>
-        <div className="stencil" style={{ fontSize: 10, marginBottom: 3, letterSpacing: '0.18em' }}>
-          ARMOR ({armor})
-        </div>
-        <div className="hp-row">
-          {Array.from({ length: baseArmor }, (_, i) => (
-            <span key={`a${i}`} className="hp-box armor" />
-          ))}
-          {Array.from({ length: extraArmor }, (_, i) => (
-            <span key={`xa${i}`} className="hp-box extra-armor" title="Extra armor" />
-          ))}
-        </div>
-      </div>
-      <div style={{ marginBottom: 10 }}>
-        <div className="stencil" style={{ fontSize: 10, marginBottom: 3, letterSpacing: '0.18em' }}>
-          STRUCTURE ({structure})
-        </div>
-        <div className="hp-row">
-          {Array.from({ length: structure }, (_, i) => (
-            <span key={`s${i}`} className="hp-box structure" />
-          ))}
-        </div>
-        <div style={{ fontSize: 9.5, color: '#666', marginTop: 3, fontStyle: 'italic' }}>
-          {mech.weightClass === 'Light' && 'Fragile Internals: structure damage applies +1 (page reference: HE-V class table).'}
-          {mech.weightClass === 'Ultraheavy' && 'Backup Systems: roll vs Critical Damage when structure depleted.'}
-        </div>
-      </div>
-
-      {/* Weapons */}
-      {mech.weapons.length > 0 && (
-        <div style={{ marginBottom: 8 }}>
-          <h3 style={cardSectionTitle}>Weapons</h3>
-          <table style={cardTable}>
-            <thead>
-              <tr>
-                <th style={cardTh}>Name</th>
-                <th style={cardTh}>Dmg</th>
-                <th style={cardTh}>Cost</th>
-                <th style={{ ...cardTh, textAlign: 'left' }}>Traits</th>
-              </tr>
-            </thead>
-            <tbody>
-              {mech.weapons.flatMap(w => {
-                const def = findWeapon(w.name);
-                if (!def) return [];
-                const dmg = valForClass(def.dmg, mech.weightClass);
-                const total = totalWeaponCost(def, mech.weightClass, w.count);
-                return [{
-                  key: w.name,
-                  name: w.count > 1 ? `${w.name} ×${w.count}` : w.name,
-                  dmg,
-                  cost: `${total}t`,
-                  traits: def.traits,
-                }];
-              }).map(r => (
-                <tr key={r.key}>
-                  <td style={cardTd}>{r.name}</td>
-                  <td style={{ ...cardTd, textAlign: 'center', fontFamily: 'monospace' }}>{r.dmg}</td>
-                  <td style={{ ...cardTd, textAlign: 'center', fontFamily: 'monospace' }}>{r.cost}</td>
-                  <td style={{ ...cardTd, fontSize: 10 }}>{r.traits}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Upgrades + Defensive in two columns */}
-      {(mech.upgrades.length > 0 || mech.defensive.length > 0) && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          {mech.upgrades.length > 0 && (
-            <div>
-              <h3 style={cardSectionTitle}>Upgrades</h3>
-              {mech.upgrades.map(u => {
-                const def = UPGRADES.find(x => x.name === u);
-                if (!def) return null;
-                const c = valForClass(def.cost, mech.weightClass);
-                return (
-                  <div key={u} style={{ marginBottom: 5 }}>
-                    <div style={{ fontWeight: 700, fontSize: 11 }}>
-                      {u} <span className="mono" style={{ color: '#666' }}>({c}t{def.compact ? ', compact' : ''})</span>
-                    </div>
-                    <div style={{ fontSize: 10, color: '#222', lineHeight: 1.4 }}>{def.rule}</div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-          {mech.defensive.length > 0 && (
-            <div>
-              <h3 style={cardSectionTitle}>Defensive</h3>
-              {mech.defensive.map(d => {
-                const def = DEFENSIVE.find(x => x.name === d);
-                if (!def) return null;
-                const c = valForClass(def.cost, mech.weightClass);
-                return (
-                  <div key={d} style={{ marginBottom: 5 }}>
-                    <div style={{ fontWeight: 700, fontSize: 11 }}>
-                      {d} <span className="mono" style={{ color: '#666' }}>({c}t)</span>
-                    </div>
-                    <div style={{ fontSize: 10, color: '#222', lineHeight: 1.4 }}>{def.rule}</div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
         </div>
       )}
     </div>
   );
 }
 
-function Stat({ label, value, last }) {
-  return (
-    <div style={{
-      padding: '6px 8px',
-      borderRight: last ? 'none' : '1px solid #000',
-      textAlign: 'center',
-    }}>
-      <div className="stencil" style={{ fontSize: 9, letterSpacing: '0.16em', color: '#555' }}>{label}</div>
-      <div className="mono" style={{ fontSize: 16, fontWeight: 700, marginTop: 2 }}>{value}</div>
-    </div>
+// ============================================================
+// SUPPORT CARD (2.5" x 3.5")
+// ============================================================
+function SupportCard({ asset: a }) {
+  const stats = a.stats || {};
+  const traits = stats.Traits || stats.traits || '';
+  const statEntries = Object.entries(stats).filter(([k]) =>
+    !/Trait|trait|Description|description/i.test(k)
   );
-}
 
-// Approximation. Full rules have movement per upgrade; this is the base.
-function moveForClass(cls) {
-  return { Light: '8"', Medium: '6"', Heavy: '5"', Ultraheavy: '4"' }[cls] || '-';
-}
-
-// ----- Support card -----
-function SupportCard({ asset }) {
   return (
-    <div className="game-card" style={{ padding: '6mm 7mm' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <div className="stencil" style={{ fontSize: 14, letterSpacing: '0.06em' }}>
-          {asset.name}
-        </div>
-        <div className="mono" style={{ fontSize: 12, fontWeight: 700 }}>
-          {asset.cost}t · {asset.kind}
-        </div>
-      </div>
-      <div style={{ fontSize: 10.5, marginTop: 4, lineHeight: 1.5 }}>{asset.fullDesc}</div>
-      {asset.stats && (
-        <table style={{ ...cardTable, marginTop: 6 }}>
+    <div className="game-card-inner">
+      <header className="card-header">
+        <div className="card-header-name">{a.name}</div>
+        <div className="card-header-class">{a.kind} · {a.cost}t</div>
+      </header>
+
+      {a.summary && (
+        <div className="card-support-summary">{a.summary}</div>
+      )}
+
+      {statEntries.length > 0 && (
+        <table className="card-support-stats">
           <tbody>
-            {Object.entries(asset.stats).map(([k, v]) => (
+            {statEntries.map(([k, v]) => (
               <tr key={k}>
-                <td style={{ ...cardTd, fontWeight: 700, width: '30%' }}>{k}</td>
-                <td style={{ ...cardTd, fontFamily: 'monospace' }}>{v}</td>
+                <th>{k}</th>
+                <td>{v}</td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
+
+      {traits && (
+        <div className="card-support-traits">
+          <div className="card-upgrades-label">Traits</div>
+          <div className="card-upgrades-list">{traits}</div>
+        </div>
+      )}
+
+      {a.fullDesc && (
+        <div className="card-support-rules">{a.fullDesc}</div>
+      )}
     </div>
   );
 }
 
-// ----- Reference sheet -----
-function ReferenceSheet({ faction, perks, teams, mechs, simpleMode }) {
-  // Collect every unique trait actually used in this list
-  const usedTraits = new Set();
-  mechs.forEach(m => {
-    m.weapons.forEach(w => {
-      const def = findWeapon(w.name);
-      if (!def) return;
-      def.traits.split(/,\s*/).forEach(t => {
-        const m2 = t.match(/^([A-Za-z\-]+)/);
-        if (m2) usedTraits.add(m2[1].toLowerCase());
-      });
-    });
-  });
-
-  const factionData = faction ? FACTIONS[faction] : null;
-  const teamObjs = teams.map(t => TEAMS.find(td => td.name === t)).filter(Boolean);
+// ============================================================
+// HP ROW with damage track boxes
+// Structure boxes get critical markers at quarter thresholds.
+// ============================================================
+function HpRow({ label, total, structure }) {
+  if (!total) return null;
+  const points = buildHpPoints(total, structure);
+  const rows = chunk(points, 6);
 
   return (
-    <div>
-      <h2 style={{
-        fontFamily: "'Chakra Petch', sans-serif",
-        fontSize: 22, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase',
-        borderBottom: '3px double #000', paddingBottom: 6, marginBottom: 14,
-      }}>
-        Reference
-      </h2>
-
-      {factionData && !simpleMode && (
-        <div style={{ marginBottom: 14 }}>
-          <h3 style={cardSectionTitle}>Faction · {faction}</h3>
-          <div style={{ fontSize: 11, marginBottom: 4 }}>
-            <strong>Faction Agenda:</strong> {factionData.agenda}
+    <div className="hp-row">
+      <div className="hp-row-label">{label}</div>
+      <div className="hp-row-boxes">
+        {rows.map((row, ri) => (
+          <div key={ri} className="hp-row-line">
+            {row.map((mark, bi) => (
+              <span key={bi} className={`hp-box ${mark ? 'hp-box-marked' : ''}`}>
+                {mark || ''}
+              </span>
+            ))}
           </div>
-          {perks.length > 0 && perks.map(pn => {
-            // Find perk text
-            for (const opts of Object.values(factionData.perks)) {
-              const p = opts.find(o => o.name === pn);
-              if (p) return (
-                <div key={pn} style={{ marginTop: 4, fontSize: 11 }}>
-                  <strong>{p.name}:</strong> {p.text}
-                </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function buildHpPoints(total, isStructure) {
+  if (!isStructure) return Array(total).fill(null);
+  const parts = 4;
+  const base = Math.floor(total / parts);
+  const remainder = total % parts;
+  const chunks = Array(parts).fill(base);
+  for (let i = 0; i < remainder; i++) chunks[i] += 1;
+
+  const map = ['M', 'D', 'Ø'];
+  const out = [];
+  chunks.forEach((count, idx) => {
+    for (let j = 0; j < count; j++) {
+      const isLast = j === count - 1;
+      out.push(isLast && map[idx] ? map[idx] : null);
+    }
+  });
+  return out;
+}
+
+function chunk(arr, n) {
+  const out = [];
+  for (let i = 0; i < arr.length; i += n) out.push(arr.slice(i, i + n));
+  return out;
+}
+
+// ============================================================
+// REFERENCE PAGE
+// ============================================================
+function ReferencePage({ faction, perks, teams, traits, mechs }) {
+  const upgradesUsed = new Set();
+  mechs.forEach(m => m.upgrades.forEach(u => upgradesUsed.add(u)));
+  const upgradeDefs = Array.from(upgradesUsed)
+    .map(name => UPGRADES.find(u => u.name === name))
+    .filter(Boolean);
+
+  const teamDefs = teams
+    .map(name => TEAMS.find(t => t.name === name))
+    .filter(Boolean);
+
+  const factionData = faction ? FACTIONS[faction] : null;
+
+  return (
+    <div className="print-ref">
+      <h1 className="print-ref-h1">Reference</h1>
+
+      {factionData && perks.length > 0 && (
+        <section className="print-ref-section">
+          <h2 className="print-ref-h2">{faction} Perks</h2>
+          <dl className="print-ref-dl">
+            {perks.map(perkName => {
+              const perkDef = findPerk(factionData, perkName);
+              if (!perkDef) return null;
+              return (
+                <React.Fragment key={perkName}>
+                  <dt>{perkName}</dt>
+                  <dd>{perkDef.text}</dd>
+                </React.Fragment>
               );
-            }
-            return null;
-          })}
-        </div>
+            })}
+          </dl>
+        </section>
       )}
 
-      {teamObjs.length > 0 && !simpleMode && (
-        <div style={{ marginBottom: 14 }}>
-          <h3 style={cardSectionTitle}>Teams</h3>
-          {teamObjs.map(t => (
-            <div key={t.name} style={{ marginBottom: 8, paddingBottom: 8, borderBottom: '1px dotted #999' }}>
-              <div style={{ fontSize: 12, fontWeight: 700 }}>{t.name}</div>
-              <div style={{ fontSize: 10.5, marginTop: 2 }}><em>Benefits.</em> {t.benefits}</div>
-              <div style={{ fontSize: 10.5, marginTop: 2 }}><em>Agenda.</em> {t.agenda}</div>
+      {teamDefs.length > 0 && (
+        <section className="print-ref-section">
+          <h2 className="print-ref-h2">HE-V Teams</h2>
+          {teamDefs.map(t => (
+            <div key={t.name} className="print-ref-team">
+              <div className="print-ref-team-name">{t.name}</div>
+              <div className="print-ref-team-blurb">{t.blurb}</div>
             </div>
           ))}
-        </div>
+        </section>
       )}
 
-      {usedTraits.size > 0 && (
-        <div>
-          <h3 style={cardSectionTitle}>Trait Reference</h3>
-          <div style={{
-            display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px 18px',
-          }}>
-            {[...usedTraits].sort().map(t => {
+      {upgradeDefs.length > 0 && (
+        <section className="print-ref-section">
+          <h2 className="print-ref-h2">Upgrade Rules</h2>
+          <dl className="print-ref-dl">
+            {upgradeDefs.map(u => (
+              <React.Fragment key={u.name}>
+                <dt>{u.name}</dt>
+                <dd>{u.rule}</dd>
+              </React.Fragment>
+            ))}
+          </dl>
+        </section>
+      )}
+
+      {traits.length > 0 && (
+        <section className="print-ref-section">
+          <h2 className="print-ref-h2">Traits in Play</h2>
+          <dl className="print-ref-dl print-ref-dl-2col">
+            {traits.map(t => {
               const def = GLOSSARY[t];
               if (!def) return null;
               return (
-                <div key={t} style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}>
-                  <div className="stencil" style={{ fontSize: 11, marginBottom: 2 }}>{def.title}</div>
-                  <div style={{ fontSize: 10.5, lineHeight: 1.4 }}>{def.text}</div>
-                </div>
+                <React.Fragment key={t}>
+                  <dt>{def.title}</dt>
+                  <dd>{def.text}</dd>
+                </React.Fragment>
               );
             })}
-          </div>
-        </div>
+          </dl>
+        </section>
       )}
     </div>
   );
 }
 
-// Shared print styles
-const cardSectionTitle = {
-  fontFamily: "'Schibsted Grotesk', sans-serif",
-  fontSize: 11.5,
-  fontWeight: 700,
-  letterSpacing: '0.16em',
-  textTransform: 'uppercase',
-  margin: '0 0 5px',
-  paddingBottom: 2,
-  borderBottom: '1px solid #000',
-};
+function findPerk(factionData, name) {
+  for (const group of Object.values(factionData.perks || {})) {
+    const found = group.find(p => p.name === name);
+    if (found) return found;
+  }
+  return null;
+}
 
-const cardTable = {
-  width: '100%',
-  borderCollapse: 'collapse',
-  fontSize: 10.5,
-};
-const cardTh = {
-  textAlign: 'left',
-  padding: '3px 6px',
-  borderBottom: '1px solid #000',
-  fontFamily: "'Schibsted Grotesk', sans-serif",
-  fontSize: 9.5,
-  letterSpacing: '0.14em',
-  textTransform: 'uppercase',
-};
-const cardTd = {
-  padding: '3px 6px',
-  borderBottom: '1px solid #ccc',
-  verticalAlign: 'top',
-};
+// Helpers
+function movDefault(cls) {
+  return { Light: 8, Medium: 6, Heavy: 5, Ultraheavy: 4 }[cls] || 6;
+}
+function jumpDefault(cls, mech) {
+  if (!mech.upgrades.includes('Jump Jets')) return null;
+  return { Light: 6, Medium: 5, Heavy: 4, Ultraheavy: 3 }[cls] || 4;
+}
+function defDefault(cls) {
+  return { Light: 4, Medium: 5, Heavy: 6, Ultraheavy: 6 }[cls] || 5;
+}
+function inferRange(traits) {
+  if (!traits) return 'std';
+  const m = traits.match(/Short\s*\(([^)]+)\)/i);
+  if (m) return m[1];
+  if (/Melee/i.test(traits)) return 'melee';
+  return 'std';
+}
+function meleeDamage(w, cls) {
+  const m = (w.traits || '').match(/Melee\s*\(([^)]+)\)/i);
+  if (!m) return '—';
+  const parts = m[1].split('/');
+  const idx = ['Light', 'Medium', 'Heavy', 'Ultraheavy'].indexOf(cls);
+  return parts[idx] || parts[0];
+}
+function filterDisplayTraits(traits) {
+  if (!traits) return '';
+  return traits
+    .split(/,\s*/)
+    .filter(t => !/Limited\s*\(/i.test(t) && !/Short\s*\(/i.test(t))
+    .join(', ');
+}

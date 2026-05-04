@@ -4,39 +4,73 @@ import { calcMech, newMech, findAsset } from './calc';
 
 import { Navbar, BottomBar, MechCard, EmptyRoster, SupportRosterCard } from './components/chrome';
 import { MechEditor } from './components/editor';
-import { SupportPanel, TeamPanel, FactionPanel } from './components/panels';
+import { SupportPanel, TeamPanel, FactionPanel, SupportDetailView } from './components/panels';
 import { AddMechModal, OptionsModal } from './components/modals';
 import { PrintView } from './components/print';
 import { SectionTitle, GhostButton } from './components/ui';
 
+// localStorage key and helpers. Bump the version if the schema changes
+// in a non-backward-compatible way.
+const STATE_KEY = 'forge-state-v1';
+function loadStored() {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = window.localStorage.getItem(STATE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch { return {}; }
+}
+const stored = loadStored();
+
 export default function App() {
   // ---- State ----
-  const [forceName, setForceName] = useState('');
-  const [mission, setMission] = useState('Strike');
-  const [customTons, setCustomTons] = useState(150);
+  const [forceName, setForceName] = useState(stored.forceName ?? '');
+  const [mission, setMission] = useState(stored.mission ?? 'Strike');
+  const [customTons, setCustomTons] = useState(stored.customTons ?? 150);
 
-  const [faction, setFaction] = useState(null);
-  const [perks, setPerks] = useState([]);
-  // Optional faction logo (data URL) used in the print header.
-  const [factionLogo, setFactionLogo] = useState(null);
+  const [faction, setFaction] = useState(stored.faction ?? null);
+  const [perks, setPerks] = useState(stored.perks ?? []);
+  const [factionLogo, setFactionLogo] = useState(stored.factionLogo ?? null);
 
-  const [mechs, setMechs] = useState([]);
-  const [supportAssets, setSupportAssets] = useState([]);
-  const [selectedTeams, setSelectedTeams] = useState([]);
+  const [mechs, setMechs] = useState(stored.mechs ?? []);
+  const [supportAssets, setSupportAssets] = useState(stored.supportAssets ?? []);
+  const [selectedTeams, setSelectedTeams] = useState(stored.selectedTeams ?? []);
   const [selectedMechId, setSelectedMechId] = useState(null);
+  // When the user adds or clicks a support asset, it gets shown in the
+  // right pane with full details. Lives in memory only (not persisted).
+  const [selectedSupportName, setSelectedSupportName] = useState(null);
 
-  const [callsignPool, setCallsignPool] = useState('Mixed');
-  const [customCallsigns, setCustomCallsigns] = useState([]);
+  const [callsignPool, setCallsignPool] = useState(stored.callsignPool ?? 'Mixed');
+  const [customCallsigns, setCustomCallsigns] = useState(stored.customCallsigns ?? []);
 
-  // Simple mode hides factions, teams, advanced support assets, secondary agendas.
-  // Advanced is the default (full game).
-  const [simpleMode, setSimpleMode] = useState(false);
+  const [simpleMode, setSimpleMode] = useState(stored.simpleMode ?? false);
 
   const [addMechOpen, setAddMechOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
 
-  // Sidebar tab. In simple mode only roster + support are reachable.
   const [sideTab, setSideTab] = useState('roster');
+
+  // Persist any state change. Wrapped in try/catch because localStorage
+  // can throw when full or in privacy modes.
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(STATE_KEY, JSON.stringify({
+        forceName, mission, customTons,
+        faction, perks, factionLogo,
+        mechs, supportAssets, selectedTeams,
+        callsignPool, customCallsigns,
+        simpleMode,
+      }));
+    } catch (e) {
+      // Quota exceeded or similar; don't crash the app.
+      console.warn('Could not persist state:', e?.message || e);
+    }
+  }, [
+    forceName, mission, customTons,
+    faction, perks, factionLogo,
+    mechs, supportAssets, selectedTeams,
+    callsignPool, customCallsigns,
+    simpleMode,
+  ]);
 
   // If simple mode is enabled while sitting on a now-hidden tab, fall back to roster.
   useEffect(() => {
@@ -88,8 +122,20 @@ export default function App() {
     if (selectedMechId === id) setSelectedMechId(null);
   };
 
-  const toggleSupport = (name) =>
-    setSupportAssets(prev => prev.includes(name) ? prev.filter(n => n !== name) : [...prev, name]);
+  const toggleSupport = (name) => {
+    setSupportAssets(prev => {
+      const has = prev.includes(name);
+      const next = has ? prev.filter(n => n !== name) : [...prev, name];
+      // Surface details in the right pane when adding; clear when removing.
+      if (!has) {
+        setSelectedSupportName(name);
+        setSelectedMechId(null);
+      } else if (selectedSupportName === name) {
+        setSelectedSupportName(null);
+      }
+      return next;
+    });
+  };
 
   const toggleTeam = (name) =>
     setSelectedTeams(prev => prev.includes(name) ? prev.filter(n => n !== name) : [...prev, name]);
@@ -213,7 +259,19 @@ export default function App() {
                       {supportAssets.map(name => {
                         const a = findAsset(name);
                         if (!a) return null;
-                        return <SupportRosterCard key={name} asset={a} onRemove={toggleSupport} />;
+                        return (
+                          <SupportRosterCard
+                            key={name}
+                            asset={a}
+                            onRemove={toggleSupport}
+                            active={selectedSupportName === name && sideTab === 'support'}
+                            onClick={() => {
+                              setSelectedMechId(null);
+                              setSelectedSupportName(name);
+                              setSideTab('support');
+                            }}
+                          />
+                        );
                       })}
                     </div>
                   </div>
@@ -245,8 +303,6 @@ export default function App() {
                 perks={perks}
                 onSetFaction={handleSetFaction}
                 onTogglePerk={togglePerk}
-                factionLogo={factionLogo}
-                onSetFactionLogo={setFactionLogo}
               />
             )}
           </aside>
@@ -272,8 +328,16 @@ export default function App() {
               <FirstRunBriefing onAdd={() => setAddMechOpen(true)} simpleMode={simpleMode} />
             )}
 
-            {sideTab === 'support' && (
-              <SupportContextPane count={supportAssets.length} limit={supportLimit} />
+            {sideTab === 'support' && selectedSupportName && (
+              <SupportDetailView assetName={selectedSupportName} />
+            )}
+
+            {sideTab === 'support' && !selectedSupportName && supportAssets.length === 0 && (
+              <EmptyState>Pick a support asset on the left.</EmptyState>
+            )}
+
+            {sideTab === 'support' && !selectedSupportName && supportAssets.length > 0 && (
+              <EmptyState>Click any taken support asset to inspect it.</EmptyState>
             )}
 
             {!simpleMode && sideTab === 'teams' && (
@@ -317,6 +381,8 @@ export default function App() {
         setCustomCallsigns={setCustomCallsigns}
         simpleMode={simpleMode}
         setSimpleMode={setSimpleMode}
+        factionLogo={factionLogo}
+        setFactionLogo={setFactionLogo}
       />
     </>
   );
@@ -342,27 +408,7 @@ function EmptyState({ children }) {
   );
 }
 
-// Right-pane context for the Support tab: numbers, no waffle.
-function SupportContextPane({ count, limit }) {
-  return (
-    <div style={{ marginTop: 36, maxWidth: 520 }}>
-      <div className="stencil" style={{ fontSize: 12, color: 'var(--rust)', letterSpacing: '0.22em', marginBottom: 8 }}>
-        SUPPORT
-      </div>
-      <h2 style={{
-        fontFamily: 'var(--font-stencil)',
-        fontSize: 24, fontWeight: 700, letterSpacing: '0.04em',
-        textTransform: 'uppercase', margin: '0 0 6px',
-      }}>
-        {count} of {limit} taken
-      </h2>
-      <div style={{ fontSize: 14, color: 'var(--ink-2)', lineHeight: 1.55 }}>
-        Mission tonnage scales the support cap. The chevron on each row reveals full rules and the statline.
-      </div>
-    </div>
-  );
-}
-
+// Right-pane context for the Teams tab.
 function TeamsContextPane({ mission }) {
   const counts = mission.teamCounts;
   return (
@@ -385,6 +431,7 @@ function TeamsContextPane({ mission }) {
 }
 
 function FactionContextPane({ faction }) {
+  if (faction) return null; // No noise when a faction is picked
   return (
     <div style={{ marginTop: 36, maxWidth: 520 }}>
       <div className="stencil" style={{ fontSize: 12, color: 'var(--rust)', letterSpacing: '0.22em', marginBottom: 8 }}>
@@ -395,12 +442,10 @@ function FactionContextPane({ faction }) {
         fontSize: 24, fontWeight: 700, letterSpacing: '0.04em',
         textTransform: 'uppercase', margin: '0 0 10px',
       }}>
-        {faction ? `${faction} selected` : 'Pick a faction'}
+        Pick a faction
       </h2>
       <div style={{ fontSize: 14, color: 'var(--ink-2)', lineHeight: 1.55 }}>
-        {faction
-          ? 'Take 2 perks, no more than one per group. Faction Agendas score additional VPs each round.'
-          : 'Each faction has a doctrine, an agenda, and a perk catalog. Choose at left.'}
+        Each faction has a doctrine, an agenda, and a perk catalog. Choose at left.
       </div>
     </div>
   );
