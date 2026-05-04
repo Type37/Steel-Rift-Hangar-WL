@@ -41,6 +41,8 @@ export default function App() {
 
   const [callsignPool, setCallsignPool] = useState(stored.callsignPool ?? 'Mixed');
   const [customCallsigns, setCustomCallsigns] = useState(stored.customCallsigns ?? []);
+  // Per-asset nicknames so the user can rename their support units.
+  const [supportNicknames, setSupportNicknames] = useState(stored.supportNicknames ?? {});
 
   const [simpleMode, setSimpleMode] = useState(stored.simpleMode ?? false);
 
@@ -49,35 +51,37 @@ export default function App() {
 
   const [sideTab, setSideTab] = useState('roster');
 
-  // Persist any state change. Wrapped in try/catch because localStorage
-  // can throw when full or in privacy modes.
+  // Persist any state change.
   useEffect(() => {
     try {
       window.localStorage.setItem(STATE_KEY, JSON.stringify({
         forceName, mission, customTons,
         faction, perks, factionLogo,
         mechs, supportAssets, selectedTeams,
-        callsignPool, customCallsigns,
+        callsignPool, customCallsigns, supportNicknames,
         simpleMode,
       }));
     } catch (e) {
-      // Quota exceeded or similar; don't crash the app.
       console.warn('Could not persist state:', e?.message || e);
     }
   }, [
     forceName, mission, customTons,
     faction, perks, factionLogo,
     mechs, supportAssets, selectedTeams,
-    callsignPool, customCallsigns,
+    callsignPool, customCallsigns, supportNicknames,
     simpleMode,
   ]);
 
-  // If simple mode is enabled while sitting on a now-hidden tab, fall back to roster.
-  useEffect(() => {
-    if (simpleMode && (sideTab === 'teams' || sideTab === 'faction')) {
-      setSideTab('roster');
-    }
-  }, [simpleMode, sideTab]);
+  // Rename a support asset. Empty string clears the nickname.
+  const renameSupport = (assetName, nickname) => {
+    setSupportNicknames(prev => {
+      const next = { ...prev };
+      const trimmed = (nickname || '').trim();
+      if (trimmed) next[assetName] = trimmed;
+      else delete next[assetName];
+      return next;
+    });
+  };
 
   // Auto-scroll to editor pane on phones when picking a mech.
   const editorRef = useRef(null);
@@ -150,19 +154,6 @@ export default function App() {
     setSideTab('support');
   };
 
-  // Tab list rebuilt per mode
-  const tabs = simpleMode
-    ? [
-        { id: 'roster', label: 'Roster', count: mechs.length },
-        { id: 'support', label: 'Support', count: supportAssets.length },
-      ]
-    : [
-        { id: 'roster', label: 'Roster', count: mechs.length },
-        { id: 'support', label: 'Support', count: supportAssets.length },
-        { id: 'teams', label: 'Teams', count: selectedTeams.length },
-        { id: 'faction', label: 'Faction', count: perks.length },
-      ];
-
   // ---- Render ----
   return (
     <>
@@ -177,176 +168,202 @@ export default function App() {
       <div className="app-shell no-print">
         <Navbar />
 
-        {/* Main two-column layout */}
+        {/* Two-column layout. Left = your force (static summary).
+            Right = workshop with always-visible tabs for picking/customizing. */}
         <div className="layout">
           <aside className="sidebar scroll" style={{
             background: 'var(--bg)',
             borderRight: '1.5px solid var(--rule-strong)',
             padding: '18px 16px 24px',
           }}>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: `repeat(${tabs.length}, 1fr)`,
-              gap: 0,
-              marginBottom: 18,
-              border: '1.5px solid var(--ink)',
+            {/* Force summary heading */}
+            <div className="stencil" style={{
+              fontSize: 11, color: 'var(--mute)', letterSpacing: '0.22em',
+              marginBottom: 18, paddingBottom: 8, borderBottom: '1px solid var(--rule)',
             }}>
-              {tabs.map((t, i) => (
+              YOUR FORCE
+            </div>
+
+            {/* HE-V Roster section */}
+            <ForceSection
+              title="Roster"
+              count={mechs.length}
+              empty={mechs.length === 0}
+              addLabel="Add HE-V"
+              onAdd={() => setAddMechOpen(true)}
+              accent="rust"
+            >
+              {mechs.length === 0 ? (
+                <EmptyHint>No HE-Vs yet. Add one to begin.</EmptyHint>
+              ) : (
+                mechs.map((m, i) => (
+                  <MechCard
+                    key={m.id}
+                    mech={m}
+                    index={i}
+                    active={selectedMechId === m.id && sideTab === 'roster'}
+                    onSelect={(id) => {
+                      setSelectedMechId(id);
+                      setSideTab('roster');
+                    }}
+                  />
+                ))
+              )}
+            </ForceSection>
+
+            {/* Support section */}
+            <ForceSection
+              title="Support"
+              count={supportAssets.length}
+              max={supportLimit}
+              addLabel="Browse"
+              onAdd={() => {
+                setSelectedSupportName(null);
+                setSideTab('support');
+              }}
+            >
+              {supportAssets.length === 0 ? (
+                <EmptyHint>No support taken.</EmptyHint>
+              ) : (
+                supportAssets.map(name => {
+                  const a = findAsset(name);
+                  if (!a) return null;
+                  return (
+                    <SupportRosterCard
+                      key={name}
+                      asset={a}
+                      customName={supportNicknames[name]}
+                      onRemove={toggleSupport}
+                      onRename={(nick) => renameSupport(name, nick)}
+                      active={selectedSupportName === name && sideTab === 'support'}
+                      onClick={() => {
+                        setSelectedMechId(null);
+                        setSelectedSupportName(name);
+                        setSideTab('support');
+                      }}
+                    />
+                  );
+                })
+              )}
+            </ForceSection>
+
+            {/* Teams section */}
+            <ForceSection
+              title="Teams"
+              count={selectedTeams.length}
+              max={teamMax}
+              addLabel="Browse"
+              onAdd={() => setSideTab('teams')}
+            >
+              {selectedTeams.length === 0 ? (
+                <EmptyHint>No teams enlisted.</EmptyHint>
+              ) : (
+                selectedTeams.map(name => (
+                  <TeamSummaryCard
+                    key={name}
+                    teamName={name}
+                    onClick={() => setSideTab('teams')}
+                    onRemove={() => toggleTeam(name)}
+                  />
+                ))
+              )}
+            </ForceSection>
+
+            {/* Faction section */}
+            <ForceSection
+              title="Faction"
+              count={faction ? 1 : 0}
+              addLabel={faction ? 'Edit' : 'Pick'}
+              onAdd={() => setSideTab('faction')}
+            >
+              {faction ? (
+                <FactionSummaryCard
+                  faction={faction}
+                  perks={perks}
+                  onClick={() => setSideTab('faction')}
+                />
+              ) : (
+                <EmptyHint>No faction picked.</EmptyHint>
+              )}
+            </ForceSection>
+          </aside>
+
+          {/* RIGHT: workshop with tab strip + content */}
+          <main ref={editorRef} className="editor-col scroll" style={{
+            background: 'var(--surface)',
+            display: 'flex', flexDirection: 'column',
+          }}>
+            {/* Tab strip — always all 4 tabs */}
+            <div className="workshop-tabs">
+              {[
+                { id: 'roster', label: 'Roster' },
+                { id: 'support', label: 'Support' },
+                { id: 'teams', label: 'Teams' },
+                { id: 'faction', label: 'Faction' },
+              ].map(t => (
                 <button
                   key={t.id}
                   onClick={() => setSideTab(t.id)}
-                  className="add-btn"
-                  style={{
-                    background: sideTab === t.id ? 'var(--ink)' : 'transparent',
-                    color: sideTab === t.id ? 'var(--surface)' : 'var(--ink)',
-                    border: 'none',
-                    borderRight: i < tabs.length - 1 ? '1.5px solid var(--ink)' : 'none',
-                    padding: '10px 4px',
-                    cursor: 'pointer',
-                    fontFamily: 'var(--font-stencil)',
-                    fontSize: 12,
-                    fontWeight: 700,
-                    letterSpacing: '0.14em',
-                    textTransform: 'uppercase',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
-                  }}
+                  className={`workshop-tab ${sideTab === t.id ? 'is-active' : ''}`}
                 >
                   {t.label}
-                  <span className="mono" style={{
-                    fontSize: 11, fontWeight: 700,
-                    color: sideTab === t.id ? 'var(--surface)' : 'var(--mute)',
-                  }}>
-                    {t.count}
-                  </span>
                 </button>
               ))}
             </div>
 
-            {sideTab === 'roster' && (
-              <div>
-                <SectionTitle tag={mechs.length === 0 ? 'empty' : `${mechs.length} ${mechs.length === 1 ? 'unit' : 'units'}`}>
-                  Roster
-                </SectionTitle>
-                {mechs.length === 0 ? (
-                  <EmptyRoster onAdd={() => setAddMechOpen(true)} />
-                ) : (
-                  <div style={{ borderBottom: '1px solid var(--rule)', marginBottom: 12 }}>
-                    {mechs.map((m, i) => (
-                      <MechCard
-                        key={m.id}
-                        mech={m}
-                        index={i}
-                        active={selectedMechId === m.id}
-                        onSelect={setSelectedMechId}
-                      />
-                    ))}
-                  </div>
-                )}
+            <div className="workshop-content scroll">
+              {sideTab === 'roster' && selectedMech && (
+                <MechEditor
+                  mech={selectedMech}
+                  mechIndex={mechs.findIndex(m => m.id === selectedMech.id)}
+                  onChange={handleUpdateMech}
+                  onDelete={handleDeleteMech}
+                />
+              )}
 
-                {mechs.length > 0 && (
-                  <div style={{ marginTop: 8 }}>
-                    <GhostButton onClick={() => setAddMechOpen(true)} fullWidth accent="rust">
-                      + Add Another HE-V
-                    </GhostButton>
-                  </div>
-                )}
+              {sideTab === 'roster' && !selectedMech && mechs.length > 0 && (
+                <EmptyState>Pick an HE-V from your force to load it out.</EmptyState>
+              )}
 
-                {/* Support roster: always visible alongside the HE-Vs */}
-                {supportAssets.length > 0 && (
-                  <div style={{ marginTop: 26 }}>
-                    <SectionTitle tag={`${supportAssets.length} taken`}>Support</SectionTitle>
-                    <div style={{ borderBottom: '1px solid var(--rule)', marginBottom: 10 }}>
-                      {supportAssets.map(name => {
-                        const a = findAsset(name);
-                        if (!a) return null;
-                        return (
-                          <SupportRosterCard
-                            key={name}
-                            asset={a}
-                            onRemove={toggleSupport}
-                            active={selectedSupportName === name && sideTab === 'support'}
-                            onClick={() => {
-                              setSelectedMechId(null);
-                              setSelectedSupportName(name);
-                              setSideTab('support');
-                            }}
-                          />
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
+              {sideTab === 'roster' && !selectedMech && mechs.length === 0 && (
+                <FirstRunBriefing onAdd={() => setAddMechOpen(true)} simpleMode={simpleMode} />
+              )}
 
-            {sideTab === 'support' && (
-              <SupportPanel
-                selected={supportAssets}
-                onToggle={toggleSupport}
-                limit={supportLimit}
-                simpleMode={simpleMode}
-              />
-            )}
+              {sideTab === 'support' && selectedSupportName && (
+                <SupportDetailView
+                  assetName={selectedSupportName}
+                  customName={supportNicknames[selectedSupportName]}
+                  onBack={() => setSelectedSupportName(null)}
+                />
+              )}
 
-            {!simpleMode && sideTab === 'teams' && (
-              <TeamPanel
-                mechs={mechs}
-                selectedTeams={selectedTeams}
-                onToggleTeam={toggleTeam}
-                mission={missionObj}
-              />
-            )}
+              {sideTab === 'support' && !selectedSupportName && (
+                <SupportPanel
+                  selected={supportAssets}
+                  onToggle={toggleSupport}
+                  limit={supportLimit}
+                  simpleMode={simpleMode}
+                />
+              )}
 
-            {!simpleMode && sideTab === 'faction' && (
-              <FactionPanel
-                faction={faction}
-                perks={perks}
-                onSetFaction={handleSetFaction}
-                onTogglePerk={togglePerk}
-              />
-            )}
-          </aside>
+              {sideTab === 'teams' && (
+                <TeamPanel
+                  mechs={mechs}
+                  selectedTeams={selectedTeams}
+                  onToggleTeam={toggleTeam}
+                  mission={missionObj}
+                />
+              )}
 
-          <main ref={editorRef} className="editor-col scroll" style={{
-            padding: '24px 28px 36px',
-            background: 'var(--surface)',
-          }}>
-            {sideTab === 'roster' && selectedMech && (
-              <MechEditor
-                mech={selectedMech}
-                mechIndex={mechs.findIndex(m => m.id === selectedMech.id)}
-                onChange={handleUpdateMech}
-                onDelete={handleDeleteMech}
-              />
-            )}
-
-            {sideTab === 'roster' && !selectedMech && mechs.length > 0 && (
-              <EmptyState>Select an HE-V from the roster to load it out.</EmptyState>
-            )}
-
-            {sideTab === 'roster' && !selectedMech && mechs.length === 0 && (
-              <FirstRunBriefing onAdd={() => setAddMechOpen(true)} simpleMode={simpleMode} />
-            )}
-
-            {sideTab === 'support' && selectedSupportName && (
-              <SupportDetailView assetName={selectedSupportName} />
-            )}
-
-            {sideTab === 'support' && !selectedSupportName && supportAssets.length === 0 && (
-              <EmptyState>Pick a support asset on the left.</EmptyState>
-            )}
-
-            {sideTab === 'support' && !selectedSupportName && supportAssets.length > 0 && (
-              <EmptyState>Click any taken support asset to inspect it.</EmptyState>
-            )}
-
-            {!simpleMode && sideTab === 'teams' && (
-              <TeamsContextPane mission={missionObj} />
-            )}
-
-            {!simpleMode && sideTab === 'faction' && (
-              <FactionContextPane faction={faction} />
-            )}
+              {sideTab === 'faction' && (
+                <FactionPanel
+                  faction={faction}
+                  perks={perks}
+                  onSetFaction={handleSetFaction}
+                  onTogglePerk={togglePerk}
+                />
+              )}
+            </div>
           </main>
         </div>
 
@@ -408,45 +425,134 @@ function EmptyState({ children }) {
   );
 }
 
-// Right-pane context for the Teams tab.
-function TeamsContextPane({ mission }) {
-  const counts = mission.teamCounts;
+// ============================================================
+// LEFT SIDEBAR HELPERS
+// ============================================================
+
+// Wraps each summary section (Roster/Support/Teams/Faction) on the left.
+function ForceSection({ title, count, max, addLabel, onAdd, accent, children }) {
   return (
-    <div style={{ marginTop: 36, maxWidth: 520 }}>
-      <div className="stencil" style={{ fontSize: 12, color: 'var(--rust)', letterSpacing: '0.22em', marginBottom: 8 }}>
-        TEAMS
-      </div>
-      <h2 style={{
-        fontFamily: 'var(--font-stencil)',
-        fontSize: 24, fontWeight: 700, letterSpacing: '0.04em',
-        textTransform: 'uppercase', margin: '0 0 10px',
+    <section className="force-section" style={{ marginBottom: 22 }}>
+      <header style={{
+        display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+        gap: 8, marginBottom: 8, paddingBottom: 4,
+        borderBottom: '1px solid var(--rule-strong)',
       }}>
-        Mission allows {counts['2']}·2 / {counts['2-3']}·2-3 / {counts['3-4']}·3-4
-      </h2>
-      <div style={{ fontSize: 14, color: 'var(--ink-2)', lineHeight: 1.55 }}>
-        A team needs at least two qualifying HE-Vs from your roster. The sidebar marks each team eligible or short.
-      </div>
+        <div className="stencil" style={{
+          fontSize: 13, color: 'var(--ink)', letterSpacing: '0.18em',
+        }}>
+          {title}
+        </div>
+        <div className="mono" style={{ fontSize: 11, color: 'var(--mute)' }}>
+          {count}{max != null ? ` / ${max}` : ''}
+        </div>
+      </header>
+      <div>{children}</div>
+      {onAdd && (
+        <button
+          onClick={onAdd}
+          className="add-btn"
+          style={{
+            marginTop: 8,
+            background: 'transparent',
+            border: `1.5px ${accent === 'rust' ? 'solid var(--rust)' : 'dashed var(--rule-strong)'}`,
+            color: accent === 'rust' ? 'var(--rust)' : 'var(--ink-2)',
+            padding: '7px 14px',
+            cursor: 'pointer',
+            fontFamily: 'var(--font-stencil)', fontSize: 11.5, fontWeight: 700,
+            letterSpacing: '0.10em', textTransform: 'uppercase',
+            width: '100%',
+          }}
+        >
+          + {addLabel}
+        </button>
+      )}
+    </section>
+  );
+}
+
+function EmptyHint({ children }) {
+  return (
+    <div style={{
+      padding: '8px 6px', fontSize: 12.5, color: 'var(--mute)',
+      fontStyle: 'italic',
+    }}>
+      {children}
     </div>
   );
 }
 
-function FactionContextPane({ faction }) {
-  if (faction) return null; // No noise when a faction is picked
+// Small clickable card for a selected Team in the left summary.
+function TeamSummaryCard({ teamName, onClick, onRemove }) {
+  const team = TEAMS.find(t => t.name === teamName);
+  if (!team) return null;
   return (
-    <div style={{ marginTop: 36, maxWidth: 520 }}>
-      <div className="stencil" style={{ fontSize: 12, color: 'var(--rust)', letterSpacing: '0.22em', marginBottom: 8 }}>
-        FACTION
+    <div
+      onClick={onClick}
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr auto',
+        gap: 8, alignItems: 'center',
+        padding: '8px 10px',
+        borderTop: '1px solid var(--rule)',
+        cursor: 'pointer',
+      }}
+    >
+      <div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)' }}>
+          {team.name}
+        </div>
+        <div className="mono" style={{ fontSize: 10.5, color: 'var(--mute)' }}>
+          Team of {team.band}
+        </div>
       </div>
-      <h2 style={{
-        fontFamily: 'var(--font-stencil)',
-        fontSize: 24, fontWeight: 700, letterSpacing: '0.04em',
-        textTransform: 'uppercase', margin: '0 0 10px',
+      <button
+        onClick={(e) => { e.stopPropagation(); onRemove(); }}
+        title="Remove team"
+        style={{
+          background: 'transparent', border: '1px solid var(--rust)',
+          color: 'var(--rust)', padding: '3px 8px', cursor: 'pointer',
+          fontFamily: 'var(--font-stencil)', fontSize: 10,
+          fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
+        }}
+      >
+        ×
+      </button>
+    </div>
+  );
+}
+
+// Faction summary card on the left.
+function FactionSummaryCard({ faction, perks, onClick }) {
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        padding: '10px 12px',
+        borderTop: '1px solid var(--rule)',
+        cursor: 'pointer',
+      }}
+    >
+      <div style={{
+        fontFamily: 'var(--font-display)',
+        fontSize: 17, fontWeight: 700, color: 'var(--ink)',
+        letterSpacing: '0.03em', textTransform: 'uppercase',
+        marginBottom: 4,
       }}>
-        Pick a faction
-      </h2>
-      <div style={{ fontSize: 14, color: 'var(--ink-2)', lineHeight: 1.55 }}>
-        Each faction has a doctrine, an agenda, and a perk catalog. Choose at left.
+        {faction}
       </div>
+      {perks.length > 0 ? (
+        <ul style={{
+          margin: 0, paddingLeft: 16,
+          fontSize: 12, color: 'var(--ink-2)', lineHeight: 1.5,
+        }}>
+          {perks.map(p => <li key={p}>{p}</li>)}
+        </ul>
+      ) : (
+        <div style={{ fontSize: 12, color: 'var(--mute)', fontStyle: 'italic' }}>
+          No perks picked yet.
+        </div>
+      )}
     </div>
   );
 }

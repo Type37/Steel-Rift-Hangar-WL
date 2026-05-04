@@ -424,13 +424,24 @@ function TeamRow({ team, eligible, minSize, canAssign, slotLeft, selected, onTog
 // inline glossary of any traits referenced.
 // ============================================================
 
-export function SupportDetailView({ assetName }) {
+export function SupportDetailView({ assetName, customName, onBack }) {
   const a = findAsset(assetName);
   if (!a) return null;
   const traitNames = collectTraits(a.stats?.Traits || '');
 
   return (
     <div style={{ maxWidth: 760 }}>
+      {onBack && (
+        <button onClick={onBack} className="add-btn" style={{
+          background: 'transparent', border: '1.5px solid var(--rule-strong)',
+          color: 'var(--ink-2)', padding: '6px 14px', cursor: 'pointer',
+          fontFamily: 'var(--font-stencil)', fontSize: 11.5, fontWeight: 700,
+          letterSpacing: '0.10em', textTransform: 'uppercase', marginBottom: 16,
+        }}>
+          ← Browse all
+        </button>
+      )}
+
       <div className="stencil" style={{
         fontSize: 12, color: 'var(--rust)', letterSpacing: '0.22em', marginBottom: 6,
       }}>
@@ -439,11 +450,16 @@ export function SupportDetailView({ assetName }) {
       <h1 style={{
         fontFamily: 'var(--font-display)',
         fontSize: 32, fontWeight: 700, letterSpacing: '0.03em',
-        textTransform: 'uppercase', margin: '0 0 12px',
+        textTransform: 'uppercase', margin: '0 0 4px',
         lineHeight: 1.05,
       }}>
-        {a.name}
+        {customName || a.name}
       </h1>
+      {customName && (
+        <div className="mono" style={{ fontSize: 12, color: 'var(--mute)', marginBottom: 8 }}>
+          ({a.name})
+        </div>
+      )}
       <div className="mono" style={{
         fontSize: 14, color: 'var(--rust)', fontWeight: 700, marginBottom: 16,
       }}>
@@ -459,14 +475,52 @@ export function SupportDetailView({ assetName }) {
         {a.summary}
       </div>
 
-      <div className="label" style={{ marginBottom: 6 }}>Rules</div>
+      <div className="label" style={{ marginBottom: 6 }}>Composition</div>
       <div style={{ fontSize: 14, color: 'var(--ink)', lineHeight: 1.6, marginBottom: 18 }}>
         {a.fullDesc}
       </div>
 
+      {a.subunits && a.subunits.length > 0 && (
+        <>
+          <div className="label" style={{ marginBottom: 6 }}>Sub-units</div>
+          <div style={{ overflowX: 'auto', marginBottom: 18 }}>
+            <table style={{
+              borderCollapse: 'collapse', width: '100%',
+              background: 'var(--surface)', border: '1px solid var(--rule)',
+              fontSize: 12.5,
+            }}>
+              <thead>
+                <tr style={{ background: 'var(--bg)' }}>
+                  <th style={subTableTh}>Type</th>
+                  <th style={{ ...subTableTh, textAlign: 'center', width: 56 }}>SPD</th>
+                  <th style={{ ...subTableTh, textAlign: 'center', width: 50 }}>ARM</th>
+                  <th style={{ ...subTableTh, textAlign: 'center', width: 50 }}>STR</th>
+                  <th style={subTableTh}>Weapons</th>
+                  <th style={subTableTh}>Traits</th>
+                </tr>
+              </thead>
+              <tbody>
+                {a.subunits.map(su => (
+                  <tr key={su.name}>
+                    <td style={subTableTd}>
+                      <strong>{su.name}</strong>
+                    </td>
+                    <td style={{ ...subTableTd, textAlign: 'center', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>{su.spd}</td>
+                    <td style={{ ...subTableTd, textAlign: 'center', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>{su.arm}</td>
+                    <td style={{ ...subTableTd, textAlign: 'center', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>{su.str}</td>
+                    <td style={subTableTd}>{su.weapons}</td>
+                    <td style={{ ...subTableTd, fontSize: 12, color: 'var(--ink-2)' }}>{su.traits}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+
       {a.stats && (
         <>
-          <div className="label" style={{ marginBottom: 6 }}>Statline</div>
+          <div className="label" style={{ marginBottom: 6 }}>Shared Stats</div>
           <table style={{
             borderCollapse: 'collapse', width: '100%', maxWidth: 560,
             background: 'var(--surface)', border: '1px solid var(--rule)',
@@ -501,6 +555,24 @@ export function SupportDetailView({ assetName }) {
     </div>
   );
 }
+
+const subTableTh = {
+  padding: '8px 10px',
+  fontFamily: 'var(--font-stencil)',
+  fontSize: 10.5,
+  letterSpacing: '0.14em',
+  textTransform: 'uppercase',
+  fontWeight: 700,
+  color: 'var(--ink-2)',
+  borderBottom: '1.5px solid var(--rule-strong)',
+  textAlign: 'left',
+};
+const subTableTd = {
+  padding: '8px 10px',
+  borderBottom: '1px solid var(--rule)',
+  verticalAlign: 'top',
+  lineHeight: 1.4,
+};
 
 export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
   const data = faction ? FACTIONS[faction] : null;

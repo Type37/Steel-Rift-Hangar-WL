@@ -313,18 +313,36 @@ export function MechCard({ mech, index, active, onSelect }) {
 // SUPPORT ROSTER CARD: compact summary of a chosen support asset.
 // Shown alongside HE-V cards so the user always sees their force.
 // ============================================================
-export function SupportRosterCard({ asset: a, onRemove, onClick, active }) {
+export function SupportRosterCard({ asset: a, customName, onRemove, onClick, onRename, active }) {
+  const [editing, setEditing] = React.useState(false);
+  const [draft, setDraft] = React.useState(customName || '');
+  const inputRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (editing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [editing]);
+
+  const commit = () => {
+    if (onRename) onRename(draft);
+    setEditing(false);
+  };
+
   // Pull a short stats string out of the stats object if present
   const statsLine = (() => {
     if (!a.stats) return null;
     const e = Object.entries(a.stats).filter(([k]) => !/Trait|Description/i.test(k));
     if (e.length === 0) return null;
-    return e.map(([k, v]) => /Per/i.test(k) ? v : `${k} ${v}`).join(' · ');
+    return e.map(([k, v]) => /Per/i.test(k) ? v : `${k} ${v}`).join(' \u00B7 ');
   })();
+
+  const displayName = customName || a.name;
 
   return (
     <div
-      onClick={onClick}
+      onClick={editing ? undefined : onClick}
       style={{
         display: 'grid',
         gridTemplateColumns: 'auto 1fr auto',
@@ -332,7 +350,7 @@ export function SupportRosterCard({ asset: a, onRemove, onClick, active }) {
         padding: '11px 14px',
         borderTop: '1px solid var(--rule)',
         alignItems: 'center',
-        cursor: onClick ? 'pointer' : 'default',
+        cursor: onClick && !editing ? 'pointer' : 'default',
         background: active ? 'var(--surface-2)' : 'transparent',
       }}
     >
@@ -346,10 +364,51 @@ export function SupportRosterCard({ asset: a, onRemove, onClick, active }) {
         <div style={{
           display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap',
         }}>
-          <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--ink)' }}>{a.name}</span>
+          {editing ? (
+            <input
+              ref={inputRef}
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onBlur={commit}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') { e.preventDefault(); commit(); }
+                if (e.key === 'Escape') { setDraft(customName || ''); setEditing(false); }
+              }}
+              onClick={(e) => e.stopPropagation()}
+              placeholder={a.name}
+              style={{
+                background: 'var(--surface)', border: '1.5px solid var(--rust)',
+                padding: '2px 6px', fontFamily: 'var(--font-body)',
+                fontSize: 14, fontWeight: 700, color: 'var(--ink)',
+                width: 200, maxWidth: '100%', outline: 'none',
+              }}
+            />
+          ) : (
+            <span
+              onDoubleClick={(e) => {
+                e.stopPropagation();
+                if (onRename) {
+                  setDraft(customName || '');
+                  setEditing(true);
+                }
+              }}
+              title={onRename ? 'Double-click to rename' : ''}
+              style={{
+                fontWeight: 700, fontSize: 14, color: 'var(--ink)',
+                cursor: onRename ? 'text' : 'inherit',
+              }}
+            >
+              {displayName}
+            </span>
+          )}
           <span className="mono" style={{ fontSize: 12, color: 'var(--rust)', fontWeight: 700 }}>
             {a.cost}t
           </span>
+          {customName && !editing && (
+            <span className="mono" style={{ fontSize: 10, color: 'var(--mute)' }}>
+              ({a.name})
+            </span>
+          )}
         </div>
         {statsLine && (
           <div className="mono" style={{
@@ -361,7 +420,7 @@ export function SupportRosterCard({ asset: a, onRemove, onClick, active }) {
       </div>
       <button
         onClick={(e) => { e.stopPropagation(); onRemove(a.name); }}
-        title={`Remove ${a.name}`}
+        title={`Remove ${displayName}`}
         className="add-btn"
         style={{
           background: 'transparent', border: '1.5px solid var(--rust)',
