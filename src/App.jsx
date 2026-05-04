@@ -146,7 +146,7 @@ export default function App() {
         {/* Main two-column layout */}
         <div className="layout" style={{
           display: 'grid',
-          gridTemplateColumns: '380px 1fr',
+          gridTemplateColumns: 'minmax(440px, 1fr) 1.35fr',
           minHeight: 0,
         }}>
           <aside className="sidebar scroll" style={{
@@ -423,12 +423,13 @@ function FirstRunBriefing({ onAdd, simpleMode }) {
         Pick a mission size below, add an HE-V, and start loading it out. Tonnage and slot use are tracked live.
         {!simpleMode && ' Faction perks and HE-V Teams sit in the sidebar tabs once your roster fills out.'}
       </p>
-      <button onClick={onAdd} className="add-btn" style={{
+      <button onClick={onAdd} className="add-btn cta-mech cta-pulse" style={{
         background: 'var(--rust)', color: 'var(--surface)', border: 'none',
-        padding: '14px 22px', cursor: 'pointer',
-        fontFamily: 'var(--font-stencil)', fontSize: 14, fontWeight: 700,
+        padding: '15px 26px', cursor: 'pointer',
+        fontFamily: 'var(--font-stencil)', fontSize: 15, fontWeight: 700,
         letterSpacing: '0.16em', textTransform: 'uppercase',
-        display: 'inline-flex', alignItems: 'center', gap: 8,
+        display: 'inline-flex', alignItems: 'center', gap: 9,
+        boxShadow: '0 3px 0 var(--rust-deep)',
       }}>
         + Add Your First HE-V
       </button>

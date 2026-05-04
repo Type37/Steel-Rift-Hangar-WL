@@ -3,7 +3,7 @@
 // ============================================================
 // Definitions reproduced from the v1.5 rules PDF (p. 21-22 weapon traits,
 // p. 25 upgrade traits, scattered upgrade rules). Used by the inline
-// definitions panel — when a trait token is clicked anywhere in the UI,
+// definitions panel. When a trait token is clicked anywhere in the UI,
 // its definition is surfaced below.
 // ============================================================
 
@@ -35,7 +35,7 @@ export const GLOSSARY = {
   },
   'dash': {
     title: 'Dash (X)',
-    text: 'New Order — DASH: move up to X" ignoring Rough Terrain, then immediately resolve a SMASH or ENGAGE Order. The secondary Order does not count toward the 2-Order limit. DASH counts as a MOVE for movement-based bonuses to SMASH.',
+    text: 'New Order. DASH: move up to X" ignoring Rough Terrain, then immediately resolve a SMASH or ENGAGE Order. The secondary Order does not count toward the 2-Order limit. DASH counts as a MOVE for movement-based bonuses to SMASH.',
   },
   'disruptive': {
     title: 'Disruptive',

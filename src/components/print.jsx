@@ -94,7 +94,7 @@ function ForceHeader({ forceName, mission, useCustom, cap, totalTons, mechCount,
         {(faction || teams.length > 0) && (
           <div style={{ fontSize: 11, marginTop: 6 }}>
             {faction && (
-              <span><strong>{faction}</strong>{perks.length > 0 && ` — ${perks.join(' · ')}`}</span>
+              <span><strong>{faction}</strong>{perks.length > 0 && `; ${perks.join(' · ')}`}</span>
             )}
             {teams.length > 0 && <span> · <strong>Teams:</strong> {teams.join(', ')}</span>}
           </div>
@@ -295,9 +295,9 @@ function Stat({ label, value, last }) {
   );
 }
 
-// Approximation — full rules have movement per upgrade. This is the base.
+// Approximation. Full rules have movement per upgrade; this is the base.
 function moveForClass(cls) {
-  return { Light: '8"', Medium: '6"', Heavy: '5"', Ultraheavy: '4"' }[cls] || '—';
+  return { Light: '8"', Medium: '6"', Heavy: '5"', Ultraheavy: '4"' }[cls] || '-';
 }
 
 // ----- Support card -----

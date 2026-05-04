@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Trash2, ChevronDown, ChevronRight, Shield, Activity } from 'lucide-react';
+import { Trash2, Shield, Activity } from 'lucide-react';
 import { WC, WC_ORDER, RANGED, MELEE, UPGRADES, DEFENSIVE } from '../data';
 import { calcMech, valForClass, copyCost, totalWeaponCost, resetMechToClass } from '../calc';
-import { SectionTitle, FieldLabel, StepButton, TraitList } from './ui';
+import { SectionTitle, FieldLabel, StepButton, TraitList, RowExpand, InlineTraitGlossary, collectTraits } from './ui';
 
 // ============================================================
 // HE-V EDITOR
@@ -384,23 +384,27 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
   const total = available ? totalWeaponCost(weapon, cls, count) : 0;
   const next = available ? copyCost(base, count + 1) : null;
 
+  const unavailableReason = !available
+    ? `${weapon.name} is not available on a ${cls} HE-V (per the per-class cost table).`
+    : null;
+
   return (
     <div style={{
       borderBottom: '1px solid var(--rule)',
       background: count > 0 ? 'var(--surface)' : 'transparent',
-      opacity: available ? 1 : 0.42,
+      opacity: available ? 1 : 0.55,
       transition: 'background 100ms',
     }}>
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'auto 1fr auto auto auto',
-        alignItems: 'center', gap: 12,
-        padding: '9px 14px',
-      }}>
-        <button onClick={onToggle} className="add-btn" aria-label="Expand"
-          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: 'var(--mute)' }}>
-          {expanded ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
-        </button>
+      <div
+        title={unavailableReason || undefined}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'auto 1fr auto auto auto',
+          alignItems: 'center', gap: 12,
+          padding: '9px 14px',
+        }}
+      >
+        <RowExpand open={expanded} onClick={onToggle} />
 
         <div style={{ minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
@@ -410,6 +414,11 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
                 <span className="mono" style={{ fontSize: 12, color: 'var(--steel)' }}>DMG {dmg}</span>
                 <span className="mono" style={{ fontSize: 12, color: 'var(--rust)', fontWeight: 700 }}>{base}t</span>
               </>
+            )}
+            {!available && (
+              <span className="mono" style={{ fontSize: 11, color: 'var(--mute)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                Not available at {WC[cls].abbr}
+              </span>
             )}
             {count > 1 && (
               <span className="mono" style={{ fontSize: 11, color: 'var(--warn)' }}>
@@ -444,9 +453,10 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
 }
 
 function ExpandedWeapon({ weapon, cls }) {
+  const traits = collectTraits(weapon.traits);
   return (
     <div style={{
-      padding: '10px 14px 16px 36px',
+      padding: '10px 14px 16px 14px',
       background: 'var(--bg-deep)',
       borderTop: '1px dashed var(--rule)',
     }}>
@@ -475,28 +485,25 @@ function ExpandedWeapon({ weapon, cls }) {
             <td style={tdLabelStyle}>Cost (base)</td>
             {weapon.cost.map((c, i) => (
               <td key={i} style={{ ...tdStyle, color: WC_ORDER[i] === cls ? 'var(--rust)' : 'var(--ink-2)', fontWeight: WC_ORDER[i] === cls ? 700 : 400 }}>
-                {c === '-' ? '—' : `${c}t`}
+                {c === '-' ? '-' : `${c}t`}
               </td>
             ))}
           </tr>
           <tr>
             <td style={tdLabelStyle}>2nd / 3rd copy</td>
             {weapon.cost.map((c, i) => {
-              const c2 = c === '-' ? '—' : copyCost(c, 2);
-              const c3 = c === '-' ? '—' : copyCost(c, 3);
+              const c2 = c === '-' ? '-' : copyCost(c, 2);
+              const c3 = c === '-' ? '-' : copyCost(c, 3);
               return (
                 <td key={i} style={{ ...tdStyle, color: 'var(--mute)' }}>
-                  {c === '-' ? '—' : `${c2}t / ${c3}t`}
+                  {c === '-' ? '-' : `${c2}t / ${c3}t`}
                 </td>
               );
             })}
           </tr>
         </tbody>
       </table>
-      <div style={{ marginTop: 10, fontSize: 13, color: 'var(--ink-2)' }}>
-        <span className="label" style={{ marginRight: 6 }}>Traits:</span>
-        <TraitList traits={weapon.traits} />
-      </div>
+      <InlineTraitGlossary traits={traits} />
     </div>
   );
 }
@@ -506,29 +513,38 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand }) {
   const cost = valForClass(upgrade.cost, cls);
   const available = cost !== '-' && cost != null;
   const eq = mech.upgrades.includes(upgrade.name);
+  const unavailableReason = !available
+    ? `${upgrade.name} is not available on a ${cls} HE-V.`
+    : null;
+
   return (
     <div style={{
       borderBottom: '1px solid var(--rule)',
       background: eq ? 'var(--surface)' : 'transparent',
-      opacity: available ? 1 : 0.42,
+      opacity: available ? 1 : 0.55,
       transition: 'background 100ms',
     }}>
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'auto 1fr auto',
-        alignItems: 'center', gap: 12,
-        padding: '9px 14px',
-      }}>
-        <button onClick={onExpand} className="add-btn" aria-label="Expand"
-          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: 'var(--mute)' }}>
-          {expanded ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
-        </button>
+      <div
+        title={unavailableReason || undefined}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'auto 1fr auto',
+          alignItems: 'center', gap: 12,
+          padding: '9px 14px',
+        }}
+      >
+        <RowExpand open={expanded} onClick={onExpand} />
 
         <div style={{ minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
             <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--ink)' }}>{upgrade.name}</span>
             {available && (
               <span className="mono" style={{ fontSize: 12, color: 'var(--rust)', fontWeight: 700 }}>{cost}t</span>
+            )}
+            {!available && (
+              <span className="mono" style={{ fontSize: 11, color: 'var(--mute)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                Not available at {WC[cls].abbr}
+              </span>
             )}
             {upgrade.compact && (
               <span className="stencil" style={{
@@ -549,12 +565,13 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand }) {
         {available && (
           <button
             onClick={() => onToggle(upgrade.name)}
+            title={eq ? `Remove ${upgrade.name}.` : `Add ${upgrade.name} (${cost}t).`}
             className="add-btn"
             style={{
               border: `1.5px solid ${eq ? 'var(--rust)' : 'var(--olive)'}`,
               background: eq ? 'transparent' : 'var(--olive)',
               color: eq ? 'var(--rust)' : 'var(--surface)',
-              padding: '6px 14px', cursor: 'pointer',
+              padding: '7px 14px', cursor: 'pointer',
               fontFamily: 'var(--font-stencil)', fontSize: 12, fontWeight: 700,
               letterSpacing: '0.12em', textTransform: 'uppercase',
             }}
@@ -566,7 +583,7 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand }) {
 
       {expanded && (
         <div style={{
-          padding: '4px 14px 16px 36px',
+          padding: '4px 14px 16px 14px',
           background: 'var(--bg-deep)',
           borderTop: '1px dashed var(--rule)',
         }}>
@@ -576,9 +593,10 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand }) {
           <div style={{ marginTop: 10 }}>
             <span className="label" style={{ marginRight: 6 }}>Cost (Lt/Md/Hv/UH):</span>
             <span className="mono" style={{ fontSize: 13 }}>
-              {upgrade.cost.map(c => c === '-' ? '—' : `${c}t`).join(' / ')}
+              {upgrade.cost.map(c => c === '-' ? '-' : `${c}t`).join(' / ')}
             </span>
           </div>
+          <InlineTraitGlossary traits={collectTraits(upgrade.rule)} />
         </div>
       )}
     </div>
@@ -590,28 +608,41 @@ function DefRow({ def, mech, onToggle, atLimit, expanded, onExpand }) {
   const cost = valForClass(def.cost, cls);
   const available = cost !== '-' && cost != null;
   const eq = mech.defensive.includes(def.name);
+  const limitMax = cls === 'Ultraheavy' ? 2 : 1;
+  const blockedByLimit = !eq && atLimit;
+  const reason = !available
+    ? `${def.name} is not available on a ${cls} HE-V.`
+    : blockedByLimit
+      ? `Already at ${limitMax} Defensive Configuration${limitMax > 1 ? 's' : ''}. Remove one to swap.`
+      : null;
+
   return (
     <div style={{
       borderBottom: '1px solid var(--rule)',
       background: eq ? 'var(--surface)' : 'transparent',
-      opacity: available ? 1 : 0.42,
+      opacity: available ? 1 : 0.55,
       transition: 'background 100ms',
     }}>
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'auto 1fr auto',
-        alignItems: 'center', gap: 12,
-        padding: '9px 14px',
-      }}>
-        <button onClick={onExpand} className="add-btn" aria-label="Expand"
-          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: 'var(--mute)' }}>
-          {expanded ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
-        </button>
+      <div
+        title={reason || undefined}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'auto 1fr auto',
+          alignItems: 'center', gap: 12,
+          padding: '9px 14px',
+        }}
+      >
+        <RowExpand open={expanded} onClick={onExpand} />
         <div style={{ minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
             <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--ink)' }}>{def.name}</span>
             {available && (
               <span className="mono" style={{ fontSize: 12, color: 'var(--rust)', fontWeight: 700 }}>{cost}t</span>
+            )}
+            {!available && (
+              <span className="mono" style={{ fontSize: 11, color: 'var(--mute)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                Not available at {WC[cls].abbr}
+              </span>
             )}
             {def.mod?.armor && (
               <span className="mono" style={{ fontSize: 11, color: 'var(--olive)' }}>
@@ -629,13 +660,14 @@ function DefRow({ def, mech, onToggle, atLimit, expanded, onExpand }) {
         {available && (
           <button
             onClick={() => onToggle(def.name)}
-            disabled={!eq && atLimit}
+            disabled={blockedByLimit}
+            title={reason || (eq ? `Remove ${def.name}.` : `Add ${def.name} (${cost}t).`)}
             className="add-btn"
             style={{
-              border: `1.5px solid ${eq ? 'var(--rust)' : (atLimit ? 'var(--rule)' : 'var(--olive)')}`,
-              background: eq ? 'transparent' : (atLimit ? 'var(--bg-deep)' : 'var(--olive)'),
-              color: eq ? 'var(--rust)' : (atLimit ? 'var(--mute)' : 'var(--surface)'),
-              padding: '6px 14px', cursor: !eq && atLimit ? 'not-allowed' : 'pointer',
+              border: `1.5px solid ${eq ? 'var(--rust)' : (blockedByLimit ? 'var(--rule)' : 'var(--olive)')}`,
+              background: eq ? 'transparent' : (blockedByLimit ? 'var(--bg-deep)' : 'var(--olive)'),
+              color: eq ? 'var(--rust)' : (blockedByLimit ? 'var(--mute)' : 'var(--surface)'),
+              padding: '7px 14px', cursor: blockedByLimit ? 'not-allowed' : 'pointer',
               fontFamily: 'var(--font-stencil)', fontSize: 12, fontWeight: 700,
               letterSpacing: '0.12em', textTransform: 'uppercase',
             }}
@@ -646,7 +678,7 @@ function DefRow({ def, mech, onToggle, atLimit, expanded, onExpand }) {
       </div>
       {expanded && (
         <div style={{
-          padding: '4px 14px 16px 36px',
+          padding: '4px 14px 16px 14px',
           background: 'var(--bg-deep)',
           borderTop: '1px dashed var(--rule)',
         }}>
@@ -654,9 +686,10 @@ function DefRow({ def, mech, onToggle, atLimit, expanded, onExpand }) {
           <div style={{ marginTop: 10 }}>
             <span className="label" style={{ marginRight: 6 }}>Cost (Lt/Md/Hv/UH):</span>
             <span className="mono" style={{ fontSize: 13 }}>
-              {def.cost.map(c => c === '-' ? '—' : `${c}t`).join(' / ')}
+              {def.cost.map(c => c === '-' ? '-' : `${c}t`).join(' / ')}
             </span>
           </div>
+          <InlineTraitGlossary traits={collectTraits(def.rule)} />
         </div>
       )}
     </div>

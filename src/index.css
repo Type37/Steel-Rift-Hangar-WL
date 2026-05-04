@@ -1,5 +1,5 @@
 /* ============================================================
-   THE FORGE — global styles
+   THE FORGE global styles
    - Warm parchment background, deep ink text
    - Chakra Petch reserved for big banner headings only
    - Schibsted Grotesk for stencil/uppercase labels
@@ -81,7 +81,7 @@ body {
     );
 }
 
-/* Type — display headers run wider and tighter than browser defaults */
+/* Type. Display headers run wider and tighter than browser defaults */
 .display {
   font-family: var(--font-display);
   font-weight: 700;
@@ -161,7 +161,7 @@ textarea.txt { min-height: 60px; resize: vertical; }
   transform: translateY(1px);
 }
 
-/* Inline button used by main UI buttons — fade hover */
+/* Inline button used by main UI buttons. Fade hover */
 button {
   transition: background 110ms, color 110ms, border-color 110ms, transform 80ms, box-shadow 110ms, filter 110ms;
 }
@@ -196,6 +196,74 @@ button:not(:disabled):active {
   transform: translateY(1px);
   box-shadow: none;
 }
+
+/* The big rust "Add HE-V" CTA. Gets extra love */
+.cta-mech {
+  transition: transform 90ms ease-out, background 110ms, box-shadow 120ms, filter 110ms;
+  position: relative;
+  overflow: hidden;
+}
+.cta-mech:hover:not(:disabled) {
+  background: var(--rust-bright) !important;
+  box-shadow: 0 4px 0 var(--rust-deep), 0 6px 14px rgba(168, 51, 12, 0.35);
+  transform: translateY(-2px);
+}
+.cta-mech:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 var(--rust-deep), 0 1px 3px rgba(0, 0, 0, 0.2);
+  filter: brightness(0.95);
+}
+/* Sweep highlight on hover */
+.cta-mech::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -120%;
+  width: 60%; height: 100%;
+  background: linear-gradient(110deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+  transition: left 600ms ease-out;
+  pointer-events: none;
+}
+.cta-mech:hover:not(:disabled)::after {
+  left: 130%;
+}
+
+/* Pulsing glow for empty-roster prompts that want attention */
+@keyframes cta-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(168, 51, 12, 0.55); }
+  50%      { box-shadow: 0 0 0 10px rgba(168, 51, 12, 0); }
+}
+.cta-pulse {
+  animation: cta-pulse 1.6s ease-out infinite;
+}
+
+/* Bigger, more obvious row expand button. Replaces tiny chevron. */
+.row-expand {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 1.5px solid var(--rule-strong);
+  color: var(--ink-2);
+  font-family: var(--font-stencil);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: background 110ms, color 110ms, border-color 110ms;
+}
+.row-expand:hover {
+  background: var(--ink);
+  color: var(--surface);
+  border-color: var(--ink);
+}
+.row-expand.open {
+  background: var(--steel);
+  color: var(--surface);
+  border-color: var(--steel);
+}
+.row-expand svg { display: block; }
 
 /* Hover for trait token */
 .tok {
@@ -244,17 +312,18 @@ button:not(:disabled):active {
 }
 
 /* ============================================================
-   TOP NAVBAR (Steel Rift logo + links)
+   TOP NAVBAR. Matches the original Hangar's brand strip
+   Prussian Blue background, Powder Blue links, Tangerine "Buy Now"
    ============================================================ */
 .navbar-strip {
-  background: #0c0a08;
-  color: var(--surface);
-  border-bottom: 2px solid var(--rust);
+  background: #0A1128; /* Prussian Blue */
+  color: #ffffff;
+  border-bottom: 3px solid #DC4427; /* Burnt Tangerine */
 }
 .navbar-inner {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 10px 22px;
+  padding: 11px 22px;
   display: flex;
   align-items: center;
   gap: 22px;
@@ -265,51 +334,56 @@ button:not(:disabled):active {
   align-items: center;
 }
 .navbar-logo img {
-  height: 22px;
+  height: 24px;
   display: block;
-  filter: invert(0.95);
+  /* white logo on dark background */
+  filter: brightness(0) invert(1);
 }
 .navbar-links {
   display: flex;
-  gap: 4px;
+  gap: 2px;
   align-items: center;
   flex: 1;
   flex-wrap: wrap;
 }
 .navbar-links a {
-  color: rgba(241, 234, 218, 0.78);
+  color: #93B5C6; /* Powder Blue */
   text-decoration: none;
   font-family: var(--font-stencil);
   font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  padding: 6px 10px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 6px 12px;
   transition: color 110ms, background 110ms;
 }
 .navbar-links a:hover {
-  color: var(--surface);
-  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  background: rgba(147, 181, 198, 0.10);
 }
 .navbar-buynow {
-  background: var(--orange);
+  background: #f6993f; /* Original Hangar orange */
   color: #1a0f04;
   text-decoration: none;
   font-family: var(--font-stencil);
   font-weight: 700;
   font-size: 12.5px;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.10em;
   text-transform: uppercase;
-  padding: 7px 14px;
-  border: 2px solid var(--orange);
-  transition: background 110ms, color 110ms, border-color 110ms;
+  padding: 7px 16px;
+  border: 2px solid #f6993f;
+  border-radius: 4px;
+  transition: background 110ms, color 110ms, border-color 110ms, transform 80ms;
 }
 .navbar-buynow:hover {
-  background: transparent;
-  color: var(--orange);
+  background: #ffb066;
+  border-color: #ffb066;
+}
+.navbar-buynow:active {
+  transform: translateY(1px);
 }
 
 /* ============================================================
-   PRINT STYLES — game-card layout
+   PRINT STYLES: game-card layout
    See print.jsx for structure
    ============================================================ */
 .print-only { display: none; }

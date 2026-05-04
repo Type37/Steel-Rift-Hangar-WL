@@ -1,14 +1,15 @@
 import React from 'react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import { Tooltip } from './tooltip';
 import { defineToken } from '../glossary';
 
-// Schibsted Grotesk for buttons (was Chakra Petch — restricted now to banner heads only)
+// Schibsted Grotesk for buttons (was Chakra Petch; restricted now to banner heads only)
 const stencilButton = {
   fontFamily: 'var(--font-stencil)',
   textTransform: 'uppercase',
 };
 
-// Solid primary CTA — used sparingly
+// Solid primary CTA. Used sparingly
 export function PrimaryButton({ children, onClick, icon: Icon, disabled, fullWidth }) {
   return (
     <button
@@ -70,7 +71,7 @@ export function GhostButton({ children, onClick, icon: Icon, disabled, fullWidth
   );
 }
 
-// Pure text link button — for low-emphasis actions
+// Pure text link button. Low-emphasis actions
 export function TextButton({ children, onClick, disabled }) {
   return (
     <button
@@ -117,7 +118,7 @@ export function StepButton({ direction, onClick, disabled, accent = 'olive' }) {
   );
 }
 
-// Pill / chip — used for the mission-size selector
+// Pill / chip used for the mission-size selector
 export function Chip({ active, onClick, children, accent = 'ink' }) {
   const colorMap = {
     ink: 'var(--ink)',
@@ -228,13 +229,39 @@ export function Modal({ open, onClose, children, width = 560 }) {
   );
 }
 
-// Trait token — wrapped in tooltip for definition on hover/tap
+// Bigger, more obvious row-expand button. Used in catalog and panel rows
+// where the previous tiny chevron was too easy to miss.
+export function RowExpand({ open, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`row-expand ${open ? 'open' : ''}`}
+      title={open ? 'Hide details' : 'Show full rules'}
+      aria-label={open ? 'Hide details' : 'Show full rules'}
+    >
+      {open ? (
+        <>
+          <ChevronDown size={13} strokeWidth={2.5} />
+          Hide
+        </>
+      ) : (
+        <>
+          <ChevronRight size={13} strokeWidth={2.5} />
+          Details
+        </>
+      )}
+    </button>
+  );
+}
+
+// Trait token wrapped in tooltip for definition on hover or tap
 export function TraitToken({ token }) {
   const display = token.charAt(0).toUpperCase() + token.slice(1);
   const def = defineToken(token);
 
   if (!def) {
-    // Unknown trait — just render the text without a tooltip (no underline)
+    // Unknown trait. Render plain text without a tooltip.
     return <span style={{ fontSize: 'inherit' }}>{display}</span>;
   }
 
@@ -267,5 +294,49 @@ export function TraitList({ traits }) {
         );
       })}
     </span>
+  );
+}
+
+// Pull the trait keywords out of a comma-separated trait string.
+// "Blast (6\"), Limited (3)" → ["blast", "limited"]
+export function collectTraits(str) {
+  if (!str) return [];
+  const seen = new Set();
+  str.split(/,\s*/).forEach(part => {
+    const m = part.match(/^([A-Za-z\-]+)/);
+    if (m) seen.add(m[1].toLowerCase());
+  });
+  return [...seen];
+}
+
+// Inline glossary block: shows every referenced trait with its full rule text.
+// Use after expanding a row so the user sees all the rules without having to
+// hover each tag.
+export function InlineTraitGlossary({ traits }) {
+  if (!traits || traits.length === 0) return null;
+  const defs = traits.map(t => ({ key: t, def: defineToken(t) })).filter(x => x.def);
+  if (defs.length === 0) return null;
+  return (
+    <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px dotted var(--rule)' }}>
+      <div className="label" style={{ marginBottom: 8 }}>Rules in play</div>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+        gap: '10px 18px',
+      }}>
+        {defs.map(({ key, def }) => (
+          <div key={key} style={{ fontSize: 12.5, lineHeight: 1.5 }}>
+            <div className="stencil" style={{
+              fontSize: 11,
+              color: 'var(--ink)',
+              marginBottom: 2,
+            }}>
+              {def.title}
+            </div>
+            <div style={{ color: 'var(--ink-2)' }}>{def.text}</div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

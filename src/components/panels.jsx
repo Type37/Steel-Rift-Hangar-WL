@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { OFF_TABLE_ASSETS, ADVANCED_ASSETS, FACTIONS, TEAMS } from '../data';
 import { checkTeamEligibility, slotsForBand } from '../calc';
-import { SectionTitle, Chip, TextButton, TraitList } from './ui';
+import { SectionTitle, Chip, TextButton, TraitList, RowExpand, InlineTraitGlossary, collectTraits } from './ui';
+import { Tooltip } from './tooltip';
 
 // ============================================================
 // SUPPORT PANEL
@@ -55,22 +56,21 @@ function SubHeader({ children }) {
 }
 
 function SupportRow({ a, eq, atLimit, onToggle, expanded, onExpand }) {
+  const disabledReason = atLimit
+    ? `Support cap reached for this mission. Remove another asset or pick a larger mission to add ${a.name}.`
+    : null;
   return (
     <div style={{
       borderBottom: '1px solid var(--rule)',
       background: eq ? 'var(--surface)' : 'transparent',
-      opacity: atLimit ? 0.45 : 1,
+      opacity: atLimit ? 0.55 : 1,
       transition: 'background 100ms',
     }}>
       <div style={{
         display: 'grid', gridTemplateColumns: 'auto auto 1fr auto auto', alignItems: 'center', gap: 12,
         padding: '11px 12px',
       }}>
-        <button onClick={onExpand} aria-label="Expand"
-          className="add-btn"
-          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: 'var(--mute)' }}>
-          {expanded ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
-        </button>
+        <RowExpand open={expanded} onClick={onExpand} />
         <span className="stencil" style={{
           fontSize: 11, padding: '2px 7px', border: '1.5px solid var(--steel)',
           color: 'var(--steel)',
@@ -90,6 +90,7 @@ function SupportRow({ a, eq, atLimit, onToggle, expanded, onExpand }) {
         <button
           onClick={() => onToggle(a.name)}
           disabled={atLimit}
+          title={disabledReason || (eq ? `Remove ${a.name} from your support list.` : `Add ${a.name} (${a.cost}t).`)}
           className="add-btn"
           style={{
             border: `1.5px solid ${eq ? 'var(--rust)' : (atLimit ? 'var(--rule)' : 'var(--olive)')}`,
@@ -108,53 +109,65 @@ function SupportRow({ a, eq, atLimit, onToggle, expanded, onExpand }) {
   );
 }
 
-// Expanded support detail: full description + stats laid out in a small table
+// Expanded support detail: full description + stats laid out in a small table,
+// plus inline glossary for every trait this asset references so you don't have
+// to hover each tag individually.
 function SupportExpanded({ a }) {
+  // Pull traits out of the stats line if present
+  const traitStr = a.stats?.Traits || '';
+  const traitNames = collectTraits(traitStr);
+
   return (
     <div style={{
-      padding: '12px 14px 16px 36px',
+      padding: '12px 14px 16px 14px',
       background: 'var(--bg-deep)',
       borderTop: '1px dashed var(--rule)',
-      display: 'grid',
-      gridTemplateColumns: 'minmax(0, 1.4fr) minmax(0, 1fr)',
-      gap: 18,
     }}>
-      <div>
-        <div className="label" style={{ marginBottom: 4 }}>Description</div>
-        <div style={{ fontSize: 13.5, color: 'var(--ink)', lineHeight: 1.55 }}>
-          {a.fullDesc}
-        </div>
-      </div>
-      {a.stats && (
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'minmax(0, 1.4fr) minmax(0, 1fr)',
+        gap: 18,
+      }}>
         <div>
-          <div className="label" style={{ marginBottom: 4 }}>Statline</div>
-          <table style={{
-            borderCollapse: 'collapse', width: '100%',
-            background: 'var(--surface)', border: '1px solid var(--rule)',
-          }}>
-            <tbody>
-              {Object.entries(a.stats).map(([k, v]) => (
-                <tr key={k}>
-                  <td className="label" style={{
-                    padding: '6px 10px', fontSize: 11,
-                    borderBottom: '1px solid var(--rule)',
-                    background: 'var(--bg)',
-                    width: '34%', verticalAlign: 'top',
-                  }}>
-                    {k}
-                  </td>
-                  <td style={{
-                    padding: '6px 10px', fontSize: 13,
-                    borderBottom: '1px solid var(--rule)',
-                    fontFamily: /Per|Stat|SPD|ARM|STR/i.test(k) ? 'var(--font-mono)' : 'var(--font-body)',
-                  }}>
-                    {/Trait/i.test(k) ? <TraitList traits={v} /> : v}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="label" style={{ marginBottom: 4 }}>Description</div>
+          <div style={{ fontSize: 13.5, color: 'var(--ink)', lineHeight: 1.55 }}>
+            {a.fullDesc}
+          </div>
         </div>
+        {a.stats && (
+          <div>
+            <div className="label" style={{ marginBottom: 4 }}>Statline</div>
+            <table style={{
+              borderCollapse: 'collapse', width: '100%',
+              background: 'var(--surface)', border: '1px solid var(--rule)',
+            }}>
+              <tbody>
+                {Object.entries(a.stats).map(([k, v]) => (
+                  <tr key={k}>
+                    <td className="label" style={{
+                      padding: '6px 10px', fontSize: 11,
+                      borderBottom: '1px solid var(--rule)',
+                      background: 'var(--bg)',
+                      width: '34%', verticalAlign: 'top',
+                    }}>
+                      {k}
+                    </td>
+                    <td style={{
+                      padding: '6px 10px', fontSize: 13,
+                      borderBottom: '1px solid var(--rule)',
+                      fontFamily: /Per|Stat|SPD|ARM|STR/i.test(k) ? 'var(--font-mono)' : 'var(--font-body)',
+                    }}>
+                      {/Trait/i.test(k) ? <TraitList traits={v} /> : v}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+      {traitNames.length > 0 && (
+        <InlineTraitGlossary traits={traitNames} />
       )}
     </div>
   );
@@ -205,12 +218,22 @@ export function TeamPanel({ mechs, selectedTeams, onToggleTeam, mission }) {
       <div>
         {results.map(({ t, eligible, minsMet, perReq }) => {
           const sel = selectedTeams.includes(t.name);
-          const ready = minsMet && eligible >= 2;
+          // Team minimum size from band string ("2", "2-3", "3-4") = first number
+          const minSize = parseInt(t.band.split('-')[0], 10);
+          const canAssign = minsMet && eligible >= minSize;
           const slotLeft = slotsRemaining[t.band] > 0 || sel;
           return (
-            <TeamRow key={t.name} team={t} eligible={eligible} ready={ready}
-              selected={sel} canTake={ready && slotLeft}
-              onToggle={onToggleTeam} perReq={perReq} />
+            <TeamRow
+              key={t.name}
+              team={t}
+              eligible={eligible}
+              minSize={minSize}
+              canAssign={canAssign}
+              slotLeft={slotLeft}
+              selected={sel}
+              onToggle={onToggleTeam}
+              perReq={perReq}
+            />
           );
         })}
       </div>
@@ -218,8 +241,61 @@ export function TeamPanel({ mechs, selectedTeams, onToggleTeam, mission }) {
   );
 }
 
-function TeamRow({ team, eligible, ready, selected, canTake, onToggle, perReq }) {
+function TeamRow({ team, eligible, minSize, canAssign, slotLeft, selected, onToggle, perReq }) {
   const [open, setOpen] = useState(false);
+
+  // Decide button state
+  // - selected → "Remove" (rust outlined)
+  // - canAssign + slotLeft → "Assign" (olive solid)
+  // - !canAssign → "Enlist" (steel dashed; reminds user they'd need to recruit)
+  // - !slotLeft → disabled, tooltip explains why
+  let btnLabel, btnStyle, btnDisabled, btnTitle;
+  if (selected) {
+    btnLabel = 'Remove';
+    btnStyle = {
+      border: '1.5px solid var(--rust)',
+      background: 'transparent',
+      color: 'var(--rust)',
+    };
+    btnDisabled = false;
+    btnTitle = 'Remove this team from your force.';
+  } else if (!slotLeft) {
+    btnLabel = canAssign ? 'Assign' : 'Enlist';
+    btnStyle = {
+      border: '1.5px solid var(--rule)',
+      background: 'var(--bg-deep)',
+      color: 'var(--mute)',
+    };
+    btnDisabled = true;
+    btnTitle = `No team slot of size ${team.band} left for this mission.`;
+  } else if (canAssign) {
+    btnLabel = 'Assign';
+    btnStyle = {
+      border: '1.5px solid var(--olive)',
+      background: 'var(--olive)',
+      color: 'var(--surface)',
+    };
+    btnDisabled = false;
+    btnTitle = 'You have enough qualifying HE-Vs to form this team. Click to assign them.';
+  } else {
+    btnLabel = 'Enlist';
+    btnStyle = {
+      border: '1.5px dashed var(--steel)',
+      background: 'transparent',
+      color: 'var(--steel)',
+    };
+    btnDisabled = false;
+    btnTitle = 'Your roster does not meet this team\'s requirements yet. Picking it now reminds you to recruit qualifying HE-Vs.';
+  }
+
+  // Eligibility badge text + tooltip
+  const eligText = canAssign ? `${eligible} ready` : `${eligible} so far`;
+  const eligibilityTooltip = (
+    <div style={{ lineHeight: 1.5 }}>
+      A team grants its benefits only when at least {minSize} HE-Vs in your roster meet its requirements at the same time. Eligibility checks the weight class of each HE-V, any required upgrades or defensive configurations, and weapon constraints listed below.
+    </div>
+  );
+
   return (
     <div style={{
       borderTop: '1px solid var(--rule)',
@@ -231,51 +307,47 @@ function TeamRow({ team, eligible, ready, selected, canTake, onToggle, perReq })
         display: 'grid', gridTemplateColumns: 'auto 1fr auto auto', alignItems: 'center', gap: 12,
         padding: '12px 12px',
       }}>
-        <button onClick={() => setOpen(o => !o)} className="add-btn"
-          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--mute)', padding: 4 }}>
-          {open ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
-        </button>
+        <RowExpand open={open} onClick={() => setOpen(o => !o)} />
         <div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
             <span className="stencil" style={{ fontSize: 14 }}>{team.name}</span>
-            <span className="mono" style={{ fontSize: 11, color: 'var(--mute)' }}>band: {team.band}</span>
-            {ready ? (
-              <span className="mono" style={{
-                fontSize: 11, color: 'var(--olive)', fontWeight: 700,
-                border: '1px solid var(--olive)', padding: '1px 6px',
+            <span className="mono" style={{ fontSize: 11, color: 'var(--mute)' }}>
+              Team of {team.band}
+            </span>
+            <Tooltip title="Eligibility" body={eligibilityTooltip}>
+              <span className="tok mono" style={{
+                fontSize: 11, fontWeight: 700,
+                color: canAssign ? 'var(--olive)' : 'var(--mute)',
+                border: `1px ${canAssign ? 'solid var(--olive)' : 'dashed var(--rule)'}`,
+                padding: '1px 6px',
+                borderBottom: `1px ${canAssign ? 'solid var(--olive)' : 'dashed var(--rule)'}`,
               }}>
-                ✓ {eligible} ELIGIBLE
+                {canAssign ? '\u2713' : ''} {eligText}
               </span>
-            ) : (
-              <span className="mono" style={{
-                fontSize: 11, color: 'var(--mute)',
-                border: '1px dashed var(--rule)', padding: '1px 6px',
-              }}>
-                {eligible} eligible
-              </span>
-            )}
+            </Tooltip>
           </div>
           <div style={{ fontSize: 12.5, color: 'var(--ink-2)', marginTop: 2 }}>{team.blurb}</div>
         </div>
         <span />
         <button
           onClick={() => onToggle(team.name)}
-          disabled={!canTake && !selected}
+          disabled={btnDisabled}
+          title={btnTitle}
           className="add-btn"
           style={{
-            border: `1.5px solid ${selected ? 'var(--rust)' : (canTake ? 'var(--olive)' : 'var(--rule)')}`,
-            background: selected ? 'transparent' : (canTake ? 'var(--olive)' : 'var(--bg-deep)'),
-            color: selected ? 'var(--rust)' : (canTake ? 'var(--surface)' : 'var(--mute)'),
-            padding: '6px 14px', cursor: canTake || selected ? 'pointer' : 'not-allowed',
+            ...btnStyle,
+            padding: '7px 16px',
+            cursor: btnDisabled ? 'not-allowed' : 'pointer',
             fontFamily: 'var(--font-stencil)', fontSize: 12, fontWeight: 700,
             letterSpacing: '0.12em', textTransform: 'uppercase',
+            opacity: btnDisabled ? 0.55 : 1,
           }}
         >
-          {selected ? 'Remove' : 'Take'}
+          {btnLabel}
         </button>
       </div>
       {open && (
-        <div style={{ padding: '0 14px 16px 36px', background: 'var(--bg-deep)', borderTop: '1px dashed var(--rule)' }}>
+        <div style={{ padding: '0 14px 16px 14px', background: 'var(--bg-deep)', borderTop: '1px dashed var(--rule)' }}>
           <div style={{ marginTop: 12 }}><span className="label">Requirements</span></div>
           <div style={{ fontSize: 13, color: 'var(--ink)', lineHeight: 1.6, marginTop: 4 }}>
             {team.req.map((r, i) => {

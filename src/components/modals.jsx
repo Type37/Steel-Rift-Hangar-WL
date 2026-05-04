@@ -58,7 +58,7 @@ export function AddMechModal({ open, onClose, onConfirm, callsignPool, customCal
             className="txt"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Ironwake, Saturn Forge, Silt-7…"
+            placeholder="e.g. Ironwake, Saturn Forge, Silt-7"
             autoFocus
           />
           <button
@@ -87,7 +87,7 @@ export function AddMechModal({ open, onClose, onConfirm, callsignPool, customCal
           className="txt"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Notes about this HE-V — pilot, paint scheme, role…"
+          placeholder="Notes about this HE-V: pilot, paint scheme, role"
           style={{ marginBottom: 18 }}
         />
 
@@ -154,7 +154,7 @@ export function AddMechModal({ open, onClose, onConfirm, callsignPool, customCal
 }
 
 // ============================================================
-// OPTIONS MODAL — callsign pool + simple/advanced mode
+// OPTIONS MODAL: callsign pool + simple/advanced mode
 // ============================================================
 
 export function OptionsModal({

@@ -2,7 +2,7 @@
 // STEEL RIFT v1.5 DATA
 // ============================================================
 // Page references throughout point to the v1.5 rules PDF.
-// If you find an error, fix it here and push — the UI reads from this file.
+// If you find an error, fix it here and push. The UI reads from this file.
 // ============================================================
 
 // ---- Weight classes (p. 18, 19, 84) ----
@@ -102,7 +102,7 @@ export const OFF_TABLE_ASSETS = [
   { name: 'Mine Drone Barrage', cost: 10, kind: 'Off-Table',
     summary: 'Place 3 Mine Drone Tokens at once.',
     fullDesc: 'Select 3 points on the table within LoS of one friendly Unit with a Target Designator Marker, and remove the Marker. Place a Mine Drone Token on each point. No Mine Drone Token may be placed within 6" of an existing Mine Drone Token.',
-    stats: { Damage: '—', Traits: 'Limited (3) (9 tokens total per game)' } },
+    stats: { Damage: '-', Traits: 'Limited (3) (9 tokens total per game)' } },
   { name: 'Orbital Laser',      cost: 10, kind: 'Off-Table',
     summary: 'Precision AP strike from orbit.',
     fullDesc: 'Select an enemy Unit within LoS of a friendly Unit with a Target Designator Marker, and remove the Marker. Perform an ENGAGE Order. Do not apply modifiers for Side/Rear, Covered, Blocking, Secondary Target, or Bypassing Shot.',
@@ -142,7 +142,7 @@ export const ADVANCED_ASSETS = [
 export const FACTIONS = {
   Authorities: {
     blurb: 'Old governments and nations of Earth, their fragments, and their imitators. The Sahel Alliance, the 67th North Horizon Corps, the Antarctic Habitation, the Knightwatch.',
-    agenda: 'Territorial — When checking Victory, if no enemy Units are within 10" of any of your Deployment Edges or Corners, score 1 VP.',
+    agenda: 'Territorial: When checking Victory, if no enemy Units are within 10" of any of your Deployment Edges or Corners, score 1 VP.',
     perks: {
       'Old Infrastructure': [
         { name: 'Orbital Stockpiles', text: 'Off-Table Support Assets with the Limited trait have this value increased by 1.' },
@@ -163,7 +163,7 @@ export const FACTIONS = {
   },
   Corporations: {
     blurb: 'Economic monsters of Mars and their contractors. Visal Corporation, Helios Industries, the Echelon Group, WegMaCo, Akamatsu.',
-    agenda: 'Asset Protection — When checking Victory, if the enemy has had more overall Tonnage in Units Destroyed than you, score 1 VP.',
+    agenda: 'Asset Protection: When checking Victory, if the enemy has had more overall Tonnage in Units Destroyed than you, score 1 VP.',
     perks: {
       'Espionage': [
         { name: 'Embedded Informants', text: 'During Deployment, the enemy must Deploy 2 Assets for every 1 of yours.' },
@@ -184,7 +184,7 @@ export const FACTIONS = {
   },
   Freelancers: {
     blurb: 'Unconventional bands with unpredictable forces. Vanguard Industrial Cooperative, Dairo Mining Group, Cerberus Group, Roland\'s Reavers.',
-    agenda: 'Wildcards — When checking Victory, if you have 2+ Wildcard Kills, score 1 VP.',
+    agenda: 'Wildcards: When checking Victory, if you have 2+ Wildcard Kills, score 1 VP.',
     perks: {
       'Rogue Agency': [
         { name: 'Unpredictable Gambits', text: 'Once per game turn: randomly pick one of your unactivated HE-Vs to Activate; it may perform an additional Order.' },
@@ -217,7 +217,7 @@ export const TEAMS = [
       { cls: 'Heavy', min: 0, max: 2, needs: ['Target Designator'], stripped: true },
     ],
     benefits: 'At 2+: Lights ignore slot for Electronic Countermeasures. At 3+: Off-Table Assets +1 Damage Rating; Lights\' Target Designators are slot-free. At 4: TD and ECM cost 0; one Medium/Heavy gains Guidance Suite (MOVE) once per turn.',
-    agenda: 'Death from Above — 2+ enemy HE-Vs Destroyed by an Off-Table called from a team TD = 1 VP.',
+    agenda: 'Death from Above: 2+ enemy HE-Vs Destroyed by an Off-Table called from a team TD = 1 VP.',
   },
   {
     name: 'Security Team', band: '2-3',
@@ -228,7 +228,7 @@ export const TEAMS = [
       { cls: 'Ultraheavy', min: 0, max: 2, needsDefensive: true },
     ],
     benefits: 'At 2+: HE-V gets a 2nd Defensive Configuration slot; Heavy/UH count as +5 Tons for scoring. At 3+: Defensive Configs cost 0; Mediums also score +5 Tons; Heavy/UH ignore Side Arc bonuses against them. At 4: Suppressive Fire trait; Mediums ignore Side Arc bonuses.',
-    agenda: 'Don\'t Give an Inch — More friendly than enemy HE-Vs in 12" of every Deployment Corner/Edge of yours = 1 VP.',
+    agenda: 'Don\'t Give an Inch: More friendly than enemy HE-Vs in 12" of every Deployment Corner/Edge of yours = 1 VP.',
   },
   {
     name: 'Assassination Team', band: '2-3',
@@ -238,7 +238,7 @@ export const TEAMS = [
       { cls: 'Medium', min: 1, max: 2, needs: ['Directional Thruster'], melee: true, noReach: true },
     ],
     benefits: 'At 2+: deploy as Support Assets; Mediums get +1" JUMP. At 3+: Melee on enemies in B2B with 2+ team members gets Frag; Lights\' Directional Thrusters slot-free. At 4: SMASH-interrupt; Mediums\' Directional Thrusters slot-free.',
-    agenda: 'Target Eliminated — Heaviest enemy HE-V Destroyed by a team member = 1 VP.',
+    agenda: 'Target Eliminated: Heaviest enemy HE-V Destroyed by a team member = 1 VP.',
   },
   {
     name: 'Berserker Team', band: '2-3',
@@ -250,7 +250,7 @@ export const TEAMS = [
       { cls: 'Ultraheavy', min: 0, max: 1, needs: ['Heavy Plating', 'Nitro Boost'] },
     ],
     benefits: 'At 2+: Lights\' Defensive Configs cost 0; Mediums\' & Heavies\' Directional Thrusters slot-free. At 3+: Lights\' Directional Thrusters slot-free; Mediums may buy a Shield for 3 Tons; UH gains Nitro Boost Limited (2). At 4: Heavies\' Nitro Boost Limited (2); UH\'s Directional Thrusters slot-free.',
-    agenda: 'Drive Them Out — 40+ Tons of enemy HE-Vs SMASHed within 18" of their Edge/Corner = 1 VP.',
+    agenda: 'Drive Them Out: 40+ Tons of enemy HE-Vs SMASHed within 18" of their Edge/Corner = 1 VP.',
   },
   {
     name: 'Multirole Team', band: '2-3',
@@ -261,7 +261,7 @@ export const TEAMS = [
       { cls: 'Heavy', min: 0, max: 1, noDup: true },
     ],
     benefits: 'Cumulative weapon-specific buffs (Light, Blast, Kinetic, Melee, Short, Draining handling) per class as the team grows.',
-    agenda: 'Mission Momentum — Score primary Mission VP on Turns 2 AND 3 = 1 VP.',
+    agenda: 'Mission Momentum: Score primary Mission VP on Turns 2 AND 3 = 1 VP.',
   },
   {
     name: 'Gunslinger Team', band: '3-4',
@@ -272,7 +272,7 @@ export const TEAMS = [
       { cls: 'Heavy', min: 1, max: 2, needs: ['Haptic Suit'], shortMeleeOnly: true },
     ],
     benefits: 'At 2+: Return Fire when Activated (taking a Redline Marker instead). At 3+: Short weapons +2" range. At 4: Return Smash interrupt.',
-    agenda: 'Trophy Takers — Team kills outside 18" of own Edge, then end within 8" of own Edge = 1 VP.',
+    agenda: 'Trophy Takers: Team kills outside 18" of own Edge, then end within 8" of own Edge = 1 VP.',
   },
   {
     name: 'Coordinated Assets Team', band: '3-4',
@@ -282,6 +282,6 @@ export const TEAMS = [
       { cls: 'UL HE-V or Assault Vehicle Squadron', min: 1, max: 2 },
     ],
     benefits: 'At 2+: team members may move through each other. At 3+: stack a 2nd matching Support Asset. At 4: activation handoff between HE-V and Support Asset.',
-    agenda: 'Combined Arms Assault — CAPTURE Objective at the wreck of an enemy you killed = 1 VP.',
+    agenda: 'Combined Arms Assault: CAPTURE Objective at the wreck of an enemy you killed = 1 VP.',
   },
 ];

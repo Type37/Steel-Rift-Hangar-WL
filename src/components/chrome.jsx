@@ -3,12 +3,12 @@ import { Printer, Settings as SettingsIcon, Plus } from 'lucide-react';
 import { WC, MISSION_ORDER, MISSIONS } from '../data';
 import { calcMech } from '../calc';
 
-// Resolve absolute path with the configured base — works at root or under /Steel-Rift-Hangar-WL/
+// Resolve absolute path with the configured base; works at root or under /Steel-Rift-Hangar-WL/
 const BASE = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '/');
 const asset = (p) => `${BASE}${p.replace(/^\//, '')}`;
 
 // ============================================================
-// NAVBAR — top strip with Steel Rift logo + outbound links
+// NAVBAR: top strip with Steel Rift logo + outbound links
 // ============================================================
 export function Navbar() {
   return (
@@ -33,7 +33,7 @@ export function Navbar() {
 }
 
 // ============================================================
-// FORCE BAR — was "TopBar". Force name + summary counters + actions
+// FORCE BAR. Was "TopBar". Force name + summary counters + actions
 // ============================================================
 export function TopBar({
   forceName, onForceName, onPrint, onOptions,
@@ -72,7 +72,7 @@ export function TopBar({
           <input
             value={forceName}
             onChange={(e) => onForceName(e.target.value)}
-            placeholder="Name your force…"
+            placeholder="Name your force"
             style={{
               flex: 1, minWidth: 0,
               background: 'transparent', border: 'none',
@@ -85,7 +85,7 @@ export function TopBar({
           />
         </div>
 
-        {/* Inline status — visible on desktop, hidden on phones (lives in bottom bar) */}
+        {/* Inline status. Visible on desktop, hidden on phones (lives in bottom bar) */}
         <div className="topbar-counters" style={{
           display: 'flex', gap: 14, alignItems: 'baseline',
           fontSize: 12, color: 'var(--ink-2)',
@@ -142,7 +142,7 @@ function Counter({ label, used, max }) {
 }
 
 // ============================================================
-// BOTTOM BAR — mission selection + the two big CTAs
+// BOTTOM BAR: mission selection + the two big CTAs
 // ============================================================
 export function BottomBar({
   mission, customTons, onMission, onCustomTons,
@@ -153,6 +153,17 @@ export function BottomBar({
   const cap = useCustom ? customTons : MISSIONS[mission].tons;
   const pct = cap ? Math.min(100, (totalTons / cap) * 100) : 0;
   const over = totalTons > cap;
+
+  // Small "More" toggle reveals All-Out War + Custom. Auto-opens if user
+  // is currently sitting on one of those.
+  const isExtra = mission === 'All-Out War' || mission === 'Custom';
+  const [showMore, setShowMore] = React.useState(isExtra);
+  React.useEffect(() => {
+    if (isExtra) setShowMore(true);
+  }, [isExtra]);
+
+  const standardMissions = MISSION_ORDER.filter(m => m !== 'All-Out War');
+  const extraMissions = ['All-Out War'];
 
   return (
     <div className="bottombar no-print" style={{
@@ -167,49 +178,76 @@ export function BottomBar({
       <div className="bottombar-tonnage" style={{ minWidth: 0 }}>
         <div className="bottombar-mission-row" style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
           <span className="label" style={{ marginRight: 4 }}>Mission</span>
-          {MISSION_ORDER.map(m => {
+          {standardMissions.map(m => {
             const active = mission === m;
             return (
-              <button key={m} onClick={() => onMission(m)} className={`chip-hover ${active ? 'is-active' : ''}`} style={{
-                background: active ? 'var(--ink)' : 'transparent',
-                color: active ? 'var(--surface)' : 'var(--ink)',
-                border: `1.5px solid ${active ? 'var(--ink)' : 'var(--rule-strong)'}`,
+              <MissionChip key={m} m={m} active={active} onClick={() => onMission(m)} />
+            );
+          })}
+
+          {!showMore && (
+            <button
+              onClick={() => setShowMore(true)}
+              className="chip-hover"
+              style={{
+                background: 'transparent',
+                color: 'var(--ink-2)',
+                border: '1.5px dashed var(--rule-strong)',
+                padding: '6px 10px',
+                cursor: 'pointer',
+                fontFamily: 'var(--font-stencil)', fontSize: 12.5,
+                fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
+              }}
+              title="Show All-Out War and Custom tonnage"
+            >
+              + More
+            </button>
+          )}
+
+          {showMore && (
+            <>
+              {extraMissions.map(m => (
+                <MissionChip key={m} m={m} active={mission === m} onClick={() => onMission(m)} />
+              ))}
+              <button onClick={() => onMission('Custom')} className={`chip-hover ${useCustom ? 'is-active' : ''}`} style={{
+                background: useCustom ? 'var(--rust)' : 'transparent',
+                color: useCustom ? 'var(--surface)' : 'var(--rust)',
+                border: '1.5px solid var(--rust)',
                 padding: '6px 10px', cursor: 'pointer',
                 fontFamily: 'var(--font-stencil)', fontSize: 12.5,
                 fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
               }}>
-                {m}
-                <span className="mono" style={{
-                  marginLeft: 6, fontSize: 11,
-                  opacity: active ? 0.75 : 0.55, fontWeight: 400,
-                }}>
-                  {MISSIONS[m].tons}t
-                </span>
+                Custom
               </button>
-            );
-          })}
-          <button onClick={() => onMission('Custom')} className={`chip-hover ${useCustom ? 'is-active' : ''}`} style={{
-            background: useCustom ? 'var(--rust)' : 'transparent',
-            color: useCustom ? 'var(--surface)' : 'var(--rust)',
-            border: `1.5px solid var(--rust)`,
-            padding: '6px 10px', cursor: 'pointer',
-            fontFamily: 'var(--font-stencil)', fontSize: 12.5,
-            fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
-          }}>
-            Custom
-          </button>
-          {useCustom && (
-            <input
-              type="number"
-              value={customTons}
-              onChange={(e) => onCustomTons(Math.max(20, Number(e.target.value) || 0))}
-              style={{
-                width: 82, padding: '4px 8px',
-                border: '1.5px solid var(--rust)', background: 'var(--surface)',
-                fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700,
-                color: 'var(--ink)',
-              }}
-            />
+              {useCustom && (
+                <input
+                  type="number"
+                  value={customTons}
+                  onChange={(e) => onCustomTons(Math.max(20, Number(e.target.value) || 0))}
+                  style={{
+                    width: 82, padding: '4px 8px',
+                    border: '1.5px solid var(--rust)', background: 'var(--surface)',
+                    fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700,
+                    color: 'var(--ink)',
+                  }}
+                />
+              )}
+              {!isExtra && (
+                <button
+                  onClick={() => setShowMore(false)}
+                  style={{
+                    background: 'transparent', border: 'none',
+                    padding: '6px 6px', cursor: 'pointer',
+                    color: 'var(--mute)', fontSize: 11.5,
+                    textDecoration: 'underline',
+                    fontFamily: 'var(--font-body)',
+                  }}
+                  title="Hide larger mission sizes"
+                >
+                  less
+                </button>
+              )}
+            </>
           )}
         </div>
 
@@ -250,7 +288,7 @@ export function BottomBar({
         Add Support
       </button>
 
-      <button onClick={onAddMech} className="bottombar-add-mech add-btn" style={{
+      <button onClick={onAddMech} className={`bottombar-add-mech add-btn cta-mech ${mechCount === 0 ? 'cta-pulse' : ''}`} style={{
         background: 'var(--rust)',
         color: 'var(--surface)',
         border: '2px solid var(--rust)',
@@ -258,7 +296,7 @@ export function BottomBar({
         fontFamily: 'var(--font-stencil)', fontSize: 14, fontWeight: 700,
         letterSpacing: '0.14em', textTransform: 'uppercase',
         display: 'inline-flex', alignItems: 'center', gap: 8,
-        boxShadow: '0 0 0 1px var(--rust-deep) inset',
+        boxShadow: '0 2px 0 var(--rust-deep)',
       }}>
         <Plus size={16} strokeWidth={2.5} />
         Add HE-V
@@ -267,8 +305,29 @@ export function BottomBar({
   );
 }
 
+function MissionChip({ m, active, onClick }) {
+  return (
+    <button onClick={onClick} className={`chip-hover ${active ? 'is-active' : ''}`} style={{
+      background: active ? 'var(--ink)' : 'transparent',
+      color: active ? 'var(--surface)' : 'var(--ink)',
+      border: `1.5px solid ${active ? 'var(--ink)' : 'var(--rule-strong)'}`,
+      padding: '6px 10px', cursor: 'pointer',
+      fontFamily: 'var(--font-stencil)', fontSize: 12.5,
+      fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
+    }}>
+      {m}
+      <span className="mono" style={{
+        marginLeft: 6, fontSize: 11,
+        opacity: active ? 0.75 : 0.55, fontWeight: 400,
+      }}>
+        {MISSIONS[m].tons}t
+      </span>
+    </button>
+  );
+}
+
 // ============================================================
-// MECH CARD — roster list item with HE-V silhouette icon
+// MECH CARD: roster list item with HE-V silhouette icon
 // ============================================================
 export function MechCard({ mech, index, active, onSelect }) {
   const stats = calcMech(mech);
@@ -359,14 +418,15 @@ export function EmptyRoster({ onAdd }) {
         Empty Roster
       </div>
       <div style={{ marginTop: 14 }}>
-        <button onClick={onAdd} className="add-btn" style={{
+        <button onClick={onAdd} className="add-btn cta-mech cta-pulse" style={{
           background: 'var(--rust)', color: 'var(--surface)', border: 'none',
-          padding: '12px 18px', cursor: 'pointer',
-          fontFamily: 'var(--font-stencil)', fontSize: 13, fontWeight: 700,
-          letterSpacing: '0.14em', textTransform: 'uppercase',
+          padding: '13px 22px', cursor: 'pointer',
+          fontFamily: 'var(--font-stencil)', fontSize: 14, fontWeight: 700,
+          letterSpacing: '0.16em', textTransform: 'uppercase',
           display: 'inline-flex', alignItems: 'center', gap: 7,
+          boxShadow: '0 2px 0 var(--rust-deep)',
         }}>
-          <Plus size={14} strokeWidth={2.5} />
+          <Plus size={15} strokeWidth={2.5} />
           Add HE-V
         </button>
       </div>
