@@ -1,13 +1,44 @@
 import React from 'react';
-import { Printer, Settings as SettingsIcon, Plus, ChevronRight } from 'lucide-react';
+import { Printer, Settings as SettingsIcon, Plus } from 'lucide-react';
 import { WC, MISSION_ORDER, MISSIONS } from '../data';
 import { calcMech } from '../calc';
 
-// ============================================================
-// TOP BAR
-// ============================================================
+// Resolve absolute path with the configured base — works at root or under /Steel-Rift-Hangar-WL/
+const BASE = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '/');
+const asset = (p) => `${BASE}${p.replace(/^\//, '')}`;
 
-export function TopBar({ forceName, onForceName, onPrint, onOptions }) {
+// ============================================================
+// NAVBAR — top strip with Steel Rift logo + outbound links
+// ============================================================
+export function Navbar() {
+  return (
+    <div className="navbar-strip no-print">
+      <div className="navbar-inner">
+        <a href="https://www.steelrift.com" className="navbar-logo" target="_blank" rel="noopener">
+          <img src={asset('steel-rift-logo.svg')} alt="Steel Rift" />
+        </a>
+        <div className="navbar-links">
+          <a href="https://www.steelrift.com/play" target="_blank" rel="noopener">Get Started</a>
+          <a href="https://www.steelrift.com/rules" target="_blank" rel="noopener">Rules</a>
+          <a href="https://www.steelrift.com/downloads" target="_blank" rel="noopener">Downloads</a>
+          <a href="https://www.steelrift.com/faq" target="_blank" rel="noopener">FAQ</a>
+        </div>
+        <a href="https://deathraydesigns.com/product-category/minis/steel-rift/"
+           target="_blank" rel="noopener" className="navbar-buynow">
+          Buy Now
+        </a>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// FORCE BAR — was "TopBar". Force name + summary counters + actions
+// ============================================================
+export function TopBar({
+  forceName, onForceName, onPrint, onOptions,
+  totalTons, capTons, mechCount, supportCount, supportLimit, teamCount, teamMax,
+}) {
   return (
     <div className="topbar no-print" style={{
       borderBottom: '2px solid var(--ink)',
@@ -18,68 +49,101 @@ export function TopBar({ forceName, onForceName, onPrint, onOptions }) {
       alignItems: 'center',
       gap: 22,
     }}>
-      {/* Wordmark — deliberately not centered, left-aligned with a stencil sub */}
+      {/* App identity */}
       <div className="topbar-wordmark">
-        <div className="display" style={{ fontSize: 19, letterSpacing: '0.2em', lineHeight: 1 }}>
-          STEEL RIFT <span style={{ color: 'var(--rust)' }}>//</span> FORGE
+        <div className="display" style={{ fontSize: 20, letterSpacing: '0.2em', lineHeight: 1 }}>
+          THE FORGE
         </div>
         <div className="topbar-tagline mono" style={{
-          fontSize: 9.5, color: 'var(--mute)', letterSpacing: '0.22em',
+          fontSize: 10, color: 'var(--mute)', letterSpacing: '0.2em',
           marginTop: 3, textTransform: 'uppercase',
         }}>
-          unofficial listbuilder · v1.5 ruleset
+          v1.5 listbuilder
         </div>
       </div>
 
-      {/* Force name — single-line, prominent */}
-      <div className="topbar-force" style={{ display: 'flex', alignItems: 'baseline', gap: 10, minWidth: 0 }}>
-        <span className="label" style={{ flexShrink: 0 }}>Force</span>
-        <input
-          value={forceName}
-          onChange={(e) => onForceName(e.target.value)}
-          placeholder="Name your force…"
-          style={{
-            flex: 1, minWidth: 0,
-            background: 'transparent', border: 'none',
-            borderBottom: '1.5px solid var(--rule-strong)',
-            padding: '4px 0',
-            fontFamily: 'var(--font-display)',
-            fontSize: 18, fontWeight: 600, letterSpacing: '0.06em',
-            color: 'var(--ink)', outline: 'none',
-          }}
-        />
+      {/* Center: force name + status counters */}
+      <div className="topbar-force" style={{
+        display: 'flex', flexDirection: 'column', gap: 4,
+        minWidth: 0,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+          <span className="label" style={{ flexShrink: 0 }}>Force</span>
+          <input
+            value={forceName}
+            onChange={(e) => onForceName(e.target.value)}
+            placeholder="Name your force…"
+            style={{
+              flex: 1, minWidth: 0,
+              background: 'transparent', border: 'none',
+              borderBottom: '1.5px solid var(--rule-strong)',
+              padding: '4px 0',
+              fontFamily: 'var(--font-stencil)',
+              fontSize: 19, fontWeight: 700, letterSpacing: '0.04em',
+              color: 'var(--ink)', outline: 'none',
+            }}
+          />
+        </div>
+
+        {/* Inline status — visible on desktop, hidden on phones (lives in bottom bar) */}
+        <div className="topbar-counters" style={{
+          display: 'flex', gap: 14, alignItems: 'baseline',
+          fontSize: 12, color: 'var(--ink-2)',
+          flexWrap: 'wrap',
+        }}>
+          <Counter label="Tonnage" used={totalTons} max={capTons} />
+          <Counter label="HE-Vs" used={mechCount} />
+          <Counter label="Support" used={supportCount} max={supportLimit} />
+          <Counter label="Teams" used={teamCount} max={teamMax} />
+        </div>
       </div>
 
-      {/* Actions — Options is text-only, Print is the only emphasized button up here */}
-      <div className="topbar-actions" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        <button onClick={onOptions} style={{
-          background: 'transparent', border: 'none', padding: '6px 4px',
-          color: 'var(--ink-2)', fontSize: 12, cursor: 'pointer',
-          display: 'inline-flex', alignItems: 'center', gap: 5,
-          fontFamily: 'var(--font-body)', textDecoration: 'underline',
+      {/* Actions */}
+      <div className="topbar-actions" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <button onClick={onOptions} className="add-btn" style={{
+          background: 'transparent', border: '1.5px solid var(--rule-strong)',
+          padding: '8px 12px', cursor: 'pointer',
+          color: 'var(--ink)',
+          display: 'inline-flex', alignItems: 'center', gap: 6,
+          fontFamily: 'var(--font-stencil)', fontSize: 12.5, fontWeight: 700,
+          letterSpacing: '0.12em', textTransform: 'uppercase',
         }}>
-          <SettingsIcon size={13} strokeWidth={2} />
+          <SettingsIcon size={14} strokeWidth={2.25} />
           Options
         </button>
-        <button onClick={onPrint} className="topbar-print" style={{
+        <button onClick={onPrint} className="topbar-print add-btn" style={{
           background: 'var(--ink)', color: 'var(--surface)', border: 'none',
-          padding: '8px 14px', cursor: 'pointer',
+          padding: '9px 14px', cursor: 'pointer',
           display: 'inline-flex', alignItems: 'center', gap: 7,
-          fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 600,
-          letterSpacing: '0.16em', textTransform: 'uppercase',
+          fontFamily: 'var(--font-stencil)', fontSize: 12.5, fontWeight: 700,
+          letterSpacing: '0.14em', textTransform: 'uppercase',
         }}>
-          <Printer size={13} strokeWidth={2.25} />
-          <span className="topbar-print-label">Print Roster</span>
+          <Printer size={14} strokeWidth={2.25} />
+          <span className="topbar-print-label">Print</span>
         </button>
       </div>
     </div>
   );
 }
 
-// ============================================================
-// BOTTOM BAR — persistent mission/tonnage tracker, with the two big actions
-// ============================================================
+function Counter({ label, used, max }) {
+  const over = max != null && used > max;
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5 }}>
+      <span className="label" style={{ fontSize: 10, color: 'var(--mute)' }}>{label}</span>
+      <span className="mono" style={{
+        fontSize: 13, fontWeight: 700,
+        color: over ? 'var(--rust)' : 'var(--ink)',
+      }}>
+        {used}{max != null && `/${max}`}
+      </span>
+    </span>
+  );
+}
 
+// ============================================================
+// BOTTOM BAR — mission selection + the two big CTAs
+// ============================================================
 export function BottomBar({
   mission, customTons, onMission, onCustomTons,
   totalTons, supportCount, mechCount,
@@ -100,24 +164,23 @@ export function BottomBar({
       alignItems: 'center',
       gap: 22,
     }}>
-      {/* Mission picker + tonnage bar */}
       <div className="bottombar-tonnage" style={{ minWidth: 0 }}>
         <div className="bottombar-mission-row" style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
           <span className="label" style={{ marginRight: 4 }}>Mission</span>
           {MISSION_ORDER.map(m => {
             const active = mission === m;
             return (
-              <button key={m} onClick={() => onMission(m)} style={{
+              <button key={m} onClick={() => onMission(m)} className={`chip-hover ${active ? 'is-active' : ''}`} style={{
                 background: active ? 'var(--ink)' : 'transparent',
                 color: active ? 'var(--surface)' : 'var(--ink)',
                 border: `1.5px solid ${active ? 'var(--ink)' : 'var(--rule-strong)'}`,
-                padding: '5px 10px', cursor: 'pointer',
-                fontFamily: 'var(--font-display)', fontSize: 11,
-                fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase',
+                padding: '6px 10px', cursor: 'pointer',
+                fontFamily: 'var(--font-stencil)', fontSize: 12.5,
+                fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
               }}>
                 {m}
                 <span className="mono" style={{
-                  marginLeft: 6, fontSize: 10,
+                  marginLeft: 6, fontSize: 11,
                   opacity: active ? 0.75 : 0.55, fontWeight: 400,
                 }}>
                   {MISSIONS[m].tons}t
@@ -125,14 +188,13 @@ export function BottomBar({
               </button>
             );
           })}
-          {/* Custom tonnage option */}
-          <button onClick={() => onMission('Custom')} style={{
+          <button onClick={() => onMission('Custom')} className={`chip-hover ${useCustom ? 'is-active' : ''}`} style={{
             background: useCustom ? 'var(--rust)' : 'transparent',
             color: useCustom ? 'var(--surface)' : 'var(--rust)',
             border: `1.5px solid var(--rust)`,
-            padding: '5px 10px', cursor: 'pointer',
-            fontFamily: 'var(--font-display)', fontSize: 11,
-            fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase',
+            padding: '6px 10px', cursor: 'pointer',
+            fontFamily: 'var(--font-stencil)', fontSize: 12.5,
+            fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
           }}>
             Custom
           </button>
@@ -142,21 +204,18 @@ export function BottomBar({
               value={customTons}
               onChange={(e) => onCustomTons(Math.max(20, Number(e.target.value) || 0))}
               style={{
-                width: 78, padding: '4px 8px',
+                width: 82, padding: '4px 8px',
                 border: '1.5px solid var(--rust)', background: 'var(--surface)',
-                fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700,
+                fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700,
                 color: 'var(--ink)',
               }}
             />
           )}
         </div>
 
-        {/* Bar + numeric breakdown */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 12,
-        }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{
-            flex: 1, height: 18, background: 'var(--bg-deep)',
+            flex: 1, height: 20, background: 'var(--bg-deep)',
             border: '1.5px solid var(--rule-strong)', position: 'relative',
             minWidth: 200,
           }}>
@@ -168,79 +227,62 @@ export function BottomBar({
             <div className="mono" style={{
               position: 'absolute', inset: 0,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 11, fontWeight: 700,
+              fontSize: 12, fontWeight: 700,
               color: pct > 50 ? 'var(--surface)' : 'var(--ink)',
-              mixBlendMode: 'normal',
               letterSpacing: '0.06em',
             }}>
               {totalTons} / {cap}t
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 14, fontSize: 11 }}>
-            <Stat label="HE-Vs" value={mechCount} />
-            <Stat label="Support" value={supportCount} />
-            {!useCustom && <Stat label="Board" value={MISSIONS[mission].board} />}
-            {!useCustom && <Stat label="Agendas" value={MISSIONS[mission].agendas} />}
-          </div>
         </div>
       </div>
 
-      {/* The two contrasting CTAs */}
-      <button onClick={onAddSupport} className="bottombar-add-support" style={{
+      <button onClick={onAddSupport} className="bottombar-add-support add-btn" style={{
         background: 'transparent',
         color: 'var(--ink)',
         border: '2px solid var(--ink)',
         padding: '14px 20px', cursor: 'pointer',
-        fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700,
-        letterSpacing: '0.16em', textTransform: 'uppercase',
+        fontFamily: 'var(--font-stencil)', fontSize: 14, fontWeight: 700,
+        letterSpacing: '0.14em', textTransform: 'uppercase',
         display: 'inline-flex', alignItems: 'center', gap: 8,
       }}>
-        <Plus size={15} strokeWidth={2.5} />
+        <Plus size={16} strokeWidth={2.5} />
         Add Support
       </button>
 
-      <button onClick={onAddMech} className="bottombar-add-mech" style={{
+      <button onClick={onAddMech} className="bottombar-add-mech add-btn" style={{
         background: 'var(--rust)',
         color: 'var(--surface)',
         border: '2px solid var(--rust)',
         padding: '14px 22px', cursor: 'pointer',
-        fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700,
-        letterSpacing: '0.16em', textTransform: 'uppercase',
+        fontFamily: 'var(--font-stencil)', fontSize: 14, fontWeight: 700,
+        letterSpacing: '0.14em', textTransform: 'uppercase',
         display: 'inline-flex', alignItems: 'center', gap: 8,
         boxShadow: '0 0 0 1px var(--rust-deep) inset',
       }}>
-        <Plus size={15} strokeWidth={2.5} />
+        <Plus size={16} strokeWidth={2.5} />
         Add HE-V
       </button>
     </div>
   );
 }
 
-function Stat({ label, value }) {
-  return (
-    <div style={{ textAlign: 'center', minWidth: 50 }}>
-      <div className="label" style={{ fontSize: 9, marginBottom: 1 }}>{label}</div>
-      <div className="mono" style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>{value}</div>
-    </div>
-  );
-}
-
 // ============================================================
-// MECH CARD — roster list item. Numbered, weight-class badge, name, tonnage
+// MECH CARD — roster list item with HE-V silhouette icon
 // ============================================================
-
-export function MechCard({ mech, index, active, onSelect, onTabSwitch }) {
+export function MechCard({ mech, index, active, onSelect }) {
   const stats = calcMech(mech);
   const wc = WC[mech.weightClass];
   return (
     <button
-      onClick={() => { onSelect(mech.id); onTabSwitch && onTabSwitch('roster'); }}
+      onClick={() => onSelect(mech.id)}
+      className="add-btn"
       style={{
         display: 'grid',
-        gridTemplateColumns: 'auto 1fr auto',
+        gridTemplateColumns: 'auto auto 1fr auto',
         alignItems: 'center',
         gap: 12,
-        padding: '10px 12px',
+        padding: '12px 14px',
         background: active ? 'var(--ink)' : 'transparent',
         color: active ? 'var(--surface)' : 'var(--ink)',
         border: 'none',
@@ -250,22 +292,29 @@ export function MechCard({ mech, index, active, onSelect, onTabSwitch }) {
         width: '100%',
       }}
     >
-      <span className="stencil" style={{
-        fontSize: 12, color: active ? 'rgba(241,234,218,0.7)' : 'var(--mute)',
+      <span className="roster-num" style={{
+        color: active ? 'rgba(241,234,218,0.7)' : 'var(--mute)',
       }}>
         {String(index + 1).padStart(2, '0')}
       </span>
+      <img src={asset('icons/hev.svg')} alt=""
+        style={{
+          width: 26, height: 26,
+          filter: active ? 'invert(1) brightness(0.95)' : 'none',
+          opacity: active ? 0.85 : 0.7,
+        }}
+      />
       <div style={{ minWidth: 0 }}>
         <div style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 15, fontWeight: 600, letterSpacing: '0.04em',
+          fontFamily: 'var(--font-stencil)',
+          fontSize: 16, fontWeight: 700, letterSpacing: '0.03em',
           textTransform: 'uppercase',
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
           {mech.name || <span style={{ opacity: 0.55, fontStyle: 'italic' }}>Unnamed</span>}
         </div>
         <div className="mono" style={{
-          fontSize: 10.5,
+          fontSize: 11.5,
           color: active ? 'rgba(241,234,218,0.65)' : 'var(--mute)',
           letterSpacing: '0.06em', marginTop: 2,
         }}>
@@ -281,13 +330,13 @@ export function MechCard({ mech, index, active, onSelect, onTabSwitch }) {
       </div>
       <div style={{ textAlign: 'right' }}>
         <div className="mono" style={{
-          fontSize: 17, fontWeight: 700,
+          fontSize: 18, fontWeight: 700,
           color: stats.overTons ? (active ? '#ffb89c' : 'var(--rust)') : (active ? 'var(--surface)' : 'var(--ink)'),
         }}>
           {stats.totalUsed}t
         </div>
         <div className="mono" style={{
-          fontSize: 9.5, color: active ? 'rgba(241,234,218,0.55)' : 'var(--mute)',
+          fontSize: 10.5, color: active ? 'rgba(241,234,218,0.55)' : 'var(--mute)',
         }}>
           / {wc.tons}t
         </div>
@@ -302,24 +351,25 @@ export function EmptyRoster({ onAdd }) {
     <div style={{
       padding: '38px 16px 28px', textAlign: 'center',
       borderTop: '1px solid var(--rule)', borderBottom: '1px solid var(--rule)',
-      marginTop: 0,
     }}>
-      <div className="display" style={{ fontSize: 13, letterSpacing: '0.2em', color: 'var(--mute)' }}>
+      <img src={asset('icons/hev.svg')} alt=""
+        style={{ width: 48, height: 48, opacity: 0.35, marginBottom: 10 }}
+      />
+      <div className="stencil" style={{ fontSize: 14, color: 'var(--mute)' }}>
         Empty Roster
       </div>
-      <div style={{ fontSize: 12, color: 'var(--ink-2)', marginTop: 6, marginBottom: 16 }}>
-        Add your first HE-V to begin loading out a force.
+      <div style={{ marginTop: 14 }}>
+        <button onClick={onAdd} className="add-btn" style={{
+          background: 'var(--rust)', color: 'var(--surface)', border: 'none',
+          padding: '12px 18px', cursor: 'pointer',
+          fontFamily: 'var(--font-stencil)', fontSize: 13, fontWeight: 700,
+          letterSpacing: '0.14em', textTransform: 'uppercase',
+          display: 'inline-flex', alignItems: 'center', gap: 7,
+        }}>
+          <Plus size={14} strokeWidth={2.5} />
+          Add HE-V
+        </button>
       </div>
-      <button onClick={onAdd} style={{
-        background: 'var(--rust)', color: 'var(--surface)', border: 'none',
-        padding: '12px 18px', cursor: 'pointer',
-        fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 700,
-        letterSpacing: '0.16em', textTransform: 'uppercase',
-        display: 'inline-flex', alignItems: 'center', gap: 7,
-      }}>
-        <Plus size={14} strokeWidth={2.5} />
-        Add HE-V
-      </button>
     </div>
   );
 }

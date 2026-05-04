@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { X, Dices, Settings as SettingsIcon } from 'lucide-react';
+import { X, Dices } from 'lucide-react';
 import { WC, WC_ORDER } from '../data';
 import { POOL_NAMES, rollCallsign } from '../callsigns';
-import { Modal, FieldLabel, PrimaryButton, GhostButton, TextButton, Chip } from './ui';
+import { Modal, FieldLabel, PrimaryButton, TextButton, Chip } from './ui';
 
 // ============================================================
 // ADD HE-V MODAL
 // ============================================================
-// Inspired by the screenshot the user pasted: NAME / DESCRIPTION / TYPE.
-// Plus a "roll callsign" button and a name-pool indicator.
 
 export function AddMechModal({ open, onClose, onConfirm, callsignPool, customCallsigns }) {
   const [name, setName] = useState('');
@@ -27,8 +25,7 @@ export function AddMechModal({ open, onClose, onConfirm, callsignPool, customCal
   const submit = () => onConfirm({ name: name.trim(), description: description.trim(), cls });
 
   return (
-    <Modal open={open} onClose={onClose} width={560}>
-      {/* Header strip */}
+    <Modal open={open} onClose={onClose} width={580}>
       <div style={{
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         padding: '14px 18px',
@@ -36,28 +33,27 @@ export function AddMechModal({ open, onClose, onConfirm, callsignPool, customCal
         background: 'var(--ink)', color: 'var(--surface)',
       }}>
         <div>
-          <div className="display" style={{ fontSize: 18, letterSpacing: '0.2em' }}>
+          <div className="display" style={{ fontSize: 19, letterSpacing: '0.18em' }}>
             New HE-V
           </div>
           <div className="mono" style={{
-            fontSize: 10, opacity: 0.7, marginTop: 2, letterSpacing: '0.18em',
+            fontSize: 10.5, opacity: 0.7, marginTop: 2, letterSpacing: '0.18em',
           }}>
             ROSTER ENTRY
           </div>
         </div>
-        <button onClick={onClose} style={{
+        <button onClick={onClose} className="add-btn" style={{
           background: 'transparent', border: '1.5px solid var(--surface)',
-          color: 'var(--surface)', width: 32, height: 32,
+          color: 'var(--surface)', width: 34, height: 34,
           display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
         }}>
           <X size={16} strokeWidth={2.5} />
         </button>
       </div>
 
-      <div style={{ padding: '20px 22px' }}>
-        {/* Name + roll button */}
+      <div style={{ padding: '22px' }}>
         <FieldLabel>Callsign</FieldLabel>
-        <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
+        <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
           <input
             className="txt"
             value={name}
@@ -68,24 +64,24 @@ export function AddMechModal({ open, onClose, onConfirm, callsignPool, customCal
           <button
             onClick={roll}
             title={`Roll a name from the ${callsignPool} pool`}
+            className="add-btn"
             style={{
               border: '1px solid var(--rule)', background: 'var(--surface)',
-              padding: '0 14px', cursor: 'pointer',
+              padding: '0 16px', cursor: 'pointer',
               display: 'inline-flex', alignItems: 'center', gap: 6,
-              fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 600,
-              letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--ink)',
+              fontFamily: 'var(--font-stencil)', fontSize: 13, fontWeight: 700,
+              letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--ink)',
               flexShrink: 0,
             }}
           >
-            <Dices size={14} strokeWidth={2.25} />
+            <Dices size={15} strokeWidth={2.25} />
             Roll
           </button>
         </div>
-        <div className="mono" style={{ fontSize: 10.5, color: 'var(--mute)', marginTop: -10, marginBottom: 18 }}>
+        <div className="mono" style={{ fontSize: 11, color: 'var(--mute)', marginBottom: 18 }}>
           Pool: <strong style={{ color: 'var(--ink-2)' }}>{callsignPool}</strong>. Change in Options.
         </div>
 
-        {/* Description */}
         <FieldLabel>Description (optional)</FieldLabel>
         <textarea
           className="txt"
@@ -95,11 +91,8 @@ export function AddMechModal({ open, onClose, onConfirm, callsignPool, customCal
           style={{ marginBottom: 18 }}
         />
 
-        {/* Class selector — like the screenshot's TYPE list */}
         <FieldLabel>Weight Class</FieldLabel>
-        <div style={{
-          border: '1.5px solid var(--rule)', background: 'var(--bg)',
-        }}>
+        <div style={{ border: '1.5px solid var(--rule)', background: 'var(--bg)' }}>
           {WC_ORDER.map((c, i) => {
             const w = WC[c];
             const selected = cls === c;
@@ -107,6 +100,7 @@ export function AddMechModal({ open, onClose, onConfirm, callsignPool, customCal
               <button
                 key={c}
                 onClick={() => setCls(c)}
+                className="add-btn"
                 style={{
                   display: 'grid',
                   gridTemplateColumns: 'auto 1fr auto auto',
@@ -120,7 +114,6 @@ export function AddMechModal({ open, onClose, onConfirm, callsignPool, customCal
                   textAlign: 'left',
                 }}
               >
-                {/* Selection circle / cross */}
                 <span style={{
                   width: 22, height: 22, borderRadius: '50%',
                   border: `2px solid ${selected ? 'var(--ink)' : 'var(--rule-strong)'}`,
@@ -130,16 +123,14 @@ export function AddMechModal({ open, onClose, onConfirm, callsignPool, customCal
                 }}>
                   {selected && '✕'}
                 </span>
-                <span className="display" style={{
-                  fontSize: 16, letterSpacing: '0.16em', color: 'var(--ink)',
-                }}>
+                <span className="stencil" style={{ fontSize: 17, color: 'var(--ink)' }}>
                   {c}
                 </span>
-                <span className="mono" style={{ fontSize: 11, color: 'var(--mute)' }}>
+                <span className="mono" style={{ fontSize: 12, color: 'var(--mute)' }}>
                   {w.slots} slots · {w.baseArmor}A / {w.baseStructure}S base
                 </span>
                 <span className="mono" style={{
-                  fontSize: 16, fontWeight: 700, color: 'var(--rust)', minWidth: 44, textAlign: 'right',
+                  fontSize: 17, fontWeight: 700, color: 'var(--rust)', minWidth: 46, textAlign: 'right',
                 }}>
                   {w.tons}t
                 </span>
@@ -148,7 +139,6 @@ export function AddMechModal({ open, onClose, onConfirm, callsignPool, customCal
           })}
         </div>
 
-        {/* Footer */}
         <div style={{
           marginTop: 24, paddingTop: 16, borderTop: '1px solid var(--rule)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12,
@@ -164,10 +154,15 @@ export function AddMechModal({ open, onClose, onConfirm, callsignPool, customCal
 }
 
 // ============================================================
-// OPTIONS MODAL
+// OPTIONS MODAL — callsign pool + simple/advanced mode
 // ============================================================
 
-export function OptionsModal({ open, onClose, callsignPool, setCallsignPool, customCallsigns, setCustomCallsigns }) {
+export function OptionsModal({
+  open, onClose,
+  callsignPool, setCallsignPool,
+  customCallsigns, setCustomCallsigns,
+  simpleMode, setSimpleMode,
+}) {
   const [draft, setDraft] = useState(customCallsigns.join('\n'));
 
   useEffect(() => {
@@ -181,7 +176,7 @@ export function OptionsModal({ open, onClose, callsignPool, setCallsignPool, cus
   };
 
   return (
-    <Modal open={open} onClose={onClose} width={520}>
+    <Modal open={open} onClose={onClose} width={560}>
       <div style={{
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         padding: '14px 18px',
@@ -189,18 +184,18 @@ export function OptionsModal({ open, onClose, callsignPool, setCallsignPool, cus
         background: 'var(--ink)', color: 'var(--surface)',
       }}>
         <div>
-          <div className="display" style={{ fontSize: 18, letterSpacing: '0.2em' }}>
+          <div className="display" style={{ fontSize: 19, letterSpacing: '0.18em' }}>
             Options
           </div>
           <div className="mono" style={{
-            fontSize: 10, opacity: 0.7, marginTop: 2, letterSpacing: '0.18em',
+            fontSize: 10.5, opacity: 0.7, marginTop: 2, letterSpacing: '0.18em',
           }}>
             FORGE PREFERENCES
           </div>
         </div>
-        <button onClick={onClose} style={{
+        <button onClick={onClose} className="add-btn" style={{
           background: 'transparent', border: '1.5px solid var(--surface)',
-          color: 'var(--surface)', width: 32, height: 32,
+          color: 'var(--surface)', width: 34, height: 34,
           display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
         }}>
           <X size={16} strokeWidth={2.5} />
@@ -208,6 +203,65 @@ export function OptionsModal({ open, onClose, callsignPool, setCallsignPool, cus
       </div>
 
       <div style={{ padding: '22px' }}>
+        {/* Mode toggle */}
+        <FieldLabel>Mode</FieldLabel>
+        <div style={{
+          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0,
+          border: '1.5px solid var(--ink)', marginBottom: 8,
+        }}>
+          <button
+            onClick={() => setSimpleMode(false)}
+            className="add-btn"
+            style={{
+              padding: '12px 14px',
+              background: !simpleMode ? 'var(--ink)' : 'transparent',
+              color: !simpleMode ? 'var(--surface)' : 'var(--ink)',
+              border: 'none',
+              borderRight: '1.5px solid var(--ink)',
+              cursor: 'pointer',
+              fontFamily: 'var(--font-stencil)', fontSize: 13,
+              fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase',
+              textAlign: 'left',
+            }}
+          >
+            <div>Advanced</div>
+            <div style={{
+              fontFamily: 'var(--font-body)', fontSize: 11.5, fontWeight: 400,
+              letterSpacing: 0, textTransform: 'none', marginTop: 4,
+              opacity: 0.85,
+            }}>
+              Full game: factions, teams, advanced support, secondary agendas.
+            </div>
+          </button>
+          <button
+            onClick={() => setSimpleMode(true)}
+            className="add-btn"
+            style={{
+              padding: '12px 14px',
+              background: simpleMode ? 'var(--ink)' : 'transparent',
+              color: simpleMode ? 'var(--surface)' : 'var(--ink)',
+              border: 'none',
+              cursor: 'pointer',
+              fontFamily: 'var(--font-stencil)', fontSize: 13,
+              fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase',
+              textAlign: 'left',
+            }}
+          >
+            <div>Simple</div>
+            <div style={{
+              fontFamily: 'var(--font-body)', fontSize: 11.5, fontWeight: 400,
+              letterSpacing: 0, textTransform: 'none', marginTop: 4,
+              opacity: 0.85,
+            }}>
+              Core only: HE-Vs, off-table support, missions.
+            </div>
+          </button>
+        </div>
+        <div style={{ fontSize: 12, color: 'var(--mute)', marginBottom: 22, lineHeight: 1.5 }}>
+          Switching modes hides the optional sections. Your choices in those sections are kept and reapplied if you switch back.
+        </div>
+
+        {/* Callsign pool */}
         <FieldLabel>Callsign Pool</FieldLabel>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
           {POOL_NAMES.map(p => (
@@ -231,7 +285,7 @@ export function OptionsModal({ open, onClose, callsignPool, setCallsignPool, cus
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               placeholder={'One per line.\nIronwake\nSaturn Forge\nGravewright\n…'}
-              style={{ minHeight: 160, fontFamily: 'var(--font-mono)', fontSize: 12 }}
+              style={{ minHeight: 160, fontFamily: 'var(--font-mono)', fontSize: 13 }}
             />
             <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <TextButton onClick={onClose}>Cancel</TextButton>

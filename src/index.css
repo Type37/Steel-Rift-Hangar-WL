@@ -1,16 +1,18 @@
 /* ============================================================
    THE FORGE — global styles
    - Warm parchment background, deep ink text
-   - Chakra Petch (display) + Hanken Grotesk (body) + JetBrains Mono (data)
-   - Single rust accent for actions, olive for positive/equipped
-   - Asymmetric, varied spacing — never uniform py-16 everywhere
+   - Chakra Petch reserved for big banner headings only
+   - Schibsted Grotesk for stencil/uppercase labels
+   - Space Grotesk for body
+   - JetBrains Mono for data
+   - Single rust accent for actions, olive for positive
    ============================================================ */
 
 :root {
   --bg:           #e8dfc9;
   --bg-deep:      #ddd2b6;
   --surface:      #f1eada;
-  --surface-2:   #ebe2c9;
+  --surface-2:    #ebe2c9;
   --ink:          #15110d;
   --ink-2:        #4a4339;
   --mute:         #6e6552;
@@ -18,14 +20,21 @@
   --rule-strong:  #8c7e5f;
   --rust:         #a8330c;
   --rust-deep:    #6e1f06;
+  --rust-bright:  #c44518;
   --olive:        #4f6132;
   --olive-deep:   #344020;
   --steel:        #2a3640;
   --warn:         #8a5a09;
+  --orange:       #e07a26; /* "Buy Now" warm */
 
-  --font-display: 'Chakra Petch', 'Bahnschrift', sans-serif;
-  --font-body:    'Hanken Grotesk', system-ui, sans-serif;
-  --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+  /* Chakra Petch is reserved for marquee headings ONLY */
+  --font-display:   'Chakra Petch', 'Bahnschrift', sans-serif;
+  /* Schibsted is the stencil/label workhorse */
+  --font-stencil:   'Schibsted Grotesk', system-ui, sans-serif;
+  /* Body text */
+  --font-body:      'Space Grotesk', system-ui, sans-serif;
+  /* Data / mono */
+  --font-mono:      'JetBrains Mono', ui-monospace, monospace;
 }
 
 * { box-sizing: border-box; }
@@ -35,8 +44,8 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-body);
-  font-size: 14.5px;
-  line-height: 1.45;
+  font-size: 16px;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -53,8 +62,7 @@ input:focus-visible, textarea:focus-visible, button:focus-visible {
   outline-offset: 2px;
 }
 
-/* Subtle paper-grain background using two repeating gradients.
-   Far less obtrusive than an image and adds texture instead of being flat. */
+/* Subtle paper-grain background using two repeating gradients. */
 body {
   background-image:
     repeating-linear-gradient(
@@ -81,20 +89,31 @@ body {
   text-transform: uppercase;
 }
 
+.stencil {
+  font-family: var(--font-stencil);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 .label {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 10.5px;
-  letter-spacing: 0.18em;
+  font-family: var(--font-stencil);
+  font-weight: 700;
+  font-size: 11.5px;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--mute);
 }
 
-.mono { font-family: var(--font-mono); }
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
 
 a { color: var(--rust); }
+a:hover { color: var(--rust-bright); }
 
-/* Scrollbars styled to match the parchment aesthetic */
+/* Scrollbars */
 .scroll::-webkit-scrollbar { width: 11px; height: 11px; }
 .scroll::-webkit-scrollbar-track { background: var(--bg-deep); }
 .scroll::-webkit-scrollbar-thumb {
@@ -102,38 +121,94 @@ a { color: var(--rust); }
   border: 2px solid var(--bg-deep);
 }
 
-/* Form controls reset */
+/* Form controls */
 input.txt, textarea.txt {
   border: 1px solid var(--rule);
   background: var(--surface);
-  padding: 8px 10px;
+  padding: 9px 11px;
   width: 100%;
-  font-size: 14px;
+  font-size: 15px;
+  transition: border-color 100ms, background 100ms;
 }
+input.txt:hover, textarea.txt:hover { background: #f6efdf; }
+input.txt:focus, textarea.txt:focus { border-color: var(--ink); }
 input.txt::placeholder, textarea.txt::placeholder { color: var(--mute); }
 textarea.txt { min-height: 60px; resize: vertical; }
 
 /* "Stencil number" used for roster items 01, 02, ... */
-.stencil {
+.roster-num {
   font-family: var(--font-mono);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.1em;
   color: var(--mute);
 }
 
-/* Underlined trait token, click to surface its definition */
+/* ============================================================
+   BUTTON FEEDBACK
+   Real hover, active, focus states on every button-like element
+   ============================================================ */
+
+/* Generic interactive press response (apply via class for any button) */
+.btn-press {
+  transition: transform 80ms ease-out, background 100ms, color 100ms, border-color 100ms, box-shadow 100ms;
+}
+.btn-press:hover:not(:disabled) {
+  filter: brightness(1.04);
+}
+.btn-press:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* Inline button used by main UI buttons — fade hover */
+button {
+  transition: background 110ms, color 110ms, border-color 110ms, transform 80ms, box-shadow 110ms, filter 110ms;
+}
+button:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+/* Mission chips, class picker, tabs: glow on hover */
+.chip-hover:hover:not(:disabled) {
+  background: var(--surface-2);
+  border-color: var(--ink) !important;
+}
+.chip-hover.is-active:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+/* Small +/- steppers should pop a bit on hover */
+.step-hover:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: scale(1.07);
+}
+
+/* Catalog Add buttons should feel tactile */
+.add-btn {
+  transition: background 100ms, color 100ms, border-color 100ms, transform 80ms;
+}
+.add-btn:hover:not(:disabled) {
+  filter: brightness(1.06);
+  box-shadow: 0 1px 0 var(--ink);
+}
+.add-btn:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+/* Hover for trait token */
 .tok {
   display: inline;
   border-bottom: 1.5px dotted var(--mute);
-  cursor: pointer;
+  cursor: help;
   padding-bottom: 1px;
-  transition: color 80ms;
+  transition: color 100ms, border-color 100ms, background 100ms;
 }
 .tok:hover, .tok:focus {
   color: var(--rust);
   border-bottom-color: var(--rust);
+  background: rgba(168, 51, 12, 0.06);
   outline: none;
 }
 .tok.active {
@@ -142,16 +217,149 @@ textarea.txt { min-height: 60px; resize: vertical; }
 }
 
 /* ============================================================
-   RESPONSIVE
-   Desktop layout uses a fixed-height shell with independently
-   scrolling sidebar + editor panes. On phones we drop that and
-   let the whole page scroll naturally so nothing gets clipped.
+   TOOLTIP / POPOVER (replaces the glossary band)
    ============================================================ */
+.tooltip-popover {
+  background: var(--ink);
+  color: var(--surface);
+  border: 1.5px solid var(--rust);
+  padding: 11px 13px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.5;
+  width: max-content;
+  max-width: min(340px, calc(100vw - 24px));
+  z-index: 200;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  pointer-events: auto;
+}
+.tooltip-title {
+  font-family: var(--font-stencil);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--rust-bright);
+  margin-bottom: 4px;
+}
 
-/* Desktop default — fixed-height shell, inner scroll panes */
+/* ============================================================
+   TOP NAVBAR (Steel Rift logo + links)
+   ============================================================ */
+.navbar-strip {
+  background: #0c0a08;
+  color: var(--surface);
+  border-bottom: 2px solid var(--rust);
+}
+.navbar-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 10px 22px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+.navbar-logo {
+  display: inline-flex;
+  align-items: center;
+}
+.navbar-logo img {
+  height: 22px;
+  display: block;
+  filter: invert(0.95);
+}
+.navbar-links {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex: 1;
+  flex-wrap: wrap;
+}
+.navbar-links a {
+  color: rgba(241, 234, 218, 0.78);
+  text-decoration: none;
+  font-family: var(--font-stencil);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 6px 10px;
+  transition: color 110ms, background 110ms;
+}
+.navbar-links a:hover {
+  color: var(--surface);
+  background: rgba(255, 255, 255, 0.06);
+}
+.navbar-buynow {
+  background: var(--orange);
+  color: #1a0f04;
+  text-decoration: none;
+  font-family: var(--font-stencil);
+  font-weight: 700;
+  font-size: 12.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  border: 2px solid var(--orange);
+  transition: background 110ms, color 110ms, border-color 110ms;
+}
+.navbar-buynow:hover {
+  background: transparent;
+  color: var(--orange);
+}
+
+/* ============================================================
+   PRINT STYLES — game-card layout
+   See print.jsx for structure
+   ============================================================ */
+.print-only { display: none; }
+@media print {
+  body { background: white !important; background-image: none !important; }
+  .no-print { display: none !important; }
+  .print-only { display: block !important; }
+
+  .print-page {
+    page-break-after: always;
+    break-after: page;
+    padding: 12mm;
+  }
+  .print-page:last-child { page-break-after: auto; }
+
+  .game-card {
+    border: 2px solid #000;
+    padding: 10mm 8mm;
+    margin-bottom: 4mm;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    background: #fff;
+  }
+}
+.print-page { padding: 16mm; max-width: 220mm; margin: 0 auto; background: #fff; color: #000; }
+.game-card {
+  border: 2px solid #000;
+  padding: 8mm 7mm;
+  margin-bottom: 6mm;
+  background: #fff;
+}
+
+.hp-row {
+  display: flex; flex-wrap: wrap; gap: 3px;
+}
+.hp-box {
+  width: 14px; height: 14px;
+  border: 1.5px solid #000;
+  display: inline-block;
+}
+.hp-box.armor { background: #fff; }
+.hp-box.extra-armor { background: #ddd; }
+.hp-box.structure { background: #fff; border-style: solid; border-width: 2px; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
 @media (min-width: 761px) {
   .app-shell {
-    height: 100vh;
+    height: calc(100vh - 50px); /* navbar height */
     overflow: hidden;
   }
   .layout {
@@ -165,7 +373,6 @@ textarea.txt { min-height: 60px; resize: vertical; }
   }
 }
 
-/* Mid-range — single column at 960px and below (existing behaviour) */
 @media (max-width: 960px) {
   .layout {
     grid-template-columns: 1fr !important;
@@ -180,11 +387,29 @@ textarea.txt { min-height: 60px; resize: vertical; }
   }
 }
 
-/* Phone — actual restructuring */
 @media (max-width: 760px) {
-  body { font-size: 14px; }
+  body { font-size: 15px; }
 
-  /* Top bar — stack into rows */
+  .navbar-inner {
+    padding: 8px 14px;
+    gap: 10px;
+  }
+  .navbar-logo img { height: 18px; }
+  .navbar-links {
+    order: 3;
+    width: 100%;
+    justify-content: flex-start;
+    gap: 0;
+  }
+  .navbar-links a {
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+  .navbar-buynow {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
   .topbar {
     grid-template-columns: 1fr auto !important;
     grid-template-rows: auto auto;
@@ -195,9 +420,7 @@ textarea.txt { min-height: 60px; resize: vertical; }
     grid-column: 1;
     grid-row: 1;
   }
-  .topbar-wordmark > div:first-child {
-    font-size: 15px !important;
-  }
+  .topbar-wordmark > div:first-child { font-size: 16px !important; }
   .topbar-tagline { display: none; }
 
   .topbar-actions {
@@ -207,9 +430,7 @@ textarea.txt { min-height: 60px; resize: vertical; }
     gap: 8px !important;
   }
   .topbar-print-label { display: none; }
-  .topbar-print {
-    padding: 8px 10px !important;
-  }
+  .topbar-print { padding: 8px 10px !important; }
 
   .topbar-force {
     grid-column: 1 / -1;
@@ -218,30 +439,19 @@ textarea.txt { min-height: 60px; resize: vertical; }
     padding-top: 8px;
   }
 
-  /* Glossary band — tighten up */
-  .glossary-band {
-    padding: 10px 14px !important;
-    font-size: 12px;
-  }
-
-  /* Bottom bar — single column, actions in their own row */
   .bottombar {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 1fr 1fr !important;
     gap: 10px !important;
     padding: 10px 12px !important;
   }
-  .bottombar-mission-row {
-    gap: 4px !important;
-  }
-  .bottombar-add-support,
-  .bottombar-add-mech {
+  .bottombar-mission-row { gap: 4px !important; }
+  .bottombar-add-support, .bottombar-add-mech {
     padding: 12px 14px !important;
-    font-size: 12px !important;
+    font-size: 13px !important;
     letter-spacing: 0.12em !important;
     justify-content: center !important;
     width: 100%;
   }
-  /* Make the two CTAs sit side-by-side */
   .bottombar-add-support {
     grid-row: 3;
     grid-column: 1;
@@ -250,19 +460,14 @@ textarea.txt { min-height: 60px; resize: vertical; }
     grid-row: 3;
     grid-column: 2;
   }
-  .bottombar {
-    grid-template-columns: 1fr 1fr !important;
-  }
   .bottombar-tonnage {
     grid-column: 1 / -1;
     grid-row: 1;
   }
 
-  /* Sidebar — looser padding so tap targets are real */
   .sidebar { padding: 14px 12px 20px !important; }
   .editor-col { padding: 18px 14px 28px !important; }
 
-  /* Tonnage breakdown — 5 cols too cramped at 360px, swap to 3+2 */
   .ton-breakdown {
     grid-template-columns: repeat(3, 1fr) !important;
   }
@@ -274,36 +479,21 @@ textarea.txt { min-height: 60px; resize: vertical; }
     border-right: none !important;
   }
 
-  /* Class picker — compress numbers so 4 fit at 360px */
-  .class-picker .display:nth-child(2),
-  .class-picker > button > span:nth-child(2) {
-    font-size: 22px !important;
-  }
   .class-picker > button {
     padding: 8px 4px !important;
   }
+  .class-picker .display {
+    font-size: 22px !important;
+  }
 
-  /* Briefing hero — readable on a phone */
   .briefing-hero {
-    font-size: 24px !important;
+    font-size: 28px !important;
     letter-spacing: 0.01em !important;
   }
 }
 
-/* Very narrow phones — tighten further */
 @media (max-width: 380px) {
-  .topbar > div:first-child > div:first-child {
-    font-size: 13px !important;
-  }
   .ton-breakdown {
     grid-template-columns: repeat(2, 1fr) !important;
   }
-}
-
-/* Print */
-.print-only { display: none; }
-@media print {
-  body { background: white !important; background-image: none !important; }
-  .no-print { display: none !important; }
-  .print-only { display: block !important; }
 }

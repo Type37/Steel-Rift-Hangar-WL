@@ -1,21 +1,21 @@
 import React, { useState } from 'react';
 import { Trash2, ChevronDown, ChevronRight, Shield, Activity } from 'lucide-react';
 import { WC, WC_ORDER, RANGED, MELEE, UPGRADES, DEFENSIVE } from '../data';
-import { calcMech, valForClass, isAvailable, copyCost, totalWeaponCost, resetMechToClass } from '../calc';
-import { SectionTitle, FieldLabel, GhostButton, StepButton, TextButton, TraitList, Chip } from './ui';
+import { calcMech, valForClass, copyCost, totalWeaponCost, resetMechToClass } from '../calc';
+import { SectionTitle, FieldLabel, StepButton, TraitList } from './ui';
 
 // ============================================================
 // HE-V EDITOR
 // ============================================================
 
-export function MechEditor({ mech, mechIndex, onChange, onDelete, activeToken, onToken }) {
+export function MechEditor({ mech, mechIndex, onChange, onDelete }) {
   const stats = calcMech(mech);
   const cls = mech.weightClass;
   const wc = WC[cls];
   const defLimit = cls === 'Ultraheavy' ? 2 : 1;
 
   const [tab, setTab] = useState('ranged');
-  const [expanded, setExpanded] = useState({}); // row name → bool
+  const [expanded, setExpanded] = useState({});
   const toggleExpanded = (name) => setExpanded(s => ({ ...s, [name]: !s[name] }));
 
   const update = (patch) => onChange({ ...mech, ...patch });
@@ -57,27 +57,27 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete, activeToken, o
         gap: 12, marginBottom: 18,
       }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 14 }}>
-          <span className="stencil" style={{ fontSize: 13 }}>
+          <span className="roster-num" style={{ fontSize: 14 }}>
             HE-V {String(mechIndex + 1).padStart(2, '0')}
           </span>
-          <span className="display" style={{
-            fontSize: 11, padding: '3px 7px', border: '1.5px solid var(--ink)',
-            letterSpacing: '0.18em',
+          <span className="stencil" style={{
+            fontSize: 12, padding: '3px 8px', border: '1.5px solid var(--ink)',
           }}>
             {wc.abbr}
           </span>
         </div>
         <button
           onClick={() => onDelete(mech.id)}
+          className="add-btn"
           style={{
-            border: '1px solid var(--rust)', background: 'transparent',
-            color: 'var(--rust)', padding: '4px 10px', cursor: 'pointer',
-            fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 600,
-            letterSpacing: '0.14em', textTransform: 'uppercase',
+            border: '1.5px solid var(--rust)', background: 'transparent',
+            color: 'var(--rust)', padding: '5px 12px', cursor: 'pointer',
+            fontFamily: 'var(--font-stencil)', fontSize: 12, fontWeight: 700,
+            letterSpacing: '0.12em', textTransform: 'uppercase',
             display: 'inline-flex', alignItems: 'center', gap: 5,
           }}
         >
-          <Trash2 size={11} strokeWidth={2.5} /> Remove
+          <Trash2 size={12} strokeWidth={2.5} /> Remove
         </button>
       </div>
 
@@ -93,7 +93,7 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete, activeToken, o
           borderBottom: '2px solid var(--ink)',
           padding: '4px 0',
           fontFamily: 'var(--font-display)',
-          fontSize: 32,
+          fontSize: 34,
           fontWeight: 700,
           letterSpacing: '0.04em',
           textTransform: 'uppercase',
@@ -103,14 +103,14 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete, activeToken, o
       />
       {mech.description && (
         <div style={{
-          marginTop: 6, fontSize: 13, color: 'var(--ink-2)', fontStyle: 'italic',
-          fontFamily: 'var(--font-body)', lineHeight: 1.5,
+          marginTop: 8, fontSize: 14, color: 'var(--ink-2)', fontStyle: 'italic',
+          lineHeight: 1.55,
         }}>
           {mech.description}
         </div>
       )}
 
-      {/* Class picker — runs wider, with a clear data row showing tons / armor / structure / slots */}
+      {/* Class picker */}
       <div style={{ marginTop: 22, marginBottom: 18 }}>
         <FieldLabel>Weight Class</FieldLabel>
         <div className="class-picker" style={{
@@ -124,26 +124,27 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete, activeToken, o
               <button
                 key={c}
                 onClick={() => changeClass(c)}
+                className="add-btn"
                 style={{
                   background: active ? 'var(--surface)' : 'transparent',
                   color: active ? 'var(--ink)' : 'var(--surface)',
                   border: 'none',
-                  padding: '12px 8px',
+                  padding: '14px 8px',
                   cursor: 'pointer',
                   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
                 }}
               >
-                <span className="display" style={{
-                  fontSize: 11, letterSpacing: '0.16em',
+                <span className="stencil" style={{
+                  fontSize: 12,
                   color: active ? 'var(--mute)' : 'rgba(241,234,218,0.5)',
                 }}>
                   {c}
                 </span>
-                <span className="display" style={{ fontSize: 28, lineHeight: 1.1 }}>
+                <span className="display" style={{ fontSize: 30, lineHeight: 1.05 }}>
                   {w.tons}t
                 </span>
                 <span className="mono" style={{
-                  fontSize: 9.5, letterSpacing: '0.12em',
+                  fontSize: 10.5, letterSpacing: '0.1em',
                   color: active ? 'var(--mute)' : 'rgba(241,234,218,0.45)',
                   textTransform: 'uppercase',
                 }}>
@@ -155,7 +156,6 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete, activeToken, o
         </div>
       </div>
 
-      {/* Tonnage breakdown — varied layout, not a card grid */}
       <TonBreakdown stats={stats} cls={cls} wc={wc} />
 
       {/* Armor / structure adjusters */}
@@ -183,9 +183,9 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete, activeToken, o
       {/* Catalog tabs */}
       <div style={{ marginTop: 28 }}>
         <SectionTitle tag={`${stats.totalSlotsUsed}/${stats.capSlots} slots used`}>
-          Loadout Catalog
+          Loadout
         </SectionTitle>
-        <div style={{ display: 'flex', gap: 4, marginBottom: 0 }}>
+        <div style={{ display: 'flex', gap: 4 }}>
           {[
             { id: 'ranged', label: 'Ranged' },
             { id: 'melee', label: 'Melee' },
@@ -195,15 +195,16 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete, activeToken, o
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
+              className="add-btn"
               style={{
                 background: tab === t.id ? 'var(--ink)' : 'transparent',
                 color: tab === t.id ? 'var(--surface)' : 'var(--ink)',
                 border: 'none',
-                padding: '8px 16px',
-                fontFamily: 'var(--font-display)',
-                fontSize: 12,
-                fontWeight: 600,
-                letterSpacing: '0.16em',
+                padding: '9px 18px',
+                fontFamily: 'var(--font-stencil)',
+                fontSize: 13,
+                fontWeight: 700,
+                letterSpacing: '0.14em',
                 textTransform: 'uppercase',
                 cursor: 'pointer',
               }}
@@ -217,24 +218,21 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete, activeToken, o
           {tab === 'ranged' && RANGED.map(w => (
             <WeaponRow key={w.name} weapon={w} mech={mech}
               equipped={equipped(w.name)} onAdd={addWeapon} onRemove={removeWeapon}
-              expanded={expanded[w.name]} onToggle={() => toggleExpanded(w.name)}
-              activeToken={activeToken} onToken={onToken} />
+              expanded={expanded[w.name]} onToggle={() => toggleExpanded(w.name)} />
           ))}
           {tab === 'melee' && MELEE.map(w => (
             <WeaponRow key={w.name} weapon={w} mech={mech}
               equipped={equipped(w.name)} onAdd={addWeapon} onRemove={removeWeapon}
-              expanded={expanded[w.name]} onToggle={() => toggleExpanded(w.name)}
-              activeToken={activeToken} onToken={onToken} />
+              expanded={expanded[w.name]} onToggle={() => toggleExpanded(w.name)} />
           ))}
           {tab === 'upgrades' && UPGRADES.map(u => (
             <UpgradeRow key={u.name} upgrade={u} mech={mech} onToggle={toggleUpgrade}
-              expanded={expanded[u.name]} onExpand={() => toggleExpanded(u.name)}
-              activeToken={activeToken} onToken={onToken} />
+              expanded={expanded[u.name]} onExpand={() => toggleExpanded(u.name)} />
           ))}
           {tab === 'defensive' && (
             <>
               <div style={{
-                padding: '10px 14px', fontSize: 12, color: 'var(--ink-2)',
+                padding: '11px 14px', fontSize: 13, color: 'var(--ink-2)',
                 background: 'var(--surface-2)', borderBottom: '1px solid var(--rule)',
                 lineHeight: 1.5,
               }}>
@@ -255,7 +253,7 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete, activeToken, o
 }
 
 // ============================================================
-// TONNAGE BREAKDOWN — data table style, not a card grid
+// TONNAGE BREAKDOWN
 // ============================================================
 
 function TonBreakdown({ stats, cls, wc }) {
@@ -263,22 +261,20 @@ function TonBreakdown({ stats, cls, wc }) {
   const remaining = wc.tons - stats.totalUsed;
   return (
     <div style={{ marginTop: 22 }}>
-      {/* Top rule + label row */}
       <div style={{
         display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
         marginBottom: 4,
       }}>
         <span className="label">{cls} Tonnage</span>
-        <span className="mono" style={{ fontSize: 13, fontWeight: 700, color: stats.overTons ? 'var(--rust)' : 'var(--ink)' }}>
+        <span className="mono" style={{ fontSize: 14, fontWeight: 700, color: stats.overTons ? 'var(--rust)' : 'var(--ink)' }}>
           {stats.totalUsed} / {wc.tons}t
           <span style={{ color: 'var(--mute)', marginLeft: 8, fontWeight: 400 }}>
             ({remaining >= 0 ? `${remaining} free` : `${-remaining} over`})
           </span>
         </span>
       </div>
-      {/* Bar */}
       <div style={{
-        height: 14, background: 'var(--surface-2)',
+        height: 16, background: 'var(--surface-2)',
         border: '1.5px solid var(--rule-strong)', position: 'relative',
       }}>
         <div style={{
@@ -286,7 +282,6 @@ function TonBreakdown({ stats, cls, wc }) {
           background: stats.overTons ? 'var(--rust)' : 'var(--olive)',
           transition: 'width 180ms ease-out',
         }} />
-        {/* Mile markers at 25/50/75% */}
         {[0.25, 0.5, 0.75].map(p => (
           <div key={p} style={{
             position: 'absolute', top: 0, bottom: 0, left: `${p * 100}%`,
@@ -294,7 +289,6 @@ function TonBreakdown({ stats, cls, wc }) {
           }} />
         ))}
       </div>
-      {/* Stat data row, like a tech datasheet */}
       <div className="ton-breakdown" style={{
         marginTop: 10, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)',
         borderTop: '1px solid var(--rule)', borderBottom: '1px solid var(--rule)',
@@ -307,14 +301,14 @@ function TonBreakdown({ stats, cls, wc }) {
           { l: 'Defensive', v: `${stats.defensiveTons}t` },
         ].map((r, i) => (
           <div key={r.l} style={{
-            padding: '8px 10px',
+            padding: '9px 10px',
             borderRight: i < 4 ? '1px solid var(--rule)' : 'none',
           }}>
-            <div className="label" style={{ fontSize: 9.5, marginBottom: 2 }}>{r.l}</div>
-            <div className="mono" style={{ fontSize: 17, fontWeight: 700, color: 'var(--ink)' }}>
+            <div className="label" style={{ fontSize: 10, marginBottom: 2 }}>{r.l}</div>
+            <div className="mono" style={{ fontSize: 18, fontWeight: 700, color: 'var(--ink)' }}>
               {r.v}
             </div>
-            {r.sub && <div className="mono" style={{ fontSize: 10, color: 'var(--olive)' }}>{r.sub}</div>}
+            {r.sub && <div className="mono" style={{ fontSize: 11, color: 'var(--olive)' }}>{r.sub}</div>}
           </div>
         ))}
       </div>
@@ -331,15 +325,15 @@ function Adjuster({ label, value, base, min, max, onChange, icon: Icon, step = 2
   return (
     <div style={{
       display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-      padding: '10px 14px',
+      padding: '11px 14px',
       border: '1px solid var(--rule)',
       background: 'var(--surface)',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        {Icon && <Icon size={18} color="var(--steel)" strokeWidth={2} />}
+        {Icon && <Icon size={20} color="var(--steel)" strokeWidth={2} />}
         <div>
-          <div className="display" style={{ fontSize: 12, letterSpacing: '0.16em' }}>{label}</div>
-          <div className="mono" style={{ fontSize: 10.5, color: 'var(--mute)' }}>
+          <div className="stencil" style={{ fontSize: 13 }}>{label}</div>
+          <div className="mono" style={{ fontSize: 11.5, color: 'var(--mute)' }}>
             base {base}
             {delta !== 0 && (
               <span style={{ color: delta > 0 ? 'var(--olive)' : 'var(--rust)', fontWeight: 700, marginLeft: 4 }}>
@@ -352,36 +346,36 @@ function Adjuster({ label, value, base, min, max, onChange, icon: Icon, step = 2
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
         <button onClick={() => onChange(Math.max(min, value - step))} disabled={value <= min}
-          style={stepBtnStyle(value <= min)}>−</button>
+          className="step-hover" style={stepBtnStyle(value <= min)}>−</button>
         <div style={{
-          minWidth: 38, height: 32, border: '2px solid var(--ink)', background: 'var(--bg)',
+          minWidth: 42, height: 36, border: '2px solid var(--ink)', background: 'var(--bg)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'var(--font-mono)', fontSize: 18, fontWeight: 700,
+          fontFamily: 'var(--font-mono)', fontSize: 19, fontWeight: 700,
         }}>
           {value}
         </div>
         <button onClick={() => onChange(Math.min(max, value + step))} disabled={value >= max}
-          style={stepBtnStyle(value >= max)}>+</button>
+          className="step-hover" style={stepBtnStyle(value >= max)}>+</button>
       </div>
     </div>
   );
 }
 
 const stepBtnStyle = (disabled) => ({
-  width: 30, height: 30,
+  width: 34, height: 34,
   border: '1.5px solid var(--rule-strong)',
   background: disabled ? 'var(--bg-deep)' : 'var(--surface-2)',
   cursor: disabled ? 'not-allowed' : 'pointer',
-  fontFamily: 'var(--font-mono)', fontSize: 18, fontWeight: 700, color: 'var(--ink)',
+  fontFamily: 'var(--font-mono)', fontSize: 19, fontWeight: 700, color: 'var(--ink)',
   opacity: disabled ? 0.4 : 1,
   padding: 0,
 });
 
 // ============================================================
-// CATALOG ROWS — table-style, expandable, with full per-class info on expand
+// CATALOG ROWS
 // ============================================================
 
-function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle, activeToken, onToken }) {
+function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle }) {
   const cls = mech.weightClass;
   const base = valForClass(weapon.cost, cls);
   const dmg = valForClass(weapon.dmg, cls);
@@ -395,44 +389,44 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
       borderBottom: '1px solid var(--rule)',
       background: count > 0 ? 'var(--surface)' : 'transparent',
       opacity: available ? 1 : 0.42,
+      transition: 'background 100ms',
     }}>
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'auto 1fr auto auto auto',
         alignItems: 'center', gap: 12,
-        padding: '8px 14px',
+        padding: '9px 14px',
       }}>
-        <button onClick={onToggle} aria-label="Expand"
+        <button onClick={onToggle} className="add-btn" aria-label="Expand"
           style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: 'var(--mute)' }}>
-          {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+          {expanded ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
         </button>
 
         <div style={{ minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ fontWeight: 600, fontSize: 14, color: 'var(--ink)' }}>{weapon.name}</span>
+            <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--ink)' }}>{weapon.name}</span>
             {available && (
               <>
-                <span className="mono" style={{ fontSize: 11, color: 'var(--steel)' }}>DMG {dmg}</span>
-                <span className="mono" style={{ fontSize: 11, color: 'var(--rust)', fontWeight: 700 }}>{base}t</span>
+                <span className="mono" style={{ fontSize: 12, color: 'var(--steel)' }}>DMG {dmg}</span>
+                <span className="mono" style={{ fontSize: 12, color: 'var(--rust)', fontWeight: 700 }}>{base}t</span>
               </>
             )}
             {count > 1 && (
-              <span className="mono" style={{ fontSize: 10.5, color: 'var(--warn)' }}>
+              <span className="mono" style={{ fontSize: 11, color: 'var(--warn)' }}>
                 ×{count} = {total}t (next +{next}t)
               </span>
             )}
           </div>
-          <div style={{ fontSize: 11.5, color: 'var(--ink-2)', marginTop: 2 }}>
-            <TraitList traits={weapon.traits} activeToken={activeToken} onToken={onToken} />
+          <div style={{ fontSize: 12.5, color: 'var(--ink-2)', marginTop: 2 }}>
+            <TraitList traits={weapon.traits} />
           </div>
         </div>
 
-        {/* Equipped count display + steppers */}
         {count > 0 ? (
           <>
             <StepButton direction="down" accent="rust" onClick={() => onRemove(weapon.name)} />
             <span className="mono" style={{
-              minWidth: 28, textAlign: 'center', fontWeight: 700, fontSize: 16, color: 'var(--ink)',
+              minWidth: 28, textAlign: 'center', fontWeight: 700, fontSize: 17, color: 'var(--ink)',
             }}>×{count}</span>
             <StepButton direction="up" onClick={() => onAdd(weapon.name)} disabled={!available} />
           </>
@@ -444,22 +438,20 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
         )}
       </div>
 
-      {expanded && available && (
-        <ExpandedWeapon weapon={weapon} cls={cls} activeToken={activeToken} onToken={onToken} />
-      )}
+      {expanded && available && <ExpandedWeapon weapon={weapon} cls={cls} />}
     </div>
   );
 }
 
-function ExpandedWeapon({ weapon, cls, activeToken, onToken }) {
+function ExpandedWeapon({ weapon, cls }) {
   return (
     <div style={{
-      padding: '10px 14px 14px 36px',
+      padding: '10px 14px 16px 36px',
       background: 'var(--bg-deep)',
       borderTop: '1px dashed var(--rule)',
     }}>
       <div className="label" style={{ marginBottom: 6 }}>Per-Class</div>
-      <table style={{ borderCollapse: 'collapse', fontFamily: 'var(--font-mono)', fontSize: 11.5, width: '100%', maxWidth: 500 }}>
+      <table style={{ borderCollapse: 'collapse', fontFamily: 'var(--font-mono)', fontSize: 12.5, width: '100%', maxWidth: 520 }}>
         <thead>
           <tr>
             <th style={thStyle}></th>
@@ -501,15 +493,15 @@ function ExpandedWeapon({ weapon, cls, activeToken, onToken }) {
           </tr>
         </tbody>
       </table>
-      <div style={{ marginTop: 10, fontSize: 12, color: 'var(--ink-2)' }}>
+      <div style={{ marginTop: 10, fontSize: 13, color: 'var(--ink-2)' }}>
         <span className="label" style={{ marginRight: 6 }}>Traits:</span>
-        <TraitList traits={weapon.traits} activeToken={activeToken} onToken={onToken} />
+        <TraitList traits={weapon.traits} />
       </div>
     </div>
   );
 }
 
-function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand, activeToken, onToken }) {
+function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand }) {
   const cls = mech.weightClass;
   const cost = valForClass(upgrade.cost, cls);
   const available = cost !== '-' && cost != null;
@@ -519,35 +511,35 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand, activeToken, 
       borderBottom: '1px solid var(--rule)',
       background: eq ? 'var(--surface)' : 'transparent',
       opacity: available ? 1 : 0.42,
+      transition: 'background 100ms',
     }}>
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'auto 1fr auto',
         alignItems: 'center', gap: 12,
-        padding: '8px 14px',
+        padding: '9px 14px',
       }}>
-        <button onClick={onExpand} aria-label="Expand"
+        <button onClick={onExpand} className="add-btn" aria-label="Expand"
           style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: 'var(--mute)' }}>
-          {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+          {expanded ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
         </button>
 
         <div style={{ minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ fontWeight: 600, fontSize: 14, color: 'var(--ink)' }}>{upgrade.name}</span>
+            <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--ink)' }}>{upgrade.name}</span>
             {available && (
-              <span className="mono" style={{ fontSize: 11, color: 'var(--rust)', fontWeight: 700 }}>{cost}t</span>
+              <span className="mono" style={{ fontSize: 12, color: 'var(--rust)', fontWeight: 700 }}>{cost}t</span>
             )}
             {upgrade.compact && (
-              <span className="mono" style={{
-                fontSize: 9.5, padding: '1px 5px', background: 'var(--steel)', color: 'var(--surface)',
-                letterSpacing: '0.1em', textTransform: 'uppercase',
+              <span className="stencil" style={{
+                fontSize: 10, padding: '1px 6px', background: 'var(--steel)', color: 'var(--surface)',
               }}>
                 Compact
               </span>
             )}
           </div>
           {!expanded && (
-            <div style={{ fontSize: 11.5, color: 'var(--ink-2)', marginTop: 2,
+            <div style={{ fontSize: 12.5, color: 'var(--ink-2)', marginTop: 2,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {upgrade.rule}
             </div>
@@ -557,13 +549,14 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand, activeToken, 
         {available && (
           <button
             onClick={() => onToggle(upgrade.name)}
+            className="add-btn"
             style={{
               border: `1.5px solid ${eq ? 'var(--rust)' : 'var(--olive)'}`,
               background: eq ? 'transparent' : 'var(--olive)',
               color: eq ? 'var(--rust)' : 'var(--surface)',
-              padding: '5px 12px', cursor: 'pointer',
-              fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 600,
-              letterSpacing: '0.14em', textTransform: 'uppercase',
+              padding: '6px 14px', cursor: 'pointer',
+              fontFamily: 'var(--font-stencil)', fontSize: 12, fontWeight: 700,
+              letterSpacing: '0.12em', textTransform: 'uppercase',
             }}
           >
             {eq ? 'Remove' : 'Add'}
@@ -573,16 +566,16 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand, activeToken, 
 
       {expanded && (
         <div style={{
-          padding: '4px 14px 14px 36px',
+          padding: '4px 14px 16px 36px',
           background: 'var(--bg-deep)',
           borderTop: '1px dashed var(--rule)',
         }}>
-          <div style={{ fontSize: 13, color: 'var(--ink)', lineHeight: 1.55 }}>
+          <div style={{ fontSize: 14, color: 'var(--ink)', lineHeight: 1.6 }}>
             {upgrade.rule}
           </div>
           <div style={{ marginTop: 10 }}>
             <span className="label" style={{ marginRight: 6 }}>Cost (Lt/Md/Hv/UH):</span>
-            <span className="mono" style={{ fontSize: 12 }}>
+            <span className="mono" style={{ fontSize: 13 }}>
               {upgrade.cost.map(c => c === '-' ? '—' : `${c}t`).join(' / ')}
             </span>
           </div>
@@ -602,31 +595,32 @@ function DefRow({ def, mech, onToggle, atLimit, expanded, onExpand }) {
       borderBottom: '1px solid var(--rule)',
       background: eq ? 'var(--surface)' : 'transparent',
       opacity: available ? 1 : 0.42,
+      transition: 'background 100ms',
     }}>
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'auto 1fr auto',
         alignItems: 'center', gap: 12,
-        padding: '8px 14px',
+        padding: '9px 14px',
       }}>
-        <button onClick={onExpand} aria-label="Expand"
+        <button onClick={onExpand} className="add-btn" aria-label="Expand"
           style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: 'var(--mute)' }}>
-          {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+          {expanded ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
         </button>
         <div style={{ minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ fontWeight: 600, fontSize: 14, color: 'var(--ink)' }}>{def.name}</span>
+            <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--ink)' }}>{def.name}</span>
             {available && (
-              <span className="mono" style={{ fontSize: 11, color: 'var(--rust)', fontWeight: 700 }}>{cost}t</span>
+              <span className="mono" style={{ fontSize: 12, color: 'var(--rust)', fontWeight: 700 }}>{cost}t</span>
             )}
             {def.mod?.armor && (
-              <span className="mono" style={{ fontSize: 10.5, color: 'var(--olive)' }}>
+              <span className="mono" style={{ fontSize: 11, color: 'var(--olive)' }}>
                 +{def.mod.armor} armor
               </span>
             )}
           </div>
           {!expanded && (
-            <div style={{ fontSize: 11.5, color: 'var(--ink-2)', marginTop: 2,
+            <div style={{ fontSize: 12.5, color: 'var(--ink-2)', marginTop: 2,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {def.rule}
             </div>
@@ -636,13 +630,14 @@ function DefRow({ def, mech, onToggle, atLimit, expanded, onExpand }) {
           <button
             onClick={() => onToggle(def.name)}
             disabled={!eq && atLimit}
+            className="add-btn"
             style={{
               border: `1.5px solid ${eq ? 'var(--rust)' : (atLimit ? 'var(--rule)' : 'var(--olive)')}`,
               background: eq ? 'transparent' : (atLimit ? 'var(--bg-deep)' : 'var(--olive)'),
               color: eq ? 'var(--rust)' : (atLimit ? 'var(--mute)' : 'var(--surface)'),
-              padding: '5px 12px', cursor: !eq && atLimit ? 'not-allowed' : 'pointer',
-              fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 600,
-              letterSpacing: '0.14em', textTransform: 'uppercase',
+              padding: '6px 14px', cursor: !eq && atLimit ? 'not-allowed' : 'pointer',
+              fontFamily: 'var(--font-stencil)', fontSize: 12, fontWeight: 700,
+              letterSpacing: '0.12em', textTransform: 'uppercase',
             }}
           >
             {eq ? 'Remove' : 'Add'}
@@ -651,14 +646,14 @@ function DefRow({ def, mech, onToggle, atLimit, expanded, onExpand }) {
       </div>
       {expanded && (
         <div style={{
-          padding: '4px 14px 14px 36px',
+          padding: '4px 14px 16px 36px',
           background: 'var(--bg-deep)',
           borderTop: '1px dashed var(--rule)',
         }}>
-          <div style={{ fontSize: 13, color: 'var(--ink)', lineHeight: 1.55 }}>{def.rule}</div>
+          <div style={{ fontSize: 14, color: 'var(--ink)', lineHeight: 1.6 }}>{def.rule}</div>
           <div style={{ marginTop: 10 }}>
             <span className="label" style={{ marginRight: 6 }}>Cost (Lt/Md/Hv/UH):</span>
-            <span className="mono" style={{ fontSize: 12 }}>
+            <span className="mono" style={{ fontSize: 13 }}>
               {def.cost.map(c => c === '-' ? '—' : `${c}t`).join(' / ')}
             </span>
           </div>
@@ -669,14 +664,14 @@ function DefRow({ def, mech, onToggle, atLimit, expanded, onExpand }) {
 }
 
 const thStyle = {
-  textAlign: 'center', padding: '4px 8px',
-  fontFamily: 'var(--font-display)', fontWeight: 600,
-  fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase',
+  textAlign: 'center', padding: '5px 10px',
+  fontFamily: 'var(--font-stencil)', fontWeight: 700,
+  fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase',
   borderBottom: '1px solid var(--rule)',
 };
-const tdStyle = { textAlign: 'center', padding: '4px 8px' };
+const tdStyle = { textAlign: 'center', padding: '5px 10px' };
 const tdLabelStyle = {
-  textAlign: 'left', padding: '4px 8px',
-  fontFamily: 'var(--font-display)', fontSize: 10, letterSpacing: '0.14em',
-  textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 600,
+  textAlign: 'left', padding: '5px 10px',
+  fontFamily: 'var(--font-stencil)', fontSize: 11, letterSpacing: '0.14em',
+  textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 700,
 };
