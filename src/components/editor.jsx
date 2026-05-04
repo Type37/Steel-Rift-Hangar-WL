@@ -113,7 +113,7 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete, activeToken, o
       {/* Class picker — runs wider, with a clear data row showing tons / armor / structure / slots */}
       <div style={{ marginTop: 22, marginBottom: 18 }}>
         <FieldLabel>Weight Class</FieldLabel>
-        <div style={{
+        <div className="class-picker" style={{
           display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4,
           background: 'var(--ink)', padding: 4,
         }}>
@@ -295,7 +295,7 @@ function TonBreakdown({ stats, cls, wc }) {
         ))}
       </div>
       {/* Stat data row, like a tech datasheet */}
-      <div style={{
+      <div className="ton-breakdown" style={{
         marginTop: 10, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)',
         borderTop: '1px solid var(--rule)', borderBottom: '1px solid var(--rule)',
       }}>

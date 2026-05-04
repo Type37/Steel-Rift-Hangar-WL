@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { TEAMS, MISSIONS, MISSION_ORDER } from './data';
 import { calcMech, newMech, findAsset } from './calc';
 
@@ -32,6 +32,14 @@ export default function App() {
 
   // Sidebar tab
   const [sideTab, setSideTab] = useState('roster'); // roster | support | teams | faction
+
+  // Ref to the editor pane so we can scroll to it on mobile when a mech is selected
+  const editorRef = useRef(null);
+  useEffect(() => {
+    if (selectedMechId && editorRef.current && window.matchMedia('(max-width: 760px)').matches) {
+      editorRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [selectedMechId]);
 
   // ---- Derived ----
   const selectedMech = mechs.find(m => m.id === selectedMechId) || null;
@@ -101,11 +109,10 @@ export default function App() {
         faction={faction} perks={perks} selectedTeams={selectedTeams}
       />
 
-      <div className="no-print" style={{
+      <div className="app-shell no-print" style={{
         display: 'grid',
         gridTemplateRows: 'auto auto 1fr auto',
-        height: '100vh',
-        overflow: 'hidden',
+        minHeight: '100vh',
       }}>
         <TopBar
           forceName={forceName} onForceName={setForceName}
@@ -121,13 +128,11 @@ export default function App() {
           display: 'grid',
           gridTemplateColumns: '380px 1fr',
           minHeight: 0,
-          overflow: 'hidden',
         }}>
           {/* LEFT — sidebar with tabs (roster/support/teams/faction) */}
-          <aside className="scroll" style={{
+          <aside className="sidebar scroll" style={{
             background: 'var(--bg)',
             borderRight: '1.5px solid var(--rule-strong)',
-            overflowY: 'auto',
             padding: '18px 16px 24px',
           }}>
             {/* Tab switcher */}
@@ -228,8 +233,7 @@ export default function App() {
           </aside>
 
           {/* RIGHT — editor or context-appropriate empty state */}
-          <main className="editor-col scroll" style={{
-            overflowY: 'auto',
+          <main ref={editorRef} className="editor-col scroll" style={{
             padding: '24px 28px 36px',
             background: 'var(--surface)',
           }}>
@@ -333,7 +337,7 @@ function FirstRunBriefing({ onAdd }) {
       }}>
         BRIEFING
       </div>
-      <h1 style={{
+      <h1 className="briefing-hero" style={{
         fontFamily: 'var(--font-display)',
         fontSize: 38, fontWeight: 700, letterSpacing: '0.02em',
         textTransform: 'uppercase', margin: '0 0 18px',

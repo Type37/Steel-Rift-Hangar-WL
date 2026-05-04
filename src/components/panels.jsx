@@ -403,7 +403,7 @@ export function GlossaryPanel({ activeToken, onClear }) {
   const def = activeToken ? defineToken(activeToken) : null;
 
   return (
-    <div style={{
+    <div className="glossary-band" style={{
       background: 'var(--ink)',
       color: 'var(--surface)',
       padding: '12px 18px',

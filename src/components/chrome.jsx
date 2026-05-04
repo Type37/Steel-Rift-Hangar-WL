@@ -9,7 +9,7 @@ import { calcMech } from '../calc';
 
 export function TopBar({ forceName, onForceName, onPrint, onOptions }) {
   return (
-    <div style={{
+    <div className="topbar no-print" style={{
       borderBottom: '2px solid var(--ink)',
       background: 'var(--bg)',
       padding: '12px 22px',
@@ -17,13 +17,13 @@ export function TopBar({ forceName, onForceName, onPrint, onOptions }) {
       gridTemplateColumns: 'auto 1fr auto',
       alignItems: 'center',
       gap: 22,
-    }} className="no-print">
+    }}>
       {/* Wordmark — deliberately not centered, left-aligned with a stencil sub */}
-      <div>
+      <div className="topbar-wordmark">
         <div className="display" style={{ fontSize: 19, letterSpacing: '0.2em', lineHeight: 1 }}>
           STEEL RIFT <span style={{ color: 'var(--rust)' }}>//</span> FORGE
         </div>
-        <div className="mono" style={{
+        <div className="topbar-tagline mono" style={{
           fontSize: 9.5, color: 'var(--mute)', letterSpacing: '0.22em',
           marginTop: 3, textTransform: 'uppercase',
         }}>
@@ -32,7 +32,7 @@ export function TopBar({ forceName, onForceName, onPrint, onOptions }) {
       </div>
 
       {/* Force name — single-line, prominent */}
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, minWidth: 0 }}>
+      <div className="topbar-force" style={{ display: 'flex', alignItems: 'baseline', gap: 10, minWidth: 0 }}>
         <span className="label" style={{ flexShrink: 0 }}>Force</span>
         <input
           value={forceName}
@@ -51,7 +51,7 @@ export function TopBar({ forceName, onForceName, onPrint, onOptions }) {
       </div>
 
       {/* Actions — Options is text-only, Print is the only emphasized button up here */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+      <div className="topbar-actions" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
         <button onClick={onOptions} style={{
           background: 'transparent', border: 'none', padding: '6px 4px',
           color: 'var(--ink-2)', fontSize: 12, cursor: 'pointer',
@@ -61,7 +61,7 @@ export function TopBar({ forceName, onForceName, onPrint, onOptions }) {
           <SettingsIcon size={13} strokeWidth={2} />
           Options
         </button>
-        <button onClick={onPrint} style={{
+        <button onClick={onPrint} className="topbar-print" style={{
           background: 'var(--ink)', color: 'var(--surface)', border: 'none',
           padding: '8px 14px', cursor: 'pointer',
           display: 'inline-flex', alignItems: 'center', gap: 7,
@@ -69,7 +69,7 @@ export function TopBar({ forceName, onForceName, onPrint, onOptions }) {
           letterSpacing: '0.16em', textTransform: 'uppercase',
         }}>
           <Printer size={13} strokeWidth={2.25} />
-          Print Roster
+          <span className="topbar-print-label">Print Roster</span>
         </button>
       </div>
     </div>
@@ -91,7 +91,7 @@ export function BottomBar({
   const over = totalTons > cap;
 
   return (
-    <div className="no-print" style={{
+    <div className="bottombar no-print" style={{
       borderTop: '2px solid var(--ink)',
       background: 'var(--surface)',
       padding: '12px 22px',
@@ -101,8 +101,8 @@ export function BottomBar({
       gap: 22,
     }}>
       {/* Mission picker + tonnage bar */}
-      <div style={{ minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+      <div className="bottombar-tonnage" style={{ minWidth: 0 }}>
+        <div className="bottombar-mission-row" style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
           <span className="label" style={{ marginRight: 4 }}>Mission</span>
           {MISSION_ORDER.map(m => {
             const active = mission === m;
@@ -186,7 +186,7 @@ export function BottomBar({
       </div>
 
       {/* The two contrasting CTAs */}
-      <button onClick={onAddSupport} style={{
+      <button onClick={onAddSupport} className="bottombar-add-support" style={{
         background: 'transparent',
         color: 'var(--ink)',
         border: '2px solid var(--ink)',
@@ -199,7 +199,7 @@ export function BottomBar({
         Add Support
       </button>
 
-      <button onClick={onAddMech} style={{
+      <button onClick={onAddMech} className="bottombar-add-mech" style={{
         background: 'var(--rust)',
         color: 'var(--surface)',
         border: '2px solid var(--rust)',
