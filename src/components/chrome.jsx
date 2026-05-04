@@ -295,10 +295,11 @@ export function BottomBar({
         padding: '14px 22px', cursor: 'pointer',
         fontFamily: 'var(--font-stencil)', fontSize: 14, fontWeight: 700,
         letterSpacing: '0.14em', textTransform: 'uppercase',
-        display: 'inline-flex', alignItems: 'center', gap: 8,
+        display: 'inline-flex', alignItems: 'center', gap: 9,
         boxShadow: '0 2px 0 var(--rust-deep)',
       }}>
-        <Plus size={16} strokeWidth={2.5} />
+        <img src={asset('icons/hev.svg')} alt="" className="cta-mech-icon" />
+        <Plus size={14} strokeWidth={2.5} />
         Add HE-V
       </button>
     </div>
@@ -423,10 +424,11 @@ export function EmptyRoster({ onAdd }) {
           padding: '13px 22px', cursor: 'pointer',
           fontFamily: 'var(--font-stencil)', fontSize: 14, fontWeight: 700,
           letterSpacing: '0.16em', textTransform: 'uppercase',
-          display: 'inline-flex', alignItems: 'center', gap: 7,
+          display: 'inline-flex', alignItems: 'center', gap: 9,
           boxShadow: '0 2px 0 var(--rust-deep)',
         }}>
-          <Plus size={15} strokeWidth={2.5} />
+          <img src={asset('icons/hev.svg')} alt="" className="cta-mech-icon" />
+          <Plus size={13} strokeWidth={2.5} />
           Add HE-V
         </button>
       </div>

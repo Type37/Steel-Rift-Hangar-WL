@@ -389,8 +389,25 @@ function TeamRow({ team, eligible, minSize, canAssign, slotLeft, selected, onTog
 // FACTION PANEL
 // ============================================================
 
-export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
+export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk, factionLogo, onSetFactionLogo }) {
   const data = faction ? FACTIONS[faction] : null;
+
+  const handleLogoUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      alert('Please pick an image file.');
+      return;
+    }
+    if (file.size > 1024 * 1024) {
+      alert('Image is larger than 1 MB. Pick a smaller file or compress it first.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => onSetFactionLogo(reader.result);
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div>
       <SectionTitle tag={faction ? `${perks.length}/2 perks` : 'none'}>Faction</SectionTitle>
@@ -405,7 +422,7 @@ export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
       </div>
 
       {data && (
-        <div>
+        <>
           <p style={{ fontSize: 13.5, color: 'var(--ink-2)', lineHeight: 1.55, margin: '0 0 12px' }}>
             {data.blurb}
           </p>
@@ -421,6 +438,67 @@ export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
             </div>
           </div>
 
+          {/* Logo upload — appears only when a faction is picked.
+              Stored as data URL in state and embedded in the print header. */}
+          <div style={{
+            border: '1.5px dashed var(--rule-strong)',
+            background: 'var(--bg-deep)',
+            padding: '12px 14px',
+            marginBottom: 18,
+            display: 'flex', alignItems: 'center', gap: 14,
+          }}>
+            <div style={{
+              width: 56, height: 56, flexShrink: 0,
+              background: 'var(--surface)',
+              border: '1px solid var(--rule)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              overflow: 'hidden',
+            }}>
+              {factionLogo ? (
+                <img src={factionLogo} alt="Faction logo"
+                  style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+              ) : (
+                <span className="mono" style={{ fontSize: 10, color: 'var(--mute)', letterSpacing: '0.18em' }}>
+                  NO LOGO
+                </span>
+              )}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="label" style={{ marginBottom: 2 }}>Faction Logo</div>
+              <div style={{ fontSize: 12.5, color: 'var(--ink-2)', lineHeight: 1.45, marginBottom: 6 }}>
+                Optional. Shown next to your force name when you print.
+              </div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                <label className="add-btn" style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  border: '1.5px solid var(--ink)', background: 'transparent',
+                  color: 'var(--ink)', padding: '6px 12px', cursor: 'pointer',
+                  fontFamily: 'var(--font-stencil)', fontSize: 11.5, fontWeight: 700,
+                  letterSpacing: '0.12em', textTransform: 'uppercase',
+                }}>
+                  {factionLogo ? 'Replace' : 'Upload'}
+                  <input
+                    type="file"
+                    accept="image/png, image/jpeg, image/svg+xml, image/webp"
+                    onChange={handleLogoUpload}
+                    style={{ display: 'none' }}
+                  />
+                </label>
+                {factionLogo && (
+                  <button onClick={() => onSetFactionLogo(null)} className="add-btn"
+                    style={{
+                      border: '1.5px solid var(--rust)', background: 'transparent',
+                      color: 'var(--rust)', padding: '6px 12px', cursor: 'pointer',
+                      fontFamily: 'var(--font-stencil)', fontSize: 11.5, fontWeight: 700,
+                      letterSpacing: '0.12em', textTransform: 'uppercase',
+                    }}>
+                    Remove
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
           <div className="label" style={{ marginBottom: 8 }}>Perks (pick 2, max 1 per group)</div>
           {Object.entries(data.perks).map(([group, opts]) => {
             const inGroup = opts.find(o => perks.includes(o.name));
@@ -430,16 +508,21 @@ export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
                   fontSize: 12, color: 'var(--mute)',
                   paddingBottom: 2, borderBottom: '1px dotted var(--rule)', marginBottom: 6,
                 }}>
-                  ─ {group}
+                  {group}
                 </div>
                 {opts.map(o => {
                   const eq = perks.includes(o.name);
                   const blocked = !eq && (inGroup || perks.length >= 2);
+                  const blockedReason = !eq
+                    ? (inGroup ? `You already picked "${inGroup.name}" from this group; only one perk per group allowed.`
+                        : perks.length >= 2 ? 'You already picked 2 perks. Remove one first.' : null)
+                    : null;
                   return (
                     <button
                       key={o.name}
                       onClick={() => !blocked && onTogglePerk(o.name)}
                       disabled={blocked}
+                      title={blockedReason || (eq ? `Remove ${o.name}.` : `Add ${o.name}.`)}
                       className="add-btn"
                       style={{
                         display: 'grid',
@@ -475,7 +558,7 @@ export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
               </div>
             );
           })}
-        </div>
+        </>
       )}
     </div>
   );

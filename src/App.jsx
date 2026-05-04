@@ -17,6 +17,8 @@ export default function App() {
 
   const [faction, setFaction] = useState(null);
   const [perks, setPerks] = useState([]);
+  // Optional faction logo (data URL) used in the print header.
+  const [factionLogo, setFactionLogo] = useState(null);
 
   const [mechs, setMechs] = useState([]);
   const [supportAssets, setSupportAssets] = useState([]);
@@ -123,16 +125,11 @@ export default function App() {
         mechs={mechs} supportAssets={supportAssets}
         faction={faction} perks={perks} selectedTeams={selectedTeams}
         simpleMode={simpleMode}
+        factionLogo={factionLogo}
       />
 
-      {/* Steel Rift navbar at the very top */}
-      <Navbar />
-
-      <div className="app-shell no-print" style={{
-        display: 'grid',
-        gridTemplateRows: 'auto 1fr auto',
-        minHeight: '100vh',
-      }}>
+      <div className="app-shell no-print">
+        <Navbar />
         <TopBar
           forceName={forceName} onForceName={setForceName}
           onPrint={() => window.print()}
@@ -144,11 +141,7 @@ export default function App() {
         />
 
         {/* Main two-column layout */}
-        <div className="layout" style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(440px, 1fr) 1.35fr',
-          minHeight: 0,
-        }}>
+        <div className="layout">
           <aside className="sidebar scroll" style={{
             background: 'var(--bg)',
             borderRight: '1.5px solid var(--rule-strong)',
@@ -247,6 +240,8 @@ export default function App() {
                 perks={perks}
                 onSetFaction={handleSetFaction}
                 onTogglePerk={togglePerk}
+                factionLogo={factionLogo}
+                onSetFactionLogo={setFactionLogo}
               />
             )}
           </aside>
@@ -428,10 +423,11 @@ function FirstRunBriefing({ onAdd, simpleMode }) {
         padding: '15px 26px', cursor: 'pointer',
         fontFamily: 'var(--font-stencil)', fontSize: 15, fontWeight: 700,
         letterSpacing: '0.16em', textTransform: 'uppercase',
-        display: 'inline-flex', alignItems: 'center', gap: 9,
+        display: 'inline-flex', alignItems: 'center', gap: 11,
         boxShadow: '0 3px 0 var(--rust-deep)',
       }}>
-        + Add Your First HE-V
+        <img src={`${(import.meta.env.BASE_URL || '/').replace(/\/+$/, '/')}icons/hev.svg`} alt="" className="cta-mech-icon" style={{ width: 26, height: 26 }} />
+        Add Your First HE-V
       </button>
     </div>
   );

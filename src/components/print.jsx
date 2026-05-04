@@ -12,6 +12,7 @@ import { GLOSSARY } from '../glossary';
 export function PrintView({
   forceName, mission, customTons, mechs,
   supportAssets, faction, perks, selectedTeams, simpleMode,
+  factionLogo,
 }) {
   const useCustom = mission === 'Custom';
   const cap = useCustom ? customTons : MISSIONS[mission].tons;
@@ -21,7 +22,7 @@ export function PrintView({
 
   return (
     <div className="print-only" style={{
-      fontFamily: "'Space Grotesk', system-ui, sans-serif",
+      fontFamily: "'Schibsted Grotesk', system-ui, sans-serif",
       color: '#000',
       fontSize: 11.5,
       lineHeight: 1.45,
@@ -39,6 +40,7 @@ export function PrintView({
           faction={faction}
           perks={perks}
           teams={selectedTeams}
+          factionLogo={factionLogo}
         />
 
         {mechs.map((m, i) => (
@@ -72,33 +74,47 @@ export function PrintView({
 }
 
 // ----- Force header -----
-function ForceHeader({ forceName, mission, useCustom, cap, totalTons, mechCount, supportCount, faction, perks, teams }) {
+function ForceHeader({ forceName, mission, useCustom, cap, totalTons, mechCount, supportCount, faction, perks, teams, factionLogo }) {
   return (
     <div style={{
       borderBottom: '3px double #000',
       paddingBottom: 8,
       marginBottom: 14,
-      display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end',
+      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+      gap: 16,
     }}>
-      <div>
-        <div style={{
-          fontFamily: "'Chakra Petch', sans-serif",
-          fontSize: 28, fontWeight: 700, letterSpacing: '0.04em',
-          textTransform: 'uppercase',
-        }}>
-          {forceName || 'Unnamed Force'}
-        </div>
-        <div className="mono" style={{ fontSize: 10, color: '#444', marginTop: 4, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
-          THE FORGE · v1.5 · {new Date().toLocaleDateString()}
-        </div>
-        {(faction || teams.length > 0) && (
-          <div style={{ fontSize: 11, marginTop: 6 }}>
-            {faction && (
-              <span><strong>{faction}</strong>{perks.length > 0 && `; ${perks.join(' · ')}`}</span>
-            )}
-            {teams.length > 0 && <span> · <strong>Teams:</strong> {teams.join(', ')}</span>}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        {factionLogo && (
+          <div style={{
+            width: 64, height: 64, flexShrink: 0,
+            border: '1px solid #000',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            overflow: 'hidden',
+          }}>
+            <img src={factionLogo} alt={faction || 'faction logo'}
+              style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
           </div>
         )}
+        <div>
+          <div style={{
+            fontFamily: "'Chakra Petch', sans-serif",
+            fontSize: 28, fontWeight: 700, letterSpacing: '0.04em',
+            textTransform: 'uppercase',
+          }}>
+            {forceName || 'Unnamed Force'}
+          </div>
+          <div className="mono" style={{ fontSize: 10, color: '#444', marginTop: 4, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
+            THE FORGE · v1.5 · {new Date().toLocaleDateString()}
+          </div>
+          {(faction || teams.length > 0) && (
+            <div style={{ fontSize: 11, marginTop: 6 }}>
+              {faction && (
+                <span><strong>{faction}</strong>{perks.length > 0 && `; ${perks.join(' · ')}`}</span>
+              )}
+              {teams.length > 0 && <span> · <strong>Teams:</strong> {teams.join(', ')}</span>}
+            </div>
+          )}
+        </div>
       </div>
       <div style={{ textAlign: 'right' }}>
         <div className="stencil" style={{

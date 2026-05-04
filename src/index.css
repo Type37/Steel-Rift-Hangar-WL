@@ -27,12 +27,12 @@
   --warn:         #8a5a09;
   --orange:       #e07a26; /* "Buy Now" warm */
 
-  /* Chakra Petch is reserved for marquee headings ONLY */
+  /* Chakra Petch is reserved for marquee headings */
   --font-display:   'Chakra Petch', 'Bahnschrift', sans-serif;
-  /* Schibsted is the stencil/label workhorse */
-  --font-stencil:   'Schibsted Grotesk', system-ui, sans-serif;
-  /* Body text */
-  --font-body:      'Space Grotesk', system-ui, sans-serif;
+  /* Space Grotesk handles sub-headings, labels, button text */
+  --font-stencil:   'Space Grotesk', system-ui, sans-serif;
+  /* Schibsted Grotesk is the body workhorse */
+  --font-body:      'Schibsted Grotesk', system-ui, sans-serif;
   /* Data / mono */
   --font-mono:      'JetBrains Mono', ui-monospace, monospace;
 }
@@ -225,6 +225,20 @@ button:not(:disabled):active {
 }
 .cta-mech:hover:not(:disabled)::after {
   left: 130%;
+}
+
+/* HE-V silhouette icon used inline on Add HE-V buttons. Inherits color
+   via filter: light icon on rust button. */
+.cta-mech-icon {
+  width: 22px;
+  height: 22px;
+  display: inline-block;
+  /* invert dark SVG to match cream/surface text */
+  filter: brightness(0) invert(1);
+  flex-shrink: 0;
+}
+.cta-mech-icon.icon-dark {
+  filter: none; /* used on light buttons */
 }
 
 /* Pulsing glow for empty-roster prompts that want attention */
@@ -429,27 +443,47 @@ button:not(:disabled):active {
 .hp-box.structure { background: #fff; border-style: solid; border-width: 2px; }
 
 /* ============================================================
-   RESPONSIVE
+   APP SHELL: header + footer always visible, middle scrolls.
+   This applies at every viewport; the mobile media queries below
+   only change how the inner layout stacks.
    ============================================================ */
-@media (min-width: 761px) {
-  .app-shell {
-    height: calc(100vh - 50px); /* navbar height */
-    overflow: hidden;
-  }
-  .layout {
-    overflow: hidden;
-  }
-  .sidebar {
-    overflow-y: auto;
-  }
-  .editor-col {
-    overflow-y: auto;
-  }
+.app-shell {
+  height: 100vh;          /* fallback */
+  height: 100dvh;         /* honors mobile URL bar correctly */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.app-shell > .navbar-strip,
+.app-shell > .topbar,
+.app-shell > .bottombar {
+  flex-shrink: 0;
+}
+.app-shell > .layout {
+  flex: 1;
+  min-height: 0;
 }
 
+/* Desktop: side-by-side, each pane scrolls independently */
+@media (min-width: 961px) {
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(440px, 1fr) 1.35fr;
+    overflow: hidden;
+  }
+  .sidebar { overflow-y: auto; }
+  .editor-col { overflow-y: auto; }
+}
+
+/* Tablet + mobile: stacked, layout is the scroller */
 @media (max-width: 960px) {
   .layout {
-    grid-template-columns: 1fr !important;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .sidebar, .editor-col {
+    overflow: visible;
   }
   .editor-col {
     border-left: none !important;
@@ -461,83 +495,73 @@ button:not(:disabled):active {
   }
 }
 
+/* Phones: trim header/footer chrome so the middle has more room */
 @media (max-width: 760px) {
   body { font-size: 15px; }
 
+  /* Compact navbar: hide link list to keep header short.
+     Logo + Buy Now stay visible. */
   .navbar-inner {
     padding: 8px 14px;
-    gap: 10px;
+    gap: 12px;
+    flex-wrap: nowrap;
   }
   .navbar-logo img { height: 18px; }
-  .navbar-links {
-    order: 3;
-    width: 100%;
-    justify-content: flex-start;
-    gap: 0;
-  }
-  .navbar-links a {
-    padding: 5px 8px;
-    font-size: 12px;
-  }
+  .navbar-links { display: none; }
   .navbar-buynow {
     font-size: 11px;
-    padding: 6px 10px;
+    padding: 6px 12px;
+    margin-left: auto;
   }
 
+  /* Compact topbar: drop the counter strip on phones (tonnage is in
+     the bottom bar, the rest is reachable via tabs). */
   .topbar {
     grid-template-columns: 1fr auto !important;
     grid-template-rows: auto auto;
-    gap: 8px 12px !important;
-    padding: 10px 14px !important;
+    gap: 6px 12px !important;
+    padding: 8px 14px !important;
   }
-  .topbar-wordmark {
-    grid-column: 1;
-    grid-row: 1;
-  }
+  .topbar-wordmark { grid-column: 1; grid-row: 1; }
   .topbar-wordmark > div:first-child { font-size: 16px !important; }
   .topbar-tagline { display: none; }
+  .topbar-counters { display: none !important; }
 
   .topbar-actions {
     grid-column: 2;
     grid-row: 1;
     justify-self: end;
-    gap: 8px !important;
+    gap: 6px !important;
   }
   .topbar-print-label { display: none; }
-  .topbar-print { padding: 8px 10px !important; }
+  .topbar-print { padding: 7px 10px !important; }
 
   .topbar-force {
     grid-column: 1 / -1;
     grid-row: 2;
     border-top: 1px dotted var(--rule);
-    padding-top: 8px;
+    padding-top: 6px !important;
+    gap: 0 !important;
   }
+  .topbar-force input { font-size: 16px !important; }
 
+  /* Bottom bar: 2-col grid for the CTAs, mission row spans full width */
   .bottombar {
     grid-template-columns: 1fr 1fr !important;
-    gap: 10px !important;
-    padding: 10px 12px !important;
+    gap: 8px !important;
+    padding: 8px 12px !important;
   }
-  .bottombar-mission-row { gap: 4px !important; }
+  .bottombar-mission-row { gap: 4px !important; margin-bottom: 6px !important; }
   .bottombar-add-support, .bottombar-add-mech {
-    padding: 12px 14px !important;
-    font-size: 13px !important;
-    letter-spacing: 0.12em !important;
+    padding: 11px 12px !important;
+    font-size: 12.5px !important;
+    letter-spacing: 0.10em !important;
     justify-content: center !important;
     width: 100%;
   }
-  .bottombar-add-support {
-    grid-row: 3;
-    grid-column: 1;
-  }
-  .bottombar-add-mech {
-    grid-row: 3;
-    grid-column: 2;
-  }
-  .bottombar-tonnage {
-    grid-column: 1 / -1;
-    grid-row: 1;
-  }
+  .bottombar-add-support { grid-row: 3; grid-column: 1; }
+  .bottombar-add-mech { grid-row: 3; grid-column: 2; }
+  .bottombar-tonnage { grid-column: 1 / -1; grid-row: 1; }
 
   .sidebar { padding: 14px 12px 20px !important; }
   .editor-col { padding: 18px 14px 28px !important; }
