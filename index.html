@@ -1,32 +1,19 @@
 <!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8"/>
-    <link rel="icon" type="image/svg+xml" href="/steel-rift-favicon.svg"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./steel-rift-favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#15110d" />
+    <title>The Forge // Steel Rift Listbuilder</title>
+    <meta name="description" content="An unofficial Steel Rift listbuilder. Build forces, configure HE-Vs, track tonnage." />
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Chakra+Petch:wght@400;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.cdnfonts.com/css/vcr-osd-mono" rel="stylesheet">
-    <title>Steel Rift: Hangar</title>
-</head>
-<body>
-<div id="app"></div>
-<script type="module" src="/src/main.js"></script>
-<div class="container text-center" id="failsafe-container">
-    <div class="card">
-        <div class="card-body">
-            <p>If the app does not load you could try this:</p>
-            <button
-                    class="btn btn-secondary btn-lg"
-                    type="button"
-                    onclick="localStorage.clear(); location.reload()"
-            >
-                Clear Local Storage and refresh
-            </button>
-        </div>
-    </div>
-</div>
-
-</body>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>

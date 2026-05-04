@@ -1,33 +1,21 @@
 {
-  "name": "steel-rift-list-builder",
+  "name": "steel-rift-forge",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
+  "description": "An unofficial listbuilder for the Steel Rift modular mech wargame (rules v1.5).",
   "scripts": {
-    "dev": "vite --port 5373",
+    "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
-    "bootstrap": "^5.3.6",
-    "bootstrap-vue-next": "^0.29.3",
-    "es-toolkit": "^1.38.0",
-    "file-saver": "^2.0.5",
-    "pinia-plugin-persistedstate": "^4.3.0",
-    "vue": "^3.5.14",
-    "vue-dndrop": "^1.3.5",
-    "vue-router": "^4.5.1",
-    "vuedraggable": "^4.1.0"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "lucide-react": "^0.460.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.2.4",
-    "pinia": "^3.0.2",
-    "pinia-scope": "^1.7.0",
-    "sass": "^1.77.6",
-    "sass-embedded": "^1.77.5",
-    "unplugin-vue-components": "^28.5.0",
-    "vite": "^6.3.5",
-    "vite-plugin-svgs-icons": "^1.0.10",
-    "vite-plugin-vue-devtools": "^7.7.6"
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11"
   }
 }
