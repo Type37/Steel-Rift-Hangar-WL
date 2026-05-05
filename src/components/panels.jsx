@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check } from 'lucide-react';
+import { Check, Plus, Minus } from 'lucide-react';
 import { OFF_TABLE_ASSETS, ADVANCED_ASSETS, FACTIONS, FACTION_LOGOS, TEAMS } from '../data';
 import { checkTeamEligibility, slotsForBand, findAsset } from '../calc';
 import { SectionTitle, Chip, TextButton, TraitList, RowExpand, InlineTraitGlossary, collectTraits } from './ui';
@@ -711,11 +711,9 @@ export function SupportDetailView({ assetName, customName, loadout, onSetLoadout
   if (!a) return null;
   const traitNames = collectTraits(a.stats?.Traits || '');
 
-  // Resolve effective loadout: use stored, else default to first sub-unit
-  // duplicated across all slots.
-  const effectiveLoadout = loadout || (
-    a.subunits && a.unitCount ? Array(a.unitCount).fill(a.subunits[0]?.name) : []
-  );
+  // Resolve effective loadout. Defaults to empty so the user assembles
+  // their squadron deliberately by clicking + on each desired type.
+  const effectiveLoadout = loadout || [];
 
   return (
     <div style={{ maxWidth: 760 }}>
@@ -905,10 +903,11 @@ function SubUnitPicker({ asset: a, loadout, onChange }) {
 
   return (
     <div style={{
-      border: '2px solid var(--rust)',
+      border: '2px solid var(--teal)',
       background: 'var(--bg)',
       padding: '14px 14px 12px',
       marginBottom: 18,
+      borderRadius: 6,
     }}>
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -942,6 +941,7 @@ function SubUnitPicker({ asset: a, loadout, onChange }) {
                 padding: '8px 10px',
                 background: count > 0 ? 'var(--surface)' : 'transparent',
                 border: '1px solid var(--rule)',
+                borderRadius: 4,
               }}
             >
               <div style={{ minWidth: 0 }}>
@@ -974,7 +974,7 @@ function SubUnitPicker({ asset: a, loadout, onChange }) {
                   title={`Remove one ${su.name}`}
                   style={pickerBtn(canRemove(su.name), 'down')}
                 >
-                  \u2212
+                  <Minus size={14} strokeWidth={2.75} />
                 </button>
                 <div className="mono" style={{
                   width: 28, textAlign: 'center',
@@ -988,7 +988,7 @@ function SubUnitPicker({ asset: a, loadout, onChange }) {
                   title={blocked ? 'Cannot add another' : `Add a ${su.name}`}
                   style={pickerBtn(!blocked, 'up')}
                 >
-                  +
+                  <Plus size={14} strokeWidth={2.75} />
                 </button>
               </div>
             </div>
@@ -1000,16 +1000,48 @@ function SubUnitPicker({ asset: a, loadout, onChange }) {
 }
 
 function pickerBtn(enabled, dir) {
+  if (!enabled) {
+    return {
+      width: 32, height: 32,
+      border: '1.5px solid var(--rule)',
+      background: 'transparent',
+      color: 'var(--rule)',
+      cursor: 'not-allowed',
+      borderRadius: 4,
+      padding: 0,
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      opacity: 0.45,
+    };
+  }
+  if (dir === 'up') {
+    return {
+      width: 32, height: 32,
+      border: '1.5px solid var(--olive-deep)',
+      background: 'var(--olive)',
+      color: 'var(--surface)',
+      cursor: 'pointer',
+      borderRadius: 4,
+      padding: 0,
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      boxShadow: '0 1px 0 var(--olive-deep)',
+    };
+  }
+  // down
   return {
-    width: 28, height: 28,
+    width: 32, height: 32,
     border: '1.5px solid var(--rule-strong)',
-    background: enabled ? (dir === 'up' ? 'var(--olive)' : 'var(--surface-2)') : 'var(--bg-deep)',
-    color: enabled ? (dir === 'up' ? 'var(--surface)' : 'var(--ink)') : 'var(--mute)',
-    cursor: enabled ? 'pointer' : 'not-allowed',
-    fontFamily: 'var(--font-mono)',
-    fontSize: 16, fontWeight: 700,
+    background: 'var(--surface)',
+    color: 'var(--ink)',
+    cursor: 'pointer',
+    borderRadius: 4,
     padding: 0,
-    opacity: enabled ? 1 : 0.5,
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   };
 }
 

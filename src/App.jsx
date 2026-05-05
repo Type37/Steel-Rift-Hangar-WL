@@ -195,13 +195,12 @@ export default function App() {
         setSelectedMechId(null);
         const a = findAsset(name);
         if (a?.subunits && a?.unitCount && !supportLoadouts[name]) {
-          const first = a.subunits[0]?.name;
-          if (first) {
-            setSupportLoadouts(prev => ({
-              ...prev,
-              [name]: Array(a.unitCount).fill(first),
-            }));
-          }
+          // Start empty so the user can assemble the squadron deliberately;
+          // the + buttons remain enabled until target is reached.
+          setSupportLoadouts(prev => ({
+            ...prev,
+            [name]: [],
+          }));
         }
       } else if (selectedSupportName === name) {
         setSelectedSupportName(null);

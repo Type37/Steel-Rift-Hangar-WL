@@ -29,6 +29,12 @@
      the two reads don't collide visually. */
   --crimson:      #8e2620;
   --crimson-deep: #5e1611;
+  /* Teal: the secondary action color. Visual complement to rust on the
+     color wheel; distinct from steel which is bluer. WCAG AA against
+     cream text (5.83:1 vs --surface). */
+  --teal:         #16626e;
+  --teal-deep:    #0e424a;
+  --teal-bright:  #1f7886;
   --warn:         #8a5a09;
   --orange:       #e07a26; /* "Buy Now" warm */
 
@@ -175,6 +181,9 @@ button:not(:disabled):active {
 }
 
 /* Mission chips, class picker, tabs: glow on hover */
+.chip-hover {
+  border-radius: 4px;
+}
 .chip-hover:hover:not(:disabled) {
   background: var(--surface-2);
   border-color: var(--ink) !important;
@@ -189,9 +198,12 @@ button:not(:disabled):active {
   transform: scale(1.07);
 }
 
-/* Catalog Add buttons should feel tactile */
+/* Catalog Add buttons should feel tactile. Subtle rounding so they read
+   as buttons rather than military stencils, but not so much that they
+   look like pills or app-store CTAs. */
 .add-btn {
-  transition: background 100ms, color 100ms, border-color 100ms, transform 80ms;
+  border-radius: 4px;
+  transition: background 100ms, color 100ms, border-color 100ms, transform 80ms, box-shadow 80ms;
 }
 .add-btn:hover:not(:disabled) {
   filter: brightness(1.06);
@@ -288,15 +300,21 @@ button:not(:disabled):active {
   align-items: center;
   gap: 5px;
   white-space: nowrap;
+  border-radius: 4px 0 0 4px;
+  transition: filter 100ms;
 }
+.bottombar-mission-button:hover { filter: brightness(1.08); }
 .bottombar-mission-label { line-height: 1; }
 .bottombar-ton-bar {
   width: 144px;
   height: 28px;
   background: var(--bg-deep);
   border: 1.5px solid var(--rule-strong);
+  border-left: none;
   position: relative;
   flex-shrink: 0;
+  border-radius: 0 4px 4px 0;
+  overflow: hidden;
 }
 .bottombar-ton-fill {
   position: absolute;
@@ -353,7 +371,7 @@ button:not(:disabled):active {
 }
 .mission-popover-item.is-active .mono { color: rgba(241, 234, 218, 0.7) !important; }
 
-/* Add HE-V CTA: rust solid */
+/* Add HE-V CTA: rust solid with shadow lift, the primary action */
 .bottombar-add-mech {
   background: var(--rust);
   color: var(--surface);
@@ -369,12 +387,26 @@ button:not(:disabled):active {
   align-items: center;
   gap: 5px;
   white-space: nowrap;
+  border-radius: 5px;
   box-shadow: 0 2px 0 var(--rust-deep);
+  transition: background 110ms, box-shadow 80ms, transform 80ms;
 }
+.bottombar-add-mech:hover {
+  background: var(--rust-bright);
+  border-color: var(--rust-bright);
+  box-shadow: 0 3px 0 var(--rust-deep);
+}
+.bottombar-add-mech:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 var(--rust-deep);
+}
+
+/* Add Support CTA: teal solid with shadow lift, secondary action.
+   Same hover/active treatment as Add HE-V to read as a matching pair. */
 .bottombar-add-support {
-  background: transparent;
-  color: var(--ink);
-  border: 2px solid var(--ink);
+  background: var(--teal);
+  color: var(--surface);
+  border: 2px solid var(--teal);
   padding: 5px 12px;
   cursor: pointer;
   font-family: var(--font-stencil);
@@ -386,6 +418,18 @@ button:not(:disabled):active {
   align-items: center;
   gap: 5px;
   white-space: nowrap;
+  border-radius: 5px;
+  box-shadow: 0 2px 0 var(--teal-deep);
+  transition: background 110ms, box-shadow 80ms, transform 80ms;
+}
+.bottombar-add-support:hover {
+  background: var(--teal-bright);
+  border-color: var(--teal-bright);
+  box-shadow: 0 3px 0 var(--teal-deep);
+}
+.bottombar-add-support:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 var(--teal-deep);
 }
 
 /* Force input lives on the right and shrinks last */
@@ -432,10 +476,20 @@ button:not(:disabled):active {
   letter-spacing: 0.10em;
   text-transform: uppercase;
   flex-shrink: 0;
+  border-radius: 4px;
+  transition: background 100ms, border-color 100ms;
+}
+.util-btn:hover {
+  background: var(--bg);
+  border-color: var(--ink);
 }
 .util-btn-print {
   background: var(--ink);
   color: var(--surface);
+  border-color: var(--ink);
+}
+.util-btn-print:hover {
+  background: #2d2620;
   border-color: var(--ink);
 }
 
