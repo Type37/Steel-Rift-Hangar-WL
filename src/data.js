@@ -59,23 +59,24 @@ export const MELEE = [
   { name: 'Shock Net',          cost: [3,4,5,6], dmg: ['-','-','-','-'], traits: 'Melee (1/1/2/2), Stagger, Tether' },
 ];
 
-// ---- Upgrades (p. 24, 86) ----
+// ---- Upgrades (p. 24) — v1.5 correct costs ----
+// NOTE: Quick Reference (p.86) has v1.0 costs; these p.24 values are authoritative.
 export const UPGRADES = [
-  { name: 'Anti Missile System',         cost: [3,5,6,8],          compact: false, rule: 'This Unit may not be Targeted by a Weapon using the Smart trait if that Weapon is using the LoS of another Model.' },
-  { name: 'Combat Shield',               cost: [2,3,4,5],          compact: false, rule: 'When damaged by ENGAGE/SMASH from Front/Side, or makes a Defense Roll vs Blast, with >0 Armor: roll 1D6 per damage point, on 5+ ignore that point. Damage negated counts as not having happened for traits like AP. When this HE-V performs an ENGAGE, all of its Weapons receive -1 Damage Rating.' },
-  { name: 'Coolant Tanks',               cost: [2,'-','-','-'],    compact: false, rule: 'At any point during a turn, this Unit may remove one Redline Marker. Limited (2).' },
-  { name: 'Directional Thruster',        cost: [3,4,5,6],          compact: false, rule: 'This Unit gains the Dash (2) Order: move up to 2", then resolve a SMASH or ENGAGE. The secondary Order does not count toward the 2 Order limit.' },
-  { name: 'Electronic Countermeasures',  cost: [2,4,6,8],          compact: false, rule: 'This Unit may not be targeted by LOCK ON Orders.' },
-  { name: 'Haptic Suit',                 cost: [2,2,1,1],          compact: true,  rule: 'When performing a Return Fire, you may re-roll any dice in the Defense Roll (not just natural 1s). Compact.' },
-  { name: 'Heavy Reactor',               cost: [2,3,4,5],          compact: false, rule: 'When this Unit would take Structure damage from Overdrive or receiving a Redline Marker, roll 1D6. On 4+, that damage is ignored.' },
-  { name: 'High Speed Servos',           cost: [3,4,6,7],          compact: false, rule: 'After performing a SMASH Order, this Unit may perform a second SMASH Order. The second SMASH does not count against the 2-Order limit and gets no movement bonuses.' },
-  { name: 'Jump Jets',                   cost: [3,4,5,6],          compact: false, rule: 'This Unit may perform the JUMP Order.' },
-  { name: 'Mine Drone Carrier System',   cost: [2,3,4,5],          compact: false, rule: 'This Unit has the Minelayer (MOVE) trait. Limited (1/2/3/3).' },
-  { name: 'Mine Drone Tracking Munitions', cost: [2,3,5,6],        compact: false, rule: 'When making an ENGAGE Order, this Unit may target a Mine Drone Token. The Token\'s Commander makes Defense Rolls on 3+; if at least one point of Damage would be inflicted, remove the Token.' },
-  { name: 'Neural Input',                cost: [2,3,4,5],          compact: true,  rule: 'Reduce the Damage Rating of SMASH Orders targeting this Unit by 1. Compact.' },
-  { name: 'Nitro Boost',                 cost: [2,2,4,5],          compact: false, rule: 'At the beginning of a MOVE Order, you may move an additional 4". Limited (1).' },
-  { name: 'Optic Camouflage',            cost: [2,3,4,5],          compact: false, rule: '+1 to Defense Rolls for this Unit when the Active Unit is outside 10".' },
-  { name: 'Target Designator',           cost: [2,4,6,8],          compact: false, rule: 'After this Unit completes an Activation, place a Target Designator Marker on it (not after a JUMP). Remove the Marker at the start of its next Activation.' },
+  { name: 'Anti Missile System',           cost: [1,1,2,2],          compact: false, rule: 'This Unit may not be Targeted by a Weapon using the Smart trait if that Weapon is using the LoS of another Model.' },
+  { name: 'Combat Shield',                 cost: ['-','-',4,5],      compact: false, rule: 'When damaged by ENGAGE/SMASH from Front/Side, or makes a Defense Roll vs Blast, with >0 Armor: roll 1D6 per damage point, on 5+ ignore that point. Damage negated counts as not having happened for traits like AP. When this HE-V performs an ENGAGE, all of its Weapons receive -1 Damage Rating.' },
+  { name: 'Coolant Tanks',                 cost: [1,1,2,2],          compact: false, rule: 'At any point during a turn, this Unit may remove one Redline Marker. Limited (2).' },
+  { name: 'Directional Thruster',          cost: [1,2,3,4],          compact: false, rule: 'This Unit gains the Dash (2) Order: move up to 2", then resolve a SMASH or ENGAGE. The secondary Order does not count toward the 2 Order limit.' },
+  { name: 'Electronic Countermeasures',    cost: [2,2,1,1],          compact: false, rule: 'This Unit may not be targeted by LOCK ON Orders.' },
+  { name: 'Haptic Suit',                   cost: [2,2,1,1],          compact: true,  rule: 'When performing a Return Fire, you may re-roll any dice in the Defense Roll (not just natural 1s). Compact.' },
+  { name: 'Heavy Reactor',                 cost: [1,1,2,2],          compact: false, rule: 'When this Unit would take Structure damage from Overdrive or receiving a Redline Marker, roll 1D6. On 4+, that damage is ignored.' },
+  { name: 'High Speed Servos',             cost: [2,3,4,5],          compact: false, rule: 'After performing a SMASH Order, this Unit may perform a second SMASH Order. The second SMASH does not count against the 2-Order limit and gets no movement bonuses.' },
+  { name: 'Jump Jets',                     cost: [3,3,2,2],          compact: false, rule: 'This Unit may perform the JUMP Order.' },
+  { name: 'Mine Drone Carrier System',     cost: [2,3,5,5],          compact: false, rule: 'This Unit has the Minelayer (MOVE) trait. Limited (1/2/3/3).' },
+  { name: 'Mine Drone Tracking Munitions', cost: [1,1,2,2],          compact: false, rule: 'When making an ENGAGE Order, this Unit may target a Mine Drone Token. The Token\'s Commander makes Defense Rolls on 3+; if at least one point of Damage would be inflicted, remove the Token.' },
+  { name: 'Neural Input',                  cost: [2,2,1,1],          compact: true,  rule: 'Reduce the Damage Rating of SMASH Orders targeting this Unit by 1. Compact.' },
+  { name: 'Nitro Boost',                   cost: [1,1,2,2],          compact: false, rule: 'At the beginning of a MOVE Order, you may move an additional 4". Limited (1).' },
+  { name: 'Optic Camouflage',              cost: [5,4,3,2],          compact: false, rule: '+1 to Defense Rolls for this Unit when the Active Unit is outside 10".' },
+  { name: 'Target Designator',             cost: [2,1,1,1],          compact: false, rule: 'After this Unit completes an Activation, place a Target Designator Marker on it (not after a JUMP). Remove the Marker at the start of its next Activation.' },
 ];
 
 // ---- Defensive configurations (p. 25, 87) ----
@@ -198,7 +199,7 @@ export const ADVANCED_ASSETS = [
         weapons: 'Tank Missiles ×2',
         traits: '—' },
       { name: 'Infantry Assault Tank', spd: '6"', arm: '8', str: '8',
-        weapons: 'Tank Howitzer, Rotary Cannon, Dozer Blade, Submunitions',
+        weapons: 'Tank Howitzer, Rotary Cannon, Tank Dozer Blade, Submunitions',
         traits: 'Garrison (4 Infantry Squads)' },
     ],
   },
@@ -254,7 +255,7 @@ export const ADVANCED_ASSETS = [
 export const VEHICLE_WEAPONS = [
   { name: 'AA Array',           dmg: '2 (Anti-Air)', traits: 'Anti-Air, Flak, Light, Short (24")' },
   { name: 'Vehicle Autocannon', dmg: '2',            traits: 'Kinetic' },
-  { name: 'Dozer Blade',        dmg: '—',            traits: 'Smasher (Heavy, 1), Concussive (2)' },
+  { name: 'Dozer Blade',        dmg: '—',            traits: 'Smasher (Medium, X), Concussive (2)' },
   { name: 'Missile Pack',       dmg: '3',            traits: 'Smart, Limited (3)' },
   { name: 'Submunitions',       dmg: '1',            traits: 'Short (6"), Flak' },
   { name: 'Vehicle Howitzer',   dmg: '3',            traits: 'Smart, Blast (3"), Kinetic' },
@@ -267,9 +268,14 @@ export const VEHICLE_WEAPONS = [
   { name: 'Rotary Cannon',      dmg: '5',            traits: 'Short (12"), Light' },
   { name: 'Autocannon',         dmg: '2',            traits: 'Short (12"), Kinetic' },
   { name: 'Rocket Pack',        dmg: '3',            traits: 'Blast (3"), Limited (3)' },
-  // LAS-Wing weapons
-  { name: 'AG Missiles',        dmg: '2',            traits: 'Smart, Limited (2)' },
-  { name: 'Barrage Rockets',    dmg: '3',            traits: 'Blast (3"), Limited (2)' },
+  // LAS-Wing weapons (p.65)
+  { name: 'AG Missiles',        dmg: '5×(X)',         traits: 'Limited (2), Short (18")' },
+  { name: 'Barrage Rockets',    dmg: '7×(X)',         traits: 'Blast (3"), Light, Limited (2)' },
+  { name: 'LV Autocannon',      dmg: '2×(X)',         traits: 'Short (12"), Kinetic' },
+  { name: 'Missile Pod',        dmg: '2×(X)',         traits: 'Smart, Limited (2), Short (12")' },
+  { name: 'LV Cluster Rockets', dmg: '4×(X)',         traits: 'Blast (3"), Light, Limited (2)' },
+  // Heavy Tank weapons (p.70) — note Dozer Blade here is Smasher Heavy,1 not Medium,X
+  { name: 'Tank Dozer Blade',   dmg: '—',             traits: 'Smasher (Heavy, 1), Concussive (2)' },
   // Infantry and Power Suit weapons (damage rating is per X models)
   { name: 'Infantry Rifles',         dmg: '2×(X)', traits: 'Short (6"), Light' },
   { name: 'Heavy Infantry Rifles',   dmg: '3×(X)', traits: 'Short (6"), Light' },
