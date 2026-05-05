@@ -82,9 +82,6 @@ export function AddMechModal({ open, onClose, onConfirm, callsignPool, customCal
             Roll
           </button>
         </div>
-        <div className="mono" style={{ fontSize: 11, color: 'var(--mute)', marginBottom: 18 }}>
-          Pool: <strong style={{ color: 'var(--ink-2)' }}>{callsignPool}</strong>. Change in Options.
-        </div>
 
         <FieldLabel>Description (optional)</FieldLabel>
         <textarea
@@ -277,9 +274,7 @@ export function OptionsModal({
             </div>
           </button>
         </div>
-        <div style={{ fontSize: 12, color: 'var(--mute)', marginBottom: 22, lineHeight: 1.5 }}>
-          Switching modes hides the optional sections. Your choices in those sections are kept and reapplied if you switch back.
-        </div>
+
 
         {/* Faction logo. Pick a shipped default or upload a custom one. */}
         <FieldLabel>Faction Logo</FieldLabel>
@@ -312,7 +307,7 @@ export function OptionsModal({
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 12.5, color: 'var(--ink-2)', lineHeight: 1.45, marginBottom: 6 }}>
-                Pick one of the shipped organization logos below, or upload your own.
+      
               </div>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 <label className="add-btn" style={{
@@ -347,9 +342,7 @@ export function OptionsModal({
 
           <FactionLogoPicker selected={factionLogo} onPick={setFactionLogo} />
         </div>
-        <div style={{ fontSize: 12, color: 'var(--mute)', marginBottom: 22, lineHeight: 1.5 }}>
-          Logos appear next to the force name on printed roster sheets.
-        </div>
+
 
         {/* Callsign pool */}
         <FieldLabel>Callsign Pool</FieldLabel>
@@ -364,7 +357,7 @@ export function OptionsModal({
           </Chip>
         </div>
         <div style={{ fontSize: 12, color: 'var(--mute)', marginBottom: 18, lineHeight: 1.5 }}>
-          The Roll button in the Add HE-V dialog draws from the active pool.
+          Names drawn for the Roll button in Add HE-V.
         </div>
 
         {callsignPool === 'Custom' && (

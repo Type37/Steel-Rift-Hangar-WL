@@ -39,7 +39,7 @@ export default function App() {
   // right pane with full details. Lives in memory only (not persisted).
   const [selectedSupportName, setSelectedSupportName] = useState(null);
 
-  const [callsignPool, setCallsignPool] = useState(stored.callsignPool ?? 'Mixed');
+  const [callsignPool, setCallsignPool] = useState(stored.callsignPool ?? 'Mythic');
   const [customCallsigns, setCustomCallsigns] = useState(stored.customCallsigns ?? []);
   // Per-asset nicknames so the user can rename their support units.
   const [supportNicknames, setSupportNicknames] = useState(stored.supportNicknames ?? {});
