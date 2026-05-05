@@ -265,10 +265,46 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete }) {
               equipped={equipped(w.name)} onAdd={addWeapon} onRemove={removeWeapon}
               expanded={expanded[w.name]} onToggle={() => toggleExpanded(w.name)} />
           ))}
-          {tab === 'upgrades' && UPGRADES.map(u => (
-            <UpgradeRow key={u.name} upgrade={u} mech={mech} onToggle={toggleUpgrade} onAssignDrone={assignDrone}
-              expanded={expanded[u.name]} onExpand={() => toggleExpanded(u.name)} />
-          ))}
+          {tab === 'upgrades' && (() => {
+            const regular = UPGRADES.filter(u => !u.variant && !u.drone);
+            const variants = UPGRADES.filter(u => u.variant);
+            const drones = UPGRADES.filter(u => u.drone);
+            const hasVariant = mech.upgrades.some(n => variants.find(v => v.name === n));
+            return (
+              <>
+                {regular.map(u => (
+                  <UpgradeRow key={u.name} upgrade={u} mech={mech} onToggle={toggleUpgrade} onAssignDrone={assignDrone}
+                    expanded={expanded[u.name]} onExpand={() => toggleExpanded(u.name)} />
+                ))}
+                {/* Variant Motive Types */}
+                <div style={{
+                  padding: '8px 14px', fontSize: 11, fontWeight: 700, letterSpacing: '0.14em',
+                  textTransform: 'uppercase', color: 'var(--mute)',
+                  borderTop: '2px solid var(--rule)', borderBottom: '1px solid var(--rule)',
+                  background: 'var(--bg)',
+                }}>
+                  Variant Motive Types <span style={{ fontWeight: 400 }}>· one per HE-V · cost 0t</span>
+                </div>
+                {variants.map(u => (
+                  <UpgradeRow key={u.name} upgrade={u} mech={mech} onToggle={toggleUpgrade} onAssignDrone={assignDrone}
+                    expanded={expanded[u.name]} onExpand={() => toggleExpanded(u.name)} />
+                ))}
+                {/* AI Companion Drones */}
+                <div style={{
+                  padding: '8px 14px', fontSize: 11, fontWeight: 700, letterSpacing: '0.14em',
+                  textTransform: 'uppercase', color: 'var(--mute)',
+                  borderTop: '2px solid var(--rule)', borderBottom: '1px solid var(--rule)',
+                  background: 'var(--bg)',
+                }}>
+                  AI Companion Drones <span style={{ fontWeight: 400 }}>· Compact · assign to a weapon or upgrade</span>
+                </div>
+                {drones.map(u => (
+                  <UpgradeRow key={u.name} upgrade={u} mech={mech} onToggle={toggleUpgrade} onAssignDrone={assignDrone}
+                    expanded={expanded[u.name]} onExpand={() => toggleExpanded(u.name)} />
+                ))}
+              </>
+            );
+          })()}
           {tab === 'defensive' && (
             <>
               <div style={{
@@ -858,7 +894,7 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand, onAssignDrone
         const drones = mech.drones || {};
         const assigned = drones[upgrade.name] || '';
         // Build list of eligible targets
-        const isMineDirector = upgrade.name === 'Mine Director Drone';
+        const isMineDirector = upgrade.name.includes('Mine Director');
         const eligibleWeapons = isMineDirector
           ? mech.upgrades.filter(n => n === 'Mine Drone Carrier System')
           : mech.weapons.map(w => w.name);
@@ -1003,7 +1039,7 @@ function DefRow({ def, mech, onToggle, atLimit, expanded, onExpand }) {
         const drones = mech.drones || {};
         const assigned = drones[upgrade.name] || '';
         // Build list of eligible targets
-        const isMineDirector = upgrade.name === 'Mine Director Drone';
+        const isMineDirector = upgrade.name.includes('Mine Director');
         const eligibleWeapons = isMineDirector
           ? mech.upgrades.filter(n => n === 'Mine Drone Carrier System')
           : mech.weapons.map(w => w.name);

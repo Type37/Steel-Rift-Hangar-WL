@@ -223,6 +223,31 @@ export const GLOSSARY = {
     title: 'Hunker Down',
     text: 'Available to Multi-Limbed HE-Vs. Move up to 10\"/8\"/6\"/4\" (counts as a MOVE Order), then place a Hunkered Down Marker. While Hunkered Down, incoming ENGAGE attacks treat this unit as Covered (or Blocked if already Covered). Removed if the Unit moves or is SMASHed.',
   },
+
+  'support: command and control station': {
+    title: 'SUPPORT: Command and Control Station',
+    text: 'When performing the SUPPORT Order: select an HE-V and move it up to 3" immediately (once per turn per Unit). Additionally, when calculating Tonnage for any Objective, if a friendly Unit within 12" is contributing, the controlling Commander may choose to win or lose any ties.',
+  },
+  'support: combat supplies': {
+    title: 'SUPPORT: Combat Supplies',
+    text: 'When performing the SUPPORT Order: select one Unit within 2" and choose one — restore 4 Armor to an HE-V (not above starting value), or restore one use of a Limited trait to a weapon, upgrade, or trait.',
+  },
+  'support: guidance suite': {
+    title: 'SUPPORT: Guidance Suite',
+    text: 'When performing the SUPPORT Order, this model counts as having the Guidance Suite (SUPPORT) trait.',
+  },
+  'support: multi-spectral obscuration emitter deployer': {
+    title: 'SUPPORT: MSOE Deployer',
+    text: 'When performing the SUPPORT Order, this model counts as having the MSOE Launcher (SUPPORT) trait.',
+  },
+  'support: mine-drone layer': {
+    title: 'SUPPORT: Mine-Drone Layer (X)',
+    text: 'When performing the SUPPORT Order, counts as having the Minelayer (SUPPORT) trait. Limited (X).',
+  },
+  'support orders': {
+    title: 'Support Orders',
+    text: 'Units with this trait have one or more "SUPPORT:" traits. They may perform the SUPPORT Order, activating the effect of any or all SUPPORT: traits. In a Squadron, all models must perform the SUPPORT Order together; each model with a SUPPORT: trait activates it individually.',
+  },
   'smasher': {
     title: 'Smasher (X, Y)',
     text: 'This Unit may perform SMASH Orders even with the Auxiliary Unit Trait. It counts as Weight Class X when SMASHing and adds Y dice to the Attack Pool.',
