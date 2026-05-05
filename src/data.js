@@ -257,6 +257,7 @@ export const ADVANCED_ASSETS = [
   },
 ];
 
+
 // Vehicle / sub-unit weapon profiles (p. 69). These are referenced by
 // support asset subunits but loaded out at the unit, not picked individually.
 export const VEHICLE_WEAPONS = [
@@ -295,21 +296,7 @@ export const VEHICLE_WEAPONS = [
   { name: 'Missile Launcher',        dmg: '2×(X)', traits: 'Short (12"), Smart, Limited (2)' },
   { name: 'Heavy Missile Launcher',  dmg: '2×(X)', traits: 'Short (12"), Limited (2), AP (2)' },
   { name: 'Electro-Arc Pulser',      dmg: '1×(X)', traits: 'Short (6"), Stagger' },
-
-  // ── UL HE-V Squadron ────────────────────────────────────────────────────────
-  { name: 'UL HE-V Squadron', cost: 10, kind: 'Vehicle',
-    summary: '3 Ultralight HE-Vs, all same type and Upgrade Pod.',
-    unitCount: 3, pickRule: 'allSame',
-    subunits: [
-      { name: 'Brawler',  spd: '7"', arm: '2', str: '1', weapons: 'UL Melee Weapons, Submunitions', traits: 'Magnetic Grapples' },
-      { name: 'Pyro',     spd: '6"', arm: '2', str: '1', weapons: 'UL Incinerators, Submunitions', traits: 'Inferno Gear' },
-      { name: 'Commando', spd: '7"', arm: '2', str: '1', weapons: 'Submunitions', traits: 'Scramblers, Target Designator' },
-      { name: 'Rifleman', spd: '6"', arm: '2', str: '1', weapons: 'UL Autocannon, UL Grenades', traits: 'Suppressive Fire' },
-    ],
-    stats: { 'Per model': 'All-Terrain, Squadron, Close Support, Auxiliary Unit (Ultralight)',
-             'Upgrade Pod': 'Short Range Missile Pack · Cluster Rockets · Launch Gear' },
-  },
-];
+];  // end VEHICLE_WEAPONS
 // ---- Infantry and Power Suit Squad tables (p.73) ----
 // These squads are recruited as Garrison Units inside other assets.
 export const INFANTRY_SQUADS = [

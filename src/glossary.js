@@ -11,7 +11,7 @@
 export const GLOSSARY = {
   'anti-air': {
     title: 'Anti-Air',
-    text: 'Targets with the Flying Trait suffer -2 to Defense Rolls vs this Weapon. If a Flying Squadron Model is destroyed, remaining damage may be applied to another Model in the Squadron as if it weren\'t a Flying Squadron.',
+    text: 'When targeting a Unit with the Flying trait, the Target is at -2 to Defense Rolls (e.g. normally avoids on 2+, now avoids on 4+). If this Weapon destroys a Model in a Flying Squadron, remaining damage may be applied to another Model in that Squadron as if it were not a Flying Squadron.',
   },
   'ap': {
     title: 'AP (X)',
@@ -19,7 +19,7 @@ export const GLOSSARY = {
   },
   'blast': {
     title: 'Blast (X")',
-    text: 'All Units (friend or foe) within X" of the Target Model also make a Defense Roll. The total Attack Pool equals the Attack Pool against the original Target. Each Unit\'s Defense Roll uses its own Weight Class. These Units are not "Targeted".',
+    text: 'All Units (friend or foe) within (X)" of the Target Model must also make a Defense Roll using the same total Attack Pool as the main target. Each Unit\'s Defense Roll is based on its own Weight Class. Units making these rolls are not considered Targeted.',
   },
   'bulky': {
     title: 'Bulky',
@@ -27,7 +27,7 @@ export const GLOSSARY = {
   },
   'concussive': {
     title: 'Concussive (X)',
-    text: 'When the Target suffers Damage, roll 1D6 (+1 per Class larger Active is, -1 per Class smaller). On 4+, move the Target up to X" directly away from the Active Unit. Collisions deal +1 Damage with no Defense Roll, on both Target and what it hit.',
+    text: 'On damage: roll 1D6, +1 per Weight Class larger than the Target, -1 per smaller. On 4+, move Target up to (X)" directly away. If it contacts Blocking Terrain or another Unit, it stops in base contact and both take 1 Damage with no Defense Roll.',
   },
   'compact': {
     title: 'Compact',
@@ -39,19 +39,19 @@ export const GLOSSARY = {
   },
   'disruptive': {
     title: 'Disruptive',
-    text: 'When the Target suffers Damage from this Weapon, the Active Commander rolls 1D6. On 3+, mark the Target with a Redline Marker. If a Unit already has one (or cannot receive one), it takes 1 Structure Damage instead.',
+    text: 'On damage, roll 1D6. On 3+, mark the Target with a Redline Marker. If the Unit already has one or cannot receive one, it takes 1 Structure Damage instead.',
   },
   'draining': {
     title: 'Draining',
-    text: 'When a Unit uses this Weapon during its Activation, mark it with a Redline Marker after Orders are completed (in addition to its Activation Marker). A Unit with a Redline Marker may not use this Weapon when performing an Order.',
+    text: 'After completing Orders in the Activation this Weapon was used, the Unit receives a Redline Marker (in addition to an Activation Marker). While the Unit already has a Redline Marker, it may not use this Weapon.',
   },
   'drag': {
     title: 'Drag',
-    text: 'When the Target suffers Damage, roll 1D6+4 (+1 per Class larger Active is, -1 per Class smaller). Move the Target that many inches directly toward the Active Unit. Collisions deal +1 Damage with no Defense Roll.',
+    text: 'On damage: roll 1D6+4, +1 per Weight Class larger than the Target, -1 per smaller. Move Target that many inches directly toward the Active Unit, stopping at base contact with the Active Unit. If it contacts Blocking Terrain or another Unit (not the Active Unit), it stops and both take 1 Damage with no Defense Roll.',
   },
   'flak': {
     title: 'Flak',
-    text: 'When this Unit is Targeted by a Weapon with "Missile" or "Rocket" in the name, and the Active Unit is in this Model\'s front 180°, reduce that Weapon\'s Attack Pool by 1. Also reduces Mine Drone Attack Pools by 1.',
+    text: 'When this Unit is Targeted by a Weapon with "Missile" or "Rocket" in the name and the Active Unit is in this Model\'s front 180°, reduce that Attack Pool by 1. Also reduces Mine Drone Attack Pools by 1.',
   },
   'frag': {
     title: 'Frag',
@@ -95,11 +95,11 @@ export const GLOSSARY = {
   },
   'stagger': {
     title: 'Stagger',
-    text: 'When the Target suffers Damage from this Weapon, the Target receives a Stagger Marker at the end of the Order. A Unit with a Stagger Marker is -1 to Defense Roll dice when Targeted by ENGAGE or SMASH. Removed after the next ENGAGE/SMASH Targeting it completes.',
+    text: 'On damage, Target receives a Stagger Marker. Staggered Units apply -1 to Defense Roll dice when Targeted by ENGAGE or SMASH; Marker is removed after that Order. If a Unit has a Stagger Marker at start of its Activation, it may only perform one Order and may not MOVE; Marker removed at end of Activation.',
   },
   'tether': {
     title: 'Tether',
-    text: 'Target receives a Tether Marker, the Active Unit a corresponding Anchor Marker. Tethered Units may not end MOVE or JUMP further from the Anchor. At end of a Tethered Unit\'s Activation, on a 4+ remove the Tether (and Anchor).',
+    text: 'On damage, Target receives a Tether Marker and the Active Unit receives an Anchor Marker. The Tethered Unit may not end a MOVE or JUMP further from the Anchor Unit. At end of the Tethered Unit\'s Activation roll D6 — on 4+, remove both Markers. Anchor Unit destroyed removes all corresponding Tethers. Overdrive does not remove the Marker.',
   },
 
   // -------- Advanced unit traits (for support assets, vehicles, infantry) --------
