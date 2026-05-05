@@ -560,22 +560,22 @@ function DmgBadge({ weapon, cls }) {
   if (!active || active === '-') return null;
 
   return (
-    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexShrink: 0 }}>
+    <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4, flexShrink: 0 }}>
       <span style={{
         fontFamily: 'var(--font-display)',
-        fontSize: 32, fontWeight: 700, lineHeight: 1,
+        fontSize: 28, fontWeight: 700, lineHeight: 1,
         color: 'var(--ink)',
       }}>{active}</span>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
         <span style={{ fontSize: 9, color: 'var(--mute)', letterSpacing: '0.06em' }}>
-          {meleeVals ? 'MELEE' : 'DMG'}
+          DICE
         </span>
-        <span style={{ fontSize: 10, color: 'var(--mute)', letterSpacing: '0.03em' }}>
+        <span style={{ fontSize: 10, color: 'var(--mute)' }}>
           {vals.map((v, i) => (
             <span key={i} style={{
               fontWeight: i === idx ? 700 : 400,
               color: i === idx ? 'var(--ink-2)' : 'var(--rule-strong)',
-            }}>{v}{i < 3 ? '/' : ''}</span>
+            }}>{v}</span>
           ))}
         </span>
       </div>
@@ -611,7 +611,7 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
         title={unavailableReason || undefined}
         style={{
           display: 'grid',
-          gridTemplateColumns: 'auto 1fr auto auto auto auto',
+          gridTemplateColumns: 'auto 1fr auto auto auto',
           alignItems: 'center', gap: 12,
           padding: '9px 14px',
         }}
@@ -621,6 +621,7 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
         <div style={{ minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
             <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--ink)' }}>{weapon.name}</span>
+            <DmgBadge weapon={weapon} cls={cls} />
             {available && (
               <>
                 <span className="mono" style={{ fontSize: 12, color: 'var(--rust)', fontWeight: 700 }}>{base}t</span>
@@ -641,8 +642,6 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
             <TraitList traits={weapon.traits} />
           </div>
         </div>
-
-        <DmgBadge weapon={weapon} cls={cls} />
 
         {count > 0 ? (
           <>
