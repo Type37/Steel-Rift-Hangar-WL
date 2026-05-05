@@ -552,7 +552,6 @@ button:not(:disabled):active {
   line-height: 1;
 }
 .drag-source:hover::after { opacity: 1; }
-.drag-source:hover { background: var(--surface-2) !important; }
 
 .faction-tiles {
   display: grid;
@@ -671,7 +670,6 @@ button:not(:disabled):active {
   line-height: 1;
 }
 .drag-source:hover::after { opacity: 1; }
-.drag-source:hover { background: var(--surface-2) !important; }
 
 .faction-tiles { grid-template-columns: 1fr; }
   .faction-tile { min-height: 0; padding: 12px 12px; }

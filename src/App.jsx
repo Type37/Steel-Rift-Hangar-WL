@@ -708,11 +708,10 @@ function FirstRunBriefing({ onAdd, simpleMode }) {
         textTransform: 'uppercase', margin: '0 0 18px',
         lineHeight: 1.05,
       }}>
-        Build a force for the next deployment.
+        Build your force.
       </h1>
       <p style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink-2)', margin: '0 0 22px' }}>
-        Pick a mission size below, add an HE-V, and start loading it out. Tonnage and slot use are tracked live.
-        {!simpleMode && ' Faction perks and HE-V Teams sit in the sidebar tabs once your roster fills out.'}
+        Pick a mission size, add HE-Vs, load them out.
       </p>
       <button onClick={onAdd} className="add-btn cta-mech cta-pulse" style={{
         background: 'var(--rust)', color: 'var(--surface)', border: 'none',

@@ -17,7 +17,6 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete }) {
   const defLimit = cls === 'Ultraheavy' ? 2 : 1;
 
   const [tab, setTab] = useState('ranged');
-  const wcBlurb = wc.blurb || '';
   const [expanded, setExpanded] = useState({});
   const toggleExpanded = (name) => setExpanded(s => ({ ...s, [name]: !s[name] }));
 
@@ -171,15 +170,6 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete }) {
           })}
         </div>
       </div>
-
-      {wc.blurb && (
-        <div style={{
-          fontSize: 12.5, color: 'var(--ink-2)', fontStyle: 'italic',
-          marginTop: 8, marginBottom: 4, lineHeight: 1.5,
-        }}>
-          {wc.blurb}
-        </div>
-      )}
 
       <TonBreakdown stats={stats} cls={cls} wc={wc} />
 

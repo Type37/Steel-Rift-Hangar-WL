@@ -226,7 +226,7 @@ export function MechCard({ mech, index, active, onSelect, assignedTo }) {
       draggable
       onDragStart={handleDragStart}
       className="add-btn drag-source"
-      title="Click to load out, drag to assign to a team"
+      
       style={{
         display: 'grid',
         gridTemplateColumns: 'auto auto 1fr auto',

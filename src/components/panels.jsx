@@ -427,7 +427,6 @@ function TeamRow({
               </span>
             </Tooltip>
           </div>
-          <div style={{ fontSize: 12.5, color: 'var(--ink-2)', marginTop: 2 }}>{team.blurb}</div>
         </div>
         <span />
         <button
@@ -592,7 +591,7 @@ function AssignmentStrip({
         <span style={{
           fontSize: 11.5, color: 'var(--mute)', fontStyle: 'italic',
         }}>
-          Drop a HE-V or support asset here, or tap +Assign.
+          Drag units here or use + Assign.
         </span>
       )}
       {assignedUnits.map(u => (
