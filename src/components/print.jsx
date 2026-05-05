@@ -312,12 +312,23 @@ function PipBlock({ kind, total }) {
 // ============================================================
 function SupportCard({ asset: a, customName, loadout }) {
   const stats = a.stats || {};
-  const traits = stats.Traits || stats.traits || '';
-  const statEntries = Object.entries(stats).filter(([k]) =>
-    !/Trait|trait|Description|description/i.test(k)
-  );
+  const traitStr = stats.Traits || stats.traits || '';
+  const perModelKey = Object.keys(stats).find(k => /per/i.test(k));
+  const perModelVal = perModelKey ? stats[perModelKey] : null;
 
-  // Roll up the loadout into "N x SubName" lines.
+  // Parse ARM and STR from per-model stat string e.g. "SPD 8\", ARM 3, STR 2"
+  const armMatch = perModelVal && perModelVal.match(/ARM\s*(\d+)/i);
+  const strMatch = perModelVal && perModelVal.match(/STR\s*(\d+)/i);
+  const spdMatch = perModelVal && perModelVal.match(/SPD\s*([^,]+)/i);
+  const armVal = armMatch ? parseInt(armMatch[1]) : null;
+  const strVal = strMatch ? parseInt(strMatch[1]) : null;
+  const spdVal = spdMatch ? spdMatch[1].trim() : null;
+
+  // For off-table assets, pull Damage stat
+  const dmgVal = stats.Damage || stats.damage || null;
+  const weaponsVal = stats.Weapons || stats.weapons || null;
+
+  // Roll up the loadout
   const loadoutBreakdown = (() => {
     if (!loadout || loadout.length === 0) return null;
     const counts = loadout.reduce((acc, n) => { acc[n] = (acc[n] || 0) + 1; return acc; }, {});
@@ -331,17 +342,49 @@ function SupportCard({ asset: a, customName, loadout }) {
         <div className="card-class-band">
           {a.kind.toUpperCase()} · {a.cost}t
         </div>
-        {customName && (
-          <div className="card-class-band" style={{ flex: 1, fontStyle: 'italic', fontSize: '6.5pt', color: '#555' }}>
-            ({a.name})
-          </div>
-        )}
       </div>
 
-      {a.summary && (
-        <div className="card-support-summary">{a.summary}</div>
+      {/* Stats row — SPD + Defend-On for on-table, Damage for off-table */}
+      {(spdVal || dmgVal) && (
+        <table className="card-stats-table" style={{ marginBottom: 2 }}>
+          <thead>
+            <tr>
+              {spdVal && <th>SPD</th>}
+              {dmgVal && <th>DMG</th>}
+              {spdVal && <th>Def</th>}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              {spdVal && <td>{spdVal}</td>}
+              {dmgVal && <td>{dmgVal}</td>}
+              {spdVal && <td>4+</td>}
+            </tr>
+          </tbody>
+        </table>
       )}
 
+      {/* Armor + Structure pips for on-table units */}
+      {(armVal || strVal) && (
+        <div className="card-row-damage" style={{ marginTop: 4 }}>
+          {armVal && (
+            <div className="card-armor-col">
+              <div className="hp-heading">ARMOR</div>
+              <PipBlock kind="armor" total={armVal} />
+            </div>
+          )}
+          {strVal && (
+            <div className="card-structure-col">
+              <div className="card-structure-stack">
+                <div className="hp-heading">STRUCTURE</div>
+                <PipBlock kind="structure" total={strVal} />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Loadout for sub-unit pickers */}
       {loadoutBreakdown && (
         <>
           <div className="card-section-heading">LOADOUT</div>
@@ -353,31 +396,26 @@ function SupportCard({ asset: a, customName, loadout }) {
         </>
       )}
 
-      {statEntries.length > 0 && (
+      {/* Weapons */}
+      {weaponsVal && (
         <>
-          <div className="card-section-heading">STATS</div>
-          <table className="card-support-stats">
-            <tbody>
-              {statEntries.map(([k, v]) => (
-                <tr key={k}>
-                  <th>{k}</th>
-                  <td>{v}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="card-section-heading">WEAPONS</div>
+          <div className="card-upgrades-list">{weaponsVal}</div>
         </>
       )}
 
-      {traits && (
+      {/* Traits */}
+      {traitStr && (
         <>
           <div className="card-section-heading">TRAITS</div>
-          <div className="card-upgrades-list">{traits}</div>
+          <div className="card-upgrades-list">{traitStr}</div>
         </>
       )}
 
       {a.fullDesc && (
-        <div className="card-support-rules">{a.fullDesc}</div>
+        <div className="card-support-rules" style={{ fontSize: '6.5pt', marginTop: 4, color: '#555' }}>
+          {a.fullDesc}
+        </div>
       )}
     </div>
   );

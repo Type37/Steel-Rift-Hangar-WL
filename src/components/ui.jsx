@@ -297,8 +297,10 @@ export function collectTraits(str) {
   if (!str) return [];
   const seen = new Set();
   str.split(/,\s*/).forEach(part => {
-    const m = part.match(/^([A-Za-z\-]+)/);
-    if (m) seen.add(m[1].toLowerCase());
+    // Strip trailing parentheticals and quotes, then take the full word sequence
+    const clean = part.replace(/\s*\([^)]*\)/g, '').replace(/"/g, '').trim();
+    const key = clean.toLowerCase();
+    if (key) seen.add(key);
   });
   return [...seen];
 }

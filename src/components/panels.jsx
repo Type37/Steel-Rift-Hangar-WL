@@ -779,35 +779,19 @@ export function SupportDetailView({ assetName, customName, loadout, onSetLoadout
       )}
 
       {a.stats && (
-        <>
-          <table style={{
-            borderCollapse: 'collapse', width: '100%', maxWidth: 560,
-            background: 'var(--surface)', border: '1px solid var(--rule)',
-            marginBottom: 18,
-          }}>
-            <tbody>
-              {Object.entries(a.stats).map(([k, v]) => (
-                <tr key={k}>
-                  <td className="label" style={{
-                    padding: '8px 12px', fontSize: 11,
-                    borderBottom: '1px solid var(--rule)',
-                    background: 'var(--bg)',
-                    width: '32%', verticalAlign: 'top',
-                  }}>
-                    {k}
-                  </td>
-                  <td style={{
-                    padding: '8px 12px', fontSize: 13,
-                    borderBottom: '1px solid var(--rule)',
-                    fontFamily: /Per|Stat|SPD|ARM|STR/i.test(k) ? 'var(--font-mono)' : 'var(--font-body)',
-                  }}>
-                    {/Trait/i.test(k) ? <TraitList traits={v} /> : v}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </>
+        <div style={{
+          fontSize: 13, color: 'var(--ink-2)', lineHeight: 1.7,
+          marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 2,
+        }}>
+          {Object.entries(a.stats).map(([k, v]) => (
+            <div key={k} style={{ display: 'flex', gap: 8, alignItems: 'baseline', flexWrap: 'wrap' }}>
+              <span className="label" style={{ fontSize: 10, flexShrink: 0 }}>{k}</span>
+              <span style={{ fontFamily: /Per|Stat|SPD|ARM|STR/i.test(k) ? 'var(--font-body)' : 'var(--font-body)' }}>
+                {/Trait/i.test(k) ? <TraitList traits={v} /> : v}
+              </span>
+            </div>
+          ))}
+        </div>
       )}
 
       {traitNames.length > 0 && <InlineTraitGlossary traits={traitNames} />}
