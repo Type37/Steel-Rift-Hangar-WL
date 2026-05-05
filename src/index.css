@@ -139,6 +139,7 @@ input.txt, textarea.txt {
   padding: 9px 11px;
   width: 100%;
   font-size: 15px;
+  font-family: var(--font-display);
   transition: border-color 100ms, background 100ms;
 }
 input.txt:hover, textarea.txt:hover { background: #f6efdf; }
@@ -376,10 +377,10 @@ button:not(:disabled):active {
   background: var(--rust);
   color: var(--surface);
   border: 2px solid var(--rust);
-  padding: 5px 12px;
+  padding: 5px 14px;
   cursor: pointer;
-  font-family: var(--font-stencil);
-  font-size: 11px;
+  font-family: var(--font-body);
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.10em;
   text-transform: uppercase;
@@ -407,10 +408,10 @@ button:not(:disabled):active {
   background: var(--teal);
   color: var(--surface);
   border: 2px solid var(--teal);
-  padding: 5px 12px;
+  padding: 5px 14px;
   cursor: pointer;
-  font-family: var(--font-stencil);
-  font-size: 11px;
+  font-family: var(--font-body);
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.10em;
   text-transform: uppercase;
@@ -465,15 +466,15 @@ button:not(:disabled):active {
   background: transparent;
   border: 1.5px solid var(--rule-strong);
   color: var(--ink);
-  padding: 5px 10px;
+  padding: 5px 14px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-family: var(--font-stencil);
-  font-size: 11px;
+  font-family: var(--font-body);
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.10em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   flex-shrink: 0;
   border-radius: 4px;

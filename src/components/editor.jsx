@@ -43,8 +43,23 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete }) {
     else update({ weapons: mech.weapons.map(w => w.name === name ? { ...w, count: w.count - 1 } : w) });
   };
   const toggleUpgrade = (name) => {
-    if (mech.upgrades.includes(name)) update({ upgrades: mech.upgrades.filter(u => u !== name) });
-    else update({ upgrades: [...mech.upgrades, name] });
+    if (mech.upgrades.includes(name)) {
+      update({ upgrades: mech.upgrades.filter(u => u !== name) });
+    } else {
+      // Compact upgrades: max 1 per HE-V
+      const def = UPGRADES.find(u => u.name === name);
+      if (def?.compact) {
+        const alreadyHasCompact = mech.upgrades.some(u => {
+          const d = UPGRADES.find(x => x.name === u);
+          return d?.compact;
+        });
+        if (alreadyHasCompact) {
+          alert('Only one Compact upgrade per HE-V (rules p.25).');
+          return;
+        }
+      }
+      update({ upgrades: [...mech.upgrades, name] });
+    }
   };
   const toggleDef = (name) => {
     if (mech.defensive.includes(name)) update({ defensive: mech.defensive.filter(d => d !== name) });
@@ -760,6 +775,13 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand }) {
         <div style={{ minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
             <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--ink)' }}>{upgrade.name}</span>
+            {upgrade.compact && (
+              <span style={{
+                fontSize: 9.5, fontWeight: 700, letterSpacing: '0.1em',
+                padding: '1px 5px', border: '1px solid var(--teal)',
+                color: 'var(--teal)',
+              }}>COMPACT</span>
+            )}
             {available && (
               <span className="mono" style={{ fontSize: 12, color: 'var(--rust)', fontWeight: 700 }}>{cost}t</span>
             )}

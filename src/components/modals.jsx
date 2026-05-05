@@ -93,11 +93,8 @@ export function AddMechModal({ open, onClose, onConfirm, callsignPool: callsignP
         />
 
         <FieldLabel>Weight Class</FieldLabel>
-        <div style={{
-          display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
-          background: 'var(--ink)', gap: 1,
-        }}>
-          {WC_ORDER.map((c) => {
+        <div style={{ border: '1.5px solid var(--rule)' }}>
+          {WC_ORDER.map((c, i) => {
             const w = WC[c];
             const selected = cls === c;
             return (
@@ -106,33 +103,37 @@ export function AddMechModal({ open, onClose, onConfirm, callsignPool: callsignP
                 onClick={() => setCls(c)}
                 className="add-btn"
                 style={{
-                  display: 'flex', flexDirection: 'column',
-                  alignItems: 'center', justifyContent: 'center',
-                  gap: 2, padding: '14px 8px 12px',
-                  background: selected ? 'var(--surface)' : 'transparent',
-                  border: 'none', cursor: 'pointer', transition: 'background 0.12s',
+                  display: 'grid',
+                  gridTemplateColumns: 'auto 1fr auto',
+                  alignItems: 'center', gap: 14,
+                  padding: '12px 16px',
+                  width: '100%',
+                  background: selected ? 'var(--surface-2)' : 'transparent',
+                  border: 'none',
+                  borderTop: i === 0 ? 'none' : '1px solid var(--rule)',
+                  cursor: 'pointer', textAlign: 'left',
                 }}
               >
                 <span style={{
-                  fontFamily: 'var(--font-body)', fontSize: 10, letterSpacing: '0.18em',
-                  fontWeight: 600, textTransform: 'uppercase',
-                  color: selected ? 'var(--mute)' : 'rgba(255,255,255,0.45)',
+                  width: 18, height: 18, borderRadius: '50%', flexShrink: 0,
+                  border: `2px solid ${selected ? 'var(--rust)' : 'var(--rule-strong)'}`,
+                  background: selected ? 'var(--rust)' : 'transparent',
+                }} />
+                <span style={{
+                  fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 700,
+                  textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--ink)',
                 }}>
                   {c}
                 </span>
-                <span style={{
-                  fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 700, lineHeight: 1,
-                  color: selected ? 'var(--ink)' : 'var(--surface)',
-                  letterSpacing: '0.02em',
-                }}>
-                  {w.tons}T
-                </span>
-                <span style={{
-                  fontFamily: 'var(--font-body)', fontSize: 10, letterSpacing: '0.14em',
-                  fontWeight: 600, textTransform: 'uppercase',
-                  color: selected ? 'var(--mute)' : 'rgba(255,255,255,0.35)',
-                }}>
-                  {w.slots} SLOTS
+                <span style={{ textAlign: 'right' }}>
+                  <span style={{
+                    fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700,
+                    color: selected ? 'var(--rust)' : 'var(--ink)',
+                  }}>{w.tons}t</span>
+                  <span style={{
+                    display: 'block', fontSize: 10.5, color: 'var(--mute)',
+                    fontFamily: 'var(--font-body)', letterSpacing: '0.06em',
+                  }}>{w.slots} slots</span>
                 </span>
               </button>
             );

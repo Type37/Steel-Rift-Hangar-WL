@@ -65,7 +65,7 @@ export const UPGRADES = [
   { name: 'Coolant Tanks',               cost: [2,'-','-','-'],    compact: false, rule: 'At any point during a turn, this Unit may remove one Redline Marker. Limited (2).' },
   { name: 'Directional Thruster',        cost: [3,4,5,6],          compact: false, rule: 'This Unit gains the Dash (2) Order: move up to 2", then resolve a SMASH or ENGAGE. The secondary Order does not count toward the 2 Order limit.' },
   { name: 'Electronic Countermeasures',  cost: [2,4,6,8],          compact: false, rule: 'This Unit may not be targeted by LOCK ON Orders.' },
-  { name: 'Haptic Suit',                 cost: ['-','-','-',7],    compact: true,  rule: 'When performing a Return Fire, you may re-roll any dice in the Defense Roll (not just natural 1s). Compact.' },
+  { name: 'Haptic Suit',                 cost: [2,2,1,1],          compact: true,  rule: 'When performing a Return Fire, you may re-roll any dice in the Defense Roll (not just natural 1s). Compact.' },
   { name: 'Heavy Reactor',               cost: [2,3,4,5],          compact: false, rule: 'When this Unit would take Structure damage from Overdrive or receiving a Redline Marker, roll 1D6. On 4+, that damage is ignored.' },
   { name: 'High Speed Servos',           cost: [3,4,6,7],          compact: false, rule: 'After performing a SMASH Order, this Unit may perform a second SMASH Order. The second SMASH does not count against the 2-Order limit and gets no movement bonuses.' },
   { name: 'Jump Jets',                   cost: [3,4,5,6],          compact: false, rule: 'This Unit may perform the JUMP Order.' },
