@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { TEAMS, MISSIONS, MISSION_ORDER, FACTION_LOGOS } from './data';
+import { POOL_NAMES } from './callsigns';
 import { calcMech, newMech, findAsset } from './calc';
 
 import { Navbar, BottomBar, MechCard, EmptyRoster, SupportRosterCard } from './components/chrome';
@@ -39,7 +40,7 @@ export default function App() {
   // right pane with full details. Lives in memory only (not persisted).
   const [selectedSupportName, setSelectedSupportName] = useState(null);
 
-  const [callsignPool, setCallsignPool] = useState(stored.callsignPool ?? 'Mythic');
+  const [callsignPools, setCallsignPools] = useState(stored.callsignPools ?? [...POOL_NAMES, 'Custom']);
   const [customCallsigns, setCustomCallsigns] = useState(stored.customCallsigns ?? []);
   // Per-asset nicknames so the user can rename their support units.
   const [supportNicknames, setSupportNicknames] = useState(stored.supportNicknames ?? {});
@@ -65,7 +66,7 @@ export default function App() {
         forceName, mission, customTons,
         faction, perks, factionLogo,
         mechs, supportAssets, selectedTeams,
-        callsignPool, customCallsigns, supportNicknames, supportLoadouts,
+        callsignPools, customCallsigns, supportNicknames, supportLoadouts,
         teamAssignments,
         simpleMode,
       }));
@@ -76,7 +77,7 @@ export default function App() {
     forceName, mission, customTons,
     faction, perks, factionLogo,
     mechs, supportAssets, selectedTeams,
-    callsignPool, customCallsigns, supportNicknames, supportLoadouts,
+    callsignPools, customCallsigns, supportNicknames, supportLoadouts,
     teamAssignments,
     simpleMode,
   ]);
@@ -488,15 +489,15 @@ export default function App() {
         open={addMechOpen}
         onClose={() => setAddMechOpen(false)}
         onConfirm={handleConfirmAddMech}
-        callsignPool={callsignPool}
+        callsignPool={callsignPools}
         customCallsigns={customCallsigns}
       />
 
       <OptionsModal
         open={optionsOpen}
         onClose={() => setOptionsOpen(false)}
-        callsignPool={callsignPool}
-        setCallsignPool={setCallsignPool}
+        callsignPool={callsignPools}
+        setCallsignPool={setCallsignPools}
         customCallsigns={customCallsigns}
         setCustomCallsigns={setCustomCallsigns}
         simpleMode={simpleMode}
@@ -512,7 +513,7 @@ export default function App() {
           forceName, mission, customTons,
           faction, perks, factionLogo,
           mechs, supportAssets, selectedTeams,
-          callsignPool, customCallsigns,
+          callsignPools, customCallsigns,
           supportNicknames, supportLoadouts,
           teamAssignments,
           simpleMode,
@@ -528,7 +529,7 @@ export default function App() {
           if (data.mechs) setMechs(data.mechs);
           if (data.supportAssets) setSupportAssets(data.supportAssets);
           if (data.selectedTeams) setSelectedTeams(data.selectedTeams);
-          if (data.callsignPool) setCallsignPool(data.callsignPool);
+          if (data.callsignPools) setCallsignPools(data.callsignPools);
           if (data.customCallsigns) setCustomCallsigns(data.customCallsigns);
           if (data.supportNicknames) setSupportNicknames(data.supportNicknames);
           if (data.supportLoadouts) setSupportLoadouts(data.supportLoadouts);

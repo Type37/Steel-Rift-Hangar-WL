@@ -43,22 +43,22 @@ export const POOLS = {
 
 export const POOL_NAMES = Object.keys(POOLS);
 
-export function rollCallsign(poolName, customList = []) {
-  if (poolName === 'Custom') {
-    const names = customList.filter(Boolean);
-    if (!names.length) return '';
-    return names[Math.floor(Math.random() * names.length)];
+export function rollCallsign(activePools = [], customList = []) {
+  // Build combined list from all active pools
+  const all = [];
+  for (const poolName of activePools) {
+    if (poolName === 'Custom') {
+      customList.filter(Boolean).forEach(n => all.push(n));
+    } else if (poolName === 'Compound') {
+      const p = POOLS.Compound;
+      const a = p.a[Math.floor(Math.random() * p.a.length)];
+      const b = p.b[Math.floor(Math.random() * p.b.length)];
+      all.push(`${a} ${b}`);
+    } else {
+      const pool = POOLS[poolName];
+      if (pool) all.push(...pool);
+    }
   }
-
-  const pool = POOLS[poolName];
-  if (!pool) return '';
-
-  // Compound pool combines an A word and a B word
-  if (poolName === 'Compound') {
-    const a = pool.a[Math.floor(Math.random() * pool.a.length)];
-    const b = pool.b[Math.floor(Math.random() * pool.b.length)];
-    return `${a} ${b}`;
-  }
-
-  return pool[Math.floor(Math.random() * pool.length)];
+  if (!all.length) return '';
+  return all[Math.floor(Math.random() * all.length)];
 }

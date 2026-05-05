@@ -12,7 +12,7 @@ const asset = (p) => `${BASE}${p.replace(/^\//, '')}`;
 // ADD HE-V MODAL
 // ============================================================
 
-export function AddMechModal({ open, onClose, onConfirm, callsignPool, customCallsigns }) {
+export function AddMechModal({ open, onClose, onConfirm, callsignPool: callsignPools, customCallsigns }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [cls, setCls] = useState('Light');
@@ -25,7 +25,7 @@ export function AddMechModal({ open, onClose, onConfirm, callsignPool, customCal
     }
   }, [open]);
 
-  const roll = () => setName(rollCallsign(callsignPool, customCallsigns));
+  const roll = () => setName(rollCallsign(callsignPools, customCallsigns));
   const submit = () => onConfirm({ name: name.trim(), description: description.trim(), cls });
 
   return (
@@ -67,7 +67,7 @@ export function AddMechModal({ open, onClose, onConfirm, callsignPool, customCal
           />
           <button
             onClick={roll}
-            title={`Roll a name from the ${callsignPool} pool`}
+            title="Roll a name"
             className="add-btn"
             style={{
               border: '1px solid var(--rule)', background: 'var(--surface)',
@@ -344,23 +344,33 @@ export function OptionsModal({
         </div>
 
 
-        {/* Callsign pool */}
-        <FieldLabel>Callsign Pool</FieldLabel>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
-          {POOL_NAMES.map(p => (
-            <Chip key={p} active={callsignPool === p} onClick={() => setCallsignPool(p)}>
-              {p}
-            </Chip>
-          ))}
-          <Chip active={callsignPool === 'Custom'} onClick={() => setCallsignPool('Custom')}>
-            Custom
-          </Chip>
-        </div>
-        <div style={{ fontSize: 12, color: 'var(--mute)', marginBottom: 18, lineHeight: 1.5 }}>
-          Names drawn for the Roll button in Add HE-V.
+        {/* Callsign pools - checkboxes, all on by default */}
+        <FieldLabel>Callsign Pools</FieldLabel>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 18 }}>
+          {[...POOL_NAMES, 'Custom'].map(p => {
+            const on = callsignPool.includes(p);
+            return (
+              <label key={p} style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                cursor: 'pointer', fontSize: 13, color: 'var(--ink)',
+                fontFamily: 'var(--font-body)',
+              }}>
+                <input
+                  type="checkbox"
+                  checked={on}
+                  onChange={() => setCallsignPool(
+                    on ? callsignPool.filter(x => x !== p)
+                       : [...callsignPool, p]
+                  )}
+                  style={{ accentColor: 'var(--rust)', width: 14, height: 14 }}
+                />
+                {p}
+              </label>
+            );
+          })}
         </div>
 
-        {callsignPool === 'Custom' && (
+        {callsignPool.includes('Custom') && (
           <>
             <FieldLabel>Custom Names</FieldLabel>
             <textarea
@@ -368,7 +378,7 @@ export function OptionsModal({
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               placeholder={'One per line.\nIronwake\nSaturn Forge\nGravewright\n…'}
-              style={{ minHeight: 160, fontFamily: 'var(--font-mono)', fontSize: 13 }}
+              style={{ minHeight: 160, fontFamily: 'var(--font-body)', fontSize: 13 }}
             />
             <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <TextButton onClick={onClose}>Cancel</TextButton>
@@ -377,7 +387,7 @@ export function OptionsModal({
           </>
         )}
 
-        {callsignPool !== 'Custom' && (
+        {!callsignPool.includes('Custom') && (
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <PrimaryButton onClick={onClose}>Close</PrimaryButton>
           </div>
