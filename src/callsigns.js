@@ -38,6 +38,19 @@ export const POOLS = {
     'Coywolf', 'Jackal', 'Honey-Badger', 'Marten', 'Stoat', 'Quoll',
   ],
 
+
+  'Gravity Rush': [
+    'Are', 'Ari', 'Jiu', 'Fugare', 'Fugai', 'Lancan', 'Defnete', 'Defneti', 'Mosui', 'Malloid', 'Giacago', 'Eckiray', 'Kinoue', 'Lorets', 'Shiga', 'Manago', 'Batouyue', 'Minaye', 'Taion', 'Cusuico', 'Lagan', 'Nucago', 'Nushi',
+  ],
+
+  'Vampire Hunter D': [
+    'Larmica', 'Garou', 'Rei-Ginsei', 'Mayerling', 'Borgoff', 'Nolt', 'Groveck', 'Bengé', 'Mashira', 'Pluto-VIII', 'Bullow', 'Wu-Lin', 'Su-In', 'Krolock', 'Samon', 'Kipsch', 'Taki', 'Gii', 'Shusha', 'Rocambole', 'Kuentz', 'Gaskell', 'Laurencin', 'Shuma', 'Xenon', 'Gillis', 'Braujou', 'Valcua', 'Dyalhis', 'Speeny', 'Jessup-the-Beheader', 'Goseau', 'Bierce', 'Kururu', 'Stanza', 'Dolreack', 'Odama', 'Gilzen', 'Iriya', 'Bijima', 'Amne', 'Murtock', 'Dynus', 'Greylancer', 'Shizam', 'Sunhawk',
+  ],
+
+  'Anime 🎌': [
+    'Zankoku', 'Byakuya', 'Shinkansen', 'Murasame', 'Kamikaze', 'Gekkou', 'Raijin', 'Fujin', 'Izanami', 'Tamahagane', 'Hagane', 'Kenbu', 'Ryuusei', 'Zangetsu', 'Bankai', 'Sengoku', 'Muramasa', 'Kagerou', 'Tsurugi', 'Karasu', 'Jinrai', 'Bakuretsu', 'Naginata', 'Gourai', 'Hiziri', 'Tenrou', 'Fubuki', 'Suzumiya', 'Kagami', 'Kagura', 'Shinigami', 'Kurenai', 'Homura', 'Sakuya', 'Tenka', 'Raikiri',
+  ],
+
   // Two-word combinations, drawn from these halves
   Compound: {
     a: ['Cold', 'Black', 'Iron', 'Saturn', 'Ember', 'Long', 'Slow', 'Last', 'First', 'Salt', 'River', 'Coffin', 'Bright', 'Dust', 'Pale', 'Dry', 'Old', 'Wet'],
