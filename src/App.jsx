@@ -233,14 +233,7 @@ export default function App() {
   const toggleTeam = (name) =>
     setSelectedTeams(prev => prev.includes(name) ? prev.filter(n => n !== name) : [...prev, name]);
 
-  const BASE_URL = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '/');
-  const handleSetFaction = (f) => {
-    setFaction(f);
-    setPerks([]);
-    if (f && FACTION_LOGOS[f]?.length > 0) {
-      setFactionLogo(`${BASE_URL}faction-logos/${FACTION_LOGOS[f][0].file}`);
-    }
-  };
+  const handleSetFaction = (f) => { setFaction(f); setPerks([]); };
 
   const togglePerk = (name) =>
     setPerks(prev => prev.includes(name) ? prev.filter(p => p !== name) : [...prev, name]);
