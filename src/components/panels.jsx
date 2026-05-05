@@ -847,7 +847,11 @@ function findVehicleWeapon(name) {
 // Parse a weapons string like "Vehicle Autocannon, Submunitions" into an array of lookups.
 function parseWeapons(str) {
   if (!str || str === '—') return [];
-  return str.split(/,\s*|\/|\s+or\s+/).map(w => w.trim()).filter(Boolean);
+  return str
+    .split(/,\s*/)
+    .map(w => w.replace(/\s*[×x]\d+$/, '').replace(/^.*\bor\b.*$/i, w).trim())
+    .flatMap(w => w.split(/\s+or\s+/i).map(p => p.trim()))
+    .filter(Boolean);
 }
 
 // Garrison reference: show infantry or power suit squad options inline.
