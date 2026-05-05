@@ -1,5 +1,5 @@
 import React from 'react';
-import { Printer, Settings as SettingsIcon, Plus } from 'lucide-react';
+import { Printer, Settings as SettingsIcon, Plus, FolderOpen, ChevronDown } from 'lucide-react';
 import { WC, MISSION_ORDER, MISSIONS } from '../data';
 import { calcMech } from '../calc';
 
@@ -36,7 +36,7 @@ export function Navbar() {
 // BOTTOM BAR: force name + mission selection + the two big CTAs
 // ============================================================
 export function BottomBar({
-  forceName, onForceName, onPrint, onOptions,
+  forceName, onForceName, onPrint, onOptions, onLists,
   mission, customTons, onMission, onCustomTons,
   totalTons, supportCount, mechCount,
   onAddMech, onAddSupport,
@@ -46,162 +46,142 @@ export function BottomBar({
   const pct = cap ? Math.min(100, (totalTons / cap) * 100) : 0;
   const over = totalTons > cap;
 
-  // "More" reveals All-Out War + Custom. Auto-opens if user is on one.
-  const isExtra = mission === 'All-Out War' || mission === 'Custom';
-  const [showMore, setShowMore] = React.useState(isExtra);
+  // Mission popover: compact dropdown next to the tonnage bar.
+  const [missionOpen, setMissionOpen] = React.useState(false);
+  const missionRef = React.useRef(null);
   React.useEffect(() => {
-    if (isExtra) setShowMore(true);
-  }, [isExtra]);
-
-  const standardMissions = MISSION_ORDER.filter(m => m !== 'All-Out War');
-  const extraMissions = ['All-Out War'];
+    if (!missionOpen) return;
+    const close = (e) => {
+      if (missionRef.current && !missionRef.current.contains(e.target)) {
+        setMissionOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [missionOpen]);
 
   return (
     <div className="bottombar no-print">
-      {/* TOP ROW: identity (force/options/print) + mission/tonnage. */}
-      <div className="bottombar-row bottombar-row-top">
+      <div className="bottombar-row-top">
+        {/* MISSION + TONNAGE: a compact button-bar that shows the active
+            mission as the bar label. Click to change mission. */}
+        <div className="bottombar-points" ref={missionRef}>
+          <button
+            className="bottombar-mission-button"
+            onClick={() => setMissionOpen(o => !o)}
+            title="Change mission"
+            style={{
+              background: over ? 'var(--rust)' : 'var(--olive)',
+              color: 'var(--surface)',
+            }}
+          >
+            <span className="bottombar-mission-label">
+              {useCustom ? 'CUSTOM' : mission.toUpperCase()}
+            </span>
+            <ChevronDown size={11} strokeWidth={2.5} style={{ opacity: 0.85 }} />
+          </button>
+          <div
+            className="bottombar-ton-bar"
+            style={{
+              borderColor: over ? 'var(--rust)' : 'var(--rule-strong)',
+            }}
+          >
+            <div
+              className="bottombar-ton-fill"
+              style={{
+                width: `${pct}%`,
+                background: over ? 'var(--rust)' : 'var(--olive)',
+              }}
+            />
+            <div className="bottombar-ton-label mono">
+              {totalTons} / {cap}t
+            </div>
+          </div>
+
+          {missionOpen && (
+            <div className="bottombar-mission-popover">
+              {MISSION_ORDER.map(m => (
+                <button
+                  key={m}
+                  className={`mission-popover-item ${mission === m ? 'is-active' : ''}`}
+                  onClick={() => { onMission(m); setMissionOpen(false); }}
+                >
+                  <span>{m}</span>
+                  <span className="mono" style={{ color: 'var(--mute)', fontSize: 11 }}>
+                    {MISSIONS[m].tons}t
+                  </span>
+                </button>
+              ))}
+              <button
+                className={`mission-popover-item ${useCustom ? 'is-active' : ''}`}
+                onClick={() => { onMission('Custom'); }}
+              >
+                <span>Custom</span>
+                {useCustom ? (
+                  <input
+                    type="number"
+                    value={customTons}
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={(e) => onCustomTons(Math.max(20, Number(e.target.value) || 0))}
+                    style={{
+                      width: 60, padding: '2px 4px',
+                      border: '1.5px solid var(--rust)', background: 'var(--surface)',
+                      fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 700,
+                      color: 'var(--ink)',
+                    }}
+                  />
+                ) : (
+                  <span className="mono" style={{ color: 'var(--mute)', fontSize: 11 }}>
+                    set
+                  </span>
+                )}
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* PRIMARY ACTIONS: Add HE-V (the rust CTA) and Add Support. */}
+        <button
+          onClick={onAddMech}
+          className={`add-btn bottombar-add-mech cta-mech ${mechCount === 0 ? 'cta-pulse' : ''}`}
+          title="Add a new HE-V"
+        >
+          <img src={asset('icons/hev.svg')} alt="" className="cta-mech-icon" />
+          <Plus size={12} strokeWidth={2.5} />
+          HE-V
+        </button>
+        <button
+          onClick={onAddSupport}
+          className="add-btn bottombar-add-support"
+          title="Browse support assets"
+        >
+          <Plus size={12} strokeWidth={2.5} />
+          Support
+        </button>
+
+        {/* IDENTITY: force name input on the right side of the bar. */}
         <label className="bottombar-force-input">
-          <span className="label" style={{ marginRight: 8, flexShrink: 0 }}>Force</span>
+          <span className="label" style={{ marginRight: 6, flexShrink: 0 }}>Force</span>
           <input
             value={forceName}
             onChange={(e) => onForceName(e.target.value)}
             placeholder="Name your force"
           />
         </label>
-        <button onClick={onOptions} className="add-btn util-btn" title="Options" aria-label="Options">
+
+        {/* UTILITIES: options / lists / print */}
+        <button onClick={onOptions} className="add-btn util-btn" title="Options">
           <SettingsIcon size={13} strokeWidth={2.25} />
           <span className="util-label">Options</span>
         </button>
-        <button onClick={onPrint} className="add-btn util-btn util-btn-print" title="Print roster" aria-label="Print">
+        <button onClick={onLists} className="add-btn util-btn" title="Save / load builds">
+          <FolderOpen size={13} strokeWidth={2.25} />
+          <span className="util-label">Lists</span>
+        </button>
+        <button onClick={onPrint} className="add-btn util-btn util-btn-print" title="Print roster">
           <Printer size={13} strokeWidth={2.25} />
           <span className="util-label">Print</span>
         </button>
-
-        <div className="bottombar-divider" />
-
-        <div className="bottombar-mission-row">
-          <span className="label" style={{ marginRight: 4 }}>Mission</span>
-          {standardMissions.map(m => (
-            <MissionChip key={m} m={m} active={mission === m} onClick={() => onMission(m)} />
-          ))}
-
-          {!showMore && (
-            <button
-              onClick={() => setShowMore(true)}
-              className="chip-hover"
-              style={{
-                background: 'transparent',
-                color: 'var(--ink-2)',
-                border: '1.5px dashed var(--rule-strong)',
-                padding: '5px 9px',
-                cursor: 'pointer',
-                fontFamily: 'var(--font-stencil)', fontSize: 11.5,
-                fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase',
-              }}
-              title="Show All-Out War and Custom tonnage"
-            >
-              + More
-            </button>
-          )}
-
-          {showMore && (
-            <>
-              {extraMissions.map(m => (
-                <MissionChip key={m} m={m} active={mission === m} onClick={() => onMission(m)} />
-              ))}
-              <button onClick={() => onMission('Custom')} className={`chip-hover ${useCustom ? 'is-active' : ''}`} style={{
-                background: useCustom ? 'var(--rust)' : 'transparent',
-                color: useCustom ? 'var(--surface)' : 'var(--rust)',
-                border: '1.5px solid var(--rust)',
-                padding: '5px 9px', cursor: 'pointer',
-                fontFamily: 'var(--font-stencil)', fontSize: 11.5,
-                fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase',
-              }}>
-                Custom
-              </button>
-              {useCustom && (
-                <input
-                  type="number"
-                  value={customTons}
-                  onChange={(e) => onCustomTons(Math.max(20, Number(e.target.value) || 0))}
-                  style={{
-                    width: 70, padding: '3px 6px',
-                    border: '1.5px solid var(--rust)', background: 'var(--surface)',
-                    fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700,
-                    color: 'var(--ink)',
-                  }}
-                />
-              )}
-              {!isExtra && (
-                <button
-                  onClick={() => setShowMore(false)}
-                  style={{
-                    background: 'transparent', border: 'none',
-                    padding: '4px 4px', cursor: 'pointer',
-                    color: 'var(--mute)', fontSize: 11,
-                    textDecoration: 'underline',
-                    fontFamily: 'var(--font-body)',
-                  }}
-                  title="Hide larger mission sizes"
-                >
-                  less
-                </button>
-              )}
-            </>
-          )}
-        </div>
-
-        <div className="bottombar-ton-bar" style={{
-          height: 20, background: 'var(--bg-deep)',
-          border: '1.5px solid var(--rule-strong)', position: 'relative',
-        }}>
-          <div style={{
-            position: 'absolute', inset: 0, width: `${pct}%`,
-            background: over ? 'var(--rust)' : 'var(--olive)',
-            transition: 'width 180ms ease-out',
-          }} />
-          <div className="mono" style={{
-            position: 'absolute', inset: 0,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 11.5, fontWeight: 700,
-            color: pct > 50 ? 'var(--surface)' : 'var(--ink)',
-            letterSpacing: '0.05em',
-          }}>
-            {totalTons} / {cap}t
-          </div>
-        </div>
-
-        <div className="bottombar-ctas">
-          <button onClick={onAddSupport} className="add-btn bottombar-add-support" style={{
-            background: 'transparent',
-            color: 'var(--ink)',
-            border: '2px solid var(--ink)',
-            padding: '7px 12px', cursor: 'pointer',
-            fontFamily: 'var(--font-stencil)', fontSize: 11.5, fontWeight: 700,
-            letterSpacing: '0.10em', textTransform: 'uppercase',
-            display: 'inline-flex', alignItems: 'center', gap: 6,
-            whiteSpace: 'nowrap',
-          }}>
-            <Plus size={12} strokeWidth={2.5} />
-            Support
-          </button>
-
-          <button onClick={onAddMech} className={`add-btn bottombar-add-mech cta-mech ${mechCount === 0 ? 'cta-pulse' : ''}`} style={{
-            background: 'var(--rust)',
-            color: 'var(--surface)',
-            border: '2px solid var(--rust)',
-            padding: '7px 14px', cursor: 'pointer',
-            fontFamily: 'var(--font-stencil)', fontSize: 11.5, fontWeight: 700,
-            letterSpacing: '0.10em', textTransform: 'uppercase',
-            display: 'inline-flex', alignItems: 'center', gap: 6,
-            whiteSpace: 'nowrap',
-            boxShadow: '0 2px 0 var(--rust-deep)',
-          }}>
-            <img src={asset('icons/hev.svg')} alt="" className="cta-mech-icon" />
-            <Plus size={12} strokeWidth={2.5} />
-            HE-V
-          </button>
-        </div>
       </div>
     </div>
   );
@@ -231,13 +211,22 @@ function MissionChip({ m, active, onClick }) {
 // ============================================================
 // MECH CARD: roster list item with HE-V silhouette icon
 // ============================================================
-export function MechCard({ mech, index, active, onSelect }) {
+export function MechCard({ mech, index, active, onSelect, assignedTo }) {
   const stats = calcMech(mech);
   const wc = WC[mech.weightClass];
+
+  const handleDragStart = (e) => {
+    e.dataTransfer.setData('text/plain', `hev:${mech.id}`);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
   return (
     <button
       onClick={() => onSelect(mech.id)}
-      className="add-btn"
+      draggable
+      onDragStart={handleDragStart}
+      className="add-btn drag-source"
+      title="Click to load out, drag to assign to a team"
       style={{
         display: 'grid',
         gridTemplateColumns: 'auto auto 1fr auto',
@@ -287,6 +276,18 @@ export function MechCard({ mech, index, active, onSelect }) {
               over!
             </span>
           )}
+          {assignedTo && (
+            <span style={{
+              marginLeft: 6,
+              padding: '0 5px',
+              background: active ? 'rgba(241,234,218,0.18)' : 'var(--olive)',
+              color: active ? 'var(--surface)' : 'var(--surface)',
+              fontWeight: 700, fontSize: 10,
+              letterSpacing: '0.04em',
+            }}>
+              {assignedTo}
+            </span>
+          )}
         </div>
       </div>
       <div style={{ textAlign: 'right' }}>
@@ -310,7 +311,7 @@ export function MechCard({ mech, index, active, onSelect }) {
 // SUPPORT ROSTER CARD: compact summary of a chosen support asset.
 // Shown alongside HE-V cards so the user always sees their force.
 // ============================================================
-export function SupportRosterCard({ asset: a, customName, loadout, onRemove, onClick, onRename, active }) {
+export function SupportRosterCard({ asset: a, customName, loadout, onRemove, onClick, onRename, active, assignedTo }) {
   const [editing, setEditing] = React.useState(false);
   const [draft, setDraft] = React.useState(customName || '');
   const inputRef = React.useRef(null);
@@ -321,6 +322,15 @@ export function SupportRosterCard({ asset: a, customName, loadout, onRemove, onC
       inputRef.current.select();
     }
   }, [editing]);
+
+  const handleDragStart = (e) => {
+    if (editing) {
+      e.preventDefault();
+      return;
+    }
+    e.dataTransfer.setData('text/plain', `support:${a.name}`);
+    e.dataTransfer.effectAllowed = 'move';
+  };
 
   const commit = () => {
     if (onRename) onRename(draft);
@@ -353,6 +363,10 @@ export function SupportRosterCard({ asset: a, customName, loadout, onRemove, onC
   return (
     <div
       onClick={editing ? undefined : onClick}
+      draggable={!editing}
+      onDragStart={handleDragStart}
+      className="drag-source"
+      title={onClick && !editing ? 'Click to inspect, drag to assign to a team' : undefined}
       style={{
         display: 'grid',
         gridTemplateColumns: 'auto 1fr auto',
@@ -433,6 +447,20 @@ export function SupportRosterCard({ asset: a, customName, loadout, onRemove, onC
             fontWeight: 600,
           }}>
             {loadoutLine}
+          </div>
+        )}
+        {assignedTo && (
+          <div style={{ marginTop: 4 }}>
+            <span style={{
+              padding: '1px 6px',
+              background: 'var(--olive)',
+              color: 'var(--surface)',
+              fontFamily: 'var(--font-stencil)',
+              fontWeight: 700, fontSize: 10,
+              letterSpacing: '0.06em', textTransform: 'uppercase',
+            }}>
+              {assignedTo}
+            </span>
           </div>
         )}
       </div>

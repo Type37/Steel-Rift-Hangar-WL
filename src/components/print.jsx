@@ -199,7 +199,7 @@ function HEVCard({ mech, index }) {
             <tr>
               <td>{wc.baseTons}</td>
               <td>{move}"</td>
-              <td>{jumpVal != null ? `${jumpVal}"` : '\u2014'}</td>
+              <td>{jumpVal != null ? `${jumpVal}"` : '—'}</td>
               <td>{def}+</td>
             </tr>
           </tbody>
@@ -223,7 +223,7 @@ function HEVCard({ mech, index }) {
               <tbody>
                 <tr><td><strong>(M)</strong>ove</td><td className="num">-1</td></tr>
                 <tr><td><strong>(D)</strong>mg</td><td className="num">-1</td></tr>
-                <tr><td><strong>(\u00D8)</strong>rders</td><td className="num">-1</td></tr>
+                <tr><td><strong>(Ø)</strong>rders</td><td className="num">-1</td></tr>
               </tbody>
             </table>
           </div>
@@ -257,7 +257,7 @@ function HEVCard({ mech, index }) {
         <>
           <div className="card-section-heading">UPGRADES</div>
           <div className="card-upgrades-list">
-            {[...upgrades, ...defensive].map(u => u.name).join(' \u00B7 ')}
+            {[...upgrades, ...defensive].map(u => u.name).join(' · ')}
           </div>
         </>
       )}
@@ -277,7 +277,7 @@ function PipBlock({ kind, total }) {
     const remainder = total % parts;
     const chunks = Array(parts).fill(base);
     for (let i = 0; i < remainder; i++) chunks[i] += 1;
-    const map = ['M', 'D', '\u00D8'];
+    const map = ['M', 'D', 'Ø'];
     chunks.forEach((count, idx) => {
       for (let j = 0; j < count; j++) {
         const isLast = j === count - 1;
@@ -329,7 +329,7 @@ function SupportCard({ asset: a, customName, loadout }) {
       <header className="card-name-band">{customName || a.name}</header>
       <div className="card-row card-row-id">
         <div className="card-class-band">
-          {a.kind.toUpperCase()} \u00B7 {a.cost}t
+          {a.kind.toUpperCase()} · {a.cost}t
         </div>
         {customName && (
           <div className="card-class-band" style={{ flex: 1, fontStyle: 'italic', fontSize: '6.5pt', color: '#555' }}>
@@ -347,7 +347,7 @@ function SupportCard({ asset: a, customName, loadout }) {
           <div className="card-section-heading">LOADOUT</div>
           <ul className="card-loadout-list">
             {loadoutBreakdown.map(([n, c]) => (
-              <li key={n}><strong>{c}\u00D7</strong> {n}</li>
+              <li key={n}><strong>{c}×</strong> {n}</li>
             ))}
           </ul>
         </>

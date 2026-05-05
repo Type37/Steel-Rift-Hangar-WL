@@ -462,3 +462,257 @@ function FactionLogoPicker({ selected, onPick }) {
     </div>
   );
 }
+
+// ============================================================
+// LISTS MODAL: save / load / export / import named force builds.
+// Saved lists are stored under 'forge-saved-lists-v1' in localStorage.
+// ============================================================
+const LISTS_KEY = 'forge-saved-lists-v1';
+
+function loadSavedLists() {
+  try {
+    const raw = window.localStorage.getItem(LISTS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch { return {}; }
+}
+function persistSavedLists(obj) {
+  try {
+    window.localStorage.setItem(LISTS_KEY, JSON.stringify(obj));
+  } catch (e) {
+    console.warn('Could not persist saved lists:', e?.message || e);
+  }
+}
+
+export function ListsModal({ open, onClose, currentState, onLoad }) {
+  const [lists, setLists] = useState({});
+  const [saveName, setSaveName] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(null);
+
+  useEffect(() => {
+    if (open) {
+      setLists(loadSavedLists());
+      setSaveName(currentState?.forceName || '');
+      setConfirmDelete(null);
+    }
+  }, [open, currentState]);
+
+  const sortedNames = Object.keys(lists).sort();
+
+  const save = () => {
+    const name = saveName.trim();
+    if (!name) return;
+    const next = { ...lists, [name]: { ...currentState, savedAt: Date.now() } };
+    setLists(next);
+    persistSavedLists(next);
+    setSaveName('');
+  };
+
+  const remove = (name) => {
+    const next = { ...lists };
+    delete next[name];
+    setLists(next);
+    persistSavedLists(next);
+    setConfirmDelete(null);
+  };
+
+  const load = (name) => {
+    const data = lists[name];
+    if (!data) return;
+    onLoad(data);
+    onClose();
+  };
+
+  // Export current build to a JSON file the user can save anywhere.
+  const exportCurrent = () => {
+    const safeName = (currentState?.forceName || 'force').replace(/[^a-z0-9_-]/gi, '_');
+    const blob = new Blob([JSON.stringify(currentState, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${safeName}.forge.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const importFromFile = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+        onLoad(data);
+        onClose();
+      } catch (err) {
+        alert('Could not parse that file as a saved force.');
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  return (
+    <Modal open={open} onClose={onClose} title="Saved Lists" maxWidth={620}>
+      <div style={{ padding: '18px 22px 22px', maxHeight: '70vh', overflowY: 'auto' }}>
+        {/* Save current */}
+        <FieldLabel>Save current build</FieldLabel>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+          <input
+            value={saveName}
+            onChange={(e) => setSaveName(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); save(); } }}
+            placeholder="List name"
+            style={{
+              flex: 1,
+              border: '1.5px solid var(--rule-strong)',
+              background: 'var(--surface)',
+              padding: '8px 10px',
+              fontFamily: 'var(--font-body)',
+              fontSize: 14, color: 'var(--ink)', outline: 'none',
+            }}
+          />
+          <button
+            onClick={save}
+            disabled={!saveName.trim()}
+            className="add-btn"
+            style={{
+              background: saveName.trim() ? 'var(--olive)' : 'var(--bg-deep)',
+              color: saveName.trim() ? 'var(--surface)' : 'var(--mute)',
+              border: '2px solid ' + (saveName.trim() ? 'var(--olive-deep)' : 'var(--rule)'),
+              padding: '6px 16px', cursor: saveName.trim() ? 'pointer' : 'not-allowed',
+              fontFamily: 'var(--font-stencil)', fontSize: 12, fontWeight: 700,
+              letterSpacing: '0.10em', textTransform: 'uppercase',
+            }}
+          >
+            Save
+          </button>
+        </div>
+        <div style={{ fontSize: 12, color: 'var(--mute)', marginBottom: 22, lineHeight: 1.5 }}>
+          Saving with an existing name overwrites that list. Saves stay on this device.
+        </div>
+
+        {/* Saved list grid */}
+        <FieldLabel>Saved builds ({sortedNames.length})</FieldLabel>
+        {sortedNames.length === 0 ? (
+          <div style={{
+            border: '1.5px dashed var(--rule)', padding: 18, textAlign: 'center',
+            color: 'var(--mute)', fontSize: 13, marginBottom: 22,
+          }}>
+            No saved builds yet.
+          </div>
+        ) : (
+          <div style={{ marginBottom: 22, border: '1px solid var(--rule)', background: 'var(--surface)' }}>
+            {sortedNames.map(name => {
+              const list = lists[name];
+              const ago = list.savedAt ? new Date(list.savedAt).toLocaleDateString() : '';
+              const summary = `${list.mechs?.length || 0} HE-V · ${list.supportAssets?.length || 0} support · ${list.faction || 'no faction'}`;
+              return (
+                <div key={name} style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr auto auto',
+                  gap: 10, alignItems: 'center',
+                  padding: '10px 12px',
+                  borderTop: '1px solid var(--rule)',
+                }}>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: 16, fontWeight: 700, color: 'var(--ink)',
+                      letterSpacing: '0.02em', textTransform: 'uppercase',
+                    }}>
+                      {name}
+                    </div>
+                    <div className="mono" style={{
+                      fontSize: 11, color: 'var(--mute)', marginTop: 2,
+                    }}>
+                      {summary}{ago ? ` · saved ${ago}` : ''}
+                    </div>
+                  </div>
+                  {confirmDelete === name ? (
+                    <>
+                      <button
+                        onClick={() => remove(name)}
+                        style={smallBtn('var(--rust)', 'var(--surface)', 'var(--rust)')}
+                      >
+                        Confirm
+                      </button>
+                      <button
+                        onClick={() => setConfirmDelete(null)}
+                        style={smallBtn('transparent', 'var(--ink-2)', 'var(--rule)')}
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => load(name)}
+                        style={smallBtn('var(--ink)', 'var(--surface)', 'var(--ink)')}
+                      >
+                        Load
+                      </button>
+                      <button
+                        onClick={() => setConfirmDelete(name)}
+                        style={smallBtn('transparent', 'var(--rust)', 'var(--rust)')}
+                      >
+                        Delete
+                      </button>
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Export / import */}
+        <FieldLabel>Backup & transfer</FieldLabel>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
+          <button
+            onClick={exportCurrent}
+            className="add-btn"
+            style={smallBtn('transparent', 'var(--ink)', 'var(--rule-strong)')}
+          >
+            Export current as JSON
+          </button>
+          <label
+            className="add-btn"
+            style={{ ...smallBtn('transparent', 'var(--ink)', 'var(--rule-strong)'), display: 'inline-flex' }}
+          >
+            Import JSON
+            <input
+              type="file"
+              accept="application/json,.json"
+              onChange={importFromFile}
+              style={{ display: 'none' }}
+            />
+          </label>
+        </div>
+        <div style={{ fontSize: 12, color: 'var(--mute)', lineHeight: 1.5 }}>
+          Export downloads a file you can mail to yourself or share. Import replaces your current build.
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 18 }}>
+          <PrimaryButton onClick={onClose}>Close</PrimaryButton>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+function smallBtn(bg, color, border) {
+  return {
+    background: bg,
+    color,
+    border: `1.5px solid ${border}`,
+    padding: '6px 12px',
+    cursor: 'pointer',
+    fontFamily: 'var(--font-stencil)',
+    fontSize: 11.5,
+    fontWeight: 700,
+    letterSpacing: '0.10em',
+    textTransform: 'uppercase',
+    whiteSpace: 'nowrap',
+  };
+}

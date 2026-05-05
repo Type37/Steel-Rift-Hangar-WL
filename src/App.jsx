@@ -5,7 +5,7 @@ import { calcMech, newMech, findAsset } from './calc';
 import { Navbar, BottomBar, MechCard, EmptyRoster, SupportRosterCard } from './components/chrome';
 import { MechEditor } from './components/editor';
 import { SupportPanel, TeamPanel, FactionPanel, SupportDetailView } from './components/panels';
-import { AddMechModal, OptionsModal } from './components/modals';
+import { AddMechModal, OptionsModal, ListsModal } from './components/modals';
 import { PrintView } from './components/print';
 import { SectionTitle, GhostButton } from './components/ui';
 
@@ -46,11 +46,15 @@ export default function App() {
   // Per-asset sub-unit picks. Shape: { 'LAS-Wing Attack Squadron': ['Strike LAS Wing', 'Strike LAS Wing', 'Reconnaissance and Disruption LAS Wing', 'Strike LAS Wing'], ... }
   // Each entry is the list of sub-unit names the user picked, in order.
   const [supportLoadouts, setSupportLoadouts] = useState(stored.supportLoadouts ?? {});
+  // Per-team unit assignments. Shape: { 'Reconnaissance Team': ['mech_id_1', 'support:LAS-Wing Attack Squadron', ...], ... }
+  // Drag a unit from the left onto a team row in the right pane to assign.
+  const [teamAssignments, setTeamAssignments] = useState(stored.teamAssignments ?? {});
 
   const [simpleMode, setSimpleMode] = useState(stored.simpleMode ?? false);
 
   const [addMechOpen, setAddMechOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
+  const [listsOpen, setListsOpen] = useState(false);
 
   const [sideTab, setSideTab] = useState('roster');
 
@@ -62,6 +66,7 @@ export default function App() {
         faction, perks, factionLogo,
         mechs, supportAssets, selectedTeams,
         callsignPool, customCallsigns, supportNicknames, supportLoadouts,
+        teamAssignments,
         simpleMode,
       }));
     } catch (e) {
@@ -72,6 +77,7 @@ export default function App() {
     faction, perks, factionLogo,
     mechs, supportAssets, selectedTeams,
     callsignPool, customCallsigns, supportNicknames, supportLoadouts,
+    teamAssignments,
     simpleMode,
   ]);
 
@@ -89,6 +95,41 @@ export default function App() {
   // Set the sub-unit loadout for a support asset (e.g. which 4 LAS-Wings).
   const setSupportLoadout = (assetName, loadout) => {
     setSupportLoadouts(prev => ({ ...prev, [assetName]: loadout }));
+  };
+
+  // Assign a unit (HE-V or support asset) to a team. Each unit can only be
+  // in one team at a time; this method moves the unit if needed.
+  const assignToTeam = (teamName, unitId) => {
+    setTeamAssignments(prev => {
+      const next = {};
+      for (const [t, ids] of Object.entries(prev)) {
+        next[t] = ids.filter(id => id !== unitId);
+      }
+      next[teamName] = [...(next[teamName] || []), unitId];
+      // Drop any team that ended up empty.
+      for (const t of Object.keys(next)) if (next[t].length === 0) delete next[t];
+      return next;
+    });
+  };
+  // Remove a unit from any team it's in.
+  const unassignFromTeams = (unitId) => {
+    setTeamAssignments(prev => {
+      const next = {};
+      for (const [t, ids] of Object.entries(prev)) {
+        const filtered = ids.filter(id => id !== unitId);
+        if (filtered.length > 0) next[t] = filtered;
+      }
+      return next;
+    });
+  };
+  // Clear a team's roster entirely.
+  const clearTeamAssignments = (teamName) => {
+    setTeamAssignments(prev => {
+      if (!prev[teamName]) return prev;
+      const next = { ...prev };
+      delete next[teamName];
+      return next;
+    });
   };
 
   // Auto-scroll to editor pane on phones when picking a mech.
@@ -116,6 +157,16 @@ export default function App() {
     : MISSIONS[mission];
   const teamMax = Object.values(missionObj.teamCounts).reduce((a, b) => a + b, 0);
 
+  // Reverse index: unitId -> teamName, so left-sidebar cards can show
+  // which team they're currently assigned to.
+  const assignmentLookup = useMemo(() => {
+    const map = {};
+    for (const [team, ids] of Object.entries(teamAssignments)) {
+      for (const id of ids) map[id] = team;
+    }
+    return map;
+  }, [teamAssignments]);
+
   // ---- Handlers ----
   const handleConfirmAddMech = ({ name, description, cls }) => {
     const m = newMech(cls, name, description);
@@ -132,20 +183,18 @@ export default function App() {
   const handleDeleteMech = (id) => {
     setMechs(prev => prev.filter(m => m.id !== id));
     if (selectedMechId === id) setSelectedMechId(null);
+    unassignFromTeams(`hev:${id}`);
   };
 
   const toggleSupport = (name) => {
     setSupportAssets(prev => {
       const has = prev.includes(name);
       const next = has ? prev.filter(n => n !== name) : [...prev, name];
-      // Surface details in the right pane when adding; clear when removing.
       if (!has) {
         setSelectedSupportName(name);
         setSelectedMechId(null);
-        // Initialize a default loadout for assets with sub-unit picks.
         const a = findAsset(name);
         if (a?.subunits && a?.unitCount && !supportLoadouts[name]) {
-          // Default: fill all slots with the first sub-unit type.
           const first = a.subunits[0]?.name;
           if (first) {
             setSupportLoadouts(prev => ({
@@ -159,7 +208,6 @@ export default function App() {
       }
       return next;
     });
-    // Clear nickname + loadout when removing.
     if (supportAssets.includes(name)) {
       setSupportNicknames(prev => {
         if (!prev[name]) return prev;
@@ -169,6 +217,7 @@ export default function App() {
         if (!prev[name]) return prev;
         const next = { ...prev }; delete next[name]; return next;
       });
+      unassignFromTeams(`support:${name}`);
     }
   };
 
@@ -235,6 +284,7 @@ export default function App() {
                     mech={m}
                     index={i}
                     active={selectedMechId === m.id && sideTab === 'roster'}
+                    assignedTo={assignmentLookup[`hev:${m.id}`]}
                     onSelect={(id) => {
                       setSelectedMechId(id);
                       setSideTab('roster');
@@ -267,6 +317,7 @@ export default function App() {
                       asset={a}
                       customName={supportNicknames[name]}
                       loadout={supportLoadouts[name]}
+                      assignedTo={assignmentLookup[`support:${name}`]}
                       onRemove={toggleSupport}
                       onRename={(nick) => renameSupport(name, nick)}
                       active={selectedSupportName === name && sideTab === 'support'}
@@ -385,9 +436,15 @@ export default function App() {
               {sideTab === 'teams' && (
                 <TeamPanel
                   mechs={mechs}
+                  supportAssets={supportAssets}
                   selectedTeams={selectedTeams}
                   onToggleTeam={toggleTeam}
                   mission={missionObj}
+                  teamAssignments={teamAssignments}
+                  supportNicknames={supportNicknames}
+                  onAssign={assignToTeam}
+                  onUnassign={unassignFromTeams}
+                  onClearTeam={clearTeamAssignments}
                 />
               )}
 
@@ -407,6 +464,7 @@ export default function App() {
           forceName={forceName} onForceName={setForceName}
           onPrint={() => window.print()}
           onOptions={() => setOptionsOpen(true)}
+          onLists={() => setListsOpen(true)}
           mission={mission} customTons={customTons}
           onMission={setMission} onCustomTons={setCustomTons}
           totalTons={totalTons}
@@ -436,6 +494,40 @@ export default function App() {
         setSimpleMode={setSimpleMode}
         factionLogo={factionLogo}
         setFactionLogo={setFactionLogo}
+      />
+
+      <ListsModal
+        open={listsOpen}
+        onClose={() => setListsOpen(false)}
+        currentState={{
+          forceName, mission, customTons,
+          faction, perks, factionLogo,
+          mechs, supportAssets, selectedTeams,
+          callsignPool, customCallsigns,
+          supportNicknames, supportLoadouts,
+          teamAssignments,
+          simpleMode,
+        }}
+        onLoad={(data) => {
+          // Defensive: only restore known keys.
+          if (data.forceName != null) setForceName(data.forceName);
+          if (data.mission != null) setMission(data.mission);
+          if (data.customTons != null) setCustomTons(data.customTons);
+          if (data.faction !== undefined) setFaction(data.faction);
+          if (data.perks) setPerks(data.perks);
+          if (data.factionLogo !== undefined) setFactionLogo(data.factionLogo);
+          if (data.mechs) setMechs(data.mechs);
+          if (data.supportAssets) setSupportAssets(data.supportAssets);
+          if (data.selectedTeams) setSelectedTeams(data.selectedTeams);
+          if (data.callsignPool) setCallsignPool(data.callsignPool);
+          if (data.customCallsigns) setCustomCallsigns(data.customCallsigns);
+          if (data.supportNicknames) setSupportNicknames(data.supportNicknames);
+          if (data.supportLoadouts) setSupportLoadouts(data.supportLoadouts);
+          if (data.teamAssignments) setTeamAssignments(data.teamAssignments);
+          if (data.simpleMode !== undefined) setSimpleMode(data.simpleMode);
+          setSelectedMechId(null);
+          setSelectedSupportName(null);
+        }}
       />
     </>
   );

@@ -200,7 +200,11 @@ function SupportExpanded({ a }) {
 // TEAMS PANEL
 // ============================================================
 
-export function TeamPanel({ mechs, selectedTeams, onToggleTeam, mission }) {
+export function TeamPanel({
+  mechs, supportAssets, selectedTeams, onToggleTeam, mission,
+  teamAssignments = {}, onAssign, onUnassign, onClearTeam,
+  supportNicknames = {},
+}) {
   const slotsRemaining = slotsForBand(mission, selectedTeams, TEAMS);
   const results = TEAMS.map(t => ({ t, ...checkTeamEligibility(t, mechs) }));
 
@@ -263,6 +267,13 @@ export function TeamPanel({ mechs, selectedTeams, onToggleTeam, mission }) {
               selected={sel}
               onToggle={onToggleTeam}
               perReq={perReq}
+              assignedIds={teamAssignments[t.name] || []}
+              mechs={mechs}
+              supportAssets={supportAssets}
+              supportNicknames={supportNicknames}
+              onAssign={onAssign}
+              onUnassign={onUnassign}
+              onClearTeam={onClearTeam}
             />
           );
         })}
@@ -271,8 +282,49 @@ export function TeamPanel({ mechs, selectedTeams, onToggleTeam, mission }) {
   );
 }
 
-function TeamRow({ team, eligible, minSize, canAssign, slotLeft, selected, onToggle, perReq }) {
+function TeamRow({
+  team, eligible, minSize, canAssign, slotLeft, selected, onToggle, perReq,
+  assignedIds = [], mechs = [], supportAssets = [], supportNicknames = {},
+  onAssign, onUnassign, onClearTeam,
+}) {
   const [open, setOpen] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+
+  // Drop handler: read the dragged unit ID and assign to this team.
+  const handleDragOver = (e) => {
+    if (!selected) return; // Only enlisted teams accept drops
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (!dragOver) setDragOver(true);
+  };
+  const handleDragLeave = () => setDragOver(false);
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    if (!selected || !onAssign) return;
+    const unitId = e.dataTransfer.getData('text/plain');
+    if (unitId) onAssign(team.name, unitId);
+  };
+
+  // Resolve assigned IDs to display info.
+  const assignedUnits = assignedIds.map(id => {
+    if (id.startsWith('hev:')) {
+      const m = mechs.find(x => x.id === id.slice(4));
+      if (m) return {
+        id,
+        label: m.name || `${m.weightClass.toUpperCase()} HE-V`,
+        kind: 'hev',
+      };
+    } else if (id.startsWith('support:')) {
+      const name = id.slice(8);
+      if (supportAssets.includes(name)) return {
+        id,
+        label: supportNicknames[name] || name,
+        kind: 'support',
+      };
+    }
+    return null;
+  }).filter(Boolean);
 
   // Decide button state
   // - selected → "Remove" (rust outlined)
@@ -327,12 +379,20 @@ function TeamRow({ team, eligible, minSize, canAssign, slotLeft, selected, onTog
   );
 
   return (
-    <div style={{
-      borderTop: '1px solid var(--rule)',
-      borderBottom: '1px solid var(--rule)',
-      marginBottom: -1,
-      background: selected ? 'var(--surface)' : 'transparent',
-    }}>
+    <div
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      style={{
+        borderTop: '1px solid var(--rule)',
+        borderBottom: '1px solid var(--rule)',
+        marginBottom: -1,
+        background: dragOver ? 'var(--olive)' : (selected ? 'var(--surface)' : 'transparent'),
+        outline: dragOver ? '2px dashed var(--olive-deep)' : 'none',
+        outlineOffset: -3,
+        transition: 'background 100ms',
+      }}
+    >
       <div style={{
         display: 'grid', gridTemplateColumns: 'auto auto 1fr auto auto', alignItems: 'center', gap: 12,
         padding: '12px 12px',
@@ -386,6 +446,23 @@ function TeamRow({ team, eligible, minSize, canAssign, slotLeft, selected, onTog
           {btnLabel}
         </button>
       </div>
+
+      {/* Assigned units strip. Always shown when team is selected so the
+          drop zone is visible even with no assignments yet. */}
+      {selected && (
+        <AssignmentStrip
+          team={team}
+          assignedUnits={assignedUnits}
+          assignedIds={assignedIds}
+          mechs={mechs}
+          supportAssets={supportAssets}
+          supportNicknames={supportNicknames}
+          onAssign={onAssign}
+          onUnassign={onUnassign}
+          onClearTeam={onClearTeam}
+        />
+      )}
+
       {open && (
         <div style={{ padding: '0 14px 16px 14px', background: 'var(--bg-deep)', borderTop: '1px dashed var(--rule)' }}>
           <div style={{ marginTop: 12 }}><span className="label">Requirements</span></div>
@@ -457,8 +534,173 @@ function TeamRow({ team, eligible, minSize, canAssign, slotLeft, selected, onTog
   );
 }
 
-// ============================================================
-// SUPPORT DETAIL VIEW
+// AssignmentStrip: chips for each assigned unit, plus a tap-to-assign
+// button that opens a popover listing every available unit not yet on
+// this team. Drag-drop still works on the parent row; this is the
+// touch-friendly fallback.
+function AssignmentStrip({
+  team, assignedUnits, assignedIds,
+  mechs, supportAssets, supportNicknames,
+  onAssign, onUnassign, onClearTeam,
+}) {
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const ref = React.useRef(null);
+
+  React.useEffect(() => {
+    if (!pickerOpen) return;
+    const close = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setPickerOpen(false);
+    };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [pickerOpen]);
+
+  // Available units: every HE-V + support that is NOT already on this team.
+  const candidates = [];
+  mechs.forEach(m => {
+    const id = `hev:${m.id}`;
+    if (!assignedIds.includes(id)) {
+      candidates.push({
+        id,
+        label: m.name || `${m.weightClass.toUpperCase()} HE-V`,
+        kind: 'hev',
+      });
+    }
+  });
+  supportAssets.forEach(name => {
+    const id = `support:${name}`;
+    if (!assignedIds.includes(id)) {
+      candidates.push({
+        id,
+        label: supportNicknames[name] || name,
+        kind: 'support',
+      });
+    }
+  });
+
+  return (
+    <div style={{
+      padding: '0 14px 10px 56px',
+      display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6,
+      minHeight: 22,
+      position: 'relative',
+    }} ref={ref}>
+      {assignedUnits.length === 0 && (
+        <span style={{
+          fontSize: 11.5, color: 'var(--mute)', fontStyle: 'italic',
+        }}>
+          Drop a HE-V or support asset here, or tap +Assign.
+        </span>
+      )}
+      {assignedUnits.map(u => (
+        <span
+          key={u.id}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 4,
+            padding: '2px 4px 2px 8px',
+            background: u.kind === 'support' ? 'var(--steel)' : 'var(--olive)',
+            color: 'var(--surface)',
+            fontFamily: 'var(--font-stencil)',
+            fontSize: 11, fontWeight: 700,
+            letterSpacing: '0.04em', textTransform: 'uppercase',
+          }}
+        >
+          {u.label}
+          <button
+            onClick={(e) => { e.stopPropagation(); onUnassign?.(u.id); }}
+            title="Remove from team"
+            style={{
+              background: 'transparent', border: 'none',
+              color: 'rgba(241,234,218,0.85)',
+              padding: '0 4px', cursor: 'pointer',
+              fontSize: 13, lineHeight: 1,
+            }}
+          >
+            ×
+          </button>
+        </span>
+      ))}
+
+      {/* + Assign tap button. Always available; popover lists available units. */}
+      {candidates.length > 0 && (
+        <button
+          onClick={() => setPickerOpen(o => !o)}
+          style={{
+            background: 'transparent',
+            border: '1.5px dashed var(--rule-strong)',
+            color: 'var(--ink-2)',
+            padding: '2px 8px', cursor: 'pointer',
+            fontFamily: 'var(--font-stencil)', fontSize: 11,
+            fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
+          }}
+          title="Pick a unit to assign"
+        >
+          + Assign
+        </button>
+      )}
+
+      {assignedUnits.length > 0 && onClearTeam && (
+        <button
+          onClick={() => onClearTeam(team.name)}
+          style={{
+            background: 'transparent', border: 'none',
+            color: 'var(--mute)', cursor: 'pointer',
+            fontFamily: 'var(--font-body)', fontSize: 11.5,
+            textDecoration: 'underline', padding: '0 4px',
+          }}
+          title="Unassign all units from this team"
+        >
+          clear all
+        </button>
+      )}
+
+      {pickerOpen && (
+        <div style={{
+          position: 'absolute',
+          top: '100%', left: 56,
+          background: 'var(--surface)',
+          border: '2px solid var(--ink)',
+          minWidth: 240, maxWidth: 320,
+          zIndex: 50,
+          maxHeight: 280, overflowY: 'auto',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.18)',
+        }}>
+          {candidates.map(c => (
+            <button
+              key={c.id}
+              onClick={() => {
+                onAssign?.(team.name, c.id);
+                setPickerOpen(false);
+              }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                width: '100%',
+                background: 'transparent', border: 'none',
+                borderBottom: '1px solid var(--rule)',
+                padding: '8px 12px',
+                cursor: 'pointer',
+                fontFamily: 'var(--font-body)',
+                fontSize: 13, color: 'var(--ink)',
+                textAlign: 'left',
+              }}
+            >
+              <span className="stencil" style={{
+                fontSize: 9.5,
+                padding: '1px 5px',
+                border: '1px solid ' + (c.kind === 'support' ? 'var(--steel)' : 'var(--olive)'),
+                color: c.kind === 'support' ? 'var(--steel)' : 'var(--olive)',
+                flexShrink: 0,
+              }}>
+                {c.kind === 'hev' ? 'HE-V' : 'SUPP'}
+              </span>
+              <span>{c.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 // Right-pane content when a support asset is added or clicked.
 // Shows everything: full description, statline as a table, and an
 // inline glossary of any traits referenced.
@@ -484,14 +726,14 @@ export function SupportDetailView({ assetName, customName, loadout, onSetLoadout
           fontFamily: 'var(--font-stencil)', fontSize: 11.5, fontWeight: 700,
           letterSpacing: '0.10em', textTransform: 'uppercase', marginBottom: 16,
         }}>
-          \u2190 Browse all
+          ← Browse all
         </button>
       )}
 
       <div className="stencil" style={{
         fontSize: 12, color: 'var(--rust)', letterSpacing: '0.22em', marginBottom: 6,
       }}>
-        SUPPORT ASSET \u00B7 {a.kind.toUpperCase()}
+        SUPPORT ASSET · {a.kind.toUpperCase()}
       </div>
       <h1 style={{
         fontFamily: 'var(--font-display)',
@@ -709,14 +951,14 @@ function SubUnitPicker({ asset: a, loadout, onChange }) {
                 <div className="mono" style={{
                   fontSize: 11, color: 'var(--ink-2)', marginTop: 2, lineHeight: 1.4,
                 }}>
-                  SPD {su.spd} \u00B7 ARM {su.arm} \u00B7 STR {su.str}
+                  SPD {su.spd} · ARM {su.arm} · STR {su.str}
                 </div>
                 <div style={{
                   fontSize: 11.5, color: 'var(--ink-2)', marginTop: 2, lineHeight: 1.4,
                 }}>
                   {su.weapons}
                 </div>
-                {su.traits && su.traits !== '\u2014' && (
+                {su.traits && su.traits !== '—' && (
                   <div style={{
                     fontSize: 11, color: 'var(--mute)', marginTop: 2, fontStyle: 'italic',
                     lineHeight: 1.4,
@@ -814,11 +1056,6 @@ export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
           );
         })}
       </div>
-      {faction && (
-        <div style={{ marginTop: 8, marginBottom: 16 }}>
-          <TextButton onClick={() => onSetFaction(null)}>clear faction</TextButton>
-        </div>
-      )}
 
       {data && (
         <>

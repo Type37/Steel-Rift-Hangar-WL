@@ -250,27 +250,153 @@ button:not(:disabled):active {
    navbar.
    ============================================================ */
 /* ============================================================
-   BOTTOM BAR. Single row: force input | Options | Print | mission
-   chips | tonnage bar | Add Support | Add HE-V. Wraps gracefully.
+   BOTTOM BAR. Single row, left-to-right:
+   [mission/tonnage] [+HE-V] [+Support] [spacer] [Force] [Options] [Lists] [Print]
    ============================================================ */
 .bottombar {
   border-top: 2px solid var(--ink);
   background: var(--surface);
-  padding: 8px 16px;
+  padding: 8px 14px;
 }
 .bottombar-row-top {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
+
+/* Mission + tonnage cluster. The mission button doubles as a label
+   and a dropdown trigger, the tonnage bar shows fill. */
+.bottombar-points {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  flex: 0 0 auto;
+}
+.bottombar-mission-button {
+  border: 1.5px solid var(--ink);
+  border-right: none;
+  padding: 4px 9px;
+  cursor: pointer;
+  font-family: var(--font-stencil);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.bottombar-mission-label { line-height: 1; }
+.bottombar-ton-bar {
+  width: 144px;
+  height: 28px;
+  background: var(--bg-deep);
+  border: 1.5px solid var(--rule-strong);
+  position: relative;
+  flex-shrink: 0;
+}
+.bottombar-ton-fill {
+  position: absolute;
+  inset: 0;
+  width: 0;
+  transition: width 180ms ease-out;
+}
+.bottombar-ton-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  text-shadow: 0 0 2px rgba(241, 234, 218, 0.85);
+  pointer-events: none;
+}
+.bottombar-mission-popover {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.18);
+  min-width: 220px;
+  z-index: 100;
+}
+.mission-popover-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  padding: 9px 12px;
+  cursor: pointer;
+  font-family: var(--font-stencil);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-align: left;
+}
+.mission-popover-item:last-child { border-bottom: none; }
+.mission-popover-item:hover { background: var(--bg); }
+.mission-popover-item.is-active {
+  background: var(--ink);
+  color: var(--surface);
+}
+.mission-popover-item.is-active .mono { color: rgba(241, 234, 218, 0.7) !important; }
+
+/* Add HE-V CTA: rust solid */
+.bottombar-add-mech {
+  background: var(--rust);
+  color: var(--surface);
+  border: 2px solid var(--rust);
+  padding: 5px 12px;
+  cursor: pointer;
+  font-family: var(--font-stencil);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  box-shadow: 0 2px 0 var(--rust-deep);
+}
+.bottombar-add-support {
+  background: transparent;
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  padding: 5px 12px;
+  cursor: pointer;
+  font-family: var(--font-stencil);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+/* Force input lives on the right and shrinks last */
 .bottombar-force-input {
-  flex: 0 1 220px;
+  flex: 1 1 180px;
   display: flex;
   align-items: center;
   border-bottom: 1.5px solid var(--rule-strong);
   padding-bottom: 1px;
   min-width: 140px;
+  margin-left: auto;
 }
 .bottombar-force-input input {
   flex: 1;
@@ -282,7 +408,7 @@ button:not(:disabled):active {
   font-family: var(--font-display);
   font-size: 16px;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   color: var(--ink);
 }
 .bottombar-force-input input::placeholder {
@@ -290,6 +416,7 @@ button:not(:disabled):active {
   font-weight: 500;
   letter-spacing: 0.02em;
 }
+
 .util-btn {
   background: transparent;
   border: 1.5px solid var(--rule-strong);
@@ -310,29 +437,6 @@ button:not(:disabled):active {
   background: var(--ink);
   color: var(--surface);
   border-color: var(--ink);
-}
-.bottombar-divider {
-  width: 1px;
-  height: 22px;
-  background: var(--rule-strong);
-  flex-shrink: 0;
-}
-.bottombar-mission-row {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-wrap: wrap;
-  flex: 1 1 240px;
-  min-width: 0;
-}
-.bottombar-ton-bar {
-  flex: 0 1 200px;
-  min-width: 140px;
-}
-.bottombar-ctas {
-  display: flex;
-  gap: 6px;
-  flex-shrink: 0;
 }
 
 /* Pulsing glow for empty-roster prompts that want attention */
@@ -1109,27 +1213,24 @@ button:not(:disabled):active {
 
   /* Bottom bar collapses on phone */
   .bottombar {
-    padding: 6px 10px !important;
+    padding: 6px 8px !important;
   }
   .bottombar-row-top {
-    gap: 6px !important;
+    gap: 5px !important;
   }
+  .bottombar-points { flex: 1 1 100% !important; }
+  .bottombar-ton-bar { flex: 1; width: auto !important; }
   .bottombar-force-input {
     flex: 1 1 100% !important;
+    margin-left: 0 !important;
+    order: 1;
   }
   .bottombar-force-input input { font-size: 15px !important; }
   .util-btn { padding: 5px 8px; font-size: 10.5px; }
   .util-label { display: none; }
-  .bottombar-divider { display: none; }
-  .bottombar-mission-row { flex: 1 1 100% !important; }
-  .bottombar-ton-bar { flex: 1 1 100% !important; }
-  .bottombar-ctas {
-    flex: 1 1 100% !important;
-    margin-left: 0;
-  }
-  .bottombar-ctas > * {
-    flex: 1;
-    justify-content: center;
+  .bottombar-add-mech, .bottombar-add-support {
+    padding: 5px 9px !important;
+    font-size: 10.5px !important;
   }
 
   .sidebar { padding: 14px 12px 20px !important; }
