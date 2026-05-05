@@ -24,6 +24,11 @@
   --olive:        #4f6132;
   --olive-deep:   #344020;
   --steel:        #2a3640;
+  --steel-deep:   #1a2229;
+  /* Freelancers crimson — warmer, more saturated than rust accent so
+     the two reads don't collide visually. */
+  --crimson:      #8e2620;
+  --crimson-deep: #5e1611;
   --warn:         #8a5a09;
   --orange:       #e07a26; /* "Buy Now" warm */
 
@@ -244,27 +249,28 @@ button:not(:disabled):active {
    The topbar has been removed; this is the only chrome below the
    navbar.
    ============================================================ */
+/* ============================================================
+   BOTTOM BAR. Single row: force input | Options | Print | mission
+   chips | tonnage bar | Add Support | Add HE-V. Wraps gracefully.
+   ============================================================ */
 .bottombar {
   border-top: 2px solid var(--ink);
   background: var(--surface);
-  padding: 10px 22px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  padding: 8px 16px;
 }
-.bottombar-row {
+.bottombar-row-top {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
-.bottombar-row-force { gap: 10px; }
 .bottombar-force-input {
-  flex: 0 1 360px;
+  flex: 0 1 220px;
   display: flex;
   align-items: center;
   border-bottom: 1.5px solid var(--rule-strong);
-  padding-bottom: 2px;
-  min-width: 180px;
+  padding-bottom: 1px;
+  min-width: 140px;
 }
 .bottombar-force-input input {
   flex: 1;
@@ -272,9 +278,9 @@ button:not(:disabled):active {
   background: transparent;
   border: none;
   outline: none;
-  padding: 4px 0;
+  padding: 3px 0;
   font-family: var(--font-display);
-  font-size: 19px;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: 0.04em;
   color: var(--ink);
@@ -284,54 +290,49 @@ button:not(:disabled):active {
   font-weight: 500;
   letter-spacing: 0.02em;
 }
-.bottombar-utilities {
-  display: flex;
-  gap: 6px;
-  flex-shrink: 0;
-  margin-left: auto;
-}
 .util-btn {
   background: transparent;
   border: 1.5px solid var(--rule-strong);
   color: var(--ink);
-  padding: 6px 12px;
+  padding: 5px 10px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   font-family: var(--font-stencil);
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.10em;
   text-transform: uppercase;
+  flex-shrink: 0;
 }
 .util-btn-print {
   background: var(--ink);
   color: var(--surface);
   border-color: var(--ink);
 }
-.bottombar-row-mission {
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
+.bottombar-divider {
+  width: 1px;
+  height: 22px;
+  background: var(--rule-strong);
+  flex-shrink: 0;
 }
 .bottombar-mission-row {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   flex-wrap: wrap;
-  flex: 1 1 280px;
+  flex: 1 1 240px;
   min-width: 0;
 }
 .bottombar-ton-bar {
-  flex: 0 1 240px;
-  min-width: 160px;
+  flex: 0 1 200px;
+  min-width: 140px;
 }
 .bottombar-ctas {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
-  margin-left: auto;
 }
 
 /* Pulsing glow for empty-roster prompts that want attention */
@@ -396,9 +397,6 @@ button:not(:disabled):active {
   overflow: hidden;
   isolation: isolate;
 }
-/* Logo wash sits behind the text content, faded out by default,
-   fades in on hover. The image is set via inline style with a CSS var
-   on each tile so each faction shows its own org logo. */
 .faction-tile::before {
   content: '';
   position: absolute;
@@ -413,14 +411,50 @@ button:not(:disabled):active {
   filter: grayscale(0.4);
 }
 .faction-tile:hover::before { opacity: 0.18; }
-.faction-tile.is-active::before { opacity: 0.22; filter: grayscale(0); }
-.faction-tile:hover {
-  border-color: var(--ink);
-  background: var(--bg);
+.faction-tile.is-active::before { opacity: 0.24; filter: grayscale(0); }
+
+/* Authorities: military olive. Top stripe + olive border on active. */
+.faction-tile-authorities {
+  border-color: var(--olive);
+  border-top-width: 4px;
 }
-.faction-tile.is-active {
-  background: var(--steel);
+.faction-tile-authorities:hover {
+  background: #ede9d2;
+  border-color: var(--olive-deep);
+}
+.faction-tile-authorities.is-active {
+  background: var(--olive);
+  border-color: var(--olive-deep);
+  color: var(--surface);
+}
+
+/* Corporations: cool steel. */
+.faction-tile-corporations {
   border-color: var(--steel);
+  border-top-width: 4px;
+}
+.faction-tile-corporations:hover {
+  background: #e1ddc7;
+  border-color: var(--steel-deep);
+}
+.faction-tile-corporations.is-active {
+  background: var(--steel);
+  border-color: var(--steel-deep);
+  color: var(--surface);
+}
+
+/* Freelancers: a warmer crimson-rust, distinct from the primary --rust accent. */
+.faction-tile-freelancers {
+  border-color: var(--crimson);
+  border-top-width: 4px;
+}
+.faction-tile-freelancers:hover {
+  background: #efd6c8;
+  border-color: var(--crimson-deep);
+}
+.faction-tile-freelancers.is-active {
+  background: var(--crimson);
+  border-color: var(--crimson-deep);
   color: var(--surface);
 }
 .faction-tile-name {
@@ -710,176 +744,205 @@ button:not(:disabled):active {
 .game-card-blank { outline: 1px dashed #ccc; }
 
 .game-card-inner {
-  padding: 6pt 7pt;
+  padding: 4pt 4pt;
   font-family: 'Schibsted Grotesk', system-ui, sans-serif;
-  font-size: 8.5pt;
-  line-height: 1.35;
+  font-size: 8pt;
+  line-height: 1.3;
   color: #000;
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  border-bottom: 1.5pt solid #000;
-  padding-bottom: 3pt;
-  margin-bottom: 4pt;
-}
-.card-header-name {
+/* Name band: prominent uppercase title at the top of every card. */
+.card-name-band {
   font-family: 'Chakra Petch', sans-serif;
   font-weight: 700;
   font-size: 12pt;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   line-height: 1.05;
-  flex: 1;
-  min-width: 0;
-}
-.card-header-class {
-  font-family: 'Space Mono', monospace;
-  font-size: 7pt;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #555;
-  flex-shrink: 0;
-  margin-left: 4pt;
+  padding: 1pt 4pt 3pt;
+  color: #000;
 }
 
+/* Class + stats two-column row. */
+.card-row { display: flex; gap: 4pt; }
+.card-row-id {
+  margin-bottom: 2pt;
+  align-items: stretch;
+}
+.card-class-band {
+  flex: 0 0 38%;
+  background: #ddd;
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 8pt;
+  letter-spacing: 0.04em;
+  padding: 2pt 4pt;
+  display: flex;
+  align-items: center;
+}
+
+/* Stats table: Tng / Mov / Jmp / Def header band on gray, body on white. */
 .card-stats-table {
-  width: 100%;
+  flex: 1;
   border-collapse: collapse;
-  margin-bottom: 4pt;
   font-family: 'JetBrains Mono', monospace;
 }
 .card-stats-table th {
-  font-family: 'Space Mono', monospace;
-  font-size: 6.5pt;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #555;
-  border-bottom: 0.5pt solid #999;
-  padding: 1pt 0;
+  font-family: 'Chakra Petch', sans-serif;
   font-weight: 500;
+  font-size: 7.5pt;
+  background: #ddd;
+  padding: 1pt 0;
   text-align: center;
 }
 .card-stats-table td {
-  font-size: 10pt;
+  font-size: 9pt;
   font-weight: 700;
-  padding: 2pt 0;
+  padding: 1.5pt 0;
   text-align: center;
 }
 
-.hp-row {
+/* Damage row: ARMOR (col-5) | STRUCTURE+CRIT (col-7) */
+.card-row-damage {
   display: grid;
-  grid-template-columns: 0.5in 1fr;
-  gap: 4pt;
-  align-items: start;
+  grid-template-columns: 42% 58%;
+  gap: 3pt;
   margin-bottom: 3pt;
 }
-.hp-row-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 6.5pt;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #555;
-  padding-top: 2pt;
+.card-armor-col { padding-right: 1pt; }
+.card-structure-col { display: flex; gap: 3pt; }
+.card-structure-stack { flex: 1; min-width: 0; }
+.card-crit { padding-right: 1pt; }
+
+.hp-heading {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 7.5pt;
+  letter-spacing: 0.04em;
+  padding: 1pt 4pt;
+  background: #ddd;
+  margin-bottom: 1pt;
 }
-.hp-row-boxes {
+
+/* Pip container: rows of pills (armor) or circles (structure). */
+.hp-container {
+  padding-left: 3pt;
+  padding-top: 1pt;
+}
+.hp-row {
   display: flex;
-  flex-direction: column;
-  gap: 2pt;
+  align-items: start;
+  gap: 1px;
+  margin-bottom: 1px;
 }
-.hp-row-line {
-  display: flex;
-  gap: 1.5pt;
-}
-.hp-box {
-  width: 10pt;
-  height: 10pt;
-  border: 0.5pt solid #000;
+.hp {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 9pt;
+  height: 9pt;
+  border: 1pt solid #000;
   font-family: 'JetBrains Mono', monospace;
   font-size: 6pt;
   font-weight: 700;
+  line-height: 1;
   background: #fff;
+  flex-shrink: 0;
 }
-.hp-box-marked { background: #eee; }
+/* Armor: pill with rounded ends, taller than tall */
+.hp-armor {
+  border-radius: 50% 50% 50% 50% / 25% 25% 75% 75%;
+}
+/* Structure: full circle */
+.hp-structure {
+  border-radius: 50%;
+}
+
+/* CRIT legend table. */
+.card-crit-heading {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 7.5pt;
+  letter-spacing: 0.04em;
+  padding: 1pt 0;
+}
+.table-crit {
+  border-collapse: collapse;
+  font-size: 6pt;
+  font-family: 'Schibsted Grotesk', sans-serif;
+}
+.table-crit td {
+  padding: 0.5pt 2pt 0.5pt 0;
+  white-space: nowrap;
+}
+.table-crit .num {
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+}
+
+/* Section heading band (gray fill, used for WEAPONS / UPGRADES). */
+.card-section-heading {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 8pt;
+  letter-spacing: 0.04em;
+  background: #ddd;
+  padding: 1.5pt 4pt;
+  margin: 2pt 0 2pt;
+}
 
 .card-weapons-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 3pt;
-  font-size: 7.5pt;
+  font-size: 7pt;
 }
 .card-weapons-table th {
-  font-family: 'Space Mono', monospace;
-  font-size: 6pt;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #555;
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 6.5pt;
   font-weight: 500;
-  border-bottom: 0.5pt solid #999;
   text-align: left;
-  padding: 2pt 2pt 1pt 0;
+  padding: 1pt 2pt 0.5pt 4pt;
+  border-bottom: 0.4pt solid #444;
 }
-.card-weapons-table th.num { text-align: center; }
+.card-weapons-table th.num { text-align: center; padding-left: 0; padding-right: 0; }
 .card-weapons-table td {
-  padding: 1.5pt 2pt 1.5pt 0;
-  border-bottom: 0.25pt solid #ddd;
+  padding: 1pt 2pt 1pt 4pt;
+  border-bottom: 0.25pt solid #aaa;
   vertical-align: top;
 }
 .card-weapons-table td.num {
   text-align: center;
   font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
+  padding-left: 0; padding-right: 0;
 }
+.card-weapons-table tr:last-child td { border-bottom: none; }
 .card-weapons-table .card-traits {
-  font-size: 6.5pt;
+  font-size: 6pt;
   color: #444;
   line-height: 1.3;
 }
 
-.card-upgrades {
-  margin-top: auto;
-  padding-top: 4pt;
-  border-top: 0.5pt dashed #999;
-}
-.card-upgrades-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 6.5pt;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #555;
-  margin-bottom: 2pt;
-}
 .card-upgrades-list {
-  font-size: 7.5pt;
+  font-size: 7pt;
   line-height: 1.4;
+  padding: 1pt 4pt 0;
+  margin-top: auto;
 }
 
 /* Support card */
 .card-support-summary {
   font-style: italic;
-  font-size: 7.5pt;
+  font-size: 7pt;
   color: #555;
-  margin-bottom: 4pt;
+  padding: 1pt 4pt;
+  margin: 1pt 0 2pt;
   line-height: 1.35;
 }
-.card-loadout {
-  margin-bottom: 4pt;
-  padding: 3pt 0;
-  border-top: 0.25pt solid #ddd;
-  border-bottom: 0.25pt solid #ddd;
-}
 .card-loadout-list {
-  margin: 2pt 0 0;
-  padding-left: 12pt;
-  font-size: 7.5pt;
+  margin: 1pt 0 2pt;
+  padding: 1pt 4pt 1pt 16pt;
+  font-size: 7pt;
   line-height: 1.4;
   color: #000;
 }
@@ -887,37 +950,31 @@ button:not(:disabled):active {
 .card-support-stats {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 4pt;
+  margin: 1pt 0 2pt;
 }
 .card-support-stats th {
-  font-family: 'Space Mono', monospace;
+  font-family: 'Chakra Petch', sans-serif;
   font-size: 6.5pt;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #555;
   font-weight: 500;
+  color: #444;
   text-align: left;
-  padding: 1.5pt 4pt 1.5pt 0;
-  border-bottom: 0.25pt solid #ddd;
+  padding: 1pt 3pt 1pt 4pt;
+  border-bottom: 0.25pt solid #aaa;
   vertical-align: top;
   width: 32%;
 }
 .card-support-stats td {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 7.5pt;
-  padding: 1.5pt 0;
-  border-bottom: 0.25pt solid #ddd;
-}
-.card-support-traits {
-  margin-bottom: 4pt;
+  font-size: 7pt;
+  padding: 1pt 0;
+  border-bottom: 0.25pt solid #aaa;
 }
 .card-support-rules {
-  font-size: 7pt;
+  font-size: 6.5pt;
   line-height: 1.4;
   color: #222;
   margin-top: auto;
-  padding-top: 3pt;
-  border-top: 0.5pt dashed #999;
+  padding: 2pt 4pt 0;
 }
 
 /* Reference page (full width) */
@@ -1050,30 +1107,25 @@ button:not(:disabled):active {
     margin-left: auto;
   }
 
-  /* Bottom bar collapses to tighter rows on phone */
+  /* Bottom bar collapses on phone */
   .bottombar {
-    padding: 8px 12px 10px !important;
+    padding: 6px 10px !important;
+  }
+  .bottombar-row-top {
     gap: 6px !important;
   }
-  .bottombar-row { gap: 8px; }
-  .bottombar-row-force { gap: 6px; flex-wrap: wrap; }
   .bottombar-force-input {
     flex: 1 1 100% !important;
   }
-  .bottombar-force-input input { font-size: 16px !important; }
-  .util-btn { padding: 6px 9px; font-size: 11px; }
+  .bottombar-force-input input { font-size: 15px !important; }
+  .util-btn { padding: 5px 8px; font-size: 10.5px; }
   .util-label { display: none; }
-
-  .bottombar-row-mission {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 6px;
-  }
-  .bottombar-mission-row { gap: 4px !important; flex: 1 1 auto !important; }
-  .bottombar-ton-bar { flex: 1 1 auto; }
+  .bottombar-divider { display: none; }
+  .bottombar-mission-row { flex: 1 1 100% !important; }
+  .bottombar-ton-bar { flex: 1 1 100% !important; }
   .bottombar-ctas {
-    margin-left: 0 !important;
-    justify-content: stretch;
+    flex: 1 1 100% !important;
+    margin-left: 0;
   }
   .bottombar-ctas > * {
     flex: 1;

@@ -183,28 +183,55 @@ function HEVCard({ mech, index }) {
 
   return (
     <div className="game-card-inner">
-      <header className="card-header">
-        <div className="card-header-name">{mech.name || `${cls.toUpperCase()} HE-V`}</div>
-        <div className="card-header-class">{cls} HE-V</div>
+      {/* Header band */}
+      <header className="card-name-band">
+        {mech.name || `${cls.toUpperCase()} HE-V`}
       </header>
 
-      <table className="card-stats-table">
-        <thead>
-          <tr><th>Tng</th><th>Mov</th><th>Jmp</th><th>Def</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>{wc.baseTons}</td>
-            <td>{move}"</td>
-            <td>{jumpVal != null ? `${jumpVal}"` : '—'}</td>
-            <td>{def}+</td>
-          </tr>
-        </tbody>
-      </table>
+      {/* Class + stats row, two columns */}
+      <div className="card-row card-row-id">
+        <div className="card-class-band">{cls.toUpperCase()} HE-V</div>
+        <table className="card-stats-table">
+          <thead>
+            <tr><th>Tng</th><th>Mov</th><th>Jmp</th><th>Def</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{wc.baseTons}</td>
+              <td>{move}"</td>
+              <td>{jumpVal != null ? `${jumpVal}"` : '\u2014'}</td>
+              <td>{def}+</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      <HpRow label="Armor" total={mech.armor} />
-      <HpRow label="Structure" total={mech.structure} structure />
+      {/* Damage row: ARMOR (col-5) | STRUCTURE + CRIT legend (col-7) */}
+      <div className="card-row-damage">
+        <div className="card-armor-col">
+          <div className="hp-heading">ARMOR</div>
+          <PipBlock kind="armor" total={mech.armor} />
+        </div>
+        <div className="card-structure-col">
+          <div className="card-structure-stack">
+            <div className="hp-heading">STRUCTURE</div>
+            <PipBlock kind="structure" total={mech.structure} />
+          </div>
+          <div className="card-crit">
+            <div className="card-crit-heading">CRIT</div>
+            <table className="table-crit">
+              <tbody>
+                <tr><td><strong>(M)</strong>ove</td><td className="num">-1</td></tr>
+                <tr><td><strong>(D)</strong>mg</td><td className="num">-1</td></tr>
+                <tr><td><strong>(\u00D8)</strong>rders</td><td className="num">-1</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
+      {/* Weapons table */}
+      <div className="card-section-heading">WEAPONS</div>
       <table className="card-weapons-table">
         <thead>
           <tr>
@@ -227,13 +254,55 @@ function HEVCard({ mech, index }) {
       </table>
 
       {(upgrades.length > 0 || defensive.length > 0) && (
-        <div className="card-upgrades">
-          <div className="card-upgrades-label">Upgrades</div>
+        <>
+          <div className="card-section-heading">UPGRADES</div>
           <div className="card-upgrades-list">
-            {[...upgrades, ...defensive].map(u => u.name).join(' · ')}
+            {[...upgrades, ...defensive].map(u => u.name).join(' \u00B7 ')}
           </div>
-        </div>
+        </>
       )}
+    </div>
+  );
+}
+
+// Pill (armor) or circle (structure) pip block. Critical markers M/D/Ø
+// land at the quarter-thresholds for structure.
+function PipBlock({ kind, total }) {
+  if (!total) return null;
+  const isStructure = kind === 'structure';
+  const points = [];
+  if (isStructure) {
+    const parts = 4;
+    const base = Math.floor(total / parts);
+    const remainder = total % parts;
+    const chunks = Array(parts).fill(base);
+    for (let i = 0; i < remainder; i++) chunks[i] += 1;
+    const map = ['M', 'D', '\u00D8'];
+    chunks.forEach((count, idx) => {
+      for (let j = 0; j < count; j++) {
+        const isLast = j === count - 1;
+        points.push(isLast && map[idx] ? map[idx] : null);
+      }
+    });
+  } else {
+    for (let i = 0; i < total; i++) points.push(null);
+  }
+
+  // Wrap into rows of 5 for armor, 6 for structure.
+  const rowSize = isStructure ? 6 : 5;
+  const rows = chunk(points, rowSize);
+
+  return (
+    <div className="hp-container">
+      {rows.map((row, ri) => (
+        <div key={ri} className="hp-row">
+          {row.map((mark, bi) => (
+            <span key={bi} className={`hp ${isStructure ? 'hp-structure' : 'hp-armor'}`}>
+              {mark || ''}
+            </span>
+          ))}
+        </div>
+      ))}
     </div>
   );
 }
@@ -257,50 +326,54 @@ function SupportCard({ asset: a, customName, loadout }) {
 
   return (
     <div className="game-card-inner">
-      <header className="card-header">
-        <div className="card-header-name">{customName || a.name}</div>
-        <div className="card-header-class">{a.kind} \u00B7 {a.cost}t</div>
-      </header>
-
-      {customName && (
-        <div className="card-support-summary" style={{ marginBottom: 2 }}>
-          ({a.name})
+      <header className="card-name-band">{customName || a.name}</header>
+      <div className="card-row card-row-id">
+        <div className="card-class-band">
+          {a.kind.toUpperCase()} \u00B7 {a.cost}t
         </div>
-      )}
+        {customName && (
+          <div className="card-class-band" style={{ flex: 1, fontStyle: 'italic', fontSize: '6.5pt', color: '#555' }}>
+            ({a.name})
+          </div>
+        )}
+      </div>
 
       {a.summary && (
         <div className="card-support-summary">{a.summary}</div>
       )}
 
       {loadoutBreakdown && (
-        <div className="card-loadout">
-          <div className="card-upgrades-label">Loadout</div>
+        <>
+          <div className="card-section-heading">LOADOUT</div>
           <ul className="card-loadout-list">
             {loadoutBreakdown.map(([n, c]) => (
               <li key={n}><strong>{c}\u00D7</strong> {n}</li>
             ))}
           </ul>
-        </div>
+        </>
       )}
 
       {statEntries.length > 0 && (
-        <table className="card-support-stats">
-          <tbody>
-            {statEntries.map(([k, v]) => (
-              <tr key={k}>
-                <th>{k}</th>
-                <td>{v}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <>
+          <div className="card-section-heading">STATS</div>
+          <table className="card-support-stats">
+            <tbody>
+              {statEntries.map(([k, v]) => (
+                <tr key={k}>
+                  <th>{k}</th>
+                  <td>{v}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
       )}
 
       {traits && (
-        <div className="card-support-traits">
-          <div className="card-upgrades-label">Traits</div>
+        <>
+          <div className="card-section-heading">TRAITS</div>
           <div className="card-upgrades-list">{traits}</div>
-        </div>
+        </>
       )}
 
       {a.fullDesc && (
@@ -310,52 +383,7 @@ function SupportCard({ asset: a, customName, loadout }) {
   );
 }
 
-// ============================================================
-// HP ROW with damage track boxes
-// Structure boxes get critical markers at quarter thresholds.
-// ============================================================
-function HpRow({ label, total, structure }) {
-  if (!total) return null;
-  const points = buildHpPoints(total, structure);
-  const rows = chunk(points, 6);
-
-  return (
-    <div className="hp-row">
-      <div className="hp-row-label">{label}</div>
-      <div className="hp-row-boxes">
-        {rows.map((row, ri) => (
-          <div key={ri} className="hp-row-line">
-            {row.map((mark, bi) => (
-              <span key={bi} className={`hp-box ${mark ? 'hp-box-marked' : ''}`}>
-                {mark || ''}
-              </span>
-            ))}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function buildHpPoints(total, isStructure) {
-  if (!isStructure) return Array(total).fill(null);
-  const parts = 4;
-  const base = Math.floor(total / parts);
-  const remainder = total % parts;
-  const chunks = Array(parts).fill(base);
-  for (let i = 0; i < remainder; i++) chunks[i] += 1;
-
-  const map = ['M', 'D', 'Ø'];
-  const out = [];
-  chunks.forEach((count, idx) => {
-    for (let j = 0; j < count; j++) {
-      const isLast = j === count - 1;
-      out.push(isLast && map[idx] ? map[idx] : null);
-    }
-  });
-  return out;
-}
-
+// Splits an array into rows of N items.
 function chunk(arr, n) {
   const out = [];
   for (let i = 0; i < arr.length; i += n) out.push(arr.slice(i, i + n));

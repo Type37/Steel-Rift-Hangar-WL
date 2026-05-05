@@ -797,19 +797,22 @@ export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
       <SectionTitle tag={faction ? `${perks.length}/2 perks` : 'none'}>Faction</SectionTitle>
 
       <div className="faction-tiles">
-        {Object.keys(FACTIONS).map(f => (
-          <button
-            key={f}
-            onClick={() => onSetFaction(f)}
-            className={`faction-tile add-btn ${faction === f ? 'is-active' : ''}`}
-            style={{
-              '--faction-hover-bg': `url("${asset(FACTION_HOVER_LOGO[f])}")`,
-            }}
-          >
-            <span className="faction-tile-name">{f}</span>
-            <span className="faction-tile-blurb">{FACTIONS[f].blurb.split('.')[0]}.</span>
-          </button>
-        ))}
+        {Object.keys(FACTIONS).map(f => {
+          const cls = `faction-tile faction-tile-${f.toLowerCase()} ${faction === f ? 'is-active' : ''}`;
+          return (
+            <button
+              key={f}
+              onClick={() => onSetFaction(f)}
+              className={cls}
+              style={{
+                '--faction-hover-bg': `url("${asset(FACTION_HOVER_LOGO[f])}")`,
+              }}
+            >
+              <span className="faction-tile-name">{f}</span>
+              <span className="faction-tile-blurb">{FACTIONS[f].blurb.split('.')[0]}.</span>
+            </button>
+          );
+        })}
       </div>
       {faction && (
         <div style={{ marginTop: 8, marginBottom: 16 }}>
