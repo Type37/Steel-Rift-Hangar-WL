@@ -257,8 +257,22 @@ function HEVCard({ mech, index }) {
         <>
           <div className="card-section-heading">UPGRADES</div>
           <div className="card-upgrades-list">
-            {[...upgrades, ...defensive].map(u => u.name).join(' · ')}
+            {[...upgrades, ...defensive].map(u => {
+              const drones = mech.drones || {};
+              // If a drone is assigned to this upgrade, show the target
+              const droneEntries = Object.entries(drones).filter(([,target]) => target === u.name);
+              const suffix = droneEntries.length > 0 ? ` [${droneEntries.map(([d]) => d).join(', ')}]` : '';
+              return u.name + suffix;
+            }).join(' · ')}
           </div>
+          {/* Show drones and their targets */}
+          {Object.keys(mech.drones || {}).length > 0 && (
+            <div className="card-upgrades-list" style={{ marginTop: 2, fontStyle: 'italic', fontSize: '6.5pt' }}>
+              {Object.entries(mech.drones).map(([drone, target]) => (
+                <span key={drone}>{drone}{target ? ` → ${target}` : ' (unassigned)'} · </span>
+              ))}
+            </div>
+          )}
         </>
       )}
     </div>

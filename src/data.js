@@ -283,14 +283,33 @@ export const VEHICLE_WEAPONS = [
   { name: 'LV Cluster Rockets', dmg: '4×(X)',         traits: 'Blast (3"), Light, Limited (2)' },
   // Heavy Tank weapons (p.70) — note Dozer Blade here is Smasher Heavy,1 not Medium,X
   { name: 'Tank Dozer Blade',   dmg: '—',             traits: 'Smasher (Heavy, 1), Concussive (2)' },
+  // UL HE-V weapons (p.63)
+  { name: 'UL Autocannon',         dmg: '2×(X)', traits: 'Short (10"), Kinetic' },
+  { name: 'UL Grenades',           dmg: '3×(X)', traits: 'Short (6"), Blast, Light, Limited (1)' },
+  { name: 'UL Incinerators',       dmg: '4×(X)', traits: 'Short (4"), Disruptive, Light' },
+  { name: 'UL Melee Weapons',      dmg: '—',      traits: 'Smasher (Light, X), AP 1×(X)' },
+  { name: 'UL Submunitions',       dmg: '1×(X)', traits: 'Short (6"), Flak' },
   // Infantry and Power Suit weapons (damage rating is per X models)
   { name: 'Infantry Rifles',         dmg: '2×(X)', traits: 'Short (6"), Light' },
   { name: 'Heavy Infantry Rifles',   dmg: '3×(X)', traits: 'Short (6"), Light' },
   { name: 'Missile Launcher',        dmg: '2×(X)', traits: 'Short (12"), Smart, Limited (2)' },
   { name: 'Heavy Missile Launcher',  dmg: '2×(X)', traits: 'Short (12"), Limited (2), AP (2)' },
   { name: 'Electro-Arc Pulser',      dmg: '1×(X)', traits: 'Short (6"), Stagger' },
-];
 
+  // ── UL HE-V Squadron ────────────────────────────────────────────────────────
+  { name: 'UL HE-V Squadron', cost: 10, kind: 'Vehicle',
+    summary: '3 Ultralight HE-Vs, all same type and Upgrade Pod.',
+    unitCount: 3, pickRule: 'allSame',
+    subunits: [
+      { name: 'Brawler',  spd: '7"', arm: '2', str: '1', weapons: 'UL Melee Weapons, Submunitions', traits: 'Magnetic Grapples' },
+      { name: 'Pyro',     spd: '6"', arm: '2', str: '1', weapons: 'UL Incinerators, Submunitions', traits: 'Inferno Gear' },
+      { name: 'Commando', spd: '7"', arm: '2', str: '1', weapons: 'Submunitions', traits: 'Scramblers, Target Designator' },
+      { name: 'Rifleman', spd: '6"', arm: '2', str: '1', weapons: 'UL Autocannon, UL Grenades', traits: 'Suppressive Fire' },
+    ],
+    stats: { 'Per model': 'All-Terrain, Squadron, Close Support, Auxiliary Unit (Ultralight)',
+             'Upgrade Pod': 'Short Range Missile Pack · Cluster Rockets · Launch Gear' },
+  },
+];
 // ---- Infantry and Power Suit Squad tables (p.73) ----
 // These squads are recruited as Garrison Units inside other assets.
 export const INFANTRY_SQUADS = [

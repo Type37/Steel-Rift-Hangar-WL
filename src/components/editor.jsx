@@ -813,11 +813,7 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand, onAssignDrone
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
             <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--ink)' }}>{upgrade.name}</span>
             {upgrade.compact && (
-              <span style={{
-                fontSize: 9.5, fontWeight: 700, letterSpacing: '0.1em',
-                padding: '1px 5px', border: '1px solid var(--teal)',
-                color: 'var(--teal)',
-              }}>COMPACT</span>
+              <TraitToken token="compact" />
             )}
             {available && (
               <span className="mono" style={{ fontSize: 12, color: 'var(--rust)', fontWeight: 700 }}>{cost}t</span>
@@ -827,13 +823,7 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand, onAssignDrone
                 Not available at {WC[cls].abbr}
               </span>
             )}
-            {upgrade.compact && (
-              <span className="stencil" style={{
-                fontSize: 10, padding: '1px 6px', background: 'var(--steel)', color: 'var(--surface)',
-              }}>
-                Compact
-              </span>
-            )}
+
           </div>
           {!expanded && (
             <div style={{ fontSize: 12.5, color: 'var(--ink-2)', marginTop: 2,
