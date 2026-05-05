@@ -1,6 +1,6 @@
 import React from 'react';
 import { Printer, Settings as SettingsIcon, Plus, FolderOpen, ChevronDown } from 'lucide-react';
-import { WC, MISSION_ORDER, MISSIONS } from '../data';
+import { WC, MISSION_ORDER, MISSIONS, FREEFORM_MISSION } from '../data';
 import { calcMech } from '../calc';
 
 // Resolve absolute path with the configured base; works at root or under /Steel-Rift-Hangar-WL/
@@ -94,7 +94,7 @@ export function BottomBar({
               }}
             />
             <div className="bottombar-ton-label mono">
-              {totalTons} / {cap}t
+              {totalTons}{cap === Infinity ? 't' : ` / ${cap}t`}
             </div>
           </div>
 
@@ -135,6 +135,13 @@ export function BottomBar({
                     set
                   </span>
                 )}
+              </button>
+              <button
+                className={`mission-popover-item ${mission === FREEFORM_MISSION ? 'is-active' : ''}`}
+                onClick={() => { onMission(FREEFORM_MISSION); setMissionOpen(false); }}
+              >
+                <span>Freeform</span>
+                <span className="mono" style={{ color: 'var(--mute)', fontSize: 11 }}>∞t</span>
               </button>
             </div>
           )}

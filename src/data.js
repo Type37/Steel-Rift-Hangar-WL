@@ -23,6 +23,7 @@ export const MISSIONS = {
   'All-Out War': { tons: 350, support: 4, agendas: 4, teamCounts: { '2': 0, '2-3': 2, '3-4': 2 }, board: '4×4', terrain: 14 },
 };
 export const MISSION_ORDER = ['Recon', 'Strike', 'Battle', 'All-Out War'];
+export const FREEFORM_MISSION = 'Freeform';
 
 // ---- Ranged weapons (p. 20, 85) ----
 // cost / dmg arrays are [Light, Medium, Heavy, Ultraheavy]. '-' = not available.

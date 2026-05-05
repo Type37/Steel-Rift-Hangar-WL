@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { TEAMS, MISSIONS, MISSION_ORDER, FACTION_LOGOS } from './data';
+import { TEAMS, MISSIONS, MISSION_ORDER, FACTION_LOGOS, FREEFORM_MISSION } from './data';
 import { POOL_NAMES } from './callsigns';
 import { calcMech, newMech, findAsset } from './calc';
 
@@ -144,8 +144,9 @@ export default function App() {
   // ---- Derived ----
   const selectedMech = mechs.find(m => m.id === selectedMechId) || null;
   const useCustom = mission === 'Custom';
-  const cap = useCustom ? customTons : MISSIONS[mission].tons;
-  const supportLimit = useCustom ? Math.max(1, Math.floor(customTons / 50)) : MISSIONS[mission].support;
+  const isFreeform = mission === FREEFORM_MISSION;
+  const cap = isFreeform ? Infinity : (useCustom ? customTons : MISSIONS[mission].tons);
+  const supportLimit = isFreeform ? Infinity : (useCustom ? Math.max(1, Math.floor(customTons / 50)) : MISSIONS[mission].support);
   const totalTons = useMemo(
     () =>
       mechs.reduce((s, m) => s + calcMech(m).totalUsed, 0) +
@@ -153,10 +154,12 @@ export default function App() {
     [mechs, supportAssets]
   );
 
-  const missionObj = useCustom
-    ? { ...MISSIONS['Battle'], teamCounts: { '2': 1, '2-3': 2, '3-4': 2 } }
-    : MISSIONS[mission];
-  const teamMax = Object.values(missionObj.teamCounts).reduce((a, b) => a + b, 0);
+  const missionObj = isFreeform
+    ? { ...MISSIONS['All-Out War'], teamCounts: { '2': 99, '2-3': 99, '3-4': 99 } }
+    : useCustom
+      ? { ...MISSIONS['Battle'], teamCounts: { '2': 1, '2-3': 2, '3-4': 2 } }
+      : MISSIONS[mission];
+  const teamMax = isFreeform ? 999 : Object.values(missionObj.teamCounts).reduce((a, b) => a + b, 0);
 
   // Reverse index: unitId -> teamName, so left-sidebar cards can show
   // which team they're currently assigned to.
