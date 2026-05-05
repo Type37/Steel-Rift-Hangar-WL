@@ -772,49 +772,12 @@ export function SupportDetailView({ assetName, customName, loadout, onSetLoadout
         {a.fullDesc}
       </div>
 
-      {a.subunits && a.unitCount && onSetLoadout && (
+      {a.subunits && a.subunits.length > 0 && (
         <SubUnitPicker
           asset={a}
           loadout={effectiveLoadout}
-          onChange={onSetLoadout}
+          onChange={onSetLoadout || null}
         />
-      )}
-
-      {a.subunits && a.subunits.length > 0 && (
-        <>
-          <div style={{ overflowX: 'auto', marginBottom: 18 }}>
-            <table style={{
-              borderCollapse: 'collapse', width: '100%',
-              background: 'var(--surface)', border: '1px solid var(--rule)',
-              fontSize: 12.5,
-            }}>
-              <thead>
-                <tr style={{ background: 'var(--bg)' }}>
-                  <th style={subTableTh}>Type</th>
-                  <th style={{ ...subTableTh, textAlign: 'center', width: 56 }}>SPD</th>
-                  <th style={{ ...subTableTh, textAlign: 'center', width: 50 }}>ARM</th>
-                  <th style={{ ...subTableTh, textAlign: 'center', width: 50 }}>STR</th>
-                  <th style={subTableTh}>Weapons</th>
-                  <th style={subTableTh}>Traits</th>
-                </tr>
-              </thead>
-              <tbody>
-                {a.subunits.map(su => (
-                  <tr key={su.name}>
-                    <td style={subTableTd}>
-                      <strong>{su.name}</strong>
-                    </td>
-                    <td style={{ ...subTableTd, textAlign: 'center', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>{su.spd}</td>
-                    <td style={{ ...subTableTd, textAlign: 'center', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>{su.arm}</td>
-                    <td style={{ ...subTableTd, textAlign: 'center', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>{su.str}</td>
-                    <td style={subTableTd}>{su.weapons}</td>
-                    <td style={{ ...subTableTd, fontSize: 12, color: 'var(--ink-2)' }}>{su.traits}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </>
       )}
 
       {a.stats && (
@@ -947,28 +910,27 @@ function SubUnitPicker({ asset: a, loadout, onChange }) {
               }}
             >
               <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--ink)' }}>
-                  {su.name}
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap', marginBottom: 4 }}>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--ink)' }}>
+                    {su.name}
+                  </span>
+                  <span style={{
+                    fontFamily: 'var(--font-body)', fontSize: 11.5, color: 'var(--mute)',
+                    letterSpacing: '0.04em',
+                  }}>
+                    SPD {su.spd} · ARM {su.arm} · STR {su.str}
+                  </span>
                 </div>
-                <div className="mono" style={{
-                  fontSize: 11, color: 'var(--ink-2)', marginTop: 2, lineHeight: 1.4,
-                }}>
-                  SPD {su.spd} · ARM {su.arm} · STR {su.str}
-                </div>
-                <div style={{
-                  fontSize: 11.5, color: 'var(--ink-2)', marginTop: 2, lineHeight: 1.4,
-                }}>
+                <div style={{ fontSize: 12.5, color: 'var(--ink-2)', marginBottom: 2 }}>
                   {su.weapons}
                 </div>
                 {su.traits && su.traits !== '—' && (
-                  <div style={{
-                    fontSize: 11, color: 'var(--mute)', marginTop: 2, fontStyle: 'italic',
-                    lineHeight: 1.4,
-                  }}>
-                    {su.traits}
+                  <div style={{ fontSize: 11.5, color: 'var(--mute)', lineHeight: 1.5 }}>
+                    <TraitList traits={su.traits} />
                   </div>
                 )}
               </div>
+              {onChange && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 <button
                   onClick={() => remove(su.name)}
@@ -993,6 +955,7 @@ function SubUnitPicker({ asset: a, loadout, onChange }) {
                   <Plus size={14} strokeWidth={2.75} />
                 </button>
               </div>
+              )}
             </div>
           );
         })}
