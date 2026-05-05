@@ -536,6 +536,53 @@ function StructureIcon({ size = 38 }) {
   );
 }
 
+
+// Parse Melee (X/X/X/X) out of a traits string.
+// Returns [lt, md, hv, uh] or null if not a melee weapon.
+function parseMeleeDmg(traits) {
+  const m = traits && traits.match(/Melee\s*\(([\/\d-]+)\)/);
+  if (!m) return null;
+  return m[1].split('/');
+}
+
+const WC_IDX = { Light: 0, Medium: 1, Heavy: 2, Ultraheavy: 3 };
+const WC_ABBR = ['LT', 'MD', 'HV', 'UH'];
+
+// Big active value + small per-class row.
+// For ranged: reads from dmg array. For melee: parses trait string.
+function DmgBadge({ weapon, cls }) {
+  const idx = WC_IDX[cls];
+  const meleeVals = parseMeleeDmg(weapon.traits);
+  const vals = meleeVals
+    ? meleeVals
+    : weapon.dmg;
+  const active = vals[idx];
+  if (!active || active === '-') return null;
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexShrink: 0 }}>
+      <span style={{
+        fontFamily: 'var(--font-display)',
+        fontSize: 32, fontWeight: 700, lineHeight: 1,
+        color: 'var(--ink)',
+      }}>{active}</span>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <span style={{ fontSize: 9, color: 'var(--mute)', letterSpacing: '0.06em' }}>
+          {meleeVals ? 'MELEE' : 'DMG'}
+        </span>
+        <span style={{ fontSize: 10, color: 'var(--mute)', letterSpacing: '0.03em' }}>
+          {vals.map((v, i) => (
+            <span key={i} style={{
+              fontWeight: i === idx ? 700 : 400,
+              color: i === idx ? 'var(--ink-2)' : 'var(--rule-strong)',
+            }}>{v}{i < 3 ? '/' : ''}</span>
+          ))}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 // ============================================================
 // CATALOG ROWS
 // ============================================================
@@ -564,7 +611,7 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
         title={unavailableReason || undefined}
         style={{
           display: 'grid',
-          gridTemplateColumns: 'auto 1fr auto auto auto',
+          gridTemplateColumns: 'auto 1fr auto auto auto auto',
           alignItems: 'center', gap: 12,
           padding: '9px 14px',
         }}
@@ -576,7 +623,6 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
             <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--ink)' }}>{weapon.name}</span>
             {available && (
               <>
-                <span className="mono" style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>DMG {dmg}</span>
                 <span className="mono" style={{ fontSize: 12, color: 'var(--rust)', fontWeight: 700 }}>{base}t</span>
               </>
             )}
@@ -595,6 +641,8 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
             <TraitList traits={weapon.traits} />
           </div>
         </div>
+
+        <DmgBadge weapon={weapon} cls={cls} />
 
         {count > 0 ? (
           <>

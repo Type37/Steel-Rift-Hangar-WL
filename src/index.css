@@ -268,7 +268,7 @@ button:not(:disabled):active {
 .bottombar {
   border-top: 2px solid var(--ink);
   background: var(--surface);
-  padding: 8px 14px;
+  padding: 14px 18px;
 }
 .bottombar-row-top {
   display: flex;
