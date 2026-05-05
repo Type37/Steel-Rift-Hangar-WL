@@ -559,27 +559,37 @@ function DmgBadge({ weapon, cls }) {
   const active = vals[idx];
   if (!active || active === '-') return null;
 
+  const label = meleeVals ? '+DICE' : 'DMG';
+
   return (
-    <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4, flexShrink: 0 }}>
+    <span style={{
+      display: 'inline-flex', alignItems: 'center',
+      background: 'var(--surface-2)',
+      border: '1px solid var(--rule)',
+      borderRadius: 999,
+      padding: '2px 8px 2px 6px',
+      gap: 0, flexShrink: 0,
+      verticalAlign: 'middle',
+    }}>
       <span style={{
-        fontFamily: 'var(--font-display)',
-        fontSize: 28, fontWeight: 700, lineHeight: 1,
-        color: 'var(--ink)',
-      }}>{active}</span>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-        <span style={{ fontSize: 9, color: 'var(--mute)', letterSpacing: '0.06em' }}>
-          DICE
-        </span>
-        <span style={{ fontSize: 10, color: 'var(--mute)' }}>
-          {vals.map((v, i) => (
-            <span key={i} style={{
-              fontWeight: i === idx ? 700 : 400,
-              color: i === idx ? 'var(--ink-2)' : 'var(--rule-strong)',
-            }}>{v}</span>
-          ))}
-        </span>
-      </div>
-    </div>
+        fontSize: 9, color: 'var(--mute)', letterSpacing: '0.08em',
+        marginRight: 5, fontFamily: 'var(--font-body)', fontWeight: 600,
+        textTransform: 'uppercase',
+      }}>{label}</span>
+      {vals.map((v, i) => (
+        <React.Fragment key={i}>
+          <span style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: i === idx ? 22 : 13,
+            fontWeight: 700,
+            lineHeight: 1,
+            color: i === idx ? 'var(--ink)' : 'var(--mute)',
+            transition: 'font-size 120ms',
+          }}>{v}</span>
+          {i < 3 && <span style={{ fontSize: 11, color: 'var(--rule-strong)', margin: '0 1px' }}>/</span>}
+        </React.Fragment>
+      ))}
+    </span>
   );
 }
 
