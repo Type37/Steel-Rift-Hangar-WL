@@ -83,7 +83,6 @@ export function AddMechModal({ open, onClose, onConfirm, callsignPool: callsignP
           </button>
         </div>
 
-        <FieldLabel>Description (optional)</FieldLabel>
         <textarea
           className="txt"
           value={description}

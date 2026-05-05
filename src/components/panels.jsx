@@ -768,7 +768,6 @@ export function SupportDetailView({ assetName, customName, loadout, onSetLoadout
         {a.summary}
       </div>
 
-      <div className="label" style={{ marginBottom: 6 }}>Composition</div>
       <div style={{ fontSize: 14, color: 'var(--ink)', lineHeight: 1.6, marginBottom: 18 }}>
         {a.fullDesc}
       </div>
@@ -783,9 +782,6 @@ export function SupportDetailView({ assetName, customName, loadout, onSetLoadout
 
       {a.subunits && a.subunits.length > 0 && (
         <>
-          <div className="label" style={{ marginBottom: 6, marginTop: 18 }}>
-            Sub-unit reference
-          </div>
           <div style={{ overflowX: 'auto', marginBottom: 18 }}>
             <table style={{
               borderCollapse: 'collapse', width: '100%',
@@ -823,7 +819,6 @@ export function SupportDetailView({ assetName, customName, loadout, onSetLoadout
 
       {a.stats && (
         <>
-          <div className="label" style={{ marginBottom: 6 }}>Shared Stats</div>
           <table style={{
             borderCollapse: 'collapse', width: '100%', maxWidth: 560,
             background: 'var(--surface)', border: '1px solid var(--rule)',

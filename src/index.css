@@ -291,6 +291,7 @@ button:not(:disabled):active {
   border: 1.5px solid var(--ink);
   border-right: none;
   padding: 4px 9px;
+  min-height: 36px;
   cursor: pointer;
   font-family: var(--font-stencil);
   font-size: 11px;
@@ -308,7 +309,7 @@ button:not(:disabled):active {
 .bottombar-mission-label { line-height: 1; }
 .bottombar-ton-bar {
   width: 144px;
-  height: 28px;
+  height: 36px;
   background: var(--bg-deep);
   border: 1.5px solid var(--rule-strong);
   border-left: none;
@@ -374,6 +375,7 @@ button:not(:disabled):active {
 
 /* Add HE-V CTA: rust solid with shadow lift, the primary action */
 .bottombar-add-mech {
+  min-height: 36px;
   background: var(--rust);
   color: var(--surface);
   border: 2px solid var(--rust);
@@ -405,6 +407,7 @@ button:not(:disabled):active {
 /* Add Support CTA: teal solid with shadow lift, secondary action.
    Same hover/active treatment as Add HE-V to read as a matching pair. */
 .bottombar-add-support {
+  min-height: 36px;
   background: var(--teal);
   color: var(--surface);
   border: 2px solid var(--teal);
@@ -463,6 +466,7 @@ button:not(:disabled):active {
 }
 
 .util-btn {
+  min-height: 36px;
   background: transparent;
   border: 1.5px solid var(--rule-strong);
   color: var(--ink);
@@ -1322,6 +1326,7 @@ button:not(:disabled):active {
   .util-btn { padding: 5px 8px; font-size: 10.5px; }
   .util-label { display: none; }
   .bottombar-add-mech, .bottombar-add-support {
+  min-height: 36px;
     padding: 5px 9px !important;
     font-size: 10.5px !important;
   }
