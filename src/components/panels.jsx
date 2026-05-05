@@ -94,19 +94,17 @@ function SupportRow({ a, eq, atLimit, onToggle, expanded, onExpand }) {
         display: 'grid', gridTemplateColumns: 'auto 1fr auto auto', alignItems: 'center', gap: 12,
         padding: '11px 12px',
       }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 5 }}>
-          <RowExpand open={expanded} onClick={onExpand} />
-          <span className="stencil" style={{
-            fontSize: 10, padding: '1px 6px', border: '1.5px solid var(--steel)',
-            color: 'var(--steel)',
-          }}>
-            {a.kind}
-          </span>
-        </div>
+        <RowExpand open={expanded} onClick={onExpand} />
         <div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
             <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--ink)' }}>{a.name}</span>
             <span className="mono" style={{ fontSize: 13, color: 'var(--rust)', fontWeight: 700 }}>{a.cost}t</span>
+            <span className="stencil" style={{
+              fontSize: 9.5, padding: '1px 6px', border: '1px solid var(--steel)',
+              color: 'var(--steel)', letterSpacing: '0.14em',
+            }}>
+              {a.kind.toUpperCase()}
+            </span>
           </div>
           <div style={{ fontSize: 12.5, color: 'var(--ink-2)', marginTop: 2 }}>
             {a.summary}
@@ -825,6 +823,37 @@ export function SupportDetailView({ assetName, customName, loadout, onSetLoadout
 //   - 'allSame':     every slot must be the same type
 //   - 'maxTwoEach':  no type more than twice
 // ============================================================
+
+// Tiny pip row for sub-unit stat display: shields for armor, circles for structure.
+function MiniPips({ value, kind }) {
+  if (!value || value === '-') return null;
+  const n = parseInt(value, 10);
+  if (!n) return null;
+  const rows = [];
+  for (let i = 0; i < n; i += 5) rows.push(Math.min(5, n - i));
+  const isArmor = kind === 'armor';
+  const color = isArmor ? 'var(--steel)' : 'var(--olive-deep)';
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'flex-start' }}>
+      {rows.map((rowLen, ri) => (
+        <div key={ri} style={{ display: 'flex', gap: 2 }}>
+          {Array.from({ length: rowLen }).map((_, i) => (
+            <span key={i} style={{
+              display: 'inline-block',
+              width: isArmor ? 11 : 10,
+              height: isArmor ? 13 : 10,
+              border: `1px solid ${color}`,
+              borderRadius: isArmor ? '50% 50% 50% 50% / 25% 25% 75% 75%' : '50%',
+              background: 'transparent',
+              flexShrink: 0,
+            }} />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function SubUnitPicker({ asset: a, loadout, onChange }) {
   const counts = loadout.reduce((acc, n) => { acc[n] = (acc[n] || 0) + 1; return acc; }, {});
   const total = loadout.length;
@@ -910,16 +939,27 @@ function SubUnitPicker({ asset: a, loadout, onChange }) {
               }}
             >
               <div style={{ minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap', marginBottom: 4 }}>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--ink)' }}>
-                    {su.name}
-                  </span>
-                  <span style={{
-                    fontFamily: 'var(--font-body)', fontSize: 11.5, color: 'var(--mute)',
-                    letterSpacing: '0.04em',
-                  }}>
-                    SPD {su.spd} · ARM {su.arm} · STR {su.str}
-                  </span>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, flexWrap: 'wrap', marginBottom: 6 }}>
+                  <div style={{ flex: 1 }}>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--ink)' }}>
+                      {su.name}
+                    </span>
+                    <span style={{
+                      marginLeft: 8, fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--mute)',
+                    }}>
+                      SPD {su.spd}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', flexShrink: 0 }}>
+                    <div>
+                      <div style={{ fontSize: 9, color: 'var(--mute)', letterSpacing: '0.08em', marginBottom: 2 }}>ARM {su.arm}</div>
+                      <MiniPips value={su.arm} kind="armor" />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 9, color: 'var(--mute)', letterSpacing: '0.08em', marginBottom: 2 }}>STR {su.str}</div>
+                      <MiniPips value={su.str} kind="structure" />
+                    </div>
+                  </div>
                 </div>
                 <div style={{ fontSize: 12.5, color: 'var(--ink-2)', marginBottom: 2 }}>
                   {su.weapons}
