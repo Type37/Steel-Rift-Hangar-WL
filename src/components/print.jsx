@@ -275,6 +275,25 @@ function HEVCard({ mech, index }) {
           )}
         </>
       )}
+      {/* Light: Fragile Internals reminder */}
+      {cls === 'Light' && (
+        <div className="card-section-heading" style={{ marginTop: 4 }}>FRAGILE INTERNALS</div>
+      )}
+      {cls === 'Light' && (
+        <div className="card-upgrades-list" style={{ fontSize: '6pt', lineHeight: 1.4 }}>
+          Each point of Structure Damage: roll 1D6. On 5+, suffer 1 additional Damage (no further rolls).
+        </div>
+      )}
+
+      {/* Ultraheavy: Backup Systems Engage reminder */}
+      {cls === 'Ultraheavy' && (
+        <div className="card-section-heading" style={{ marginTop: 4 }}>BACKUP SYSTEMS ENGAGE</div>
+      )}
+      {cls === 'Ultraheavy' && (
+        <div className="card-upgrades-list" style={{ fontSize: '6pt', lineHeight: 1.4 }}>
+          Each point of Structure Damage: roll 1D6. On 5+, that point is ignored (Structure not reduced).
+        </div>
+      )}
     </div>
   );
 }

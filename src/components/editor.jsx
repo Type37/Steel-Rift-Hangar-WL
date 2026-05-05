@@ -220,6 +220,24 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete }) {
         />
       </div>
 
+      {/* Light / Ultraheavy structure rules reminder */}
+      {(cls === 'Light' || cls === 'Ultraheavy') && (
+        <div style={{
+          margin: '6px 0 0',
+          padding: '7px 12px',
+          background: 'var(--surface-2)',
+          border: '1px solid var(--rule)',
+          fontSize: 12, color: 'var(--ink-2)', lineHeight: 1.5,
+        }}>
+          {cls === 'Light' && (
+            <><strong>Fragile Internals:</strong> Each point of Structure Damage — roll 1D6. On 5+, suffer 1 additional point (no further rolls).</>
+          )}
+          {cls === 'Ultraheavy' && (
+            <><strong>Backup Systems Engage:</strong> Each point of Structure Damage — roll 1D6. On 5+, that point is ignored (Structure not reduced).</>
+          )}
+        </div>
+      )}
+
       {/* Catalog tabs */}
       <div style={{ marginTop: 28 }}>
         <SectionTitle tag={`${stats.totalSlotsUsed}/${stats.capSlots} slots used`}>
