@@ -118,6 +118,8 @@ export const ADVANCED_ASSETS = [
     summary: '4 light flyers in any combination of Strike or Recon types.',
     fullDesc: 'A Squadron of 4 LAS-Wings. Pick any mix of the two types below. All LAS-Wings share Auxiliary Unit (Light), Flying, Flying Squadron, Vulnerable, Yielding.',
     stats: { 'Per model': 'SPD 12", ARM 1, STR 1', Traits: 'Auxiliary Unit (Light), Flying, Flying Squadron, Vulnerable, Yielding' },
+    unitCount: 4,
+    pickRule: 'any',
     subunits: [
       { name: 'Strike LAS Wing', spd: '12"', arm: '1', str: '1',
         weapons: 'Autocannon or Rotary Cannon, AG Missiles or Barrage Rockets',
@@ -131,6 +133,8 @@ export const ADVANCED_ASSETS = [
     summary: 'Air-deliver Infantry, Power Suits, or a UL HE-V Squadron.',
     fullDesc: 'A Squadron of LAS-Wing Transports, all of the same type. Garrisoned units are placed off-table until they perform a MUSTER Order. All Transports share Auxiliary Unit (Light), Flying, Flying Squadron, Vulnerable, Yielding.',
     stats: { 'Per model': 'SPD 12", ARM 1, STR 2', Weapons: 'Rotary Cannon (each)', Traits: 'Auxiliary Unit (Light), Flying, Flying Squadron, Vulnerable, Yielding' },
+    unitCount: 4,
+    pickRule: 'allSame',
     subunits: [
       { name: 'Infantry Air Transport', spd: '12"', arm: '1', str: '2',
         weapons: 'Rotary Cannon',
@@ -147,6 +151,8 @@ export const ADVANCED_ASSETS = [
     summary: '4 ground vehicles in any combination.',
     fullDesc: 'A Squadron of 4 Assault Vehicles. Mix any of the eight types below. All vehicles share Auxiliary Unit (Medium), Squadron, All-Terrain.',
     stats: { 'Per model': 'SPD 8", ARM 3, STR 2', Traits: 'Auxiliary Unit (Medium), Squadron, All-Terrain' },
+    unitCount: 4,
+    pickRule: 'any',
     subunits: [
       { name: 'Netter Vehicle', spd: '8"', arm: '3', str: '2',
         weapons: 'Vehicle Autocannon, Submunitions',
@@ -178,6 +184,8 @@ export const ADVANCED_ASSETS = [
     summary: '2 heavy tanks with HE-V scale weapons.',
     fullDesc: 'A Troop of 2 Heavy Tanks. Each tank scores as 10 Tons. Pick any 2 of the four loadouts below. All tanks share Auxiliary Unit (Heavy), Asset Command, All-Terrain.',
     stats: { 'Per tank': 'SPD 6", ARM 8, STR 8', Traits: 'Auxiliary Unit (Heavy), Asset Command, All-Terrain' },
+    unitCount: 2,
+    pickRule: 'any',
     subunits: [
       { name: 'Direct Fire Tank', spd: '6"', arm: '8', str: '8',
         weapons: 'Tank Laser, Submunitions',
@@ -197,6 +205,8 @@ export const ADVANCED_ASSETS = [
     summary: '2 fortified bunkers with garrisoned infantry squads.',
     fullDesc: 'Two Bunkers, each carrying 6 Infantry Squad Models. Each Bunker mounts a single weapon picked from the list below. Each Bunker scores as 5 Tons.',
     stats: { 'Per bunker': 'ARM 2, STR 8', Traits: 'Auxiliary Unit (Ultraheavy), Asset Command, Fortification, Garrison (6 Infantry Squads), Minelayer (ENGAGE)' },
+    unitCount: 2,
+    pickRule: 'any',
     subunits: [
       { name: 'Bunker (Autocannon)', spd: '0"', arm: '2', str: '8',
         weapons: 'Autocannon (DMG 2, Short 12", Kinetic)',
@@ -213,6 +223,8 @@ export const ADVANCED_ASSETS = [
     summary: '4 specialist support vehicles, no type more than twice.',
     fullDesc: 'A Squadron of 4 Support Vehicles. No vehicle type may be picked more than twice. All vehicles share Auxiliary Unit (Medium), Squadron, Support Orders.',
     stats: { 'Per model': 'SPD 8", ARM 2, STR 2', Traits: 'Auxiliary Unit (Medium), Squadron, Support Orders' },
+    unitCount: 4,
+    pickRule: 'maxTwoEach',
     subunits: [
       { name: 'Recon Vehicle', spd: '8"', arm: '2', str: '2',
         weapons: 'Vehicle Autocannon',
@@ -324,6 +336,32 @@ export const FACTIONS = {
   },
 };
 
+// ---- Faction default logos ----
+// Each faction ships with a list of organization logos that exist as
+// pre-shipped images under /public/faction-logos/<slug>/. Users can
+// pick one as their default or upload a custom file.
+export const FACTION_LOGOS = {
+  Authorities: [
+    { name: '67th North Horizon Corps', file: 'authorities/67th-north-horizon-corp.png' },
+    { name: 'Knight Watch',             file: 'authorities/knight-watch.png' },
+    { name: 'Old Solar Republic',       file: 'authorities/old-solar-republic.png' },
+    { name: 'Sahel Alliance',           file: 'authorities/sahel-alliance.png' },
+  ],
+  Corporations: [
+    { name: 'Akamatsu',              file: 'corporations/akamatsu.png' },
+    { name: 'Empyrean Reach',        file: 'corporations/empyrean-reach.png' },
+    { name: 'Helios',                file: 'corporations/helios.png' },
+    { name: 'The Echelon Group',     file: 'corporations/the-echelon-group.png' },
+    { name: 'The Selegin Cooperative', file: 'corporations/the-selegin-cooperative.png' },
+    { name: 'Visal Corp',            file: 'corporations/visal-corp.png' },
+    { name: 'WegMaCo',               file: 'corporations/wegmaco.png' },
+  ],
+  Freelancers: [
+    { name: 'Cerberus Group',   file: 'freelancers/cerberus-group.png' },
+    { name: "Roland's Reavers", file: 'freelancers/rolands-reavers.png' },
+  ],
+};
+
 // ---- HE-V Teams (p. 50-61) ----
 // `band` is which mission team-count slot it consumes: '2', '2-3', or '3-4'.
 export const TEAMS = [
@@ -336,6 +374,17 @@ export const TEAMS = [
       { cls: 'Heavy', min: 0, max: 2, needs: ['Target Designator'], stripped: true },
     ],
     benefits: 'At 2+: Lights ignore slot for Electronic Countermeasures. At 3+: Off-Table Assets +1 Damage Rating; Lights\' Target Designators are slot-free. At 4: TD and ECM cost 0; one Medium/Heavy gains Guidance Suite (MOVE) once per turn.',
+    benefitsList: [
+      { gate: '2+', items: ['Lights ignore the slot cost for Electronic Countermeasures'] },
+      { gate: '3+', items: [
+        'Off-Table Support Assets gain +1 Damage Rating',
+        'Lights\' Target Designators are slot-free',
+      ] },
+      { gate: '4', items: [
+        'Target Designator and Electronic Countermeasures cost 0',
+        'One Medium or Heavy gains Guidance Suite (MOVE) once per turn',
+      ] },
+    ],
     agenda: 'Death from Above: 2+ enemy HE-Vs Destroyed by an Off-Table called from a team TD = 1 VP.',
   },
   {
@@ -347,6 +396,21 @@ export const TEAMS = [
       { cls: 'Ultraheavy', min: 0, max: 2, needsDefensive: true },
     ],
     benefits: 'At 2+: HE-V gets a 2nd Defensive Configuration slot; Heavy/UH count as +5 Tons for scoring. At 3+: Defensive Configs cost 0; Mediums also score +5 Tons; Heavy/UH ignore Side Arc bonuses against them. At 4: Suppressive Fire trait; Mediums ignore Side Arc bonuses.',
+    benefitsList: [
+      { gate: '2+', items: [
+        'Each HE-V gets a 2nd Defensive Configuration slot',
+        'Heavy and Ultraheavy count as +5 Tons for scoring objectives',
+      ] },
+      { gate: '3+', items: [
+        'Defensive Configurations cost 0',
+        'Mediums also score as +5 Tons',
+        'Heavy and Ultraheavy ignore Side Arc attack bonuses against them',
+      ] },
+      { gate: '4', items: [
+        'Team gains the Suppressive Fire trait',
+        'Mediums also ignore Side Arc attack bonuses',
+      ] },
+    ],
     agenda: 'Don\'t Give an Inch: More friendly than enemy HE-Vs in 12" of every Deployment Corner/Edge of yours = 1 VP.',
   },
   {
@@ -357,6 +421,20 @@ export const TEAMS = [
       { cls: 'Medium', min: 1, max: 2, needs: ['Directional Thruster'], melee: true, noReach: true },
     ],
     benefits: 'At 2+: deploy as Support Assets; Mediums get +1" JUMP. At 3+: Melee on enemies in B2B with 2+ team members gets Frag; Lights\' Directional Thrusters slot-free. At 4: SMASH-interrupt; Mediums\' Directional Thrusters slot-free.',
+    benefitsList: [
+      { gate: '2+', items: [
+        'Team deploys as Support Assets (off-table)',
+        'Mediums gain +1" JUMP',
+      ] },
+      { gate: '3+', items: [
+        'Melee against an enemy in base contact with 2+ team members gains the Frag trait',
+        'Lights\' Directional Thrusters are slot-free',
+      ] },
+      { gate: '4', items: [
+        'SMASH-interrupt: react to enemy MOVE with a SMASH Order',
+        'Mediums\' Directional Thrusters are slot-free',
+      ] },
+    ],
     agenda: 'Target Eliminated: Heaviest enemy HE-V Destroyed by a team member = 1 VP.',
   },
   {
@@ -369,6 +447,21 @@ export const TEAMS = [
       { cls: 'Ultraheavy', min: 0, max: 1, needs: ['Heavy Plating', 'Nitro Boost'] },
     ],
     benefits: 'At 2+: Lights\' Defensive Configs cost 0; Mediums\' & Heavies\' Directional Thrusters slot-free. At 3+: Lights\' Directional Thrusters slot-free; Mediums may buy a Shield for 3 Tons; UH gains Nitro Boost Limited (2). At 4: Heavies\' Nitro Boost Limited (2); UH\'s Directional Thrusters slot-free.',
+    benefitsList: [
+      { gate: '2+', items: [
+        'Lights\' Defensive Configurations cost 0',
+        'Mediums\' and Heavies\' Directional Thrusters are slot-free',
+      ] },
+      { gate: '3+', items: [
+        'Lights\' Directional Thrusters are slot-free',
+        'Mediums may buy a Combat Shield for 3 Tons',
+        'Ultraheavy gains Nitro Boost Limited (2)',
+      ] },
+      { gate: '4', items: [
+        'Heavies\' Nitro Boost becomes Limited (2)',
+        'Ultraheavy\'s Directional Thrusters are slot-free',
+      ] },
+    ],
     agenda: 'Drive Them Out: 40+ Tons of enemy HE-Vs SMASHed within 18" of their Edge/Corner = 1 VP.',
   },
   {
@@ -380,6 +473,16 @@ export const TEAMS = [
       { cls: 'Heavy', min: 0, max: 1, noDup: true },
     ],
     benefits: 'Cumulative weapon-specific buffs (Light, Blast, Kinetic, Melee, Short, Draining handling) per class as the team grows.',
+    benefitsList: [
+      { gate: 'Light', items: ['+1 Damage Rating to weapons with the Light trait'] },
+      { gate: 'Medium', items: ['+1 Damage Rating to weapons with the Blast trait'] },
+      { gate: 'Heavy', items: ['+1 Damage Rating to weapons with the Kinetic trait'] },
+      { gate: 'Each member', items: [
+        'Melee weapons gain +1 to Attack Pool',
+        'Short weapons add 4" range',
+        'Draining trait may be re-rolled once per turn',
+      ] },
+    ],
     agenda: 'Mission Momentum: Score primary Mission VP on Turns 2 AND 3 = 1 VP.',
   },
   {
@@ -391,6 +494,15 @@ export const TEAMS = [
       { cls: 'Heavy', min: 1, max: 2, needs: ['Haptic Suit'], shortMeleeOnly: true },
     ],
     benefits: 'At 2+: Return Fire when Activated (taking a Redline Marker instead). At 3+: Short weapons +2" range. At 4: Return Smash interrupt.',
+    benefitsList: [
+      { gate: '2+', items: [
+        'May Return Fire even after being Activated; takes a Redline Marker instead of the usual cost',
+      ] },
+      { gate: '3+', items: ['Short weapons gain +2" range'] },
+      { gate: '4', items: [
+        'May interrupt with a SMASH Order in addition to Return Fire',
+      ] },
+    ],
     agenda: 'Trophy Takers: Team kills outside 18" of own Edge, then end within 8" of own Edge = 1 VP.',
   },
   {
@@ -401,6 +513,13 @@ export const TEAMS = [
       { cls: 'UL HE-V or Assault Vehicle Squadron', min: 1, max: 2 },
     ],
     benefits: 'At 2+: team members may move through each other. At 3+: stack a 2nd matching Support Asset. At 4: activation handoff between HE-V and Support Asset.',
+    benefitsList: [
+      { gate: '2+', items: ['Team members may move through each other freely'] },
+      { gate: '3+', items: ['May take a 2nd matching Support Asset, normal cost'] },
+      { gate: '4', items: [
+        'Activation handoff: when the HE-V or Support Asset Activates, the other in the team may also Activate immediately',
+      ] },
+    ],
     agenda: 'Combined Arms Assault: CAPTURE Objective at the wreck of an enemy you killed = 1 VP.',
   },
 ];

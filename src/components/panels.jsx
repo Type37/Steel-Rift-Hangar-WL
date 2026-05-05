@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Check } from 'lucide-react';
-import { OFF_TABLE_ASSETS, ADVANCED_ASSETS, FACTIONS, TEAMS } from '../data';
+import { OFF_TABLE_ASSETS, ADVANCED_ASSETS, FACTIONS, FACTION_LOGOS, TEAMS } from '../data';
 import { checkTeamEligibility, slotsForBand, findAsset } from '../calc';
 import { SectionTitle, Chip, TextButton, TraitList, RowExpand, InlineTraitGlossary, collectTraits } from './ui';
 import { Tooltip } from './tooltip';
@@ -8,6 +8,14 @@ import { Tooltip } from './tooltip';
 // Resolve absolute asset path through Vite's base
 const BASE = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '/');
 const asset = (p) => `${BASE}${p.replace(/^\//, '')}`;
+
+// Pick one representative logo per faction for the hover-wash effect on
+// the faction picker tile. Order chosen for visual punch.
+const FACTION_HOVER_LOGO = {
+  Authorities:  'authorities/sahel-alliance.png',
+  Corporations: 'corporations/helios.png',
+  Freelancers:  'freelancers/cerberus-group.png',
+};
 
 // Map team name to its silhouette icon. Icons live in /public/icons/.
 const TEAM_ICONS = {
@@ -408,7 +416,39 @@ function TeamRow({ team, eligible, minSize, canAssign, slotLeft, selected, onTog
             })}
           </div>
           <div style={{ marginTop: 10 }}><span className="label">Benefits</span></div>
-          <div style={{ fontSize: 13, color: 'var(--ink)', lineHeight: 1.6, marginTop: 4 }}>{team.benefits}</div>
+          {team.benefitsList ? (
+            <div style={{ marginTop: 4 }}>
+              {team.benefitsList.map((g, i) => (
+                <div key={i} style={{
+                  display: 'grid',
+                  gridTemplateColumns: '64px 1fr',
+                  gap: 12,
+                  alignItems: 'baseline',
+                  padding: '6px 0',
+                  borderTop: i === 0 ? '1px dotted var(--rule)' : 'none',
+                  borderBottom: '1px dotted var(--rule)',
+                }}>
+                  <div className="mono" style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: 'var(--rust)',
+                    letterSpacing: '0.10em',
+                    textTransform: 'uppercase',
+                  }}>
+                    {g.gate}
+                  </div>
+                  <ul style={{
+                    margin: 0, paddingLeft: 18,
+                    fontSize: 13, color: 'var(--ink)', lineHeight: 1.55,
+                  }}>
+                    {g.items.map((it, j) => <li key={j}>{it}</li>)}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ fontSize: 13, color: 'var(--ink)', lineHeight: 1.6, marginTop: 4 }}>{team.benefits}</div>
+          )}
           <div style={{ marginTop: 10 }}><span className="label">Team Agenda</span></div>
           <div style={{ fontSize: 13, color: 'var(--steel)', lineHeight: 1.6, marginTop: 4 }}>{team.agenda}</div>
         </div>
@@ -424,10 +464,16 @@ function TeamRow({ team, eligible, minSize, canAssign, slotLeft, selected, onTog
 // inline glossary of any traits referenced.
 // ============================================================
 
-export function SupportDetailView({ assetName, customName, onBack }) {
+export function SupportDetailView({ assetName, customName, loadout, onSetLoadout, onBack }) {
   const a = findAsset(assetName);
   if (!a) return null;
   const traitNames = collectTraits(a.stats?.Traits || '');
+
+  // Resolve effective loadout: use stored, else default to first sub-unit
+  // duplicated across all slots.
+  const effectiveLoadout = loadout || (
+    a.subunits && a.unitCount ? Array(a.unitCount).fill(a.subunits[0]?.name) : []
+  );
 
   return (
     <div style={{ maxWidth: 760 }}>
@@ -438,14 +484,14 @@ export function SupportDetailView({ assetName, customName, onBack }) {
           fontFamily: 'var(--font-stencil)', fontSize: 11.5, fontWeight: 700,
           letterSpacing: '0.10em', textTransform: 'uppercase', marginBottom: 16,
         }}>
-          ← Browse all
+          \u2190 Browse all
         </button>
       )}
 
       <div className="stencil" style={{
         fontSize: 12, color: 'var(--rust)', letterSpacing: '0.22em', marginBottom: 6,
       }}>
-        SUPPORT ASSET · {a.kind.toUpperCase()}
+        SUPPORT ASSET \u00B7 {a.kind.toUpperCase()}
       </div>
       <h1 style={{
         fontFamily: 'var(--font-display)',
@@ -480,9 +526,19 @@ export function SupportDetailView({ assetName, customName, onBack }) {
         {a.fullDesc}
       </div>
 
+      {a.subunits && a.unitCount && onSetLoadout && (
+        <SubUnitPicker
+          asset={a}
+          loadout={effectiveLoadout}
+          onChange={onSetLoadout}
+        />
+      )}
+
       {a.subunits && a.subunits.length > 0 && (
         <>
-          <div className="label" style={{ marginBottom: 6 }}>Sub-units</div>
+          <div className="label" style={{ marginBottom: 6, marginTop: 18 }}>
+            Sub-unit reference
+          </div>
           <div style={{ overflowX: 'auto', marginBottom: 18 }}>
             <table style={{
               borderCollapse: 'collapse', width: '100%',
@@ -556,6 +612,165 @@ export function SupportDetailView({ assetName, customName, onBack }) {
   );
 }
 
+// ============================================================
+// SUB-UNIT PICKER
+// Lets the user assemble the actual squadron, troop, or outpost from
+// the available sub-unit types. Honors the asset's pickRule:
+//   - 'any':         no constraint
+//   - 'allSame':     every slot must be the same type
+//   - 'maxTwoEach':  no type more than twice
+// ============================================================
+function SubUnitPicker({ asset: a, loadout, onChange }) {
+  const counts = loadout.reduce((acc, n) => { acc[n] = (acc[n] || 0) + 1; return acc; }, {});
+  const total = loadout.length;
+  const target = a.unitCount;
+  const rule = a.pickRule || 'any';
+
+  // Predicate: can we add one more of this sub-unit name?
+  const canAdd = (name) => {
+    if (total >= target) return false;
+    if (rule === 'allSame') {
+      // Only allowed if loadout is empty or already this type.
+      const filled = loadout.filter(Boolean);
+      return filled.length === 0 || filled.every(n => n === name);
+    }
+    if (rule === 'maxTwoEach') {
+      return (counts[name] || 0) < 2;
+    }
+    return true;
+  };
+
+  const canRemove = (name) => (counts[name] || 0) > 0;
+
+  const add = (name) => {
+    if (!canAdd(name)) return;
+    onChange([...loadout, name]);
+  };
+  const remove = (name) => {
+    if (!canRemove(name)) return;
+    // Remove the last instance.
+    const idx = loadout.lastIndexOf(name);
+    if (idx === -1) return;
+    onChange([...loadout.slice(0, idx), ...loadout.slice(idx + 1)]);
+  };
+
+  // Constraint hint for the user.
+  const ruleText = {
+    any: `Pick exactly ${target}, in any combination.`,
+    allSame: `Pick ${target} of the same type.`,
+    maxTwoEach: `Pick ${target}; no type more than twice.`,
+  }[rule];
+
+  return (
+    <div style={{
+      border: '2px solid var(--rust)',
+      background: 'var(--bg)',
+      padding: '14px 14px 12px',
+      marginBottom: 18,
+    }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        gap: 10, marginBottom: 8, flexWrap: 'wrap',
+      }}>
+        <div className="label" style={{ fontSize: 12 }}>
+          Loadout
+          <span className="mono" style={{
+            marginLeft: 8, color: total === target ? 'var(--olive)' : 'var(--rust)',
+            fontWeight: 700,
+          }}>
+            {total} / {target}
+          </span>
+        </div>
+        <div style={{ fontSize: 11.5, color: 'var(--ink-2)', fontStyle: 'italic' }}>
+          {ruleText}
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {a.subunits.map(su => {
+          const count = counts[su.name] || 0;
+          const blocked = !canAdd(su.name);
+          return (
+            <div
+              key={su.name}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr auto',
+                gap: 10, alignItems: 'center',
+                padding: '8px 10px',
+                background: count > 0 ? 'var(--surface)' : 'transparent',
+                border: '1px solid var(--rule)',
+              }}
+            >
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--ink)' }}>
+                  {su.name}
+                </div>
+                <div className="mono" style={{
+                  fontSize: 11, color: 'var(--ink-2)', marginTop: 2, lineHeight: 1.4,
+                }}>
+                  SPD {su.spd} \u00B7 ARM {su.arm} \u00B7 STR {su.str}
+                </div>
+                <div style={{
+                  fontSize: 11.5, color: 'var(--ink-2)', marginTop: 2, lineHeight: 1.4,
+                }}>
+                  {su.weapons}
+                </div>
+                {su.traits && su.traits !== '\u2014' && (
+                  <div style={{
+                    fontSize: 11, color: 'var(--mute)', marginTop: 2, fontStyle: 'italic',
+                    lineHeight: 1.4,
+                  }}>
+                    {su.traits}
+                  </div>
+                )}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <button
+                  onClick={() => remove(su.name)}
+                  disabled={!canRemove(su.name)}
+                  title={`Remove one ${su.name}`}
+                  style={pickerBtn(canRemove(su.name), 'down')}
+                >
+                  \u2212
+                </button>
+                <div className="mono" style={{
+                  width: 28, textAlign: 'center',
+                  fontSize: 16, fontWeight: 700, color: 'var(--ink)',
+                }}>
+                  {count}
+                </div>
+                <button
+                  onClick={() => add(su.name)}
+                  disabled={blocked}
+                  title={blocked ? 'Cannot add another' : `Add a ${su.name}`}
+                  style={pickerBtn(!blocked, 'up')}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function pickerBtn(enabled, dir) {
+  return {
+    width: 28, height: 28,
+    border: '1.5px solid var(--rule-strong)',
+    background: enabled ? (dir === 'up' ? 'var(--olive)' : 'var(--surface-2)') : 'var(--bg-deep)',
+    color: enabled ? (dir === 'up' ? 'var(--surface)' : 'var(--ink)') : 'var(--mute)',
+    cursor: enabled ? 'pointer' : 'not-allowed',
+    fontFamily: 'var(--font-mono)',
+    fontSize: 16, fontWeight: 700,
+    padding: 0,
+    opacity: enabled ? 1 : 0.5,
+  };
+}
+
 const subTableTh = {
   padding: '8px 10px',
   fontFamily: 'var(--font-stencil)',
@@ -587,6 +802,9 @@ export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
             key={f}
             onClick={() => onSetFaction(f)}
             className={`faction-tile add-btn ${faction === f ? 'is-active' : ''}`}
+            style={{
+              '--faction-hover-bg': `url("${asset(FACTION_HOVER_LOGO[f])}")`,
+            }}
           >
             <span className="faction-tile-name">{f}</span>
             <span className="faction-tile-blurb">{FACTIONS[f].blurb.split('.')[0]}.</span>

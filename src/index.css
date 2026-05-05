@@ -259,12 +259,12 @@ button:not(:disabled):active {
 }
 .bottombar-row-force { gap: 10px; }
 .bottombar-force-input {
-  flex: 1;
+  flex: 0 1 360px;
   display: flex;
   align-items: center;
   border-bottom: 1.5px solid var(--rule-strong);
   padding-bottom: 2px;
-  min-width: 0;
+  min-width: 180px;
 }
 .bottombar-force-input input {
   flex: 1;
@@ -288,6 +288,7 @@ button:not(:disabled):active {
   display: flex;
   gap: 6px;
   flex-shrink: 0;
+  margin-left: auto;
 }
 .util-btn {
   background: transparent;
@@ -311,22 +312,26 @@ button:not(:disabled):active {
 }
 .bottombar-row-mission {
   flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
 }
 .bottombar-mission-row {
   display: flex;
   align-items: center;
   gap: 5px;
   flex-wrap: wrap;
-  flex: 1;
+  flex: 1 1 280px;
   min-width: 0;
 }
 .bottombar-ton-bar {
-  flex: 0 0 240px;
+  flex: 0 1 240px;
+  min-width: 160px;
 }
-.bottombar-row-cta {
-  display: grid;
-  grid-template-columns: 1fr 1.4fr;
-  gap: 10px;
+.bottombar-ctas {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 /* Pulsing glow for empty-roster prompts that want attention */
@@ -387,7 +392,28 @@ button:not(:disabled):active {
   cursor: pointer;
   transition: background 110ms, border-color 110ms, color 110ms, transform 80ms;
   min-height: 110px;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
 }
+/* Logo wash sits behind the text content, faded out by default,
+   fades in on hover. The image is set via inline style with a CSS var
+   on each tile so each faction shows its own org logo. */
+.faction-tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--faction-hover-bg, none);
+  background-repeat: no-repeat;
+  background-position: 100% 50%;
+  background-size: contain;
+  opacity: 0;
+  transition: opacity 220ms ease;
+  z-index: -1;
+  filter: grayscale(0.4);
+}
+.faction-tile:hover::before { opacity: 0.18; }
+.faction-tile.is-active::before { opacity: 0.22; filter: grayscale(0); }
 .faction-tile:hover {
   border-color: var(--ink);
   background: var(--bg);
@@ -844,6 +870,20 @@ button:not(:disabled):active {
   margin-bottom: 4pt;
   line-height: 1.35;
 }
+.card-loadout {
+  margin-bottom: 4pt;
+  padding: 3pt 0;
+  border-top: 0.25pt solid #ddd;
+  border-bottom: 0.25pt solid #ddd;
+}
+.card-loadout-list {
+  margin: 2pt 0 0;
+  padding-left: 12pt;
+  font-size: 7.5pt;
+  line-height: 1.4;
+  color: #000;
+}
+.card-loadout-list li { margin-bottom: 1pt; }
 .card-support-stats {
   width: 100%;
   border-collapse: collapse;
@@ -1016,7 +1056,10 @@ button:not(:disabled):active {
     gap: 6px !important;
   }
   .bottombar-row { gap: 8px; }
-  .bottombar-row-force { gap: 6px; }
+  .bottombar-row-force { gap: 6px; flex-wrap: wrap; }
+  .bottombar-force-input {
+    flex: 1 1 100% !important;
+  }
   .bottombar-force-input input { font-size: 16px !important; }
   .util-btn { padding: 6px 9px; font-size: 11px; }
   .util-label { display: none; }
@@ -1026,17 +1069,15 @@ button:not(:disabled):active {
     align-items: stretch;
     gap: 6px;
   }
-  .bottombar-mission-row { gap: 4px !important; }
+  .bottombar-mission-row { gap: 4px !important; flex: 1 1 auto !important; }
   .bottombar-ton-bar { flex: 1 1 auto; }
-
-  .bottombar-row-cta {
-    grid-template-columns: 1fr 1.3fr;
-    gap: 8px !important;
+  .bottombar-ctas {
+    margin-left: 0 !important;
+    justify-content: stretch;
   }
-  .bottombar-add-support, .bottombar-add-mech {
-    padding: 11px 10px !important;
-    font-size: 12px !important;
-    letter-spacing: 0.08em !important;
+  .bottombar-ctas > * {
+    flex: 1;
+    justify-content: center;
   }
 
   .sidebar { padding: 14px 12px 20px !important; }

@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { X, Dices } from 'lucide-react';
-import { WC, WC_ORDER } from '../data';
+import { WC, WC_ORDER, FACTION_LOGOS } from '../data';
 import { POOL_NAMES, rollCallsign } from '../callsigns';
 import { Modal, FieldLabel, PrimaryButton, TextButton, Chip } from './ui';
+
+// Resolve absolute asset path through Vite's base
+const BASE = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '/');
+const asset = (p) => `${BASE}${p.replace(/^\//, '')}`;
 
 // ============================================================
 // ADD HE-V MODAL
@@ -278,67 +282,74 @@ export function OptionsModal({
           Switching modes hides the optional sections. Your choices in those sections are kept and reapplied if you switch back.
         </div>
 
-        {/* Faction logo upload. Shown next to your force name when printing. */}
+        {/* Faction logo. Pick a shipped default or upload a custom one. */}
         <FieldLabel>Faction Logo</FieldLabel>
         <div style={{
           border: '1.5px dashed var(--rule-strong)',
           background: 'var(--bg-deep)',
           padding: '12px 14px',
           marginBottom: 8,
-          display: 'flex', alignItems: 'center', gap: 14,
         }}>
           <div style={{
-            width: 60, height: 60, flexShrink: 0,
-            background: 'var(--surface)',
-            border: '1px solid var(--rule)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            overflow: 'hidden',
+            display: 'flex', alignItems: 'center', gap: 14,
+            paddingBottom: 12, marginBottom: 12,
+            borderBottom: '1px dotted var(--rule)',
           }}>
-            {factionLogo ? (
-              <img src={factionLogo} alt="Faction logo"
-                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
-            ) : (
-              <span className="mono" style={{ fontSize: 9.5, color: 'var(--mute)', letterSpacing: '0.18em' }}>
-                NO LOGO
-              </span>
-            )}
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 12.5, color: 'var(--ink-2)', lineHeight: 1.45, marginBottom: 6 }}>
-              Optional. Appears next to your force name on printed sheets.
-            </div>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-              <label className="add-btn" style={{
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-                border: '1.5px solid var(--ink)', background: 'transparent',
-                color: 'var(--ink)', padding: '6px 12px', cursor: 'pointer',
-                fontFamily: 'var(--font-stencil)', fontSize: 11.5, fontWeight: 700,
-                letterSpacing: '0.10em', textTransform: 'uppercase',
-              }}>
-                {factionLogo ? 'Replace' : 'Upload'}
-                <input
-                  type="file"
-                  accept="image/png, image/jpeg, image/svg+xml, image/webp"
-                  onChange={handleLogoUpload}
-                  style={{ display: 'none' }}
-                />
-              </label>
-              {factionLogo && (
-                <button onClick={() => setFactionLogo(null)} className="add-btn"
-                  style={{
-                    border: '1.5px solid var(--rust)', background: 'transparent',
-                    color: 'var(--rust)', padding: '6px 12px', cursor: 'pointer',
-                    fontFamily: 'var(--font-stencil)', fontSize: 11.5, fontWeight: 700,
-                    letterSpacing: '0.10em', textTransform: 'uppercase',
-                  }}>
-                  Remove
-                </button>
+            <div style={{
+              width: 60, height: 60, flexShrink: 0,
+              background: 'var(--surface)',
+              border: '1px solid var(--rule)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              overflow: 'hidden',
+            }}>
+              {factionLogo ? (
+                <img src={factionLogo} alt="Faction logo"
+                  style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+              ) : (
+                <span className="mono" style={{ fontSize: 9.5, color: 'var(--mute)', letterSpacing: '0.18em' }}>
+                  NO LOGO
+                </span>
               )}
             </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 12.5, color: 'var(--ink-2)', lineHeight: 1.45, marginBottom: 6 }}>
+                Pick one of the shipped organization logos below, or upload your own.
+              </div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                <label className="add-btn" style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  border: '1.5px solid var(--ink)', background: 'transparent',
+                  color: 'var(--ink)', padding: '6px 12px', cursor: 'pointer',
+                  fontFamily: 'var(--font-stencil)', fontSize: 11.5, fontWeight: 700,
+                  letterSpacing: '0.10em', textTransform: 'uppercase',
+                }}>
+                  Upload Custom
+                  <input
+                    type="file"
+                    accept="image/png, image/jpeg, image/svg+xml, image/webp"
+                    onChange={handleLogoUpload}
+                    style={{ display: 'none' }}
+                  />
+                </label>
+                {factionLogo && (
+                  <button onClick={() => setFactionLogo(null)} className="add-btn"
+                    style={{
+                      border: '1.5px solid var(--rust)', background: 'transparent',
+                      color: 'var(--rust)', padding: '6px 12px', cursor: 'pointer',
+                      fontFamily: 'var(--font-stencil)', fontSize: 11.5, fontWeight: 700,
+                      letterSpacing: '0.10em', textTransform: 'uppercase',
+                    }}>
+                    Clear
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
+
+          <FactionLogoPicker selected={factionLogo} onPick={setFactionLogo} />
         </div>
         <div style={{ fontSize: 12, color: 'var(--mute)', marginBottom: 22, lineHeight: 1.5 }}>
-          Default logos for each faction are coming soon.
+          Logos appear next to the force name on printed roster sheets.
         </div>
 
         {/* Callsign pool */}
@@ -381,5 +392,73 @@ export function OptionsModal({
         )}
       </div>
     </Modal>
+  );
+}
+
+// ============================================================
+// FACTION LOGO PICKER
+// Gallery of shipped organization logos grouped by faction. Click any
+// logo to set it as the active faction logo. The user's selection is
+// converted to a data URL and stored alongside the rest of state.
+// ============================================================
+function FactionLogoPicker({ selected, onPick }) {
+  const handlePick = async (filePath) => {
+    const url = asset(filePath);
+    try {
+      // Fetch then convert to data URL so the choice persists in
+      // localStorage even if the file path or build hash changes later.
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const reader = new FileReader();
+      reader.onload = () => onPick(reader.result);
+      reader.readAsDataURL(blob);
+    } catch (e) {
+      console.warn('Could not load default logo:', e?.message || e);
+      // Fall back to setting the URL directly.
+      onPick(url);
+    }
+  };
+
+  return (
+    <div>
+      {Object.entries(FACTION_LOGOS).map(([factionName, logos]) => (
+        <div key={factionName} style={{ marginBottom: 12 }}>
+          <div className="stencil" style={{
+            fontSize: 10.5, color: 'var(--mute)', letterSpacing: '0.18em',
+            marginBottom: 6,
+          }}>
+            {factionName}
+          </div>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(72px, 1fr))',
+            gap: 6,
+          }}>
+            {logos.map(l => (
+              <button
+                key={l.file}
+                onClick={() => handlePick(l.file)}
+                title={l.name}
+                className="logo-tile"
+                style={{
+                  background: 'var(--surface)',
+                  border: '1.5px solid var(--rule)',
+                  padding: 4,
+                  cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  aspectRatio: '1 / 1',
+                }}
+              >
+                <img
+                  src={asset(l.file)}
+                  alt={l.name}
+                  style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }

@@ -15,7 +15,7 @@ import { collectTraits } from './ui';
 export function PrintView({
   forceName, mission, customTons, mechs,
   supportAssets, faction, perks, selectedTeams, simpleMode,
-  factionLogo,
+  factionLogo, supportNicknames = {}, supportLoadouts = {},
 }) {
   const useCustom = mission === 'Custom';
   const cap = useCustom ? customTons : MISSIONS[mission].tons;
@@ -28,7 +28,12 @@ export function PrintView({
   mechs.forEach((m, i) => deck.push({ kind: 'hev', mech: m, idx: i }));
   supportAssets.forEach((name) => {
     const a = findAsset(name);
-    if (a) deck.push({ kind: 'support', asset: a });
+    if (a) deck.push({
+      kind: 'support',
+      asset: a,
+      customName: supportNicknames[name],
+      loadout: supportLoadouts[name],
+    });
   });
 
   // Chunk into pages of 9.
@@ -70,7 +75,7 @@ export function PrintView({
               <div key={ci} className="game-card">
                 {slot.kind === 'hev'
                   ? <HEVCard mech={slot.mech} index={slot.idx} />
-                  : <SupportCard asset={slot.asset} />}
+                  : <SupportCard asset={slot.asset} customName={slot.customName} loadout={slot.loadout} />}
               </div>
             ))}
             {Array.from({ length: 9 - page.length }).map((_, i) => (
@@ -179,7 +184,7 @@ function HEVCard({ mech, index }) {
   return (
     <div className="game-card-inner">
       <header className="card-header">
-        <div className="card-header-name">{mech.name}</div>
+        <div className="card-header-name">{mech.name || `${cls.toUpperCase()} HE-V`}</div>
         <div className="card-header-class">{cls} HE-V</div>
       </header>
 
@@ -236,22 +241,46 @@ function HEVCard({ mech, index }) {
 // ============================================================
 // SUPPORT CARD (2.5" x 3.5")
 // ============================================================
-function SupportCard({ asset: a }) {
+function SupportCard({ asset: a, customName, loadout }) {
   const stats = a.stats || {};
   const traits = stats.Traits || stats.traits || '';
   const statEntries = Object.entries(stats).filter(([k]) =>
     !/Trait|trait|Description|description/i.test(k)
   );
 
+  // Roll up the loadout into "N x SubName" lines.
+  const loadoutBreakdown = (() => {
+    if (!loadout || loadout.length === 0) return null;
+    const counts = loadout.reduce((acc, n) => { acc[n] = (acc[n] || 0) + 1; return acc; }, {});
+    return Object.entries(counts);
+  })();
+
   return (
     <div className="game-card-inner">
       <header className="card-header">
-        <div className="card-header-name">{a.name}</div>
-        <div className="card-header-class">{a.kind} · {a.cost}t</div>
+        <div className="card-header-name">{customName || a.name}</div>
+        <div className="card-header-class">{a.kind} \u00B7 {a.cost}t</div>
       </header>
+
+      {customName && (
+        <div className="card-support-summary" style={{ marginBottom: 2 }}>
+          ({a.name})
+        </div>
+      )}
 
       {a.summary && (
         <div className="card-support-summary">{a.summary}</div>
+      )}
+
+      {loadoutBreakdown && (
+        <div className="card-loadout">
+          <div className="card-upgrades-label">Loadout</div>
+          <ul className="card-loadout-list">
+            {loadoutBreakdown.map(([n, c]) => (
+              <li key={n}><strong>{c}\u00D7</strong> {n}</li>
+            ))}
+          </ul>
+        </div>
       )}
 
       {statEntries.length > 0 && (

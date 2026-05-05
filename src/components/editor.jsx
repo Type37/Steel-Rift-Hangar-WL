@@ -81,11 +81,11 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete }) {
         </button>
       </div>
 
-      {/* Name + description */}
+      {/* Name + description. Empty name falls back to "<CLASS> HE-V". */}
       <input
         value={mech.name}
         onChange={(e) => update({ name: e.target.value })}
-        placeholder="Unnamed HE-V"
+        placeholder={`${mech.weightClass.toUpperCase()} HE-V`}
         style={{
           width: '100%',
           background: 'transparent',
@@ -366,15 +366,13 @@ function Adjuster({ kind, value, base, min, max, onChange }) {
         </div>
       </div>
 
-      {/* Tonnage strip */}
-      <div className="mono" style={{
-        fontSize: 11, color: 'var(--mute)', marginBottom: 10, letterSpacing: '0.04em',
-      }}>
-        costs <strong style={{ color: 'var(--ink)' }}>{tonsSpent}t</strong> of this HE-V's tonnage
-      </div>
+      {/* Pip row: visualizes how many points of armor/structure the HE-V has.
+          For armor, plain squares. For structure, the M / D / Ø critical
+          markers land at the quarter-thresholds (per v1.5 p.37). */}
+      <PipRow value={value} structure={!isArmor} accent={isArmor ? 'steel' : 'olive'} />
 
       {/* Reinforce / Strip controls */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginTop: 10 }}>
         <button
           onClick={() => onChange(Math.max(min, value - 2))}
           disabled={!canDown}
@@ -398,6 +396,64 @@ function Adjuster({ kind, value, base, min, max, onChange }) {
           <span className="mono" style={{ opacity: 0.7, fontSize: 10 }}>-2t</span>
         </button>
       </div>
+    </div>
+  );
+}
+
+// Pip indicator: a visual row of squares showing how many armor or
+// structure points the HE-V has. Structure pips carry M / D / Ø marks
+// at the quarter thresholds matching the rulebook critical-damage track.
+function PipRow({ value, structure, accent }) {
+  if (!value) return null;
+
+  // Build pip slots. For structure, mark M (25%), D (50%), Ø (75%).
+  const points = [];
+  if (structure) {
+    const parts = 4;
+    const base = Math.floor(value / parts);
+    const remainder = value % parts;
+    const chunks = Array(parts).fill(base);
+    for (let i = 0; i < remainder; i++) chunks[i] += 1;
+    const map = ['M', 'D', '\u00D8']; // 25/50/75% markers
+    chunks.forEach((count, idx) => {
+      for (let j = 0; j < count; j++) {
+        const isLast = j === count - 1;
+        points.push({ mark: isLast && map[idx] ? map[idx] : null });
+      }
+    });
+  } else {
+    for (let i = 0; i < value; i++) points.push({ mark: null });
+  }
+
+  // Wrap pips so they don't overflow on small adjusters.
+  const color = accent === 'steel' ? 'var(--steel)' : 'var(--olive-deep)';
+
+  return (
+    <div style={{
+      display: 'flex', flexWrap: 'wrap', gap: 3,
+      padding: '6px 0 2px',
+      borderTop: '1px dotted var(--rule)',
+      borderBottom: '1px dotted var(--rule)',
+      marginBottom: 6,
+    }}>
+      {points.map((p, i) => (
+        <span
+          key={i}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center', justifyContent: 'center',
+            width: 14, height: 14,
+            border: `1.25px solid ${color}`,
+            background: p.mark ? color : 'transparent',
+            color: p.mark ? 'var(--surface)' : 'transparent',
+            fontFamily: 'var(--font-mono)',
+            fontSize: 8.5, fontWeight: 700,
+            lineHeight: 1,
+          }}
+        >
+          {p.mark || ''}
+        </span>
+      ))}
     </div>
   );
 }

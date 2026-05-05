@@ -174,37 +174,39 @@ export function BottomBar({
             {totalTons} / {cap}t
           </div>
         </div>
-      </div>
 
-      {/* BOTTOM ROW: the two CTAs */}
-      <div className="bottombar-row bottombar-row-cta">
-        <button onClick={onAddSupport} className="bottombar-add-support add-btn" style={{
-          background: 'transparent',
-          color: 'var(--ink)',
-          border: '2px solid var(--ink)',
-          padding: '12px 18px', cursor: 'pointer',
-          fontFamily: 'var(--font-stencil)', fontSize: 13, fontWeight: 700,
-          letterSpacing: '0.12em', textTransform: 'uppercase',
-          display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-        }}>
-          <Plus size={15} strokeWidth={2.5} />
-          Add Support
-        </button>
+        {/* CTAs sit alongside mission row, sized to their own labels */}
+        <div className="bottombar-ctas">
+          <button onClick={onAddSupport} className="add-btn bottombar-add-support" style={{
+            background: 'transparent',
+            color: 'var(--ink)',
+            border: '2px solid var(--ink)',
+            padding: '9px 14px', cursor: 'pointer',
+            fontFamily: 'var(--font-stencil)', fontSize: 12, fontWeight: 700,
+            letterSpacing: '0.10em', textTransform: 'uppercase',
+            display: 'inline-flex', alignItems: 'center', gap: 7,
+            whiteSpace: 'nowrap',
+          }}>
+            <Plus size={13} strokeWidth={2.5} />
+            Support
+          </button>
 
-        <button onClick={onAddMech} className={`bottombar-add-mech add-btn cta-mech ${mechCount === 0 ? 'cta-pulse' : ''}`} style={{
-          background: 'var(--rust)',
-          color: 'var(--surface)',
-          border: '2px solid var(--rust)',
-          padding: '12px 20px', cursor: 'pointer',
-          fontFamily: 'var(--font-stencil)', fontSize: 13, fontWeight: 700,
-          letterSpacing: '0.12em', textTransform: 'uppercase',
-          display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 9,
-          boxShadow: '0 2px 0 var(--rust-deep)',
-        }}>
-          <img src={asset('icons/hev.svg')} alt="" className="cta-mech-icon" />
-          <Plus size={14} strokeWidth={2.5} />
-          Add HE-V
-        </button>
+          <button onClick={onAddMech} className={`add-btn bottombar-add-mech cta-mech ${mechCount === 0 ? 'cta-pulse' : ''}`} style={{
+            background: 'var(--rust)',
+            color: 'var(--surface)',
+            border: '2px solid var(--rust)',
+            padding: '9px 16px', cursor: 'pointer',
+            fontFamily: 'var(--font-stencil)', fontSize: 12, fontWeight: 700,
+            letterSpacing: '0.10em', textTransform: 'uppercase',
+            display: 'inline-flex', alignItems: 'center', gap: 7,
+            whiteSpace: 'nowrap',
+            boxShadow: '0 2px 0 var(--rust-deep)',
+          }}>
+            <img src={asset('icons/hev.svg')} alt="" className="cta-mech-icon" />
+            <Plus size={13} strokeWidth={2.5} />
+            HE-V
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -275,7 +277,7 @@ export function MechCard({ mech, index, active, onSelect }) {
           textTransform: 'uppercase',
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
-          {mech.name || <span style={{ opacity: 0.55, fontStyle: 'italic' }}>Unnamed</span>}
+          {mech.name || `${mech.weightClass.toUpperCase()} HE-V`}
         </div>
         <div className="mono" style={{
           fontSize: 11.5,
@@ -313,7 +315,7 @@ export function MechCard({ mech, index, active, onSelect }) {
 // SUPPORT ROSTER CARD: compact summary of a chosen support asset.
 // Shown alongside HE-V cards so the user always sees their force.
 // ============================================================
-export function SupportRosterCard({ asset: a, customName, onRemove, onClick, onRename, active }) {
+export function SupportRosterCard({ asset: a, customName, loadout, onRemove, onClick, onRename, active }) {
   const [editing, setEditing] = React.useState(false);
   const [draft, setDraft] = React.useState(customName || '');
   const inputRef = React.useRef(null);
@@ -336,6 +338,19 @@ export function SupportRosterCard({ asset: a, customName, onRemove, onClick, onR
     const e = Object.entries(a.stats).filter(([k]) => !/Trait|Description/i.test(k));
     if (e.length === 0) return null;
     return e.map(([k, v]) => /Per/i.test(k) ? v : `${k} ${v}`).join(' \u00B7 ');
+  })();
+
+  // Build the picked-loadout summary, e.g. "3 Strike LAS Wing, 1 Recon".
+  // Empty if asset has no sub-units.
+  const loadoutLine = (() => {
+    if (!loadout || loadout.length === 0) return null;
+    const counts = loadout.reduce((acc, n) => {
+      acc[n] = (acc[n] || 0) + 1;
+      return acc;
+    }, {});
+    return Object.entries(counts)
+      .map(([n, c]) => `${c} \u00D7 ${shortenSubName(n)}`)
+      .join(', ');
   })();
 
   const displayName = customName || a.name;
@@ -417,6 +432,14 @@ export function SupportRosterCard({ asset: a, customName, onRemove, onClick, onR
             {statsLine}
           </div>
         )}
+        {loadoutLine && (
+          <div style={{
+            fontSize: 12, color: 'var(--olive)', marginTop: 3, lineHeight: 1.4,
+            fontWeight: 600,
+          }}>
+            {loadoutLine}
+          </div>
+        )}
       </div>
       <button
         onClick={(e) => { e.stopPropagation(); onRemove(a.name); }}
@@ -462,4 +485,34 @@ export function EmptyRoster({ onAdd }) {
       </div>
     </div>
   );
+}
+
+// Shortens long sub-unit names so they fit on a card line.
+// "Reconnaissance and Disruption LAS Wing" -> "Recon/Disruption LAS Wing"
+// "Infantry Fighting Vehicle" -> "IFV"
+function shortenSubName(name) {
+  return name
+    .replace(/Reconnaissance and Disruption/gi, 'Recon/Disruption')
+    .replace(/Infantry Fighting Vehicle/gi, 'IFV')
+    .replace(/Combat Engineering Vehicle/gi, 'Combat Engr.')
+    .replace(/Shield Projector Vehicle/gi, 'Shield Projector')
+    .replace(/Fire Support Vehicle/gi, 'Fire Support')
+    .replace(/Anti-Aircraft Vehicle/gi, 'AA Vehicle')
+    .replace(/Artillery Vehicle/gi, 'Artillery')
+    .replace(/Demolition Vehicle/gi, 'Demolition')
+    .replace(/Targeting Support Vehicle/gi, 'Targeting Support')
+    .replace(/Obscuration Projection Vehicle/gi, 'Obscuration Proj.')
+    .replace(/Minelayer Vehicle/gi, 'Minelayer')
+    .replace(/Resupply Vehicle/gi, 'Resupply')
+    .replace(/Recon Vehicle/gi, 'Recon')
+    .replace(/Command Vehicle/gi, 'Command')
+    .replace(/Netter Vehicle/gi, 'Netter')
+    .replace(/General Fire Support Tank/gi, 'GFS Tank')
+    .replace(/Direct Fire Tank/gi, 'Direct Fire')
+    .replace(/Missile Battery Tank/gi, 'Missile Battery')
+    .replace(/Infantry Assault Tank/gi, 'Inf. Assault')
+    .replace(/Infantry Air Transport/gi, 'Infantry Trans.')
+    .replace(/Power Suit Air Transport/gi, 'Power Suit Trans.')
+    .replace(/UL HE-V Air Transport/gi, 'UL HE-V Trans.')
+    .replace(/Bunker \(([^)]+)\)/gi, 'Bunker: $1');
 }

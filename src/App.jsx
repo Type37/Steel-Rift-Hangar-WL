@@ -43,6 +43,9 @@ export default function App() {
   const [customCallsigns, setCustomCallsigns] = useState(stored.customCallsigns ?? []);
   // Per-asset nicknames so the user can rename their support units.
   const [supportNicknames, setSupportNicknames] = useState(stored.supportNicknames ?? {});
+  // Per-asset sub-unit picks. Shape: { 'LAS-Wing Attack Squadron': ['Strike LAS Wing', 'Strike LAS Wing', 'Reconnaissance and Disruption LAS Wing', 'Strike LAS Wing'], ... }
+  // Each entry is the list of sub-unit names the user picked, in order.
+  const [supportLoadouts, setSupportLoadouts] = useState(stored.supportLoadouts ?? {});
 
   const [simpleMode, setSimpleMode] = useState(stored.simpleMode ?? false);
 
@@ -58,7 +61,7 @@ export default function App() {
         forceName, mission, customTons,
         faction, perks, factionLogo,
         mechs, supportAssets, selectedTeams,
-        callsignPool, customCallsigns, supportNicknames,
+        callsignPool, customCallsigns, supportNicknames, supportLoadouts,
         simpleMode,
       }));
     } catch (e) {
@@ -68,7 +71,7 @@ export default function App() {
     forceName, mission, customTons,
     faction, perks, factionLogo,
     mechs, supportAssets, selectedTeams,
-    callsignPool, customCallsigns, supportNicknames,
+    callsignPool, customCallsigns, supportNicknames, supportLoadouts,
     simpleMode,
   ]);
 
@@ -81,6 +84,11 @@ export default function App() {
       else delete next[assetName];
       return next;
     });
+  };
+
+  // Set the sub-unit loadout for a support asset (e.g. which 4 LAS-Wings).
+  const setSupportLoadout = (assetName, loadout) => {
+    setSupportLoadouts(prev => ({ ...prev, [assetName]: loadout }));
   };
 
   // Auto-scroll to editor pane on phones when picking a mech.
@@ -134,11 +142,34 @@ export default function App() {
       if (!has) {
         setSelectedSupportName(name);
         setSelectedMechId(null);
+        // Initialize a default loadout for assets with sub-unit picks.
+        const a = findAsset(name);
+        if (a?.subunits && a?.unitCount && !supportLoadouts[name]) {
+          // Default: fill all slots with the first sub-unit type.
+          const first = a.subunits[0]?.name;
+          if (first) {
+            setSupportLoadouts(prev => ({
+              ...prev,
+              [name]: Array(a.unitCount).fill(first),
+            }));
+          }
+        }
       } else if (selectedSupportName === name) {
         setSelectedSupportName(null);
       }
       return next;
     });
+    // Clear nickname + loadout when removing.
+    if (supportAssets.includes(name)) {
+      setSupportNicknames(prev => {
+        if (!prev[name]) return prev;
+        const next = { ...prev }; delete next[name]; return next;
+      });
+      setSupportLoadouts(prev => {
+        if (!prev[name]) return prev;
+        const next = { ...prev }; delete next[name]; return next;
+      });
+    }
   };
 
   const toggleTeam = (name) =>
@@ -163,6 +194,8 @@ export default function App() {
         faction={faction} perks={perks} selectedTeams={selectedTeams}
         simpleMode={simpleMode}
         factionLogo={factionLogo}
+        supportNicknames={supportNicknames}
+        supportLoadouts={supportLoadouts}
       />
 
       <div className="app-shell no-print">
@@ -233,6 +266,7 @@ export default function App() {
                       key={name}
                       asset={a}
                       customName={supportNicknames[name]}
+                      loadout={supportLoadouts[name]}
                       onRemove={toggleSupport}
                       onRename={(nick) => renameSupport(name, nick)}
                       active={selectedSupportName === name && sideTab === 'support'}
@@ -333,6 +367,8 @@ export default function App() {
                 <SupportDetailView
                   assetName={selectedSupportName}
                   customName={supportNicknames[selectedSupportName]}
+                  loadout={supportLoadouts[selectedSupportName]}
+                  onSetLoadout={(l) => setSupportLoadout(selectedSupportName, l)}
                   onBack={() => setSelectedSupportName(null)}
                 />
               )}
