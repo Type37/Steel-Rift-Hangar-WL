@@ -649,7 +649,34 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
             <DmgBadge weapon={weapon} cls={cls} />
             {available && (
               <>
-                <span className="mono" style={{ fontSize: 12, color: 'var(--rust)', fontWeight: 700 }}>{base}t</span>
+                <span style={{
+                  display: 'inline-grid',
+                  gridTemplateColumns: 'repeat(4, auto)',
+                  columnGap: 7,
+                  alignItems: 'end',
+                  verticalAlign: 'middle',
+                  background: 'var(--surface-2)',
+                  border: '1px solid var(--rule)',
+                  padding: '2px 6px',
+                }}>
+                  {weapon.cost.map((v, i) => (
+                    <span key={i} style={{
+                      display: 'flex', flexDirection: 'column', alignItems: 'center',
+                    }}>
+                      <span style={{
+                        fontSize: 9, color: 'var(--mute)', letterSpacing: '0.06em',
+                        fontFamily: 'var(--font-body)',
+                      }}>{WC_ABBR[i]}</span>
+                      <span style={{
+                        fontFamily: 'var(--font-display)',
+                        fontSize: i === WC_IDX[cls] ? 16 : 11,
+                        fontWeight: 700,
+                        color: i === WC_IDX[cls] ? 'var(--rust)' : 'var(--mute)',
+                        lineHeight: 1.1,
+                      }}>{v === '-' ? '-' : `${v}t`}</span>
+                    </span>
+                  ))}
+                </span>
               </>
             )}
             {!available && (

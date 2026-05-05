@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronDown, ChevronRight, Info } from 'lucide-react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import { Tooltip } from './tooltip';
 import { defineToken } from '../glossary';
 
@@ -237,19 +237,13 @@ export function RowExpand({ open, onClick }) {
       type="button"
       onClick={onClick}
       className={`row-expand ${open ? 'open' : ''}`}
-      title={open ? 'Hide details' : 'Show full rules'}
-      aria-label={open ? 'Hide details' : 'Show full rules'}
+      title={open ? 'Collapse' : 'Expand for full rules'}
+      aria-label={open ? 'Collapse' : 'Expand'}
     >
       {open ? (
-        <>
-          <ChevronDown size={13} strokeWidth={2.5} />
-          Hide
-        </>
+        <ChevronDown size={15} strokeWidth={2.5} />
       ) : (
-        <>
-          <Info size={13} strokeWidth={2.5} />
-          Details
-        </>
+        <ChevronRight size={15} strokeWidth={2.5} />
       )}
     </button>
   );

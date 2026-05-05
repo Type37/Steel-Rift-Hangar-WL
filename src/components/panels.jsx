@@ -91,16 +91,18 @@ function SupportRow({ a, eq, atLimit, onToggle, expanded, onExpand }) {
       transition: 'background 100ms',
     }}>
       <div style={{
-        display: 'grid', gridTemplateColumns: 'auto auto 1fr auto auto', alignItems: 'center', gap: 12,
+        display: 'grid', gridTemplateColumns: 'auto 1fr auto auto', alignItems: 'center', gap: 12,
         padding: '11px 12px',
       }}>
-        <RowExpand open={expanded} onClick={onExpand} />
-        <span className="stencil" style={{
-          fontSize: 11, padding: '2px 7px', border: '1.5px solid var(--steel)',
-          color: 'var(--steel)',
-        }}>
-          {a.kind}
-        </span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 5 }}>
+          <RowExpand open={expanded} onClick={onExpand} />
+          <span className="stencil" style={{
+            fontSize: 10, padding: '1px 6px', border: '1.5px solid var(--steel)',
+            color: 'var(--steel)',
+          }}>
+            {a.kind}
+          </span>
+        </div>
         <div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
             <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--ink)' }}>{a.name}</span>
