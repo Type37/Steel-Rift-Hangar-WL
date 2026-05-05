@@ -190,6 +190,39 @@ export const GLOSSARY = {
     text: 'Infantry Activate with a special Order list: MUSTER, MOVE (may be performed twice per Activation), LOCK ON, ENGAGE, DIG IN. Infantry suffer -1 to Defense Rolls when not in Rough or Covering Terrain. Infantry count as 0 Tons for scoring.',
   },
 
+
+  'overdrive': {
+    title: 'Overdrive',
+    text: 'When a Commander would Activate a Unit but all their Units have Activation Markers and the opponent has at least one without: select a Unit (not one with a Redline Marker or only 1 Structure remaining) to Overdrive. It receives a Redline Marker, suffers 1 Structure Damage, then performs a single Order.',
+  },
+  'return fire': {
+    title: 'Return Fire',
+    text: 'When targeted by an ENGAGE Order, a Unit may declare Return Fire if: (a) it has LoS to the Active Unit, (b) it has no Activation Marker, and (c) it has no Redline Marker. If declared, the Target may re-roll natural 1s in their Defense Roll. Once the Active Unit\'s Order is complete, if LoS still exists, the Target Unit may immediately ENGAGE the Active Unit. The returning unit is then marked with an Activation Marker.',
+  },
+  'fragile internals': {
+    title: 'Fragile Internals',
+    text: 'Light HE-Vs only. Whenever this Unit suffers Structure Damage, the Target Commander rolls 1D6 per point of Structure Damage lost. On a 5+, the Unit suffers one additional point of Damage. This does not trigger further Fragile Internals rolls.',
+  },
+  'backup systems engage': {
+    title: 'Backup Systems Engage',
+    text: 'Ultraheavy HE-Vs only. Whenever this Unit suffers Structure Damage, the Target Commander rolls 1D6 per point of Structure Damage lost. On a 5+, one point of Damage is ignored and the Structure is not reduced.',
+  },
+  'tracked': {
+    title: 'Tracked',
+    text: 'Variant Motive Type upgrade (cost 0). Grants the PLOW THROUGH Order: pivot up to 90°, then move up to the HE-V\'s current move speed in a straight line, ignoring Rough Terrain. Facing may not change at the end of this Order. Does not count as a MOVE Order.',
+  },
+  'plow through': {
+    title: 'Plow Through',
+    text: 'Available to Tracked HE-Vs. Pivot up to 90°, then move up to current move speed in a straight line, ignoring Rough Terrain. Facing may not change at end of Order. Does not count as a MOVE Order.',
+  },
+  'multi-limbed': {
+    title: 'Multi-Limbed',
+    text: 'Variant Motive Type upgrade (cost 0). Grants the HUNKER DOWN Order: move following all MOVE rules except distance is 10\"/8\"/6\"/4\". Counts as a MOVE Order. The Unit receives a Hunkered Down Marker, which modifies incoming ENGAGE attacks as Covered (or Blocked if already Covered). Marker is removed if the Unit moves or is SMASHed.',
+  },
+  'hunker down': {
+    title: 'Hunker Down',
+    text: 'Available to Multi-Limbed HE-Vs. Move up to 10\"/8\"/6\"/4\" (counts as a MOVE Order), then place a Hunkered Down Marker. While Hunkered Down, incoming ENGAGE attacks treat this unit as Covered (or Blocked if already Covered). Removed if the Unit moves or is SMASHed.',
+  },
   'smasher': {
     title: 'Smasher (X, Y)',
     text: 'This Unit may perform SMASH Orders even with the Auxiliary Unit Trait. It counts as Weight Class X when SMASHing and adds Y dice to the Attack Pool.',

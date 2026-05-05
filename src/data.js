@@ -77,6 +77,13 @@ export const UPGRADES = [
   { name: 'Nitro Boost',                   cost: [1,1,2,2],          compact: false, rule: 'At the beginning of a MOVE Order, you may move an additional 4". Limited (1).' },
   { name: 'Optic Camouflage',              cost: [5,4,3,2],          compact: false, rule: '+1 to Defense Rolls for this Unit when the Active Unit is outside 10".' },
   { name: 'Target Designator',             cost: [2,1,1,1],          compact: false, rule: 'After this Unit completes an Activation, place a Target Designator Marker on it (not after a JUMP). Remove the Marker at the start of its next Activation.' },
+  // Variant Motive Types — cost 0, one per HE-V, mutually exclusive
+  { name: 'Tracked',                        cost: [0,0,0,0],          compact: false, variant: true, rule: 'Grants PLOW THROUGH Order: pivot up to 90°, then move up to full move speed in a straight line ignoring Rough Terrain. Does not count as a MOVE Order.' },
+  { name: 'Multi-Limbed',                   cost: [0,0,0,0],          compact: false, variant: true, rule: 'Grants HUNKER DOWN Order: move 10"/8"/6"/4", counts as MOVE. Unit receives a Hunkered Down Marker; incoming ENGAGE attacks treat it as Covered (or Blocked). Removed if moved or SMASHed.' },
+  // AI Companion Drones — Compact, assigned to a specific weapon/upgrade
+  { name: 'Targeting Support Drone',        cost: [1,1,1,1],          compact: true,  drone: true, rule: 'Assign to a Weapon. When using that Weapon in an ENGAGE Order, it gains the benefits of a preceding LOCK ON Order. Blocked by Electronic Countermeasures. Compact.' },
+  { name: 'Tactical Awareness Drone',       cost: [1,1,1,1],          compact: true,  drone: true, rule: 'Assign to a Weapon. LoS may be drawn from any part of the silhouette, not just the nearest front point. Does not suffer Secondary Target or Bypass Shot penalties. Compact.' },
+  { name: 'Mine Director Drone',            cost: [1,1,1,1],          compact: true,  drone: true, rule: 'Assign to Mine Drone Carrier System. Tokens may be placed within 6" of the Active Model (instead of 3"). Once per turn, one Token within 12" may be repositioned within 6" of its current position. Disabled while HE-V has a Redline Marker. Compact.' },
 ];
 
 // ---- Defensive configurations (p. 25, 87) ----
