@@ -7,6 +7,8 @@ import { SectionTitle, FieldLabel, StepButton, TraitList, RowExpand, InlineTrait
 // ============================================================
 // HE-V EDITOR
 // ============================================================
+const BASE = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '/');
+const asset = (p) => `${BASE}${p.replace(/^\//, '')}`;
 
 export function MechEditor({ mech, mechIndex, onChange, onDelete }) {
   const stats = calcMech(mech);
@@ -15,6 +17,7 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete }) {
   const defLimit = cls === 'Ultraheavy' ? 2 : 1;
 
   const [tab, setTab] = useState('ranged');
+  const wcBlurb = wc.blurb || '';
   const [expanded, setExpanded] = useState({});
   const toggleExpanded = (name) => setExpanded(s => ({ ...s, [name]: !s[name] }));
 
@@ -55,7 +58,20 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete }) {
       <div style={{
         display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
         gap: 12, marginBottom: 18,
+        position: 'relative',
       }}>
+        <img src={asset('icons/hev.svg')} aria-hidden="true"
+          style={{
+            position: 'absolute', right: -20, top: '50%',
+            transform: `translateY(-50%) scale(${
+              cls === 'Light' ? 1.1 : cls === 'Medium' ? 1.3 : cls === 'Heavy' ? 1.5 : 1.7
+            })`,
+            height: 56,
+            opacity: 0.045,
+            pointerEvents: 'none',
+            transformOrigin: 'right center',
+          }}
+        />
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 14 }}>
           <span className="roster-num" style={{ fontSize: 14 }}>
             HE-V {String(mechIndex + 1).padStart(2, '0')}
@@ -155,6 +171,15 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete }) {
           })}
         </div>
       </div>
+
+      {wc.blurb && (
+        <div style={{
+          fontSize: 12.5, color: 'var(--ink-2)', fontStyle: 'italic',
+          marginTop: 8, marginBottom: 4, lineHeight: 1.5,
+        }}>
+          {wc.blurb}
+        </div>
+      )}
 
       <TonBreakdown stats={stats} cls={cls} wc={wc} />
 

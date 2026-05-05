@@ -565,6 +565,8 @@ function AssignmentStrip({
         id,
         label: m.name || `${m.weightClass.toUpperCase()} HE-V`,
         kind: 'hev',
+        cls: m.weightClass,
+        tons: m.armor + m.structure,
       });
     }
   });
@@ -685,16 +687,19 @@ function AssignmentStrip({
                 textAlign: 'left',
               }}
             >
-              <span className="stencil" style={{
+              <span style={{
                 fontSize: 9.5,
                 padding: '1px 5px',
                 border: '1px solid ' + (c.kind === 'support' ? 'var(--steel)' : 'var(--olive)'),
                 color: c.kind === 'support' ? 'var(--steel)' : 'var(--olive)',
+                fontFamily: 'var(--font-body)', fontWeight: 700,
+                letterSpacing: '0.06em', textTransform: 'uppercase',
                 flexShrink: 0,
               }}>
-                {c.kind === 'hev' ? 'HE-V' : 'SUPP'}
+                {c.kind === 'hev' ? (c.cls || 'HE-V') : 'SUPP'}
               </span>
-              <span>{c.label}</span>
+              <span style={{ flex: 1 }}>{c.label}</span>
+              {c.tons && <span style={{ fontSize: 10.5, color: 'var(--mute)' }}>{c.tons}t</span>}
             </button>
           ))}
         </div>

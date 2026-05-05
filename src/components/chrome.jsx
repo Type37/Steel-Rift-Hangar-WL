@@ -240,8 +240,26 @@ export function MechCard({ mech, index, active, onSelect, assignedTo }) {
         cursor: 'pointer',
         textAlign: 'left',
         width: '100%',
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
+      {/* Weight-class silhouette watermark */}
+      <img src={asset('icons/hev.svg')} aria-hidden="true"
+        style={{
+          position: 'absolute', right: -8, top: '50%',
+          transform: `translateY(-50%) scale(${
+            mech.weightClass === 'Light' ? 0.75
+            : mech.weightClass === 'Medium' ? 0.9
+            : mech.weightClass === 'Heavy' ? 1.05 : 1.22
+          })`,
+          height: 64,
+          opacity: active ? 0.08 : 0.055,
+          filter: active ? 'invert(1)' : 'none',
+          pointerEvents: 'none',
+          transformOrigin: 'right center',
+        }}
+      />
       <span className="roster-num" style={{
         color: active ? 'rgba(241,234,218,0.7)' : 'var(--mute)',
       }}>

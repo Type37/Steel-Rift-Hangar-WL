@@ -1359,3 +1359,9 @@ button:not(:disabled):active {
     grid-template-columns: repeat(2, 1fr) !important;
   }
 }
+
+/* Team assignment popover candidate rows */
+.assign-candidate:hover { background: var(--surface-2) !important; }
+
+/* Editor silhouette: clip overflow so it doesn't bleed outside the identity area */
+.editor-identity { overflow: hidden; }

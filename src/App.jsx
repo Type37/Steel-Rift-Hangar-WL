@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { TEAMS, MISSIONS, MISSION_ORDER } from './data';
+import { TEAMS, MISSIONS, MISSION_ORDER, FACTION_LOGOS } from './data';
 import { calcMech, newMech, findAsset } from './calc';
 
 import { Navbar, BottomBar, MechCard, EmptyRoster, SupportRosterCard } from './components/chrome';
@@ -220,10 +220,27 @@ export default function App() {
     }
   };
 
+
+  // Fade out the HTML loading screen once React is mounted.
+  useEffect(() => {
+    const el = document.getElementById('loading-screen');
+    if (el) {
+      el.style.opacity = '0';
+      el.style.transition = 'opacity 0.4s ease';
+      setTimeout(() => el.remove(), 450);
+    }
+  }, []);
   const toggleTeam = (name) =>
     setSelectedTeams(prev => prev.includes(name) ? prev.filter(n => n !== name) : [...prev, name]);
 
-  const handleSetFaction = (f) => { setFaction(f); setPerks([]); };
+  const BASE_URL = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '/');
+  const handleSetFaction = (f) => {
+    setFaction(f);
+    setPerks([]);
+    if (f && FACTION_LOGOS[f]?.length > 0) {
+      setFactionLogo(`${BASE_URL}faction-logos/${FACTION_LOGOS[f][0].file}`);
+    }
+  };
 
   const togglePerk = (name) =>
     setPerks(prev => prev.includes(name) ? prev.filter(p => p !== name) : [...prev, name]);

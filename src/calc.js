@@ -188,3 +188,36 @@ export const slotsForBand = (mission, selectedTeams, teamsData) => {
   });
   return result;
 };
+
+// Returns team names a single mech qualifies for (as an individual slot filler).
+// Used for roster badge display. Pass the full mechs array for noDup checks.
+export const teamsForMech = (mech, mechs, teams) => {
+  const qualifying = [];
+  for (const team of teams) {
+    for (const req of team.req) {
+      if (req.cls === 'UL HE-V or Assault Vehicle Squadron') continue;
+      const clsMatch = req.cls === 'Any HE-V' || req.cls === mech.weightClass || req.cls === 'Medium or Heavy';
+      if (!clsMatch) continue;
+      // Use the existing per-mech checker with a tweaked req
+      const effReq = req.cls === 'Medium or Heavy'
+        ? { ...req, cls: mech.weightClass }
+        : req;
+      // Import checkMechAgainstReq is private; re-check inline
+      let pass = true;
+      if (effReq.cls !== 'Any HE-V' && effReq.cls !== mech.weightClass) pass = false;
+      if (pass && effReq.needs) {
+        for (const n of effReq.needs) {
+          if (!mech.upgrades.includes(n) && !mech.defensive.includes(n)) { pass = false; break; }
+        }
+      }
+      if (pass && effReq.needsDefensive && mech.defensive.length === 0) pass = false;
+      if (pass && effReq.melee) {
+        const { MELEE } = require ? {} : {};
+        const hasMelee = mech.weapons.some(w => w.name && /Blade|Claw|Fist|Slam|Cleaver|Hammer|Spike|Talon|Punch|Strike|Sweep|Crush|Stomp|Melee/i.test(w.name));
+        if (!hasMelee) pass = false;
+      }
+      if (pass) { qualifying.push(team.name); break; }
+    }
+  }
+  return qualifying;
+};

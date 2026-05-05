@@ -7,10 +7,10 @@
 
 // ---- Weight classes (p. 18, 19, 84) ----
 export const WC = {
-  Light:      { idx: 0, tons: 20, baseArmor: 6,  baseStructure: 4,  baseRem: 10, slots: 4, abbr: 'LT' },
-  Medium:     { idx: 1, tons: 30, baseArmor: 8,  baseStructure: 6,  baseRem: 16, slots: 5, abbr: 'MD' },
-  Heavy:      { idx: 2, tons: 40, baseArmor: 10, baseStructure: 8,  baseRem: 22, slots: 6, abbr: 'HV' },
-  Ultraheavy: { idx: 3, tons: 50, baseArmor: 12, baseStructure: 10, baseRem: 28, slots: 7, abbr: 'UH' },
+  Light:      { idx: 0, tons: 20, baseArmor: 6,  baseStructure: 4,  baseRem: 10, slots: 4, abbr: 'LT', blurb: 'Fast scouts and flankers. Low survivability; high mobility.' },
+  Medium:     { idx: 1, tons: 30, baseArmor: 8,  baseStructure: 6,  baseRem: 16, slots: 5, abbr: 'MD', blurb: 'The workhorse. Balanced firepower and staying power.' },
+  Heavy:      { idx: 2, tons: 40, baseArmor: 10, baseStructure: 8,  baseRem: 22, slots: 6, abbr: 'HV', blurb: 'Armored threat. High tonnage, slow to shift, hard to remove.' },
+  Ultraheavy: { idx: 3, tons: 50, baseArmor: 12, baseStructure: 10, baseRem: 28, slots: 7, abbr: 'UH', blurb: 'Walking fortress. The heaviest thing on the field.' },
 };
 export const WC_ORDER = ['Light', 'Medium', 'Heavy', 'Ultraheavy'];
 
