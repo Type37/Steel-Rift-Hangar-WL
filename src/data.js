@@ -385,7 +385,7 @@ export const TEAMS = [
         'One Medium or Heavy gains Guidance Suite (MOVE) once per turn',
       ] },
     ],
-    agenda: 'Death from Above: 2+ enemy HE-Vs Destroyed by an Off-Table called from a team TD = 1 VP.',
+    agenda: 'Death from Above: When checking for Victory, if 2 or more enemy HE-Vs have been Destroyed while resolving an Off-Table Asset called in using a Target Designator from a Unit on this Team, score 1 VP.',
   },
   {
     name: 'Security Team', band: '2-3',
@@ -411,7 +411,7 @@ export const TEAMS = [
         'Mediums also ignore Side Arc attack bonuses',
       ] },
     ],
-    agenda: 'Don\'t Give an Inch: More friendly than enemy HE-Vs in 12" of every Deployment Corner/Edge of yours = 1 VP.',
+    agenda: 'Don\'t Give an Inch: When checking for Victory, if there are more friendly HE-Vs than Enemy HE-Vs within 12" of your Deployment Corners or Edge, score 1 VP. In the case of multiple Corners, there must be a friendly HE-V in range of all of them for this Agenda to be scored.',
   },
   {
     name: 'Assassination Team', band: '2-3',
@@ -435,7 +435,7 @@ export const TEAMS = [
         'Mediums\' Directional Thrusters are slot-free',
       ] },
     ],
-    agenda: 'Target Eliminated: Heaviest enemy HE-V Destroyed by a team member = 1 VP.',
+    agenda: 'Target Eliminated: When checking for Victory, if the heaviest HE-V deployed by the opposing Commander has been Destroyed by a member of this Team, score 1 VP. If the enemy Commander has multiple HE-Vs in that size class, select one and note that after Forces are Deployed.',
   },
   {
     name: 'Berserker Team', band: '2-3',
@@ -462,7 +462,7 @@ export const TEAMS = [
         'Ultraheavy\'s Directional Thrusters are slot-free',
       ] },
     ],
-    agenda: 'Drive Them Out: 40+ Tons of enemy HE-Vs SMASHed within 18" of their Edge/Corner = 1 VP.',
+    agenda: 'Drive Them Out: When checking for Victory, if 40 Tons or more of opposing HE-Vs have been Destroyed with a SMASH Order while within 18" of the enemy Commander\'s Deployment Edge or Corner, score 1 VP.',
   },
   {
     name: 'Multirole Team', band: '2-3',
@@ -483,7 +483,7 @@ export const TEAMS = [
         'Draining trait may be re-rolled once per turn',
       ] },
     ],
-    agenda: 'Mission Momentum: Score primary Mission VP on Turns 2 AND 3 = 1 VP.',
+    agenda: 'Mission Momentum: When checking for Victory, if your Force scored VP from the primary Mission Objective on turns 2 and 3, score 1 VP.',
   },
   {
     name: 'Gunslinger Team', band: '3-4',
@@ -503,7 +503,30 @@ export const TEAMS = [
         'May interrupt with a SMASH Order in addition to Return Fire',
       ] },
     ],
-    agenda: 'Trophy Takers: Team kills outside 18" of own Edge, then end within 8" of own Edge = 1 VP.',
+    agenda: 'Trophy Takers: When any Unit in this Team, that is not within 18" of your Deployment Edge or Corner, Destroys an HE-V, mark a Kill for that Unit. If any Units in this Team with a marked Kill are not Destroyed and within 8" of a friendly Deployment Edge or Corner at the end of the mission, score 1 VP.',
+  },
+  {
+    name: 'Fire Support Team', band: '2-3',
+    blurb: 'Forward observers directing massed indirect fire from mobile artillery.',
+    req: [
+      { cls: 'Light', min: 1, max: 2, needs: ['Target Designator'] },
+      { cls: 'Medium or Heavy', min: 1, max: 2, needs: ['Rocket Pack', 'Missiles', 'Howitzer'] },
+    ],
+    benefits: 'At 2+: Light TDs slot-free; Medium/Heavy Rocket Packs gain Smart and Short (16\"). At 3+: Light TDs cost 0; Smart weapons may target out of LoS with Short (6\"). At 4: Cluster Rockets +1 Limited.',
+    benefitsList: [
+      { gate: '2+', items: [
+        'Light: Target Designators do not use an Upgrade Slot',
+        'Medium/Heavy: Rocket Packs gain the Smart and Short (16\") traits',
+      ] },
+      { gate: '3+', items: [
+        'Light: Target Designators have their Cost reduced to 0',
+        'Medium/Heavy: Any SMART weapon may select a Target not in LoS (Short (6\") when doing so; no arc bonuses)',
+      ] },
+      { gate: '4', items: [
+        'Light: Cluster Rockets gain +1 to their Limited trait',
+      ] },
+    ],
+    agenda: 'Fire for Effect: When checking for Victory, if 2 or more enemy HE-Vs have been Destroyed by a Weapon on a member of this team actively using the Smart Trait for Line of Sight, score 1 VP.',
   },
   {
     name: 'Coordinated Assets Team', band: '3-4',
@@ -520,6 +543,6 @@ export const TEAMS = [
         'Activation handoff: when the HE-V or Support Asset Activates, the other in the team may also Activate immediately',
       ] },
     ],
-    agenda: 'Combined Arms Assault: CAPTURE Objective at the wreck of an enemy you killed = 1 VP.',
+    agenda: 'Combined Arms Assault: When any member of this team destroys an enemy HE-V, before it is removed, place an Objective token in base to base with the Destroyed HE-V. If a Support Asset member destroyed the HE-V, an HE-V member may CAPTURE it. If an HE-V member destroyed the HE-V, a Support Asset member may CAPTURE it (the Support Asset member may Control and CAPTURE an Objective for this Agenda only). No other units may CAPTURE it. If you CAPTURED this Objective token, when checking for Victory, score 1 VP.',
   },
 ];

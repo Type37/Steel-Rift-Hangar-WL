@@ -566,7 +566,7 @@ function ForceSection({ title, count, max, addLabel, onAdd, accent, children }) 
         borderBottom: '1px solid var(--rule-strong)',
       }}>
         <div className="stencil" style={{
-          fontSize: 13, color: 'var(--ink)', letterSpacing: '0.18em',
+          fontSize: 16, color: 'var(--ink)', letterSpacing: '0.14em',
         }}>
           {title}
         </div>

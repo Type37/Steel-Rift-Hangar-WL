@@ -25,6 +25,7 @@ const TEAM_ICONS = {
   'Berserker Team':         'icons/team-berserker.svg',
   'Multirole Team':         'icons/team-multirole.svg',
   'Gunslinger Team':        'icons/team-gunslinger.svg',
+  'Fire Support Team':      'icons/team-fire-support.svg',
   'Coordinated Assets Team':'icons/team-coordinated-assets.svg',
 };
 
@@ -527,7 +528,7 @@ function TeamRow({
             <div style={{ fontSize: 13, color: 'var(--ink)', lineHeight: 1.6, marginTop: 4 }}>{team.benefits}</div>
           )}
           <div style={{ marginTop: 10 }}><span className="label">Team Agenda</span></div>
-          <div style={{ fontSize: 13, color: 'var(--steel)', lineHeight: 1.6, marginTop: 4 }}>{team.agenda}</div>
+          <div style={{ fontSize: 13, color: 'var(--steel)', lineHeight: 1.6, marginTop: 4, whiteSpace: 'pre-line' }}>{team.agenda}</div>
         </div>
       )}
     </div>

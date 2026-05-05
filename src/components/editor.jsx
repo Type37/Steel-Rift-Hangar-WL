@@ -400,13 +400,17 @@ function Adjuster({ kind, value, base, min, max, onChange }) {
   );
 }
 
-// Pip indicator: a visual row of squares showing how many armor or
-// structure points the HE-V has. Structure pips carry M / D / Ø marks
-// at the quarter thresholds matching the rulebook critical-damage track.
+// Pip indicator. Armor: shield-shaped pips in rows of 5.
+// Structure: circle pips with M/D/Ø critical markers at quarter thresholds.
+function chunkArr(arr, n) {
+  const out = [];
+  for (let i = 0; i < arr.length; i += n) out.push(arr.slice(i, i + n));
+  return out;
+}
+
 function PipRow({ value, structure, accent }) {
   if (!value) return null;
 
-  // Build pip slots. For structure, mark M (25%), D (50%), Ø (75%).
   const points = [];
   if (structure) {
     const parts = 4;
@@ -414,45 +418,51 @@ function PipRow({ value, structure, accent }) {
     const remainder = value % parts;
     const chunks = Array(parts).fill(base);
     for (let i = 0; i < remainder; i++) chunks[i] += 1;
-    const map = ['M', 'D', '\u00D8']; // 25/50/75% markers
+    const map = ['M', 'D', '\u00D8'];
     chunks.forEach((count, idx) => {
       for (let j = 0; j < count; j++) {
         const isLast = j === count - 1;
-        points.push({ mark: isLast && map[idx] ? map[idx] : null });
+        points.push(isLast && map[idx] ? map[idx] : null);
       }
     });
   } else {
-    for (let i = 0; i < value; i++) points.push({ mark: null });
+    for (let i = 0; i < value; i++) points.push(null);
   }
 
-  // Wrap pips so they don't overflow on small adjusters.
   const color = accent === 'steel' ? 'var(--steel)' : 'var(--olive-deep)';
+  const rowSize = structure ? 6 : 5;
+  const rows = chunkArr(points, rowSize);
 
   return (
     <div style={{
-      display: 'flex', flexWrap: 'wrap', gap: 3,
       padding: '6px 0 2px',
       borderTop: '1px dotted var(--rule)',
       borderBottom: '1px dotted var(--rule)',
       marginBottom: 6,
     }}>
-      {points.map((p, i) => (
-        <span
-          key={i}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center', justifyContent: 'center',
-            width: 14, height: 14,
-            border: `1.25px solid ${color}`,
-            background: p.mark ? color : 'transparent',
-            color: p.mark ? 'var(--surface)' : 'transparent',
-            fontFamily: 'var(--font-mono)',
-            fontSize: 8.5, fontWeight: 700,
-            lineHeight: 1,
-          }}
-        >
-          {p.mark || ''}
-        </span>
+      {rows.map((row, ri) => (
+        <div key={ri} style={{ display: 'flex', gap: 3, marginBottom: ri < rows.length - 1 ? 3 : 0 }}>
+          {row.map((mark, bi) => (
+            <span
+              key={bi}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center', justifyContent: 'center',
+                width: structure ? 14 : 13,
+                height: structure ? 14 : 15,
+                border: `1.25px solid ${color}`,
+                borderRadius: structure ? '50%' : '50% 50% 50% 50% / 25% 25% 75% 75%',
+                background: mark ? color : 'transparent',
+                color: mark ? 'var(--surface)' : 'transparent',
+                fontFamily: 'var(--font-body)',
+                fontSize: 8, fontWeight: 700,
+                lineHeight: 1,
+              }}
+            >
+              {mark || ''}
+            </span>
+          ))}
+        </div>
       ))}
     </div>
   );
@@ -551,7 +561,7 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
             <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--ink)' }}>{weapon.name}</span>
             {available && (
               <>
-                <span className="mono" style={{ fontSize: 12, color: 'var(--steel)' }}>DMG {dmg}</span>
+                <span className="mono" style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>DMG {dmg}</span>
                 <span className="mono" style={{ fontSize: 12, color: 'var(--rust)', fontWeight: 700 }}>{base}t</span>
               </>
             )}

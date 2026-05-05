@@ -41,11 +41,11 @@
   /* Chakra Petch is reserved for marquee headings */
   --font-display:   'Chakra Petch', 'Bahnschrift', sans-serif;
   /* Space Mono is the chrome font: buttons, labels, sub-heads */
-  --font-stencil:   'Space Mono', ui-monospace, monospace;
+  --font-stencil:   'Schibsted Grotesk', system-ui, sans-serif;
   /* Schibsted Grotesk is the body workhorse */
   --font-body:      'Schibsted Grotesk', system-ui, sans-serif;
   /* Data / mono */
-  --font-mono:      'JetBrains Mono', ui-monospace, monospace;
+  --font-mono:      'Schibsted Grotesk', system-ui, sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -534,6 +534,26 @@ button:not(:disabled):active {
 /* ============================================================
    FACTION TILES. Three big buttons for picking a faction.
    ============================================================ */
+.drag-source { cursor: grab; }
+.drag-source:active { cursor: grabbing; }
+.drag-source { position: relative; }
+.drag-source::after {
+  content: '\29BF\29BF\29BF';
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--rule-strong);
+  opacity: 0;
+  transition: opacity 150ms;
+  pointer-events: none;
+  line-height: 1;
+}
+.drag-source:hover::after { opacity: 1; }
+.drag-source:hover { background: var(--surface-2) !important; }
+
 .faction-tiles {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -562,14 +582,14 @@ button:not(:disabled):active {
   background-image: var(--faction-hover-bg, none);
   background-repeat: no-repeat;
   background-position: 100% 50%;
-  background-size: contain;
+  background-size: 55%;
   opacity: 0;
   transition: opacity 220ms ease;
   z-index: -1;
   filter: grayscale(0.4);
 }
-.faction-tile:hover::before { opacity: 0.18; }
-.faction-tile.is-active::before { opacity: 0.24; filter: grayscale(0); }
+.faction-tile:hover::before { opacity: 0.45; }
+.faction-tile.is-active::before { opacity: 0.60; filter: grayscale(0); }
 
 /* Authorities: military olive. Top stripe + olive border on active. */
 .faction-tile-authorities {
@@ -633,7 +653,27 @@ button:not(:disabled):active {
   color: rgba(241, 234, 218, 0.78);
 }
 @media (max-width: 540px) {
-  .faction-tiles { grid-template-columns: 1fr; }
+  .drag-source { cursor: grab; }
+.drag-source:active { cursor: grabbing; }
+.drag-source { position: relative; }
+.drag-source::after {
+  content: '\29BF\29BF\29BF';
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--rule-strong);
+  opacity: 0;
+  transition: opacity 150ms;
+  pointer-events: none;
+  line-height: 1;
+}
+.drag-source:hover::after { opacity: 1; }
+.drag-source:hover { background: var(--surface-2) !important; }
+
+.faction-tiles { grid-template-columns: 1fr; }
   .faction-tile { min-height: 0; padding: 12px 12px; }
 }
 
@@ -722,7 +762,7 @@ button:not(:disabled):active {
   justify-content: flex-end;
 }
 .navbar-links a {
-  color: #f6993f;
+  color: var(--rust);
   text-decoration: none;
   font-family: var(--font-body);
   font-size: 16px;
@@ -731,23 +771,23 @@ button:not(:disabled):active {
   transition: color 110ms;
 }
 .navbar-links a:hover {
-  color: #ffb066;
+  color: var(--rust-bright);
 }
 .navbar-buynow {
-  background: #f6993f;
-  color: #1a0f04;
+  background: var(--rust);
+  color: #fff;
   text-decoration: none;
   font-family: var(--font-body);
   font-weight: 700;
   font-size: 15px;
   padding: 8px 18px;
-  border: 2px solid #f6993f;
-  border-radius: 4px;
+  border: 2px solid var(--rust);
+  border-radius: 0;
   transition: background 110ms, color 110ms, border-color 110ms, transform 80ms;
 }
 .navbar-buynow:hover {
-  background: #ffb066;
-  border-color: #ffb066;
+  background: var(--rust-bright);
+  border-color: var(--rust-bright);
 }
 .navbar-buynow:active {
   transform: translateY(1px);
@@ -832,7 +872,7 @@ button:not(:disabled):active {
 }
 .print-force-id { border-bottom: 2px solid #000; padding-bottom: 0.18in; margin-bottom: 0.24in; }
 .print-force-eyebrow {
-  font-family: 'Space Mono', ui-monospace, monospace;
+  font-family: var(--font-body), ui-monospace, monospace;
   font-size: 9.5pt;
   letter-spacing: 0.22em;
   color: #555;
@@ -848,13 +888,13 @@ button:not(:disabled):active {
   margin-bottom: 6pt;
 }
 .print-force-meta {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-body);
   font-size: 10.5pt;
   color: #222;
 }
 .print-block { margin-bottom: 0.18in; }
 .print-block-label {
-  font-family: 'Space Mono', monospace;
+  font-family: var(--font-body);
   font-size: 9pt;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -945,7 +985,7 @@ button:not(:disabled):active {
 .card-stats-table {
   flex: 1;
   border-collapse: collapse;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-body);
 }
 .card-stats-table th {
   font-family: 'Chakra Petch', sans-serif;
@@ -1001,7 +1041,7 @@ button:not(:disabled):active {
   width: 9pt;
   height: 9pt;
   border: 1pt solid #000;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-body);
   font-size: 6pt;
   font-weight: 700;
   line-height: 1;
@@ -1035,7 +1075,7 @@ button:not(:disabled):active {
 }
 .table-crit .num {
   text-align: right;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-body);
   font-weight: 700;
 }
 
@@ -1070,7 +1110,7 @@ button:not(:disabled):active {
 }
 .card-weapons-table td.num {
   text-align: center;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-body);
   font-weight: 700;
   padding-left: 0; padding-right: 0;
 }
@@ -1122,7 +1162,7 @@ button:not(:disabled):active {
   width: 32%;
 }
 .card-support-stats td {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-body);
   font-size: 7pt;
   padding: 1pt 0;
   border-bottom: 0.25pt solid #aaa;
@@ -1154,7 +1194,7 @@ button:not(:disabled):active {
   padding-bottom: 4pt;
 }
 .print-ref-h2 {
-  font-family: 'Space Mono', monospace;
+  font-family: var(--font-body);
   font-size: 11pt;
   font-weight: 700;
   letter-spacing: 0.10em;

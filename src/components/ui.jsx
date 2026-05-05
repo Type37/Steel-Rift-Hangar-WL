@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, Info } from 'lucide-react';
 import { Tooltip } from './tooltip';
 import { defineToken } from '../glossary';
 
@@ -247,7 +247,7 @@ export function RowExpand({ open, onClick }) {
         </>
       ) : (
         <>
-          <ChevronRight size={13} strokeWidth={2.5} />
+          <Info size={13} strokeWidth={2.5} />
           Details
         </>
       )}

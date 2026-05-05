@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Dices } from 'lucide-react';
+import { X, Dices, Info } from 'lucide-react';
 import { WC, WC_ORDER, FACTION_LOGOS } from '../data';
 import { POOL_NAMES, rollCallsign } from '../callsigns';
 import { Modal, FieldLabel, PrimaryButton, TextButton, Chip } from './ui';
@@ -96,8 +96,11 @@ export function AddMechModal({ open, onClose, onConfirm, callsignPool, customCal
         />
 
         <FieldLabel>Weight Class</FieldLabel>
-        <div style={{ border: '1.5px solid var(--rule)', background: 'var(--bg)' }}>
-          {WC_ORDER.map((c, i) => {
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
+          background: 'var(--ink)', gap: 1,
+        }}>
+          {WC_ORDER.map((c) => {
             const w = WC[c];
             const selected = cls === c;
             return (
@@ -106,37 +109,33 @@ export function AddMechModal({ open, onClose, onConfirm, callsignPool, customCal
                 onClick={() => setCls(c)}
                 className="add-btn"
                 style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'auto 1fr auto auto',
-                  alignItems: 'center', gap: 14,
-                  padding: '14px 18px',
-                  width: '100%',
-                  background: selected ? 'var(--surface-2)' : 'transparent',
-                  border: 'none',
-                  borderTop: i === 0 ? 'none' : '1px solid var(--rule)',
-                  cursor: 'pointer',
-                  textAlign: 'left',
+                  display: 'flex', flexDirection: 'column',
+                  alignItems: 'center', justifyContent: 'center',
+                  gap: 2, padding: '14px 8px 12px',
+                  background: selected ? 'var(--surface)' : 'transparent',
+                  border: 'none', cursor: 'pointer', transition: 'background 0.12s',
                 }}
               >
                 <span style={{
-                  width: 22, height: 22, borderRadius: '50%',
-                  border: `2px solid ${selected ? 'var(--ink)' : 'var(--rule-strong)'}`,
-                  background: selected ? 'var(--ink)' : 'transparent',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: 'var(--surface)', fontWeight: 700, fontSize: 14,
+                  fontFamily: 'var(--font-body)', fontSize: 10, letterSpacing: '0.18em',
+                  fontWeight: 600, textTransform: 'uppercase',
+                  color: selected ? 'var(--mute)' : 'rgba(255,255,255,0.45)',
                 }}>
-                  {selected && '✕'}
-                </span>
-                <span className="stencil" style={{ fontSize: 17, color: 'var(--ink)' }}>
                   {c}
                 </span>
-                <span className="mono" style={{ fontSize: 12, color: 'var(--mute)' }}>
-                  {w.slots} slots · {w.baseArmor}A / {w.baseStructure}S base
-                </span>
-                <span className="mono" style={{
-                  fontSize: 17, fontWeight: 700, color: 'var(--rust)', minWidth: 46, textAlign: 'right',
+                <span style={{
+                  fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 700, lineHeight: 1,
+                  color: selected ? 'var(--ink)' : 'var(--surface)',
+                  letterSpacing: '0.02em',
                 }}>
-                  {w.tons}t
+                  {w.tons}T
+                </span>
+                <span style={{
+                  fontFamily: 'var(--font-body)', fontSize: 10, letterSpacing: '0.14em',
+                  fontWeight: 600, textTransform: 'uppercase',
+                  color: selected ? 'var(--mute)' : 'rgba(255,255,255,0.35)',
+                }}>
+                  {w.slots} SLOTS
                 </span>
               </button>
             );
