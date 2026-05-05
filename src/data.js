@@ -266,7 +266,33 @@ export const VEHICLE_WEAPONS = [
   { name: 'Rotary Cannon',      dmg: '6',            traits: 'Short (12"), Light' },
   { name: 'Autocannon',         dmg: '2',            traits: 'Short (12"), Kinetic' },
   { name: 'Rocket Pack',        dmg: '3',            traits: 'Blast (3"), Limited (3)' },
+  // LAS-Wing weapons
+  { name: 'AG Missiles',        dmg: '2',            traits: 'Smart, Limited (2)' },
+  { name: 'Barrage Rockets',    dmg: '3',            traits: 'Blast (3"), Limited (2)' },
+  // Infantry and Power Suit weapons (damage rating is per X models)
+  { name: 'Infantry Rifles',         dmg: '2×(X)', traits: 'Short (6"), Light' },
+  { name: 'Heavy Infantry Rifles',   dmg: '3×(X)', traits: 'Short (6"), Light' },
+  { name: 'Missile Launcher',        dmg: '2×(X)', traits: 'Short (12"), Smart, Limited (2)' },
+  { name: 'Heavy Missile Launcher',  dmg: '2×(X)', traits: 'Short (12"), Limited (2), AP (2)' },
+  { name: 'Electro-Arc Pulser',      dmg: '1×(X)', traits: 'Short (6"), Stagger' },
 ];
+
+// ---- Infantry and Power Suit Squad tables (p.73) ----
+// These squads are recruited as Garrison Units inside other assets.
+export const INFANTRY_SQUADS = [
+  { name: 'Rifle',     spd: '3"', arm: '0', str: '2', weapons: 'Infantry Rifles',                      traits: 'Suppressive Fire' },
+  { name: 'Anti-Tank', spd: '3"', arm: '0', str: '2', weapons: 'Infantry Rifles, Missile Launcher',    traits: '' },
+  { name: 'Recon',     spd: '3"', arm: '0', str: '2', weapons: 'Infantry Rifles',                      traits: 'Target Designator' },
+  { name: 'Engineers', spd: '3"', arm: '0', str: '2', weapons: 'Infantry Rifles',                      traits: 'Minesweeper' },
+];
+export const INFANTRY_SHARED_TRAITS = 'Auxiliary Unit (Ultralight), Infantry, Squadron, All-Terrain, Vulnerable, Yielding';
+
+export const POWER_SUIT_SQUADS = [
+  { name: 'Arc Suits',    spd: '4"', arm: '2', str: '2', weapons: 'Infantry Rifles, Electro-Arc Pulsers',  traits: 'Suppressive Fire' },
+  { name: 'Reaper Suits', spd: '4"', arm: '2', str: '2', weapons: 'Infantry Rifles, Heavy Missile Launcher', traits: '' },
+  { name: 'Viper Suits',  spd: '5"', arm: '2', str: '2', weapons: 'Heavy Infantry Rifles',                traits: 'Target Designator' },
+];
+export const POWER_SUIT_SHARED_TRAITS = 'Auxiliary Unit (Ultralight), Infantry, Squadron, All-Terrain, Vulnerable, Yielding';
 
 // ---- Factions (p. 46-49) ----
 // Pick a Faction Type, then 2 Perks (one per Grouping).

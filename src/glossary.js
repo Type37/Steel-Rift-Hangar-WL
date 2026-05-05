@@ -167,6 +167,83 @@ export const GLOSSARY = {
     title: 'Shield Projector',
     text: 'A friendly Unit within 6" of this Model counts as carrying a Combat Shield Upgrade when making Defense Rolls. Does not stack with an existing Combat Shield.',
   },
+
+  'all-terrain': {
+    title: 'All-Terrain',
+    text: 'Units with this Trait ignore the movement penalty for Rough Terrain.',
+  },
+  'asset command': {
+    title: 'Asset Command',
+    text: 'All Units in this Asset are issued Orders during the same Activation. When activating one, select any Unit from this Asset and resolve its Activation, then continue until all Units have Activated. The opponent then becomes Active Commander.',
+  },
+  'close support': {
+    title: 'Close Support',
+    text: 'If a friendly Unit with this trait is within 6" of an enemy target of an ENGAGE or SMASH Order, add 1 to the Damage Rating of each weapon used in that Order. This bonus is only applied once regardless of how many Close Support Units are in range.',
+  },
+  'fortification': {
+    title: 'Fortification',
+    text: 'Once placed in Deployment, this Unit may not be moved or placed by any Order or effect, voluntarily or involuntarily.',
+  },
+  'garrison': {
+    title: 'Garrison (X)',
+    text: 'This Model contains a garrisoned Unit (specified in X). The Garrison is placed off-table until it performs the MUSTER Order: place the Garrisoned Unit within 1" of its Garrison. If the Garrison Model is Destroyed before MUSTER, the garrisoned Unit is also Destroyed.',
+  },
+  'squadron garrison': {
+    title: 'Squadron Garrison (X)',
+    text: 'As Garrison (X), except the entire Squadron Unit collectively carries the Garrisoned Unit. When a Model in this Unit is Destroyed, remove Garrisoned models proportionately (rounding up).',
+  },
+  'guidance suite': {
+    title: 'Guidance Suite (X)',
+    text: 'At the start or end of Order (X), select an enemy Unit in LOS and place a Guidance Marker on it. When that Unit is later targeted by an ENGAGE, the attacking Commander may choose: (a) all weapons count as following a LOCK ON, or (b) one weapon gains +2 to its Damage Rating. Remove the Marker after the ENGAGE or when this Unit activates again.',
+  },
+  'msoe launcher': {
+    title: 'MSOE Launcher (X)',
+    text: 'At the start or end of Order (X), place an Obscuration Emitter Token within 6" of this model. Units within 3" of the Token count as being in Covering Terrain and gain Anti-Missile System and Electronic Countermeasures. Token is removed when this Unit activates again.',
+  },
+  'scramblers': {
+    title: 'Scramblers',
+    text: 'All Units within 6" of a model with Scramblers, including its own Unit, count as equipped with Anti-Missile Systems and Electronic Countermeasures.',
+  },
+  'inferno gear': {
+    title: 'Inferno Gear',
+    text: 'If one or more Models in this Unit have this Trait, the Unit ignores the effects of the Disruptive Trait.',
+  },
+  'magnetic grapples': {
+    title: 'Magnetic Grapples',
+    text: 'When this Unit MOVEs or JUMPs into base contact with an Enemy Unit, that Enemy Unit receives a Tether Marker and the Active Unit receives a corresponding Anchor Marker.',
+  },
+  'minesweeper': {
+    title: 'Minesweeper',
+    text: 'This Unit may not be Targeted by Mine Drone Tokens. This Unit may ENGAGE Mine Drone Tokens as if equipped with the Mine Drone Tracking Munitions Upgrade.',
+  },
+  'outrider': {
+    title: 'Outrider',
+    text: 'If part of a Squadron, these Models may deploy and end moves within 12" of the Squadron Leader (instead of 3"). However, all Models with Outrider must stay within 3" of each other.',
+  },
+  'shield projector': {
+    title: 'Shield Projector',
+    text: 'Friendly Units within 6" of a model with this trait count as carrying a Combat Shield Upgrade when making Defense Rolls. Not cumulative with an existing Combat Shield.',
+  },
+  'support orders': {
+    title: 'Support Orders',
+    text: 'This Unit may use special support abilities as Orders during its Activation (see the unit\'s specific Support Orders for details).',
+  },
+  'vulnerable': {
+    title: 'Vulnerable',
+    text: 'This Unit receives full Damage from Weapons or effects with the Light trait (the halving from Light does not apply).',
+  },
+  'yielding': {
+    title: 'Yielding',
+    text: 'Any Model without the Yielding trait may move through any Model with the Yielding trait. If such a Model would end its move on top of a Yielding Model, move the Yielding Models the minimum distance to permit this.',
+  },
+  'infantry': {
+    title: 'Infantry',
+    text: 'Infantry Activate with a special Order list: MUSTER, MOVE (may be performed twice per Activation), LOCK ON, ENGAGE, DIG IN. Infantry suffer -1 to Defense Rolls when not in Rough or Covering Terrain. Infantry count as 0 Tons for scoring.',
+  },
+  'suppressive fire': {
+    title: 'Suppressive Fire',
+    text: 'If an enemy Unit within 6" of a friendly model with this Trait performs an ENGAGE Order, the target of that Order receives +1 to their Defense Rolls.',
+  },
   'smasher': {
     title: 'Smasher (X, Y)',
     text: 'This Unit may perform SMASH Orders even with the Auxiliary Unit Trait. It counts as Weight Class X when SMASHing and adds Y dice to the Attack Pool.',

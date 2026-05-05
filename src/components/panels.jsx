@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Check, Plus, Minus } from 'lucide-react';
-import { OFF_TABLE_ASSETS, ADVANCED_ASSETS, FACTIONS, FACTION_LOGOS, TEAMS } from '../data';
+import { OFF_TABLE_ASSETS, ADVANCED_ASSETS, FACTIONS, FACTION_LOGOS, TEAMS, VEHICLE_WEAPONS, INFANTRY_SQUADS, INFANTRY_SHARED_TRAITS, POWER_SUIT_SQUADS, POWER_SUIT_SHARED_TRAITS } from '../data';
 import { checkTeamEligibility, slotsForBand, findAsset } from '../calc';
 import { SectionTitle, Chip, TextButton, TraitList, RowExpand, InlineTraitGlossary, collectTraits } from './ui';
 import { Tooltip } from './tooltip';
@@ -838,6 +838,64 @@ function MiniPips({ value, kind }) {
   );
 }
 
+
+// Look up a weapon from VEHICLE_WEAPONS by name (partial match).
+function findVehicleWeapon(name) {
+  return VEHICLE_WEAPONS.find(w => w.name.toLowerCase() === name.toLowerCase().trim());
+}
+
+// Parse a weapons string like "Vehicle Autocannon, Submunitions" into an array of lookups.
+function parseWeapons(str) {
+  if (!str || str === '—') return [];
+  return str.split(/,\s*|\/|\s+or\s+/).map(w => w.trim()).filter(Boolean);
+}
+
+// Garrison reference: show infantry or power suit squad options inline.
+function GarrisonRef({ traitStr }) {
+  const infMatch = traitStr && traitStr.match(/Garrison\s*\(\s*(\d+)\s*Infantry/i);
+  const psMatch  = traitStr && traitStr.match(/Garrison\s*\(\s*(\d+)\s*Power Suit/i);
+  const ulMatch  = traitStr && /UL HE-V Squadron/i.test(traitStr);
+  const sqGarrison = traitStr && /Squadron Garrison/i.test(traitStr);
+
+  if (!infMatch && !psMatch && !ulMatch) return null;
+
+  const squads = infMatch ? INFANTRY_SQUADS : psMatch ? POWER_SUIT_SQUADS : null;
+  const sharedTraits = infMatch ? INFANTRY_SHARED_TRAITS : psMatch ? POWER_SUIT_SHARED_TRAITS : null;
+  const label = infMatch ? 'Infantry Squads' : psMatch ? 'Power Suit Squads' : 'UL HE-V Squadron';
+  const count = infMatch ? infMatch[1] : psMatch ? psMatch[1] : '1';
+
+  return (
+    <div style={{
+      marginTop: 8, padding: '8px 10px',
+      background: 'var(--bg)', border: '1px dashed var(--rule-strong)',
+      fontSize: 12,
+    }}>
+      <div className="label" style={{ fontSize: 10, marginBottom: 4 }}>
+        GARRISON · {count} {label.toUpperCase()}
+        {ulMatch && ' — purchase UL HE-V Squadron separately as a Support Asset'}
+      </div>
+      {squads && squads.map(sq => (
+        <div key={sq.name} style={{
+          display: 'flex', gap: 8, alignItems: 'baseline',
+          borderTop: '1px solid var(--rule)', paddingTop: 4, marginTop: 4, flexWrap: 'wrap',
+        }}>
+          <span style={{ fontWeight: 600, fontSize: 12, minWidth: 100 }}>{sq.name}</span>
+          <span style={{ color: 'var(--mute)', fontSize: 11 }}>
+            SPD {sq.spd} · ARM {sq.arm} · STR {sq.str}
+          </span>
+          <span style={{ fontSize: 11, color: 'var(--ink-2)' }}>{sq.weapons}</span>
+          {sq.traits && <span style={{ fontSize: 11, color: 'var(--mute)', fontStyle: 'italic' }}>{sq.traits}</span>}
+        </div>
+      ))}
+      {sharedTraits && (
+        <div style={{ fontSize: 10.5, color: 'var(--mute)', marginTop: 6, fontStyle: 'italic' }}>
+          All: {sharedTraits}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function SubUnitPicker({ asset: a, loadout, onChange }) {
   const counts = loadout.reduce((acc, n) => { acc[n] = (acc[n] || 0) + 1; return acc; }, {});
   const total = loadout.length;
@@ -945,14 +1003,28 @@ function SubUnitPicker({ asset: a, loadout, onChange }) {
                     </div>
                   </div>
                 </div>
-                <div style={{ fontSize: 12.5, color: 'var(--ink-2)', marginBottom: 2 }}>
-                  {su.weapons}
+                {/* Weapons with inline stats */}
+                <div style={{ marginBottom: 4 }}>
+                  {parseWeapons(su.weapons).map((wname, wi) => {
+                    const wdef = findVehicleWeapon(wname);
+                    return (
+                      <div key={wi} style={{ display: 'flex', gap: 6, alignItems: 'baseline', flexWrap: 'wrap', marginBottom: 2 }}>
+                        <span style={{ fontSize: 12.5, color: 'var(--ink-2)', fontWeight: 600 }}>{wname}</span>
+                        {wdef && (
+                          <span style={{ fontSize: 11, color: 'var(--mute)' }}>
+                            DMG {wdef.dmg} · {wdef.traits}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
                 {su.traits && su.traits !== '—' && (
                   <div style={{ fontSize: 11.5, color: 'var(--mute)', lineHeight: 1.5 }}>
                     <TraitList traits={su.traits} />
                   </div>
                 )}
+                <GarrisonRef traitStr={su.traits} />
               </div>
               {onChange && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
