@@ -85,6 +85,7 @@ export const newMech = (cls = 'Light', name = '', description = '') => ({
   weapons: [],
   upgrades: [],
   defensive: [],
+  drones: {},   // { 'Drone Name': 'Weapon or Upgrade Name' }
 });
 
 export const resetMechToClass = (m, cls) => ({
@@ -95,6 +96,7 @@ export const resetMechToClass = (m, cls) => ({
   weapons: [],
   upgrades: [],
   defensive: [],
+  drones: {},   // { 'Drone Name': 'Weapon or Upgrade Name' }
 });
 
 // ---- Team eligibility ----

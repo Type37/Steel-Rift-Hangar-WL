@@ -42,6 +42,16 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete }) {
     if (e.count <= 1) update({ weapons: mech.weapons.filter(w => w.name !== name) });
     else update({ weapons: mech.weapons.map(w => w.name === name ? { ...w, count: w.count - 1 } : w) });
   };
+  const assignDrone = (droneName, targetName) => {
+    const next = { ...(mech.drones || {}) };
+    if (targetName === null) {
+      delete next[droneName];
+    } else {
+      next[droneName] = targetName;
+    }
+    update({ drones: next });
+  };
+
   const toggleUpgrade = (name) => {
     if (mech.upgrades.includes(name)) {
       update({ upgrades: mech.upgrades.filter(u => u !== name) });
@@ -256,7 +266,7 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete }) {
               expanded={expanded[w.name]} onToggle={() => toggleExpanded(w.name)} />
           ))}
           {tab === 'upgrades' && UPGRADES.map(u => (
-            <UpgradeRow key={u.name} upgrade={u} mech={mech} onToggle={toggleUpgrade}
+            <UpgradeRow key={u.name} upgrade={u} mech={mech} onToggle={toggleUpgrade} onAssignDrone={assignDrone}
               expanded={expanded[u.name]} onExpand={() => toggleExpanded(u.name)} />
           ))}
           {tab === 'defensive' && (
@@ -772,7 +782,7 @@ function ExpandedWeapon({ weapon, cls }) {
   );
 }
 
-function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand }) {
+function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand, onAssignDrone }) {
   const cls = mech.weightClass;
   const cost = valForClass(upgrade.cost, cls);
   const available = cost !== '-' && cost != null;
@@ -852,6 +862,56 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand }) {
         )}
       </div>
 
+
+      {/* Drone assignment: show target picker when this drone is equipped */}
+      {eq && upgrade.drone && onAssignDrone && (() => {
+        const drones = mech.drones || {};
+        const assigned = drones[upgrade.name] || '';
+        // Build list of eligible targets
+        const isMineDirector = upgrade.name === 'Mine Director Drone';
+        const eligibleWeapons = isMineDirector
+          ? mech.upgrades.filter(n => n === 'Mine Drone Carrier System')
+          : mech.weapons.map(w => w.name);
+        const eligibleUpgrades = isMineDirector
+          ? []
+          : mech.upgrades.filter(n => n !== upgrade.name && !(['Targeting Support Drone','Tactical Awareness Drone','Mine Director Drone'].includes(n)));
+        const options = [...eligibleWeapons, ...eligibleUpgrades];
+        return (
+          <div style={{
+            padding: '8px 14px 12px',
+            background: 'var(--surface-2)',
+            borderTop: '1px solid var(--rule)',
+            display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
+          }}>
+            <span style={{ fontSize: 11, color: 'var(--mute)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              Assigned to
+            </span>
+            <select
+              value={assigned}
+              onChange={e => onAssignDrone(upgrade.name, e.target.value || null)}
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 13, padding: '4px 8px',
+                border: assigned ? '1.5px solid var(--teal)' : '1.5px dashed var(--rule-strong)',
+                background: 'var(--surface)',
+                color: assigned ? 'var(--ink)' : 'var(--mute)',
+                cursor: 'pointer',
+              }}
+            >
+              <option value="">— unassigned —</option>
+              {options.map(opt => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
+            {assigned && (
+              <span style={{ fontSize: 11, color: 'var(--teal)' }}>✓</span>
+            )}
+            {!assigned && (
+              <span style={{ fontSize: 11, color: 'var(--rust)' }}>Unassigned — select a target</span>
+            )}
+          </div>
+        );
+      })()}
       {expanded && (
         <div style={{
           padding: '4px 14px 16px 14px',
@@ -947,6 +1007,56 @@ function DefRow({ def, mech, onToggle, atLimit, expanded, onExpand }) {
           </button>
         )}
       </div>
+
+      {/* Drone assignment: show target picker when this drone is equipped */}
+      {eq && upgrade.drone && onAssignDrone && (() => {
+        const drones = mech.drones || {};
+        const assigned = drones[upgrade.name] || '';
+        // Build list of eligible targets
+        const isMineDirector = upgrade.name === 'Mine Director Drone';
+        const eligibleWeapons = isMineDirector
+          ? mech.upgrades.filter(n => n === 'Mine Drone Carrier System')
+          : mech.weapons.map(w => w.name);
+        const eligibleUpgrades = isMineDirector
+          ? []
+          : mech.upgrades.filter(n => n !== upgrade.name && !(['Targeting Support Drone','Tactical Awareness Drone','Mine Director Drone'].includes(n)));
+        const options = [...eligibleWeapons, ...eligibleUpgrades];
+        return (
+          <div style={{
+            padding: '8px 14px 12px',
+            background: 'var(--surface-2)',
+            borderTop: '1px solid var(--rule)',
+            display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
+          }}>
+            <span style={{ fontSize: 11, color: 'var(--mute)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              Assigned to
+            </span>
+            <select
+              value={assigned}
+              onChange={e => onAssignDrone(upgrade.name, e.target.value || null)}
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 13, padding: '4px 8px',
+                border: assigned ? '1.5px solid var(--teal)' : '1.5px dashed var(--rule-strong)',
+                background: 'var(--surface)',
+                color: assigned ? 'var(--ink)' : 'var(--mute)',
+                cursor: 'pointer',
+              }}
+            >
+              <option value="">— unassigned —</option>
+              {options.map(opt => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
+            {assigned && (
+              <span style={{ fontSize: 11, color: 'var(--teal)' }}>✓</span>
+            )}
+            {!assigned && (
+              <span style={{ fontSize: 11, color: 'var(--rust)' }}>Unassigned — select a target</span>
+            )}
+          </div>
+        );
+      })()}
       {expanded && (
         <div style={{
           padding: '4px 14px 16px 14px',
