@@ -8,15 +8,6 @@
 // ============================================================
 
 export const POOLS = {
-  Mixed: [
-    'Atlas', 'Blackvein', 'Cascade', 'Dover', 'Ember', 'Foxglove',
-    'Gravewright', 'Hangfire', 'Ironwake', 'Jasper', 'Kestrel', 'Longshore',
-    'Marrow', 'Northstar', 'Outrider', 'Pall', 'Quickstrike', 'Reverie',
-    'Silt-7', 'Tower', 'Undertow', 'Verdict', 'Whitlow', 'Xerxes',
-    'Yardarm', 'Zenith', 'Coalbite', 'Mockingbird', 'Slate', 'Vagrant',
-    'Brindle', 'Cinder', 'Dustwell', 'Furrow', 'Glasswort', 'Hush',
-  ],
-
   Mythic: [
     'Hephaestus', 'Tyr', 'Thanatos', 'Briareos', 'Garuda', 'Ymir',
     'Anansi', 'Arawn', 'Surt', 'Susanoo', 'Pele', 'Skadi',
