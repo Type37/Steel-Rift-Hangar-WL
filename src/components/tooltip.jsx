@@ -104,7 +104,7 @@ export function Tooltip({ children, title, body }) {
           }}
         >
           {title && <div className="tooltip-title">{title}</div>}
-          {body && <div>{body}</div>}
+          {body && <div style={{ whiteSpace: 'pre-line' }}>{body}</div>}
         </div>,
         document.body
       )}

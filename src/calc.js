@@ -128,6 +128,13 @@ const checkMechAgainstReq = (m, req) => {
     });
     if (hasReach) return false;
   }
+  if (req.noDup) {
+    const seen = new Set();
+    for (const w of mech.weapons) {
+      if (seen.has(w.name)) return false;
+      seen.add(w.name);
+    }
+  }
   if (req.shortMeleeOnly) {
     const allOk = m.weapons.every(w => {
       const def = findWeapon(w.name);

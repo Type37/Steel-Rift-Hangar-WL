@@ -328,7 +328,13 @@ export function InlineTraitGlossary({ traits }) {
             }}>
               {def.title}
             </div>
-            <div style={{ color: 'var(--ink-2)' }}>{def.text}</div>
+            {def.bullets ? (
+              <ul style={{ margin: '4px 0 0', paddingLeft: 16, color: 'var(--ink-2)', fontSize: 12 }}>
+                {def.bullets.map((b, i) => <li key={i} style={{ marginBottom: 2 }}>{b}</li>)}
+              </ul>
+            ) : (
+              <div style={{ color: 'var(--ink-2)' }}>{def.text}</div>
+            )}
           </div>
         ))}
       </div>

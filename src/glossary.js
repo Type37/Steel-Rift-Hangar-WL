@@ -107,7 +107,15 @@ export const GLOSSARY = {
 
   'auxiliary unit': {
     title: 'Auxiliary Unit (X)',
-    text: 'Defends as Weight Class (X). Side/Rear Arc modifiers do not apply. Does not suffer Critical Damage, Fragile Internals, or Backup Systems Engage. Counts as Class (X) for other rolls (e.g. Kinetic). May not SMASH unless it has the Smasher trait. May not Overdrive; Redline triggers cause 1 Structure Damage instead. Does not count as an HE-V unless otherwise stated.',
+    bullets: [
+      'Defends against ENGAGE and SMASH as if it were Weight Class (X).',
+      'Attack Pools against this Unit are never modified for Side or Rear Arc.',
+      'Does not suffer Critical Damage, Fragile Internals, or Backup Systems Engage.',
+      'Counts as Weight Class (X) when making other rolls (e.g. Kinetic trait comparisons).',
+      'May never perform a SMASH Order unless it has a weapon with the Smasher trait.',
+      'May never Overdrive. If it would receive a Redline Marker from an effect, it suffers 1 Structure Damage instead; do not mark it with the Marker.',
+      'Does not count as an HE-V for rules purposes unless otherwise specified.',
+    ],
   },
 
   'flying': {
