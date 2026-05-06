@@ -255,6 +255,19 @@ export const ADVANCED_ASSETS = [
         traits: 'SUPPORT: Mine-Drone Layer (4)' },
     ],
   },
+  // ── UL HE-V Squadron (p.63) ─────────────────────────────────────────────────
+  { name: 'UL HE-V Squadron', cost: 10, kind: 'Vehicle',
+    summary: '3 Ultralight HE-Vs, all same type. All share one Upgrade Pod.',
+    unitCount: 3, pickRule: 'allSame',
+    subunits: [
+      { name: 'Brawler',  spd: '7"', arm: '2', str: '1', weapons: 'UL Melee Weapons, Submunitions', traits: 'Magnetic Grapples' },
+      { name: 'Pyro',     spd: '6"', arm: '2', str: '1', weapons: 'UL Incinerators, Submunitions', traits: 'Inferno Gear' },
+      { name: 'Commando', spd: '7"', arm: '2', str: '1', weapons: 'Submunitions', traits: 'Scramblers, Target Designator' },
+      { name: 'Rifleman', spd: '6"', arm: '2', str: '1', weapons: 'UL Autocannon, UL Grenades', traits: 'Suppressive Fire' },
+    ],
+    stats: { 'All models': 'Auxiliary Unit (Ultralight), Squadron, Close Support, All-Terrain',
+             'Upgrade Pod': 'Short Range Missile Pack (3×(X), Smart, Limited 2, Short 12\") · Cluster Rockets (5×(X), Blast 3\", Light, Limited 2) · Launch Gear (JUMP +2\")' },
+  },
 ];
 
 

@@ -786,6 +786,15 @@ export function SupportDetailView({ assetName, customName, loadout, onSetLoadout
         />
       )}
 
+      {/* If asset itself has a garrison trait (e.g. Heavy Tank shared Garrison), show picker here */}
+      {a.stats?.Traits && /Garrison/i.test(a.stats.Traits) && (
+        <GarrisonRef
+          traitStr={a.stats.Traits}
+          garrisonLoadout={garrisonLoadout}
+          onSetGarrisonLoadout={onSetGarrisonLoadout}
+        />
+      )}
+
       {a.stats && (
         <div style={{
           fontSize: 13, color: 'var(--ink-2)', lineHeight: 1.7,
