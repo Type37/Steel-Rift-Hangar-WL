@@ -694,9 +694,9 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
                 N/A at {cls.slice(0,2).toUpperCase()}
               </span>
             )}
-            {count > 1 && (
-              <span className="mono" style={{ fontSize: 11, color: 'var(--warn)' }}>
-                ×{count} = {total}t
+            {count > 0 && (
+              <span className="mono" style={{ fontSize: 11, color: 'var(--mute)' }}>
+                ×{count}{count > 1 ? ` = ${total}t` : ''}{next && count >= 1 ? ` · next +${next}t` : ''}
               </span>
             )}
           </div>
@@ -862,7 +862,7 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand, onAssignDrone
         title={unavailableReason || undefined}
         style={{
           display: 'grid',
-          gridTemplateColumns: 'auto 1fr auto',
+          gridTemplateColumns: 'auto 1fr 128px auto',
           alignItems: 'center', gap: 12,
           padding: '9px 14px',
         }}
@@ -875,12 +875,9 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand, onAssignDrone
             {upgrade.compact && (
               <TraitToken token="compact" />
             )}
-            {available && (
-              <span className="mono" style={{ fontSize: 12, color: 'var(--rust)', fontWeight: 700 }}>{cost}t</span>
-            )}
             {!available && (
               <span className="mono" style={{ fontSize: 11, color: 'var(--mute)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                Not available at {WC[cls].abbr}
+                N/A at {cls.slice(0,2).toUpperCase()}
               </span>
             )}
 
@@ -891,6 +888,39 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand, onAssignDrone
               {upgrade.rule}
             </div>
           )}
+        </div>
+
+        {/* Pricing grid — same layout as weapons */}
+        <div style={{ width: 128, flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
+          <div style={{ display: 'flex', gap: 0 }}>
+            {WC_ABBR.map((abbr, i) => (
+              <span key={i} style={{
+                width: 32, textAlign: 'center', fontSize: 9, fontWeight: 700,
+                letterSpacing: '0.06em', color: i === WC_IDX[cls] ? 'var(--ink)' : 'var(--rule-strong)',
+                fontFamily: 'var(--font-body)',
+              }}>{abbr}</span>
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: 0 }}>
+            {upgrade.cost.map((v, i) => {
+              const isActive = i === WC_IDX[cls];
+              const isNA = v === '-' || v == null;
+              return (
+                <span key={i} style={{
+                  width: 32, textAlign: 'center',
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  height: 22,
+                  background: isActive && !isNA ? (eq ? 'var(--rust)' : 'var(--olive)') : 'transparent',
+                  borderRadius: isActive ? 4 : 0,
+                  fontFamily: 'var(--font-display)',
+                  fontSize: isActive ? 13 : 12, fontWeight: 700,
+                  color: isActive && !isNA ? 'var(--surface)' : 'var(--rule-strong)',
+                }}>
+                  {isNA ? '–' : `${v}t`}
+                </span>
+              );
+            })}
+          </div>
         </div>
 
         {available && (
@@ -1008,7 +1038,7 @@ function DefRow({ def, mech, onToggle, atLimit, expanded, onExpand }) {
         title={reason || undefined}
         style={{
           display: 'grid',
-          gridTemplateColumns: 'auto 1fr auto',
+          gridTemplateColumns: 'auto 1fr 128px auto',
           alignItems: 'center', gap: 12,
           padding: '9px 14px',
         }}
