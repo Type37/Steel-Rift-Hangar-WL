@@ -320,7 +320,7 @@ export const FACTIONS = {
   Authorities: {
     blurb: 'Old governments and nations of Earth, their fragments, and their imitators.',
     examples: 'The Sahel Alliance, the 67th North Horizon Corps, The Antarctic Habitation, The Knightwatch',
-    agenda: 'Territorial: When checking Victory, if no enemy Units are within 10" of any of your Deployment Edges or Corners, score 1 VP.',
+    agenda: 'Territorial: When checking for Victory, if there are no active enemy Units within 10" of any of your Deployment Edges or Corners, score 1 VP.',
     perks: {
       'Old Infrastructure': [
         { name: 'Orbital Stockpiles', text: 'Off-Table Support Assets with the Limited trait have this value increased by 1.' },
@@ -342,7 +342,7 @@ export const FACTIONS = {
   Corporations: {
     blurb: 'The economic monsters of Mars, and those in their pay.',
     examples: 'Visal Corporation, Helios Industries, The Echelon Group, WegMaCo, Akamatsu',
-    agenda: 'Asset Protection: When checking Victory, if the enemy has had more overall Tonnage in Units Destroyed than you, score 1 VP.',
+    agenda: 'Asset Protection: When checking for Victory, if the opposing Force has had more overall Tonnage in Units Destroyed than your Force has, score 1 VP.',
     perks: {
       'Espionage': [
         { name: 'Embedded Informants', text: 'During Deployment, the enemy must Deploy 2 Assets for every 1 of yours.' },
@@ -365,7 +365,7 @@ export const FACTIONS = {
     blurb: 'The unconventional bands with unpredictable forces.',
     examples: 'Vanguard Industrial Cooperative, Dairo Mining Group, Cerberus Group, Roland\'s Reavers',
     perkNote: 'Freelancers may never select more than one Perk from each other Faction. Their Perks may allow them to select a Perk from both the Authorities and Corporations Factions, but never two Perks from the same Faction.',
-    agenda: 'Wildcards: When checking Victory, if you have 2+ Wildcard Kills, score 1 VP.',
+    agenda: 'Wildcards: Every time a friendly HE-V Destroys an enemy HE-V, and the friendly HE-V is under the effect of any of the following Perks: Unpredictable Gambits, Reckless Piloting, Network Hackers, or Intimidation Tactics — mark a Wildcard Kill. When checking for Victory, if you have earned 2 or more Wildcard Kills, score 1 VP.',
     perks: {
       'Rogue Agency': [
         { name: 'Unpredictable Gambits', text: 'Once per game turn: randomly pick one of your unactivated HE-Vs to Activate; it may perform an additional Order.' },
