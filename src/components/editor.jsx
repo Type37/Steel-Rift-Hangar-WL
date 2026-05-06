@@ -254,7 +254,7 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
               }} />
             </div>
             {/* Numbers */}
-            <span className="mono" style={{ fontSize: 13, fontWeight: 700, color: accent, flexShrink: 0 }}>
+            <span className="mono" style={{ fontSize: 13, fontWeight: 700, color: accent, flexShrink: 0, minWidth: "2.5em", textAlign: "right", display: "inline-block" }}>
               {stats.totalUsed}
             </span>
             <span className="mono" style={{ fontSize: 12, color: 'var(--mute)', flexShrink: 0 }}>
@@ -306,7 +306,8 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
                     flexShrink: 0,
                   }}
                 >
-                  {t.label}{t.count > 0 ? ` (${t.count})` : ''}
+                  {t.label}
+                  <span style={{ fontVariantNumeric: 'tabular-nums', minWidth: '1.6em', display: 'inline-block', textAlign: 'center', opacity: t.count > 0 ? 1 : 0, fontSize: 11 }}>{t.count > 0 ? `(${t.count})` : '(0)'}</span>
                 </button>
               );
             });
@@ -677,7 +678,7 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
         title={unavailableReason || undefined}
         style={{
           display: 'grid',
-          gridTemplateColumns: 'auto 1fr 128px auto auto auto',
+          gridTemplateColumns: 'auto 1fr 128px auto auto auto 28px',
           alignItems: 'center', gap: 12,
           padding: '9px 14px',
         }}
@@ -754,12 +755,12 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
           visibility: count > 0 ? 'visible' : 'hidden',
         }}>×{count}</span>
         <StepButton direction="up" onClick={() => onAdd(weapon.name)} disabled={!available} />
-        {next && count >= 1 && (
-          <span className="mono" style={{
-            fontSize: 9, color: 'var(--mute)', letterSpacing: '0.04em',
-            alignSelf: 'flex-end', paddingBottom: 1,
-          }}>+{next}t</span>
-        )}
+        <span className="mono" style={{
+          fontSize: 9, color: 'var(--mute)', letterSpacing: '0.04em',
+          alignSelf: 'flex-end', paddingBottom: 1,
+          minWidth: 24, textAlign: 'left',
+          visibility: next && count >= 1 ? 'visible' : 'hidden',
+        }}>{next && count >= 1 ? `+${next}t` : ''}</span>
       </div>
 
       {expanded && available && <ExpandedWeapon weapon={weapon} cls={cls} />}
