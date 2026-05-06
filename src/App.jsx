@@ -60,6 +60,14 @@ export default function App() {
   const [listsOpen, setListsOpen] = useState(false);
 
   const [sideTab, setSideTab] = useState('roster');
+  // Mobile: track which "screen" is visible. 'list' = force sidebar, 'detail' = editor/panel
+  const [mobileScreen, setMobileScreen] = useState('list');
+
+  const goToDetail = (tab) => {
+    setSideTab(tab);
+    setMobileScreen('detail');
+  };
+  const goToList = () => setMobileScreen('list');
 
   // Persist any state change.
   useEffect(() => {
@@ -268,7 +276,7 @@ export default function App() {
         {/* Two-column layout. Left = your force (static summary).
             Right = workshop with always-visible tabs for picking/customizing. */}
         <div className="layout">
-          <aside className="sidebar scroll" style={{
+          <aside className={`sidebar scroll${mobileScreen === "detail" ? " mobile-hidden" : ""}`} style={{
             background: 'var(--bg)',
             borderRight: '1.5px solid var(--rule-strong)',
             padding: '18px 16px 24px',
@@ -353,7 +361,7 @@ export default function App() {
               count={selectedTeams.length}
               max={teamMax}
               addLabel="Browse"
-              onAdd={() => setSideTab('teams')}
+              onAdd={() => goToDetail('teams')}
             >
               {selectedTeams.length === 0 ? (
                 <EmptyHint>No teams enlisted.</EmptyHint>
@@ -362,7 +370,7 @@ export default function App() {
                   <TeamSummaryCard
                     key={name}
                     teamName={name}
-                    onClick={() => setSideTab('teams')}
+                    onClick={() => goToDetail('teams')}
                     onRemove={() => toggleTeam(name)}
                   />
                 ))
@@ -374,13 +382,13 @@ export default function App() {
               title="Faction"
               count={faction ? 1 : 0}
               addLabel={faction ? 'Edit' : 'Pick'}
-              onAdd={() => setSideTab('faction')}
+              onAdd={() => goToDetail('faction')}
             >
               {faction ? (
                 <FactionSummaryCard
                   faction={faction}
                   perks={perks}
-                  onClick={() => setSideTab('faction')}
+                  onClick={() => goToDetail('faction')}
                 />
               ) : (
                 <EmptyHint>No faction picked.</EmptyHint>
@@ -389,10 +397,17 @@ export default function App() {
           </aside>
 
           {/* RIGHT: workshop with tab strip + content */}
-          <main ref={editorRef} className="editor-col scroll" style={{
+          <main ref={editorRef} className={`editor-col scroll${mobileScreen === "list" ? " mobile-hidden" : ""}`} style={{
             background: 'var(--surface)',
             display: 'flex', flexDirection: 'column',
           }}>
+            {/* Mobile back button */}
+            <button className="mobile-back-btn no-print" onClick={goToList}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
+                <path d="M10 3L5 8L10 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Your Force
+            </button>
             {/* Tab strip — always all 4 tabs */}
             <div className="workshop-tabs">
               {[
