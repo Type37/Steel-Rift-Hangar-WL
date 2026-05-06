@@ -2,6 +2,7 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { TEAMS, MISSIONS, MISSION_ORDER, FACTION_LOGOS, FREEFORM_MISSION, FACTIONS } from './data';
 import { POOL_NAMES } from './callsigns';
 import { calcMech, newMech, findAsset } from './calc';
+import { WC } from './data';
 
 import { Navbar, BottomBar, MechCard, EmptyRoster, SupportRosterCard } from './components/chrome';
 import { MechEditor } from './components/editor';
@@ -150,9 +151,12 @@ export default function App() {
   const isFreeform = mission === FREEFORM_MISSION;
   const cap = isFreeform ? Infinity : (useCustom ? customTons : MISSIONS[mission].tons);
   const supportLimit = isFreeform ? Infinity : (useCustom ? Math.max(1, Math.floor(customTons / 50)) : MISSIONS[mission].support);
+  // Rules p.18: each HE-V costs its flat weight-class tonnage (20/30/40/50)
+  // from the force budget. Weapons/upgrades are paid from within that
+  // tonnage, not on top of it.
   const totalTons = useMemo(
     () =>
-      mechs.reduce((s, m) => s + calcMech(m).totalUsed, 0) +
+      mechs.reduce((s, m) => s + WC[m.weightClass].tons, 0) +
       supportAssets.reduce((s, n) => s + (findAsset(n)?.cost || 0), 0),
     [mechs, supportAssets]
   );

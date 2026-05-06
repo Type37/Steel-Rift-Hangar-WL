@@ -406,7 +406,56 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
 // TONNAGE BREAKDOWN
 // ============================================================
 
-function TonBreakdown() { return null; }
+function TonBreakdown({ stats, wc }) {
+  if (!stats || !wc) return null;
+  const total = wc.tons;
+  const armorPct   = (stats.armor / total) * 100;
+  const structPct  = (stats.structure / total) * 100;
+  const weaponPct  = (stats.weaponsTons / total) * 100;
+  const upgradePct = ((stats.upgradesTons + stats.defensiveTons) / total) * 100;
+  const over       = stats.overTons;
+  const remaining  = Math.max(0, total - stats.totalUsed);
+
+  return (
+    <div style={{ padding: '10px 14px 6px', borderBottom: '1px solid var(--rule)' }}>
+      <div style={{
+        height: 10, borderRadius: 2, background: 'var(--rule)',
+        overflow: 'hidden', display: 'flex', marginBottom: 6,
+        outline: over ? '1.5px solid var(--rust)' : 'none',
+        outlineOffset: 1,
+      }}>
+        <div style={{ width: `${armorPct}%`,   background: 'var(--teal)',  transition: 'width 150ms', opacity: 0.85 }} />
+        <div style={{ width: `${structPct}%`,  background: '#8fa66e',      transition: 'width 150ms', opacity: 0.85 }} />
+        <div style={{ width: `${weaponPct}%`,  background: 'var(--olive)', transition: 'width 150ms', opacity: 0.85 }} />
+        <div style={{ width: `${upgradePct}%`, background: '#b97a1a',      transition: 'width 150ms', opacity: 0.85 }} />
+      </div>
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', fontSize: 10.5, color: 'var(--mute)', fontFamily: 'var(--font-mono)' }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span style={{ width: 7, height: 7, borderRadius: 1, background: 'var(--teal)', display: 'inline-block' }} />
+          ARM {stats.armor}t
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span style={{ width: 7, height: 7, borderRadius: 1, background: '#8fa66e', display: 'inline-block' }} />
+          STR {stats.structure}t
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span style={{ width: 7, height: 7, borderRadius: 1, background: 'var(--olive)', display: 'inline-block' }} />
+          WPN {stats.weaponsTons}t
+        </span>
+        {(stats.upgradesTons + stats.defensiveTons) > 0 && (
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ width: 7, height: 7, borderRadius: 1, background: '#b97a1a', display: 'inline-block' }} />
+            UPG {stats.upgradesTons + stats.defensiveTons}t
+          </span>
+        )}
+        <span style={{ marginLeft: 'auto', color: over ? 'var(--rust)' : 'var(--ink)', fontWeight: 700 }}>
+          {over ? `+${stats.totalUsed - total}t OVER` : `${remaining}t free`}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 
 // ============================================================
 // ARMOR / STRUCTURE ADJUSTER
