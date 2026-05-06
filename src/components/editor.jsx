@@ -232,39 +232,51 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
       )}
 
 
-      {/* Tonnage range — dot on line. Intentionally calm; spending everything is not required. */}
+      {/* Weight tag + slot pips */}
       {(() => {
-        const pct = Math.min(1, stats.totalUsed / stats.capTons);
+        const pct = stats.totalUsed / stats.capTons;
         const near = pct >= 0.85 && !stats.overTons;
-        const dotColor = stats.overTons ? 'var(--rust)' : near ? '#b97a1a' : 'var(--ink)';
-        const slotsFree = stats.capSlots - stats.totalSlotsUsed;
+        const tagColor = stats.overTons ? 'var(--rust)' : near ? '#b97a1a' : 'var(--rule-strong)';
+        const numColor = stats.overTons ? 'var(--rust)' : near ? '#b97a1a' : 'var(--ink)';
         return (
-          <div style={{ margin: '20px 0 0', padding: '12px 14px', background: 'var(--surface)', border: '1px solid var(--rule)' }}>
-            {/* Line + dot */}
-            <div style={{ position: 'relative', height: 18, marginBottom: 4 }}>
-              <div style={{
-                position: 'absolute', top: '50%', left: 0, right: 0,
-                height: 1.5, background: 'var(--rule-strong)', transform: 'translateY(-50%)',
-              }} />
-              <div style={{
-                position: 'absolute', top: '50%',
-                left: `${Math.min(98, pct * 100)}%`,
-                width: 10, height: 10, borderRadius: '50%',
-                background: dotColor,
-                transform: 'translate(-50%, -50%)',
-                transition: 'left 150ms ease, background 150ms',
-                flexShrink: 0,
-              }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, margin: '20px 0 0',
+            padding: '10px 14px', background: 'var(--surface)', border: '1px solid var(--rule)' }}>
+            {/* Tag */}
+            <div style={{
+              border: `2px solid ${tagColor}`, borderRadius: 6,
+              padding: '6px 12px', textAlign: 'center', flexShrink: 0,
+              transition: 'border-color 150ms',
+            }}>
+              <div className="mono" style={{ fontSize: 26, fontWeight: 700, lineHeight: 1, color: numColor }}>
+                {stats.totalUsed}
+              </div>
+              <div style={{ fontSize: 9, letterSpacing: '0.14em', color: 'var(--mute)', marginTop: 2 }}>
+                TONS{stats.overTons ? ' OVER' : ''}
+              </div>
             </div>
-            {/* Labels */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <span className="mono" style={{ fontSize: 13, color: stats.overTons ? 'var(--rust)' : near ? '#b97a1a' : 'var(--ink-2)' }}>
-                {stats.totalUsed}t
-                {stats.overTons && <span style={{ marginLeft: 6, fontSize: 11 }}>over by {stats.totalUsed - stats.capTons}t</span>}
-              </span>
-              <span className="mono" style={{ fontSize: 11, color: 'var(--mute)' }}>
-                {stats.capTons}t · {slotsFree < 0 ? `${-slotsFree} slots over` : `${slotsFree} slot${slotsFree !== 1 ? 's' : ''} free`}
-              </span>
+            {/* Slot pips */}
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', marginBottom: 5 }}>
+                {Array.from({ length: stats.capSlots }).map((_, i) => (
+                  <span key={i} style={{
+                    width: 9, height: 9, borderRadius: '50%', display: 'inline-block',
+                    background: i < stats.totalSlotsUsed
+                      ? (stats.overSlots ? 'var(--rust)' : 'var(--teal)')
+                      : 'transparent',
+                    border: `1.5px solid ${i < stats.totalSlotsUsed
+                      ? (stats.overSlots ? 'var(--rust)' : 'var(--teal)')
+                      : 'var(--rule-strong)'}`,
+                    opacity: i < stats.totalSlotsUsed ? 0.9 : 0.4,
+                  }} />
+                ))}
+              </div>
+              <div className="mono" style={{ fontSize: 11, color: 'var(--mute)' }}>
+                cap {stats.capTons}t
+                {stats.overSlots
+                  ? <span style={{ color: 'var(--rust)', marginLeft: 6 }}>{stats.totalSlotsUsed - stats.capSlots} slots over</span>
+                  : <span style={{ marginLeft: 6 }}>{stats.capSlots - stats.totalSlotsUsed} slots free</span>
+                }
+              </div>
             </div>
           </div>
         );
@@ -701,7 +713,7 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
         title={unavailableReason || undefined}
         style={{
           display: 'grid',
-          gridTemplateColumns: 'auto 1fr auto auto auto auto',
+          gridTemplateColumns: 'auto 1fr 128px auto auto auto',
           alignItems: 'center', gap: 12,
           padding: '9px 14px',
         }}
@@ -729,8 +741,8 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
           </div>
         </div>
 
-        {/* Cost columns — header row + costs, active class highlighted */}
-        <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
+        {/* Cost columns — always rendered at fixed 128px so rows don't jump */}
+        <div style={{ width: 128, flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
           {/* Column headers */}
           <div style={{ display: 'flex', gap: 0 }}>
             {WC_ABBR.map((abbr, i) => {
@@ -773,20 +785,15 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
           </div>
         </div>
 
+        {/* Always render 3 fixed cells so the + never jumps */}
         {count > 0 ? (
-          <>
-            <StepButton direction="down" accent="rust" onClick={() => onRemove(weapon.name)} />
-            <span className="mono" style={{
-              minWidth: 24, textAlign: 'center', fontWeight: 700, fontSize: 17, color: 'var(--ink)',
-            }}>×{count}</span>
-            <StepButton direction="up" onClick={() => onAdd(weapon.name)} disabled={!available} />
-          </>
-        ) : (
-          <>
-            <span />{available && <span />}
-            <StepButton direction="up" onClick={() => onAdd(weapon.name)} disabled={!available} />
-          </>
-        )}
+          <StepButton direction="down" accent="rust" onClick={() => onRemove(weapon.name)} />
+        ) : <span style={{ width: 28 }} />}
+        <span className="mono" style={{
+          width: 28, textAlign: 'center', fontWeight: 700, fontSize: 17, color: 'var(--ink)',
+          visibility: count > 0 ? 'visible' : 'hidden',
+        }}>×{count}</span>
+        <StepButton direction="up" onClick={() => onAdd(weapon.name)} disabled={!available} />
       </div>
 
       {expanded && available && <ExpandedWeapon weapon={weapon} cls={cls} />}
