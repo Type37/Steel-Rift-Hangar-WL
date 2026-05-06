@@ -189,7 +189,6 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
         </div>
       </div>
 
-      <TonBreakdown stats={stats} cls={cls} wc={wc} />
 
       {/* Armor / structure adjusters. Each Reinforce step adds 2 points
           and costs 2 tons; each Strip step removes 2 points and refunds
@@ -278,46 +277,10 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
             });
           })()}
 
-          {/* Spacer */}
-          <div style={{ flex: 1 }} />
-
-          {/* Slot pips */}
-          <div style={{ display: 'flex', gap: 2, alignItems: 'center', flexShrink: 0 }}>
-            {Array.from({ length: stats.capSlots }).map((_, i) => (
-              <span key={i} style={{
-                width: 7, height: 7, borderRadius: '50%', display: 'inline-block', flexShrink: 0,
-                background: i < stats.totalSlotsUsed ? (stats.overSlots ? 'var(--rust)' : 'var(--teal)') : 'transparent',
-                border: `1.5px solid ${i < stats.totalSlotsUsed ? (stats.overSlots ? 'var(--rust)' : 'var(--teal)') : 'var(--rule-strong)'}`,
-                opacity: i < stats.totalSlotsUsed ? 0.9 : 0.4,
-              }} />
-            ))}
-          </div>
-
-          {/* Tonnage dot + numbers */}
-          {(() => {
-            const pct = Math.min(1, stats.totalUsed / stats.capTons);
-            const near = pct >= 0.85 && !stats.overTons;
-            const accent = stats.overTons ? 'var(--rust)' : near ? '#b97a1a' : 'var(--ink)';
-            return (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                <div style={{ position: 'relative', width: 44, height: 10 }}>
-                  <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: 1, background: 'var(--rule-strong)', transform: 'translateY(-50%)' }} />
-                  <div style={{
-                    position: 'absolute', top: '50%',
-                    left: `${Math.min(92, pct * 100)}%`,
-                    width: 6, height: 6, borderRadius: '50%',
-                    background: accent, transform: 'translate(-50%, -50%)',
-                    transition: 'left 150ms, background 150ms',
-                  }} />
-                </div>
-                <span className="mono" style={{ fontSize: 11, fontWeight: 700, color: accent, minWidth: '2em', textAlign: 'right' }}>
-                  {stats.totalUsed}
-                </span>
-                <span className="mono" style={{ fontSize: 11, color: 'var(--mute)' }}>/ {stats.capTons}t</span>
-              </div>
-            );
-          })()}
         </div>
+
+        {/* Tonnage bar + slot pips — prominent, sits between tabs and weapon list */}
+        <TonBreakdown stats={stats} wc={wc} />
 
         <div style={{ borderTop: '2px solid var(--ink)', minHeight: 400 }}>
           {tab === 'ranged' && sortByAvail(RANGED, w => valForClass(w.cost, cls) !== '-' && valForClass(w.cost, cls) != null).map(w => (
@@ -408,49 +371,79 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
 
 function TonBreakdown({ stats, wc }) {
   if (!stats || !wc) return null;
-  const total = wc.tons;
+  const total      = wc.tons;
   const armorPct   = (stats.armor / total) * 100;
   const structPct  = (stats.structure / total) * 100;
   const weaponPct  = (stats.weaponsTons / total) * 100;
   const upgradePct = ((stats.upgradesTons + stats.defensiveTons) / total) * 100;
   const over       = stats.overTons;
+  const near       = !over && (stats.totalUsed / total) >= 0.85;
   const remaining  = Math.max(0, total - stats.totalUsed);
+  const statusColor = over ? 'var(--rust)' : near ? '#b97a1a' : 'var(--ink)';
 
   return (
-    <div style={{ padding: '10px 14px 6px', borderBottom: '1px solid var(--rule)' }}>
+    <div style={{ padding: '8px 14px 10px', background: 'var(--surface-2)', borderBottom: '2px solid var(--ink)' }}>
+      {/* Segmented bar */}
       <div style={{
-        height: 10, borderRadius: 2, background: 'var(--rule)',
-        overflow: 'hidden', display: 'flex', marginBottom: 6,
-        outline: over ? '1.5px solid var(--rust)' : 'none',
+        height: 14, borderRadius: 2, background: 'var(--rule-strong)',
+        overflow: 'hidden', display: 'flex', marginBottom: 8,
+        outline: over ? '2px solid var(--rust)' : '1px solid var(--rule-strong)',
         outlineOffset: 1,
       }}>
-        <div style={{ width: `${armorPct}%`,   background: 'var(--teal)',  transition: 'width 150ms', opacity: 0.85 }} />
-        <div style={{ width: `${structPct}%`,  background: '#8fa66e',      transition: 'width 150ms', opacity: 0.85 }} />
-        <div style={{ width: `${weaponPct}%`,  background: 'var(--olive)', transition: 'width 150ms', opacity: 0.85 }} />
-        <div style={{ width: `${upgradePct}%`, background: '#b97a1a',      transition: 'width 150ms', opacity: 0.85 }} />
+        <div style={{ width: `${armorPct}%`,   background: 'var(--teal)',        transition: 'width 150ms' }} />
+        <div style={{ width: `${structPct}%`,  background: '#8fa66e',            transition: 'width 150ms', borderLeft: '1px solid var(--surface-2)' }} />
+        <div style={{ width: `${weaponPct}%`,  background: 'var(--olive)',       transition: 'width 150ms', borderLeft: weaponPct > 0 ? '1px solid var(--surface-2)' : 'none' }} />
+        <div style={{ width: `${upgradePct}%`, background: '#b97a1a',            transition: 'width 150ms', borderLeft: upgradePct > 0 ? '1px solid var(--surface-2)' : 'none' }} />
       </div>
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', fontSize: 10.5, color: 'var(--mute)', fontFamily: 'var(--font-mono)' }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <span style={{ width: 7, height: 7, borderRadius: 1, background: 'var(--teal)', display: 'inline-block' }} />
-          ARM {stats.armor}t
+
+      {/* Legend row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-mono)', fontSize: 11 }}>
+          <span style={{ width: 9, height: 9, borderRadius: 1, background: 'var(--teal)', display: 'inline-block', flexShrink: 0 }} />
+          <span style={{ color: 'var(--mute)', letterSpacing: '0.08em' }}>ARM</span>
+          <span style={{ color: 'var(--ink)', fontWeight: 700 }}>{stats.armor}t</span>
         </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <span style={{ width: 7, height: 7, borderRadius: 1, background: '#8fa66e', display: 'inline-block' }} />
-          STR {stats.structure}t
+        <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-mono)', fontSize: 11 }}>
+          <span style={{ width: 9, height: 9, borderRadius: 1, background: '#8fa66e', display: 'inline-block', flexShrink: 0 }} />
+          <span style={{ color: 'var(--mute)', letterSpacing: '0.08em' }}>STR</span>
+          <span style={{ color: 'var(--ink)', fontWeight: 700 }}>{stats.structure}t</span>
         </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <span style={{ width: 7, height: 7, borderRadius: 1, background: 'var(--olive)', display: 'inline-block' }} />
-          WPN {stats.weaponsTons}t
+        <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-mono)', fontSize: 11 }}>
+          <span style={{ width: 9, height: 9, borderRadius: 1, background: 'var(--olive)', display: 'inline-block', flexShrink: 0 }} />
+          <span style={{ color: 'var(--mute)', letterSpacing: '0.08em' }}>WPN</span>
+          <span style={{ color: 'var(--ink)', fontWeight: 700 }}>{stats.weaponsTons}t</span>
         </span>
         {(stats.upgradesTons + stats.defensiveTons) > 0 && (
-          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ width: 7, height: 7, borderRadius: 1, background: '#b97a1a', display: 'inline-block' }} />
-            UPG {stats.upgradesTons + stats.defensiveTons}t
+          <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-mono)', fontSize: 11 }}>
+            <span style={{ width: 9, height: 9, borderRadius: 1, background: '#b97a1a', display: 'inline-block', flexShrink: 0 }} />
+            <span style={{ color: 'var(--mute)', letterSpacing: '0.08em' }}>UPG</span>
+            <span style={{ color: 'var(--ink)', fontWeight: 700 }}>{stats.upgradesTons + stats.defensiveTons}t</span>
           </span>
         )}
-        <span style={{ marginLeft: 'auto', color: over ? 'var(--rust)' : 'var(--ink)', fontWeight: 700 }}>
-          {over ? `+${stats.totalUsed - total}t OVER` : `${remaining}t free`}
-        </span>
+
+        {/* Spacer + slot pips + status */}
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
+          {/* Slot pips */}
+          <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+            {Array.from({ length: stats.capSlots }).map((_, i) => (
+              <span key={i} style={{
+                width: 10, height: 10, borderRadius: '50%', display: 'inline-block', flexShrink: 0,
+                background: i < stats.totalSlotsUsed
+                  ? (stats.overSlots ? 'var(--rust)' : 'var(--teal)')
+                  : 'transparent',
+                border: `2px solid ${i < stats.totalSlotsUsed
+                  ? (stats.overSlots ? 'var(--rust)' : 'var(--teal)')
+                  : 'var(--rule-strong)'}`,
+              }} />
+            ))}
+          </div>
+          {/* Ton count */}
+          <span className="mono" style={{ fontSize: 13, fontWeight: 700, color: statusColor, whiteSpace: 'nowrap' }}>
+            {over
+              ? `${stats.totalUsed}t OVER`
+              : `${stats.totalUsed} / ${total}t`}
+          </span>
+        </div>
       </div>
     </div>
   );
