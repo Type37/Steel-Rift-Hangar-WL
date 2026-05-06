@@ -131,7 +131,7 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
             flexShrink: 0,
           }}
         >
-          <Trash2 size={12} strokeWidth={2.5} />
+          <Trash2 size={16} strokeWidth={2.5} />
         </button>
       </div>
       {mech.description && (
@@ -258,33 +258,42 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
           Loadout
         </SectionTitle>
         <div style={{ display: 'flex', gap: 4 }}>
-          {[
-            { id: 'ranged', label: 'Ranged' },
-            { id: 'melee', label: 'Melee' },
-            { id: 'upgrades', label: 'Upgrades' },
-            { id: 'defensive', label: 'Defensive' },
-            { id: 'motive', label: 'Motive' },
-          ].map(t => (
+          {(() => {
+            const defCount = mech.defensive.length;
+            const motiveEquipped = UPGRADES.filter(u => u.variant && mech.upgrades.includes(u.name)).length;
+            const weaponCount = mech.weapons.reduce((s, w) => s + w.count, 0);
+            const upgradeCount = mech.upgrades.filter(n => !UPGRADES.find(u => u.name === n)?.variant).length;
+            const tabs = [
+              { id: 'ranged', label: 'Ranged', count: mech.weapons.filter(w => RANGED.find(r => r.name === w.name)).reduce((s,w) => s+w.count, 0) },
+              { id: 'melee', label: 'Melee', count: mech.weapons.filter(w => MELEE.find(m => m.name === w.name)).reduce((s,w) => s+w.count, 0) },
+              { id: 'upgrades', label: 'Upgrades', count: upgradeCount },
+              { id: 'defensive', label: 'Defensive', count: defCount, noSlots: true },
+              { id: 'motive', label: 'Motive', count: motiveEquipped, noSlots: true },
+            ];
+            return tabs.map(t => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
               className="add-btn"
               style={{
-                background: tab === t.id ? 'var(--ink)' : 'transparent',
-                color: tab === t.id ? 'var(--surface)' : 'var(--ink)',
-                border: 'none',
-                padding: '9px 18px',
+                background: tab === t.id
+                  ? (t.noSlots ? 'var(--steel)' : 'var(--ink)')
+                  : 'transparent',
+                color: tab === t.id ? 'var(--surface)' : (t.noSlots ? 'var(--steel)' : 'var(--ink)'),
+                border: t.noSlots ? (tab === t.id ? 'none' : '1px dashed var(--steel)') : 'none',
+                padding: '9px 12px',
                 fontFamily: 'var(--font-stencil)',
-                fontSize: 13,
+                fontSize: 12,
                 fontWeight: 700,
-                letterSpacing: '0.14em',
+                letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 cursor: 'pointer',
               }}
             >
-              {t.label}
+              {t.label}{t.count > 0 ? ` (${t.count})` : ''}
             </button>
-          ))}
+          ));
+          })()}
         </div>
 
         <div style={{ borderTop: '2px solid var(--ink)' }}>
@@ -392,29 +401,7 @@ function TonBreakdown({ stats, cls, wc }) {
         </span>
       </div>
 
-      <div className="ton-breakdown" style={{
-        marginTop: 10, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)',
-        borderTop: '1px solid var(--rule)', borderBottom: '1px solid var(--rule)',
-      }}>
-        {[
-          { l: 'Armor', v: stats.armor, sub: stats.defensiveArmorBonus > 0 ? `+${stats.defensiveArmorBonus} eff` : null },
-          { l: 'Structure', v: stats.structure },
-          { l: 'Weapons', v: `${stats.weaponsTons}t`, sub: `${stats.weaponsSlots} slot${stats.weaponsSlots !== 1 ? 's' : ''}` },
-          { l: 'Upgrades', v: `${stats.upgradesTons}t`, sub: `${stats.upgradesSlots} slot${stats.upgradesSlots !== 1 ? 's' : ''}` },
-          { l: 'Defensive', v: `${stats.defensiveTons}t` },
-        ].map((r, i) => (
-          <div key={r.l} style={{
-            padding: '9px 10px',
-            borderRight: i < 4 ? '1px solid var(--rule)' : 'none',
-          }}>
-            <div className="label" style={{ fontSize: 10, marginBottom: 2 }}>{r.l}</div>
-            <div className="mono" style={{ fontSize: 18, fontWeight: 700, color: 'var(--ink)' }}>
-              {r.v}
-            </div>
-            {r.sub && <div className="mono" style={{ fontSize: 11, color: 'var(--olive)' }}>{r.sub}</div>}
-          </div>
-        ))}
-      </div>
+
     </div>
   );
 }
