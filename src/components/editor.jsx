@@ -232,45 +232,10 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
       )}
 
 
-      {/* Compact inline tonnage — dot on range, single line */}
-      {(() => {
-        const pct = Math.min(1, stats.totalUsed / stats.capTons);
-        const near = pct >= 0.85 && !stats.overTons;
-        const accent = stats.overTons ? 'var(--rust)' : near ? '#b97a1a' : 'var(--ink)';
-        const free = stats.capTons - stats.totalUsed;
-        return (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '14px 0 0', padding: '7px 14px', background: 'var(--surface)', border: '1px solid var(--rule)' }}>
-            <span className="label" style={{ fontSize: 10, letterSpacing: '0.12em', flexShrink: 0 }}>TONNAGE</span>
-            {/* Mini range */}
-            <div style={{ position: 'relative', flex: 1, height: 12, maxWidth: 80 }}>
-              <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: 1, background: 'var(--rule-strong)', transform: 'translateY(-50%)' }} />
-              <div style={{
-                position: 'absolute', top: '50%',
-                left: `${Math.min(95, pct * 100)}%`,
-                width: 7, height: 7, borderRadius: '50%',
-                background: accent,
-                transform: 'translate(-50%, -50%)',
-                transition: 'left 150ms, background 150ms',
-              }} />
-            </div>
-            {/* Numbers */}
-            <span className="mono" style={{ fontSize: 13, fontWeight: 700, color: accent, flexShrink: 0, minWidth: "2.5em", textAlign: "right", display: "inline-block" }}>
-              {stats.totalUsed}
-            </span>
-            <span className="mono" style={{ fontSize: 12, color: 'var(--mute)', flexShrink: 0 }}>
-              / {stats.capTons}t
-            </span>
-            <span className="mono" style={{ fontSize: 11, color: 'var(--mute)', flexShrink: 0 }}>
-              ({free >= 0 ? `${free} free` : `${-free} over`})
-            </span>
-          </div>
-        );
-      })()}
-
-      {/* Catalog tabs */}
+      {/* Catalog tabs + tonnage + slots all on one row */}
       <div style={{ marginTop: 16 }}>
         <SectionTitle>Loadout</SectionTitle>
-        <div style={{ display: 'flex', gap: 4 }}>
+        <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexWrap: 'wrap' }}>
           {(() => {
             const defCount = mech.defensive.length;
             const motiveEquipped = UPGRADES.filter(u => u.variant && mech.upgrades.includes(u.name)).length;
@@ -311,6 +276,46 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
                 </button>
               );
             });
+          })()}
+
+          {/* Spacer */}
+          <div style={{ flex: 1 }} />
+
+          {/* Slot pips */}
+          <div style={{ display: 'flex', gap: 2, alignItems: 'center', flexShrink: 0 }}>
+            {Array.from({ length: stats.capSlots }).map((_, i) => (
+              <span key={i} style={{
+                width: 7, height: 7, borderRadius: '50%', display: 'inline-block', flexShrink: 0,
+                background: i < stats.totalSlotsUsed ? (stats.overSlots ? 'var(--rust)' : 'var(--teal)') : 'transparent',
+                border: `1.5px solid ${i < stats.totalSlotsUsed ? (stats.overSlots ? 'var(--rust)' : 'var(--teal)') : 'var(--rule-strong)'}`,
+                opacity: i < stats.totalSlotsUsed ? 0.9 : 0.4,
+              }} />
+            ))}
+          </div>
+
+          {/* Tonnage dot + numbers */}
+          {(() => {
+            const pct = Math.min(1, stats.totalUsed / stats.capTons);
+            const near = pct >= 0.85 && !stats.overTons;
+            const accent = stats.overTons ? 'var(--rust)' : near ? '#b97a1a' : 'var(--ink)';
+            return (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                <div style={{ position: 'relative', width: 44, height: 10 }}>
+                  <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: 1, background: 'var(--rule-strong)', transform: 'translateY(-50%)' }} />
+                  <div style={{
+                    position: 'absolute', top: '50%',
+                    left: `${Math.min(92, pct * 100)}%`,
+                    width: 6, height: 6, borderRadius: '50%',
+                    background: accent, transform: 'translate(-50%, -50%)',
+                    transition: 'left 150ms, background 150ms',
+                  }} />
+                </div>
+                <span className="mono" style={{ fontSize: 11, fontWeight: 700, color: accent, minWidth: '2em', textAlign: 'right' }}>
+                  {stats.totalUsed}
+                </span>
+                <span className="mono" style={{ fontSize: 11, color: 'var(--mute)' }}>/ {stats.capTons}t</span>
+              </div>
+            );
           })()}
         </div>
 
