@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Trash2 } from 'lucide-react';
 import { WC, WC_ORDER, RANGED, MELEE, UPGRADES, DEFENSIVE } from '../data';
 import { calcMech, valForClass, copyCost, totalWeaponCost, resetMechToClass } from '../calc';
-import { SectionTitle, FieldLabel, StepButton, TraitList, RowExpand, InlineTraitGlossary, collectTraits } from './ui';
+import { SectionTitle, FieldLabel, StepButton, TraitList, TraitToken, RowExpand, InlineTraitGlossary, collectTraits } from './ui';
 
 // ============================================================
 // HE-V EDITOR
