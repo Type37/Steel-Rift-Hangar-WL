@@ -232,52 +232,37 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
       )}
 
 
-      {/* Weight tag + slot pips */}
+      {/* Compact inline tonnage — dot on range, single line */}
       {(() => {
-        const pct = stats.totalUsed / stats.capTons;
+        const pct = Math.min(1, stats.totalUsed / stats.capTons);
         const near = pct >= 0.85 && !stats.overTons;
-        const tagColor = stats.overTons ? 'var(--rust)' : near ? '#b97a1a' : 'var(--rule-strong)';
-        const numColor = stats.overTons ? 'var(--rust)' : near ? '#b97a1a' : 'var(--ink)';
+        const accent = stats.overTons ? 'var(--rust)' : near ? '#b97a1a' : 'var(--ink)';
+        const free = stats.capTons - stats.totalUsed;
         return (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, margin: '20px 0 0',
-            padding: '10px 14px', background: 'var(--surface)', border: '1px solid var(--rule)' }}>
-            {/* Tag */}
-            <div style={{
-              border: `2px solid ${tagColor}`, borderRadius: 6,
-              padding: '6px 12px', textAlign: 'center', flexShrink: 0,
-              transition: 'border-color 150ms',
-            }}>
-              <div className="mono" style={{ fontSize: 26, fontWeight: 700, lineHeight: 1, color: numColor }}>
-                {stats.totalUsed}
-              </div>
-              <div style={{ fontSize: 9, letterSpacing: '0.14em', color: 'var(--mute)', marginTop: 2 }}>
-                TONS{stats.overTons ? ' OVER' : ''}
-              </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '14px 0 0', padding: '7px 14px', background: 'var(--surface)', border: '1px solid var(--rule)' }}>
+            <span className="label" style={{ fontSize: 10, letterSpacing: '0.12em', flexShrink: 0 }}>TONNAGE</span>
+            {/* Mini range */}
+            <div style={{ position: 'relative', flex: 1, height: 12, maxWidth: 80 }}>
+              <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: 1, background: 'var(--rule-strong)', transform: 'translateY(-50%)' }} />
+              <div style={{
+                position: 'absolute', top: '50%',
+                left: `${Math.min(95, pct * 100)}%`,
+                width: 7, height: 7, borderRadius: '50%',
+                background: accent,
+                transform: 'translate(-50%, -50%)',
+                transition: 'left 150ms, background 150ms',
+              }} />
             </div>
-            {/* Slot pips */}
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', marginBottom: 5 }}>
-                {Array.from({ length: stats.capSlots }).map((_, i) => (
-                  <span key={i} style={{
-                    width: 9, height: 9, borderRadius: '50%', display: 'inline-block',
-                    background: i < stats.totalSlotsUsed
-                      ? (stats.overSlots ? 'var(--rust)' : 'var(--teal)')
-                      : 'transparent',
-                    border: `1.5px solid ${i < stats.totalSlotsUsed
-                      ? (stats.overSlots ? 'var(--rust)' : 'var(--teal)')
-                      : 'var(--rule-strong)'}`,
-                    opacity: i < stats.totalSlotsUsed ? 0.9 : 0.4,
-                  }} />
-                ))}
-              </div>
-              <div className="mono" style={{ fontSize: 11, color: 'var(--mute)' }}>
-                cap {stats.capTons}t
-                {stats.overSlots
-                  ? <span style={{ color: 'var(--rust)', marginLeft: 6 }}>{stats.totalSlotsUsed - stats.capSlots} slots over</span>
-                  : <span style={{ marginLeft: 6 }}>{stats.capSlots - stats.totalSlotsUsed} slots free</span>
-                }
-              </div>
-            </div>
+            {/* Numbers */}
+            <span className="mono" style={{ fontSize: 13, fontWeight: 700, color: accent, flexShrink: 0 }}>
+              {stats.totalUsed}
+            </span>
+            <span className="mono" style={{ fontSize: 12, color: 'var(--mute)', flexShrink: 0 }}>
+              / {stats.capTons}t
+            </span>
+            <span className="mono" style={{ fontSize: 11, color: 'var(--mute)', flexShrink: 0 }}>
+              ({free >= 0 ? `${free} free` : `${-free} over`})
+            </span>
           </div>
         );
       })()}
@@ -364,7 +349,7 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
                 </div>
                 {drones.map(u => (
                   <UpgradeRow key={u.name} upgrade={u} mech={mech} onToggle={toggleUpgrade} onAssignDrone={assignDrone}
-                    expanded={expanded[u.name]} onExpand={() => toggleExpanded(u.name)} />
+                    expanded={true} onExpand={() => toggleExpanded(u.name)} />
                 ))}
               </>
             );
@@ -383,7 +368,7 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
                 </div>
                 {variants.map(u => (
                   <UpgradeRow key={u.name} upgrade={u} mech={mech} onToggle={toggleUpgrade} onAssignDrone={assignDrone}
-                    expanded={expanded[u.name]} onExpand={() => toggleExpanded(u.name)} />
+                    expanded={true} onExpand={() => toggleExpanded(u.name)} />
                 ))}
               </>
             );
