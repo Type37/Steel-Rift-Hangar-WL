@@ -537,20 +537,25 @@ export const TEAMS = [
   },
   {
     name: 'Gunslinger Team', band: '3-4',
-    blurb: 'Short-range only. Return Fire even when activated.',
+    blurb: 'Short-range and melee specialists who return fire from any position.',
     req: [
       { cls: 'Light', min: 0, max: 2, needs: ['Haptic Suit'], shortMeleeOnly: true },
       { cls: 'Medium', min: 1, max: 2, needs: ['Haptic Suit'], shortMeleeOnly: true },
       { cls: 'Heavy', min: 1, max: 2, needs: ['Haptic Suit'], shortMeleeOnly: true },
     ],
-    benefits: 'At 2+: Return Fire when Activated (taking a Redline Marker instead). At 3+: Short weapons +2" range. At 4: Return Smash interrupt.',
+    benefits: 'At 2+: May Return Fire when it has an Activation Marker; takes Redline instead of Activation Marker. At 3+: Short (X) weapons add +2 to their Short (X) value. At 4: Return Smash.',
     benefitsList: [
       { gate: '2+', items: [
-        'May Return Fire even after being Activated; takes a Redline Marker instead of the usual cost',
+        'This Unit may choose to Return Fire when it has an Activation Marker.',
+        'After completing a Return Fire, the Unit is marked with a Redline Marker instead of an Activation Marker.',
       ] },
-      { gate: '3+', items: ['Short weapons gain +2" range'] },
+      { gate: '3+', items: [
+        'Short (X) weapons add +2 to their Short (X) value.',
+      ] },
       { gate: '4', items: [
-        'May interrupt with a SMASH Order in addition to Return Fire',
+        'When this Unit is Targeted by an ENGAGE or SMASH Order and does not have a Redline Marker, they may choose to declare "Return Smash".',
+        'Once the Active Unit\'s ENGAGE or SMASH Order is complete, before it performs any further Orders, the Target Unit may immediately perform a SMASH Order. The SMASH Order must Target the interrupted Unit.',
+        'Once this SMASH Order is complete, mark the Unit Returning Smash with a Redline Marker. If the interrupted Unit has Orders left to perform, they return to being the Active Unit, and play continues as normal.',
       ] },
     ],
     agenda: 'Trophy Takers: When any Unit in this Team, that is not within 18" of your Deployment Edge or Corner, Destroys an HE-V, mark a Kill for that Unit. If any Units in this Team with a marked Kill are not Destroyed and within 8" of a friendly Deployment Edge or Corner at the end of the mission, score 1 VP.',

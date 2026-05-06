@@ -782,12 +782,19 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
 
 function ExpandedWeapon({ weapon, cls }) {
   const traits = collectTraits(weapon.traits);
+  const imgSlug = weapon.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  const imgSrc = `${BASE}weapons/${imgSlug}.png`;
   return (
     <div style={{
       padding: '10px 14px 16px 14px',
       background: 'var(--bg-deep)',
       borderTop: '1px dashed var(--rule)',
+      display: 'grid',
+      gridTemplateColumns: '1fr auto',
+      gap: 16,
+      alignItems: 'start',
     }}>
+    <div>
       <div className="label" style={{ marginBottom: 6 }}>Per-Class</div>
       <table style={{ borderCollapse: 'collapse', fontFamily: 'var(--font-mono)', fontSize: 12.5, width: '100%', maxWidth: 520 }}>
         <thead>
@@ -832,6 +839,20 @@ function ExpandedWeapon({ weapon, cls }) {
         </tbody>
       </table>
       <InlineTraitGlossary traits={traits} />
+    </div>
+    {/* Weapon art */}
+    <img
+      src={imgSrc}
+      alt=""
+      onError={e => { e.target.style.display = 'none'; }}
+      style={{
+        width: 160, maxHeight: 100,
+        objectFit: 'contain',
+        opacity: 0.65,
+        filter: 'sepia(0.2)',
+        alignSelf: 'center',
+      }}
+    />
     </div>
   );
 }
