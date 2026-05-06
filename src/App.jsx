@@ -47,6 +47,8 @@ export default function App() {
   // Per-asset sub-unit picks. Shape: { 'LAS-Wing Attack Squadron': ['Strike LAS Wing', 'Strike LAS Wing', 'Reconnaissance and Disruption LAS Wing', 'Strike LAS Wing'], ... }
   // Each entry is the list of sub-unit names the user picked, in order.
   const [supportLoadouts, setSupportLoadouts] = useState(stored.supportLoadouts ?? {});
+  // Garrison unit selections per asset. Shape: { 'Infantry Outpost': [['Rifle','Rifle',...], ['Anti-Tank',...]] }
+  const [garrisonLoadouts, setGarrisonLoadouts] = useState(stored.garrisonLoadouts ?? {});
   // Per-team unit assignments. Shape: { 'Reconnaissance Team': ['mech_id_1', 'support:LAS-Wing Attack Squadron', ...], ... }
   // Drag a unit from the left onto a team row in the right pane to assign.
   const [teamAssignments, setTeamAssignments] = useState(stored.teamAssignments ?? {});
@@ -66,7 +68,7 @@ export default function App() {
         forceName, mission, customTons,
         faction, perks, factionLogo,
         mechs, supportAssets, selectedTeams,
-        callsignPools, customCallsigns, supportNicknames, supportLoadouts,
+        callsignPools, customCallsigns, supportNicknames, supportLoadouts, garrisonLoadouts,
         teamAssignments,
         simpleMode,
       }));
@@ -432,6 +434,8 @@ export default function App() {
                   assetName={selectedSupportName}
                   customName={supportNicknames[selectedSupportName]}
                   loadout={supportLoadouts[selectedSupportName]}
+                  garrisonLoadout={garrisonLoadouts[selectedSupportName]}
+                  onSetGarrisonLoadout={(v) => setGarrisonLoadouts(prev => ({ ...prev, [selectedSupportName]: v }))}
                   onSetLoadout={(l) => setSupportLoadout(selectedSupportName, l)}
                   onBack={() => setSelectedSupportName(null)}
                 />
@@ -536,6 +540,7 @@ export default function App() {
           if (data.customCallsigns) setCustomCallsigns(data.customCallsigns);
           if (data.supportNicknames) setSupportNicknames(data.supportNicknames);
           if (data.supportLoadouts) setSupportLoadouts(data.supportLoadouts);
+          if (data.garrisonLoadouts) setGarrisonLoadouts(data.garrisonLoadouts);
           if (data.teamAssignments) setTeamAssignments(data.teamAssignments);
           if (data.simpleMode !== undefined) setSimpleMode(data.simpleMode);
           setSelectedMechId(null);

@@ -717,7 +717,7 @@ function AssignmentStrip({
 // inline glossary of any traits referenced.
 // ============================================================
 
-export function SupportDetailView({ assetName, customName, loadout, onSetLoadout, onBack }) {
+export function SupportDetailView({ assetName, customName, loadout, onSetLoadout, garrisonLoadout, onSetGarrisonLoadout, onBack }) {
   const a = findAsset(assetName);
   if (!a) return null;
   const traitNames = collectTraits(a.stats?.Traits || '');
@@ -781,6 +781,8 @@ export function SupportDetailView({ assetName, customName, loadout, onSetLoadout
           asset={a}
           loadout={effectiveLoadout}
           onChange={onSetLoadout || null}
+          garrisonLoadout={garrisonLoadout}
+          onSetGarrisonLoadout={onSetGarrisonLoadout}
         />
       )}
 
@@ -861,18 +863,34 @@ function parseWeapons(str) {
 }
 
 // Garrison reference: show infantry or power suit squad options inline.
-function GarrisonRef({ traitStr }) {
+function GarrisonRef({ traitStr, garrisonLoadout, onSetGarrisonLoadout }) {
   const infMatch = traitStr && traitStr.match(/Garrison\s*\(\s*(\d+)\s*Infantry/i);
   const psMatch  = traitStr && traitStr.match(/Garrison\s*\(\s*(\d+)\s*Power Suit/i);
   const ulMatch  = traitStr && /UL HE-V Squadron/i.test(traitStr);
-  const sqGarrison = traitStr && /Squadron Garrison/i.test(traitStr);
 
   if (!infMatch && !psMatch && !ulMatch) return null;
 
   const squads = infMatch ? INFANTRY_SQUADS : psMatch ? POWER_SUIT_SQUADS : null;
   const sharedTraits = infMatch ? INFANTRY_SHARED_TRAITS : psMatch ? POWER_SUIT_SHARED_TRAITS : null;
   const label = infMatch ? 'Infantry Squads' : psMatch ? 'Power Suit Squads' : 'UL HE-V Squadron';
-  const count = infMatch ? infMatch[1] : psMatch ? psMatch[1] : '1';
+  const maxCount = parseInt(infMatch?.[1] ?? psMatch?.[1] ?? '1', 10);
+
+  // Count currently selected models
+  const counts = (garrisonLoadout || []).reduce((acc, n) => { acc[n] = (acc[n] || 0) + 1; return acc; }, {});
+  const total = Object.values(counts).reduce((s, v) => s + v, 0);
+
+  const add = (name) => {
+    if (!onSetGarrisonLoadout || total >= maxCount) return;
+    onSetGarrisonLoadout([...(garrisonLoadout || []), name]);
+  };
+  const remove = (name) => {
+    if (!onSetGarrisonLoadout) return;
+    const arr = [...(garrisonLoadout || [])];
+    const idx = arr.lastIndexOf(name);
+    if (idx >= 0) { arr.splice(idx, 1); onSetGarrisonLoadout(arr); }
+  };
+
+  const canAdd = onSetGarrisonLoadout && total < maxCount;
 
   return (
     <div style={{
@@ -880,26 +898,73 @@ function GarrisonRef({ traitStr }) {
       background: 'var(--bg)', border: '1px dashed var(--rule-strong)',
       fontSize: 12,
     }}>
-      <div className="label" style={{ fontSize: 10, marginBottom: 4 }}>
-        GARRISON · {count} {label.toUpperCase()}
-        {ulMatch && ' — purchase UL HE-V Squadron separately as a Support Asset'}
-      </div>
-      {squads && squads.map(sq => (
-        <div key={sq.name} style={{
-          display: 'flex', gap: 8, alignItems: 'baseline',
-          borderTop: '1px solid var(--rule)', paddingTop: 4, marginTop: 4, flexWrap: 'wrap',
-        }}>
-          <span style={{ fontWeight: 600, fontSize: 12, minWidth: 100 }}>{sq.name}</span>
-          <span style={{ color: 'var(--mute)', fontSize: 11 }}>
-            SPD {sq.spd} · ARM {sq.arm} · STR {sq.str}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+        <span className="label" style={{ fontSize: 10 }}>
+          GARRISON · {label.toUpperCase()}
+          {ulMatch && ' — purchase separately as a Support Asset'}
+        </span>
+        {onSetGarrisonLoadout && (
+          <span className="mono" style={{
+            fontSize: 11, fontWeight: 700,
+            color: total === maxCount ? 'var(--olive)' : total > 0 ? 'var(--rust)' : 'var(--mute)',
+          }}>
+            {total}/{maxCount}
           </span>
-          <span style={{ fontSize: 11, color: 'var(--ink-2)' }}>{sq.weapons}</span>
-          {sq.traits && <span style={{ fontSize: 11, color: 'var(--mute)', fontStyle: 'italic' }}>{sq.traits}</span>}
-        </div>
-      ))}
+        )}
+      </div>
+      {squads && squads.map(sq => {
+        const cnt = counts[sq.name] || 0;
+        return (
+          <div key={sq.name} style={{
+            display: 'grid', gridTemplateColumns: '1fr auto',
+            alignItems: 'center', gap: 8,
+            borderTop: '1px solid var(--rule)', paddingTop: 5, marginTop: 5,
+          }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap', marginBottom: 2 }}>
+                <span style={{ fontWeight: 600, fontSize: 12.5 }}>{sq.name}</span>
+                <span style={{ color: 'var(--mute)', fontSize: 10.5 }}>
+                  SPD {sq.spd} · ARM {sq.arm} · STR {sq.str}
+                </span>
+                <span style={{ fontSize: 11, color: 'var(--ink-2)' }}>{sq.weapons}</span>
+              </div>
+              {sq.traits && (
+                <div style={{ fontSize: 11 }}>
+                  <TraitList traits={sq.traits} />
+                </div>
+              )}
+            </div>
+            {onSetGarrisonLoadout && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+                <button
+                  onClick={() => remove(sq.name)}
+                  disabled={cnt === 0}
+                  style={pickerBtn(cnt > 0, 'down')}
+                  title={`Remove one ${sq.name}`}
+                >
+                  <Minus size={13} strokeWidth={2.5} />
+                </button>
+                <span className="mono" style={{
+                  fontSize: 13, fontWeight: 700, minWidth: 16, textAlign: 'center',
+                  color: cnt > 0 ? 'var(--ink)' : 'var(--mute)',
+                }}>{cnt}</span>
+                <button
+                  onClick={() => add(sq.name)}
+                  disabled={!canAdd}
+                  style={pickerBtn(!!canAdd, 'up')}
+                  title={canAdd ? `Add one ${sq.name}` : `Garrison is full (${maxCount})`}
+                >
+                  <Plus size={13} strokeWidth={2.5} />
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })}
       {sharedTraits && (
-        <div style={{ fontSize: 10.5, color: 'var(--mute)', marginTop: 6, fontStyle: 'italic' }}>
-          All: {sharedTraits}
+        <div style={{ fontSize: 10.5, color: 'var(--mute)', marginTop: 8, lineHeight: 1.5 }}>
+          <span style={{ fontWeight: 600 }}>All: </span>
+          <TraitList traits={sharedTraits} />
         </div>
       )}
     </div>
@@ -973,7 +1038,7 @@ function OneEachPicker({ asset: a, loadout, onChange }) {
   );
 }
 
-function SubUnitPicker({ asset: a, loadout, onChange }) {
+function SubUnitPicker({ asset: a, loadout, onChange, garrisonLoadout, onSetGarrisonLoadout }) {
   // 'oneEach': each of unitCount slots picks exactly one subunit independently
   if (a.pickRule === 'oneEach') {
     return <OneEachPicker asset={a} loadout={loadout} onChange={onChange} />;
@@ -1105,7 +1170,11 @@ function SubUnitPicker({ asset: a, loadout, onChange }) {
                     <TraitList traits={su.traits} />
                   </div>
                 )}
-                <GarrisonRef traitStr={su.traits} />
+                <GarrisonRef
+                  traitStr={su.traits}
+                  garrisonLoadout={garrisonLoadout}
+                  onSetGarrisonLoadout={onSetGarrisonLoadout}
+                />
               </div>
               {onChange && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
