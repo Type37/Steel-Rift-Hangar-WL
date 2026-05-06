@@ -1143,12 +1143,13 @@ export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
               key={f}
               onClick={() => onSetFaction(f)}
               className={cls}
+              title={`${FACTIONS[f].blurb}\n\nExamples: ${FACTIONS[f].examples || ''}${FACTIONS[f].perkNote ? '\n\n' + FACTIONS[f].perkNote : ''}`}
               style={{
                 '--faction-hover-bg': `url("${asset(FACTION_HOVER_LOGO[f])}")`,
               }}
             >
               <span className="faction-tile-name">{f}</span>
-              <span className="faction-tile-blurb">{FACTIONS[f].blurb.split('.')[0]}.</span>
+              <span className="faction-tile-blurb">{FACTIONS[f].blurb}</span>
             </button>
           );
         })}
@@ -1156,9 +1157,22 @@ export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
 
       {data && (
         <>
-          <p style={{ fontSize: 13.5, color: 'var(--ink-2)', lineHeight: 1.55, margin: '0 0 12px' }}>
+          <p style={{ fontSize: 13.5, color: 'var(--ink-2)', lineHeight: 1.55, margin: '0 0 4px' }}>
             {data.blurb}
           </p>
+          {data.examples && (
+            <p style={{ fontSize: 12, color: 'var(--mute)', fontStyle: 'italic', margin: '0 0 12px', lineHeight: 1.4 }}>
+              {data.examples}
+            </p>
+          )}
+          {data.perkNote && (
+            <div style={{
+              background: 'var(--surface-2)', border: '1px solid var(--rule)',
+              padding: '8px 12px', marginBottom: 14, fontSize: 12.5, color: 'var(--ink-2)', lineHeight: 1.5,
+            }}>
+              {data.perkNote}
+            </div>
+          )}
           <div style={{
             background: 'var(--surface)',
             borderLeft: '3px solid var(--steel)',

@@ -318,7 +318,8 @@ export const POWER_SUIT_SHARED_TRAITS = 'Auxiliary Unit (Ultralight), Infantry, 
 // Pick a Faction Type, then 2 Perks (one per Grouping).
 export const FACTIONS = {
   Authorities: {
-    blurb: 'Old governments and nations of Earth, their fragments, and their imitators. The Sahel Alliance, the 67th North Horizon Corps, the Antarctic Habitation, the Knightwatch.',
+    blurb: 'Old governments and nations of Earth, their fragments, and their imitators.',
+    examples: 'The Sahel Alliance, the 67th North Horizon Corps, The Antarctic Habitation, The Knightwatch',
     agenda: 'Territorial: When checking Victory, if no enemy Units are within 10" of any of your Deployment Edges or Corners, score 1 VP.',
     perks: {
       'Old Infrastructure': [
@@ -339,7 +340,8 @@ export const FACTIONS = {
     },
   },
   Corporations: {
-    blurb: 'Economic monsters of Mars and their contractors. Visal Corporation, Helios Industries, the Echelon Group, WegMaCo, Akamatsu.',
+    blurb: 'The economic monsters of Mars, and those in their pay.',
+    examples: 'Visal Corporation, Helios Industries, The Echelon Group, WegMaCo, Akamatsu',
     agenda: 'Asset Protection: When checking Victory, if the enemy has had more overall Tonnage in Units Destroyed than you, score 1 VP.',
     perks: {
       'Espionage': [
@@ -360,7 +362,9 @@ export const FACTIONS = {
     },
   },
   Freelancers: {
-    blurb: 'Unconventional bands with unpredictable forces. Vanguard Industrial Cooperative, Dairo Mining Group, Cerberus Group, Roland\'s Reavers.',
+    blurb: 'The unconventional bands with unpredictable forces.',
+    examples: 'Vanguard Industrial Cooperative, Dairo Mining Group, Cerberus Group, Roland\'s Reavers',
+    perkNote: 'Freelancers may never select more than one Perk from each other Faction. Their Perks may allow them to select a Perk from both the Authorities and Corporations Factions, but never two Perks from the same Faction.',
     agenda: 'Wildcards: When checking Victory, if you have 2+ Wildcard Kills, score 1 VP.',
     perks: {
       'Rogue Agency': [
