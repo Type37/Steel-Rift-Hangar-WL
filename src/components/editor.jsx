@@ -223,10 +223,10 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
           fontSize: 12, color: 'var(--ink-2)', lineHeight: 1.5,
         }}>
           {cls === 'Light' && (
-            <><strong>Fragile Internals:</strong> Each point of Structure Damage — roll 1D6. On 5+, suffer 1 additional point (no further rolls).</>
+            <><strong>Fragile Internals:</strong> Whenever this Unit suffers Structure Damage, the Target Commander rolls 1D6 per point of Structure Damage lost. On a 5+, the Unit suffers one additional point of Damage. This does not trigger further Fragile Internals rolls.</>
           )}
           {cls === 'Ultraheavy' && (
-            <><strong>Backup Systems Engage:</strong> Each point of Structure Damage — roll 1D6. On 5+, that point is ignored (Structure not reduced).</>
+            <><strong>Backup Systems Engage:</strong> Whenever this Unit suffers Structure Damage, the Target Commander rolls 1D6 per point of Structure Damage lost. On a 5+, a point of Damage is ignored and the Structure is not reduced.</>
           )}
         </div>
       )}

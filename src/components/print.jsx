@@ -281,7 +281,7 @@ function HEVCard({ mech, index }) {
       )}
       {cls === 'Light' && (
         <div className="card-upgrades-list" style={{ fontSize: '6pt', lineHeight: 1.4 }}>
-          Each point of Structure Damage: roll 1D6. On 5+, suffer 1 additional Damage (no further rolls).
+          Roll 1D6 per point of Structure Damage lost. On 5+, suffer 1 additional point of Damage. This does not trigger further Fragile Internals rolls.
         </div>
       )}
 
@@ -291,7 +291,7 @@ function HEVCard({ mech, index }) {
       )}
       {cls === 'Ultraheavy' && (
         <div className="card-upgrades-list" style={{ fontSize: '6pt', lineHeight: 1.4 }}>
-          Each point of Structure Damage: roll 1D6. On 5+, that point is ignored (Structure not reduced).
+          Roll 1D6 per point of Structure Damage lost. On 5+, a point of Damage is ignored and the Structure is not reduced.
         </div>
       )}
     </div>
