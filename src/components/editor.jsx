@@ -238,14 +238,19 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
           <span style={{ display: 'inline-flex', gap: 3, alignItems: 'center' }}>
             {Array.from({ length: stats.capSlots }).map((_, i) => (
               <span key={i} style={{
-                width: 10, height: 10,
-                borderRadius: 2,
+                width: 8, height: 8,
+                borderRadius: '50%',
                 background: i < stats.totalSlotsUsed
-                  ? (stats.overSlots ? 'var(--rust)' : 'var(--ink)')
+                  ? (stats.overSlots ? 'var(--rust)' : 'var(--teal)')
                   : 'transparent',
-                border: `1.5px solid ${stats.overSlots && i < stats.totalSlotsUsed ? 'var(--rust)' : 'var(--rule-strong)'}`,
+                border: `1.5px solid ${
+                  i < stats.totalSlotsUsed
+                    ? (stats.overSlots ? 'var(--rust)' : 'var(--teal)')
+                    : 'var(--rule-strong)'
+                }`,
                 flexShrink: 0,
                 display: 'inline-block',
+                opacity: i < stats.totalSlotsUsed ? 0.85 : 0.45,
               }} />
             ))}
           </span>
@@ -912,17 +917,17 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand, onAssignDrone
 
 
       {/* Drone assignment: show target picker when this drone is equipped */}
-      {eq && upgrade.drone && onAssignDrone && (() => {
+      {eq && def.drone && onAssignDrone && (() => {
         const drones = mech.drones || {};
-        const assigned = drones[upgrade.name] || '';
+        const assigned = drones[def.name] || '';
         // Build list of eligible targets
-        const isMineDirector = upgrade.name.includes('Mine Director');
+        const isMineDirector = def.name.includes('Mine Director');
         const eligibleWeapons = isMineDirector
           ? mech.upgrades.filter(n => n === 'Mine Drone Carrier System')
           : mech.weapons.map(w => w.name);
         const eligibleUpgrades = isMineDirector
           ? []
-          : mech.upgrades.filter(n => n !== upgrade.name && !(['Targeting Support Drone','Tactical Awareness Drone','Mine Director Drone'].includes(n)));
+          : mech.upgrades.filter(n => n !== def.name && !(['Targeting Support Drone','Tactical Awareness Drone','Mine Director Drone'].includes(n)));
         const options = [...eligibleWeapons, ...eligibleUpgrades];
         return (
           <div style={{
@@ -936,7 +941,7 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand, onAssignDrone
             </span>
             <select
               value={assigned}
-              onChange={e => onAssignDrone(upgrade.name, e.target.value || null)}
+              onChange={e => onAssignDrone && onAssignDrone(def.name, e.target.value || null)}
               style={{
                 fontFamily: 'var(--font-display)',
                 fontSize: 13, padding: '4px 8px',
@@ -1057,17 +1062,17 @@ function DefRow({ def, mech, onToggle, atLimit, expanded, onExpand }) {
       </div>
 
       {/* Drone assignment: show target picker when this drone is equipped */}
-      {eq && upgrade.drone && onAssignDrone && (() => {
+      {eq && def.drone && onAssignDrone && (() => {
         const drones = mech.drones || {};
-        const assigned = drones[upgrade.name] || '';
+        const assigned = drones[def.name] || '';
         // Build list of eligible targets
-        const isMineDirector = upgrade.name.includes('Mine Director');
+        const isMineDirector = def.name.includes('Mine Director');
         const eligibleWeapons = isMineDirector
           ? mech.upgrades.filter(n => n === 'Mine Drone Carrier System')
           : mech.weapons.map(w => w.name);
         const eligibleUpgrades = isMineDirector
           ? []
-          : mech.upgrades.filter(n => n !== upgrade.name && !(['Targeting Support Drone','Tactical Awareness Drone','Mine Director Drone'].includes(n)));
+          : mech.upgrades.filter(n => n !== def.name && !(['Targeting Support Drone','Tactical Awareness Drone','Mine Director Drone'].includes(n)));
         const options = [...eligibleWeapons, ...eligibleUpgrades];
         return (
           <div style={{
@@ -1081,7 +1086,7 @@ function DefRow({ def, mech, onToggle, atLimit, expanded, onExpand }) {
             </span>
             <select
               value={assigned}
-              onChange={e => onAssignDrone(upgrade.name, e.target.value || null)}
+              onChange={e => onAssignDrone && onAssignDrone(def.name, e.target.value || null)}
               style={{
                 fontFamily: 'var(--font-display)',
                 fontSize: 13, padding: '4px 8px',
