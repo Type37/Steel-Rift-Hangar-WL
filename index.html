@@ -48,6 +48,26 @@
     @keyframes ls-pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
     #loading-screen .ls-sub { animation: ls-pulse 1.6s ease-in-out infinite; }
   </style>
+  <script>
+    window.addEventListener('error', function(e) {
+      var el = document.getElementById('loading-screen');
+      if (el) {
+        var msg = document.createElement('div');
+        msg.style.cssText = 'color:#a8330c;font-family:monospace;font-size:12px;max-width:90vw;word-break:break-all;padding:16px;text-align:left;';
+        msg.textContent = 'JS Error: ' + (e.message || 'unknown') + ' @ ' + (e.filename || '') + ':' + e.lineno;
+        el.appendChild(msg);
+      }
+    });
+    window.addEventListener('unhandledrejection', function(e) {
+      var el = document.getElementById('loading-screen');
+      if (el) {
+        var msg = document.createElement('div');
+        msg.style.cssText = 'color:#a8330c;font-family:monospace;font-size:12px;max-width:90vw;word-break:break-all;padding:16px;text-align:left;';
+        msg.textContent = 'Unhandled promise: ' + (e.reason || 'unknown');
+        el.appendChild(msg);
+      }
+    });
+  </script>
   <div id="loading-screen">
     <img src="./steel-rift-logo.svg" alt="Steel Rift" />
     <span class="ls-sub">The Forge · Loading</span>
