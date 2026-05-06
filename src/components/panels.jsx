@@ -26,7 +26,8 @@ const TEAM_ICONS = {
   'Multirole Team':         'icons/team-multirole.svg',
   'Gunslinger Team':        'icons/team-gunslinger.svg',
   'Fire Support Team':      'icons/team-fire-support.svg',
-  'Coordinated Assets Team':'icons/team-coordinated-assets.svg',
+  'Networked AI Team':       'icons/team-networked-ai.svg',
+  'Coordinated Assets Team': 'icons/team-coordinated-assets.svg',
 };
 
 // ============================================================

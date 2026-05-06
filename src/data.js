@@ -584,6 +584,30 @@ export const TEAMS = [
     agenda: 'Fire for Effect: When checking for Victory, if 2 or more enemy HE-Vs have been Destroyed by a Weapon on a member of this team actively using the Smart Trait for Line of Sight, score 1 VP.',
   },
   {
+    name: 'Networked AI Team', band: '2-3',
+    blurb: 'Inter-networked Companion Drones that share their benefits across the team.',
+    req: [
+      { cls: 'Light',      min: 0, max: 2, needs: ['Targeting Support Drone', 'Tactical Awareness Drone', 'Mine Director Drone'], needsAny: true },
+      { cls: 'Medium',     min: 1, max: 2, needs: ['Targeting Support Drone', 'Tactical Awareness Drone', 'Mine Director Drone'], needsAny: true },
+      { cls: 'Heavy',      min: 1, max: 2, needs: ['Targeting Support Drone', 'Tactical Awareness Drone', 'Mine Director Drone'], needsAny: true },
+      { cls: 'Ultraheavy', min: 0, max: 1, needs: ['Targeting Support Drone', 'Tactical Awareness Drone', 'Mine Director Drone'], needsAny: true },
+    ],
+    benefits: 'At 2+: All Companion Drones may be taken more than once per HE-V (ignore Compact limit); no Weapon/Upgrade may have more than one Drone. At 3+: Shared Weapon/Upgrade gets benefits of all matching Drones in team. At 4: ENGAGE arc bonuses can use any team member in LoS within 12".',
+    benefitsList: [
+      { gate: '2+', items: [
+        'All Companion Drones may be taken more than once on each member HE-V (ignore the restriction on the number of Compact upgrades).',
+        'No Weapon or Upgrade on an HE-V may be assigned more than one Companion Drone.',
+      ] },
+      { gate: '3+', items: [
+        'If a Weapon or Upgrade on this HE-V is assigned to a Companion Drone, and any other member of this team has the same Weapon or Upgrade assigned to a Companion Drone, this Weapon or Upgrade receives the benefit of all Companion Drones assigned to the same Weapon or Upgrade in this team.',
+      ] },
+      { gate: '4', items: [
+        'When a member of this team performs an ENGAGE Order, if another member of this team has LoS to the Target, and is within 12" of the Active Unit, the Active Unit may be counted as in either member\'s position for the purposes of determining Side or Rear modifiers for that ENGAGE Order.',
+      ] },
+    ],
+    agenda: 'Expand the Network: When checking for Victory, if a) at least 2 member Units of the team are not Destroyed and b) each remaining member of the team is in a different quarter of the Mission Area, score 1 VP.',
+  },
+  {
     name: 'Coordinated Assets Team', band: '3-4',
     blurb: 'HE-Vs and Support Assets training together.',
     req: [
