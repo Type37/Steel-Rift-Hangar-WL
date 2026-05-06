@@ -1292,7 +1292,9 @@ button:not(:disabled):active {
 
 /* Phones: trim chrome so the middle has more room */
 @media (max-width: 760px) {
-  body { font-size: 15px; }
+  /* Scale everything down slightly on phones */
+  body { font-size: 14px; }
+  html { font-size: 14px; }
 
   /* Compact navbar: hide link list to keep header short. */
   .navbar-inner {
@@ -1324,6 +1326,11 @@ button:not(:disabled):active {
   }
   .bottombar-force-input input { font-size: 15px !important; }
   .util-btn { padding: 5px 8px; font-size: 10.5px; }
+
+  /* Tighten editor spacing */
+  .workshop-tab { font-size: 11px; padding: 9px 10px; }
+  .workshop-content { padding: 12px 10px; }
+  .section-title { font-size: 11px; }
   .util-label { display: none; }
   .bottombar-add-mech, .bottombar-add-support {
   min-height: 36px;

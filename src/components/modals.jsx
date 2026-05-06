@@ -93,17 +93,18 @@ export function AddMechModal({ open, onClose, onConfirm, callsignPool: callsignP
           <div style={{ background: 'var(--surface-2)', border: '1px solid var(--rule)',
             borderTop: 'none', padding: '10px 14px 12px', marginBottom: 6 }}>
             <div className="label" style={{ fontSize: 10, marginBottom: 8 }}>CALLSIGN POOLS</div>
-            {[...POOL_NAMES, 'Custom'].map(p => {
+            {POOL_NAMES.map(p => {
               const on = callsignPools.includes(p);
               return (
                 <label key={p} style={{ display: 'flex', alignItems: 'center', gap: 8,
                   cursor: 'pointer', fontSize: 13, color: 'var(--ink)', marginBottom: 4 }}>
                   <input type="checkbox" checked={on}
-                    onChange={() => {
+                    onChange={e => {
+                      e.stopPropagation();
                       const next = on ? callsignPools.filter(x => x !== p) : [...callsignPools, p];
                       if (next.length > 0 && setCallsignPool) setCallsignPool(next);
                     }}
-                    style={{ accentColor: 'var(--rust)', cursor: 'pointer' }} />
+                    style={{ accentColor: 'var(--rust)', cursor: 'pointer', width: 16, height: 16 }} />
                   {p}
                 </label>
               );
