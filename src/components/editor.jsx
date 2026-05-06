@@ -234,7 +234,22 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
 
       {/* Catalog tabs */}
       <div style={{ marginTop: 28 }}>
-        <SectionTitle tag={`${stats.totalSlotsUsed}/${stats.capSlots} slots used`}>
+        <SectionTitle tag={
+          <span style={{ display: 'inline-flex', gap: 3, alignItems: 'center' }}>
+            {Array.from({ length: stats.capSlots }).map((_, i) => (
+              <span key={i} style={{
+                width: 10, height: 10,
+                borderRadius: 2,
+                background: i < stats.totalSlotsUsed
+                  ? (stats.overSlots ? 'var(--rust)' : 'var(--ink)')
+                  : 'transparent',
+                border: `1.5px solid ${stats.overSlots && i < stats.totalSlotsUsed ? 'var(--rust)' : 'var(--rule-strong)'}`,
+                flexShrink: 0,
+                display: 'inline-block',
+              }} />
+            ))}
+          </span>
+        }>
           Loadout
         </SectionTitle>
         <div style={{ display: 'flex', gap: 4 }}>
@@ -371,22 +386,7 @@ function TonBreakdown({ stats, cls, wc }) {
           </span>
         </span>
       </div>
-      <div style={{
-        height: 16, background: 'var(--surface-2)',
-        border: '1.5px solid var(--rule-strong)', position: 'relative',
-      }}>
-        <div style={{
-          position: 'absolute', inset: 0, width: `${pct}%`,
-          background: stats.overTons ? 'var(--rust)' : 'var(--olive)',
-          transition: 'width 180ms ease-out',
-        }} />
-        {[0.25, 0.5, 0.75].map(p => (
-          <div key={p} style={{
-            position: 'absolute', top: 0, bottom: 0, left: `${p * 100}%`,
-            width: 1, background: 'rgba(0,0,0,0.18)',
-          }} />
-        ))}
-      </div>
+
       <div className="ton-breakdown" style={{
         marginTop: 10, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)',
         borderTop: '1px solid var(--rule)', borderBottom: '1px solid var(--rule)',

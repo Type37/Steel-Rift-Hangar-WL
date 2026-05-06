@@ -43,7 +43,8 @@ export const calcMech = (m) => {
     const def = findWeapon(w.name);
     if (!def) return;
     weaponsTons += totalWeaponCost(def, m.weightClass, w.count);
-    weaponsSlots += w.count;
+    const slotsPerCopy = def.traits && def.traits.toLowerCase().includes('bulky') ? 2 : 1;
+    weaponsSlots += w.count * slotsPerCopy;
   });
   let upgradesTons = 0, upgradesSlots = 0;
   m.upgrades.forEach(uName => {
