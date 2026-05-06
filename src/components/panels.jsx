@@ -772,9 +772,11 @@ export function SupportDetailView({ assetName, customName, loadout, onSetLoadout
         {a.summary}
       </div>
 
-      <div style={{ fontSize: 14, color: 'var(--ink)', lineHeight: 1.6, marginBottom: 18 }}>
-        {a.fullDesc}
-      </div>
+      {a.fullDesc && (
+        <div style={{ fontSize: 13.5, color: 'var(--ink-2)', lineHeight: 1.65, marginBottom: 18 }}>
+          {a.fullDesc}
+        </div>
+      )}
 
       {a.subunits && a.subunits.length > 0 && (
         <SubUnitPicker
@@ -803,8 +805,8 @@ export function SupportDetailView({ assetName, customName, loadout, onSetLoadout
           {Object.entries(a.stats).map(([k, v]) => (
             <div key={k} style={{ display: 'flex', gap: 8, alignItems: 'baseline', flexWrap: 'wrap' }}>
               <span className="label" style={{ fontSize: 10, flexShrink: 0 }}>{k}</span>
-              <span style={{ fontFamily: /Per|Stat|SPD|ARM|STR/i.test(k) ? 'var(--font-body)' : 'var(--font-body)' }}>
-                {/Trait/i.test(k) ? <TraitList traits={v} /> : v}
+              <span>
+                {/Trait|All models|Per model/i.test(k) ? <TraitList traits={v} /> : v}
               </span>
             </div>
           ))}
@@ -1166,8 +1168,9 @@ function SubUnitPicker({ asset: a, loadout, onChange, garrisonLoadout, onSetGarr
                       <div key={wi} style={{ display: 'flex', gap: 6, alignItems: 'baseline', flexWrap: 'wrap', marginBottom: 2 }}>
                         <span style={{ fontSize: 12.5, color: 'var(--ink-2)', fontWeight: 600 }}>{wname}</span>
                         {wdef && (
-                          <span style={{ fontSize: 11, color: 'var(--mute)' }}>
-                            DMG {wdef.dmg} · {wdef.traits}
+                          <span style={{ fontSize: 11, color: 'var(--mute)', display: 'inline-flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+                            <span>DMG {wdef.dmg}</span>
+                            <TraitList traits={wdef.traits} />
                           </span>
                         )}
                       </div>
