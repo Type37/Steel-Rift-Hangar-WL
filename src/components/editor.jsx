@@ -270,29 +270,33 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
               { id: 'defensive', label: 'Defensive', count: defCount, noSlots: true },
               { id: 'motive', label: 'Motive', count: motiveEquipped, noSlots: true },
             ];
-            return tabs.map(t => (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              className="add-btn"
-              style={{
-                background: tab === t.id
-                  ? (t.noSlots ? 'var(--steel)' : 'var(--ink)')
-                  : 'transparent',
-                color: tab === t.id ? 'var(--surface)' : (t.noSlots ? 'var(--steel)' : 'var(--ink)'),
-                border: t.noSlots ? (tab === t.id ? 'none' : '1px dashed var(--steel)') : 'none',
-                padding: '9px 12px',
-                fontFamily: 'var(--font-stencil)',
-                fontSize: 12,
-                fontWeight: 700,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                cursor: 'pointer',
-              }}
-            >
-              {t.label}{t.count > 0 ? ` (${t.count})` : ''}
-            </button>
-          ));
+            return tabs.map(t => {
+              const active = tab === t.id;
+              const accent = t.noSlots ? 'var(--teal)' : 'var(--rust)';
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => setTab(t.id)}
+                  className="add-btn"
+                  style={{
+                    background: active ? accent : 'var(--surface)',
+                    color: active ? 'var(--surface)' : (t.noSlots ? 'var(--teal)' : 'var(--ink)'),
+                    border: `1.5px solid ${active ? accent : (t.noSlots ? 'var(--teal)' : 'var(--rule-strong)')}`,
+                    padding: '7px 11px',
+                    fontFamily: 'var(--font-stencil)',
+                    fontSize: 12,
+                    fontWeight: 700,
+                    letterSpacing: '0.10em',
+                    textTransform: 'uppercase',
+                    cursor: 'pointer',
+                    transition: 'background 100ms, color 100ms',
+                    flexShrink: 0,
+                  }}
+                >
+                  {t.label}{t.count > 0 ? ` (${t.count})` : ''}
+                </button>
+              );
+            });
           })()}
         </div>
 
