@@ -165,13 +165,19 @@ const checkMechAgainstReq = (m, req) => {
   return true;
 };
 
-export const checkTeamEligibility = (team, mechs) => {
+const SUPPORT_TEAM_SLOTS = ['UL HE-V or Assault Vehicle Squadron'];
+const SUPPORT_SLOT_NAMES = ['UL HE-V Squadron', 'Assault Vehicle Squadron'];
+
+export const checkTeamEligibility = (team, mechs, supportAssets = []) => {
   let totalEligible = 0;
   let minsMet = true;
   const perReq = team.req.map(req => {
     if (req.cls === 'UL HE-V or Assault Vehicle Squadron') {
-      // Not modeled in detail; flag as 0 and skip the min check
-      return { req, count: 0 };
+      const matching = supportAssets.filter(n => SUPPORT_SLOT_NAMES.includes(n));
+      const count = Math.min(matching.length, req.max);
+      totalEligible += count;
+      if (req.min > 0 && matching.length < req.min) minsMet = false;
+      return { req, count, total: matching.length, supportSlot: true };
     }
     let matching;
     if (req.cls === 'Any HE-V') {

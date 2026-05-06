@@ -208,7 +208,7 @@ export function TeamPanel({
   supportNicknames = {},
 }) {
   const slotsRemaining = slotsForBand(mission, selectedTeams, TEAMS);
-  const results = TEAMS.map(t => ({ t, ...checkTeamEligibility(t, mechs) }));
+  const results = TEAMS.map(t => ({ t, ...checkTeamEligibility(t, mechs, supportAssets) }));
 
   return (
     <div>
@@ -556,7 +556,9 @@ function AssignmentStrip({
     return () => document.removeEventListener('mousedown', close);
   }, [pickerOpen]);
 
-  // Available units: every HE-V + support that is NOT already on this team.
+  // Available units: HE-Vs always eligible; support assets only if team has a support slot req.
+  const SUPPORT_SLOT_NAMES = ['UL HE-V Squadron', 'Assault Vehicle Squadron'];
+  const teamHasSupportSlot = team.req.some(r => r.cls === 'UL HE-V or Assault Vehicle Squadron');
   const candidates = [];
   mechs.forEach(m => {
     const id = `hev:${m.id}`;
@@ -570,16 +572,19 @@ function AssignmentStrip({
       });
     }
   });
-  supportAssets.forEach(name => {
-    const id = `support:${name}`;
-    if (!assignedIds.includes(id)) {
-      candidates.push({
-        id,
-        label: supportNicknames[name] || name,
-        kind: 'support',
-      });
-    }
-  });
+  if (teamHasSupportSlot) {
+    supportAssets.forEach(name => {
+      if (!SUPPORT_SLOT_NAMES.includes(name)) return;
+      const id = `support:${name}`;
+      if (!assignedIds.includes(id)) {
+        candidates.push({
+          id,
+          label: supportNicknames[name] || name,
+          kind: 'support',
+        });
+      }
+    });
+  }
 
   return (
     <div style={{
@@ -696,7 +701,7 @@ function AssignmentStrip({
                 letterSpacing: '0.06em', textTransform: 'uppercase',
                 flexShrink: 0,
               }}>
-                {c.kind === 'hev' ? (c.cls || 'HE-V') : 'SUPP'}
+                {c.kind === 'hev' ? (c.cls || 'HE-V') : 'ASSET'}
               </span>
               <span style={{ flex: 1 }}>{c.label}</span>
               {c.tons && <span style={{ fontSize: 10.5, color: 'var(--mute)' }}>{c.tons}t</span>}
