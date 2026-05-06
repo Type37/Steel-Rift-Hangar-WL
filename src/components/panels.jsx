@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Check, Plus, Minus } from 'lucide-react';
-import { OFF_TABLE_ASSETS, ADVANCED_ASSETS, FACTIONS, FACTION_LOGOS, TEAMS, VEHICLE_WEAPONS, INFANTRY_SQUADS, INFANTRY_SHARED_TRAITS, POWER_SUIT_SQUADS, POWER_SUIT_SHARED_TRAITS } from '../data';
+import { OFF_TABLE_ASSETS, ADVANCED_ASSETS, FACTIONS, FACTION_LOGOS, TEAMS, VEHICLE_WEAPONS, INFANTRY_SQUADS, INFANTRY_SHARED_TRAITS, POWER_SUIT_SQUADS, POWER_SUIT_SHARED_TRAITS, UNIVERSAL_AGENDAS } from '../data';
 import { checkTeamEligibility, slotsForBand, findAsset } from '../calc';
 import { SectionTitle, Chip, TextButton, TraitList, RowExpand, InlineTraitGlossary, collectTraits } from './ui';
 import { Tooltip } from './tooltip';
@@ -906,7 +906,78 @@ function GarrisonRef({ traitStr }) {
   );
 }
 
+
+// One-each picker: N independent slots, each picking exactly one option from the subunit list.
+// Used for Infantry Outpost (2 bunkers, each picks 1 weapon).
+function OneEachPicker({ asset: a, loadout, onChange }) {
+  const slots = a.unitCount || 2;
+  // loadout is [{slot, name}] or just names[] for backward compat
+  const getSlot = (i) => {
+    if (!loadout) return '';
+    if (Array.isArray(loadout) && typeof loadout[0] === 'object') {
+      return loadout.find(x => x.slot === i)?.name || '';
+    }
+    return loadout[i] || '';
+  };
+  const setSlot = (i, name) => {
+    const next = Array.from({ length: slots }, (_, idx) => ({
+      slot: idx, name: idx === i ? name : getSlot(idx),
+    }));
+    if (onChange) onChange(next.map(x => x.name));
+  };
+  return (
+    <div style={{ border: '1px solid var(--rule)', marginTop: 6 }}>
+      {Array.from({ length: slots }).map((_, i) => {
+        const selected = getSlot(i);
+        return (
+          <div key={i} style={{
+            padding: '10px 12px',
+            borderBottom: i < slots - 1 ? '1px solid var(--rule)' : 'none',
+          }}>
+            <div style={{ fontSize: 11, color: 'var(--mute)', marginBottom: 6, letterSpacing: '0.06em' }}>
+              BUNKER {i + 1} WEAPON
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {a.subunits.map(su => {
+                const isSel = selected === su.name;
+                return (
+                  <button
+                    key={su.name}
+                    onClick={() => onChange && setSlot(i, su.name)}
+                    style={{
+                      display: 'flex', alignItems: 'baseline', gap: 10,
+                      padding: '6px 10px',
+                      background: isSel ? 'var(--surface-2)' : 'transparent',
+                      border: `1px solid ${isSel ? 'var(--rust)' : 'var(--rule)'}`,
+                      cursor: onChange ? 'pointer' : 'default',
+                      textAlign: 'left',
+                    }}
+                  >
+                    <span style={{
+                      width: 12, height: 12, borderRadius: '50%', flexShrink: 0,
+                      border: `2px solid ${isSel ? 'var(--rust)' : 'var(--rule-strong)'}`,
+                      background: isSel ? 'var(--rust)' : 'transparent',
+                    }} />
+                    <span style={{ fontWeight: 600, fontSize: 13 }}>{su.weapons}</span>
+                    {su.traits && su.traits !== '—' && (
+                      <span style={{ fontSize: 11, color: 'var(--mute)' }}>{su.traits}</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function SubUnitPicker({ asset: a, loadout, onChange }) {
+  // 'oneEach': each of unitCount slots picks exactly one subunit independently
+  if (a.pickRule === 'oneEach') {
+    return <OneEachPicker asset={a} loadout={loadout} onChange={onChange} />;
+  }
   const counts = loadout.reduce((acc, n) => { acc[n] = (acc[n] || 0) + 1; return acc; }, {});
   const total = loadout.length;
   const target = a.unitCount;
@@ -1189,6 +1260,26 @@ export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
             <div style={{ fontSize: 13, color: 'var(--ink)', lineHeight: 1.55 }}>
               {data.agenda}
             </div>
+          </div>
+
+          {/* Universal Secondary Agendas */}
+          <div style={{
+            background: 'var(--surface)',
+            borderLeft: '3px solid var(--olive)',
+            padding: '10px 14px',
+            marginBottom: 18,
+          }}>
+            <div className="label" style={{ marginBottom: 6 }}>Universal Secondary Agendas</div>
+            <div style={{ fontSize: 12, color: 'var(--mute)', marginBottom: 8, lineHeight: 1.5 }}>
+              Available to any Force meeting the requirement, regardless of Faction.
+            </div>
+            {UNIVERSAL_AGENDAS.map(a => (
+              <div key={a.name} style={{ marginBottom: 10 }}>
+                <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--ink)', marginBottom: 2 }}>{a.name}</div>
+                <div style={{ fontSize: 11.5, color: 'var(--mute)', fontStyle: 'italic', marginBottom: 2 }}>{a.req}</div>
+                <div style={{ fontSize: 12.5, color: 'var(--ink-2)', lineHeight: 1.55 }}>{a.text}</div>
+              </div>
+            ))}
           </div>
 
           {/* Logo upload moved to Options. */}

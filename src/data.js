@@ -412,6 +412,30 @@ export const FACTION_LOGOS = {
   ],
 };
 
+
+// ---- Universal Secondary Agendas (p.45) ----
+export const UNIVERSAL_AGENDAS = [
+  {
+    name: 'Stalkers',
+    req: 'Two or more Light HE-Vs in your Force.',
+    text: 'Every time a Light HE-V Destroys an HE-V or Unit with the Fortification trait, mark a Kill. If Light HE-Vs you control have earned 2 or more Kills when you check for Victory, and at least one of your Light HE-Vs is not Destroyed, score 1 VP.',
+  },
+  {
+    name: 'Brawlers',
+    req: 'Two or more Medium HE-Vs in your Force.',
+    text: 'Every time a Medium HE-V Destroys an HE-V or Unit with the Fortification trait, mark a Kill. If Medium HE-Vs you control have earned 3 or more Kills when you check for Victory, and at least one of your Medium HE-Vs is not Destroyed, score 1 VP.',
+  },
+  {
+    name: 'Enforcers',
+    req: 'Two or more Heavy HE-Vs in your Force.',
+    text: 'Every time a Heavy HE-V Destroys an HE-V or Unit with the Fortification trait, mark a Kill. If Heavy HE-Vs you control have earned 3 or more Kills when you check for Victory, and at least one of your Heavy HE-Vs is not Destroyed, score 1 VP.',
+  },
+  {
+    name: 'Titan-Killers',
+    req: "Opponent's Force contains two or more Heavy HE-Vs or at least one Ultraheavy HE-V.",
+    text: "Every time an HE-V in your force of a Class Medium or smaller Destroys a Heavy HE-V, mark a Kill. Every time an HE-V in your Force of a Class Heavy or smaller destroys an Ultraheavy HE-V, mark two Kills. If your force has earned 2 or more Kills when you check for Victory and there are any HE-Vs you control of a Class smaller than Heavy or Ultraheavy that are not Destroyed, score 1 VP.",
+  },
+];
 // ---- HE-V Teams (p. 50-61) ----
 // `band` is which mission team-count slot it consumes: '2', '2-3', or '3-4'.
 export const TEAMS = [
@@ -425,14 +449,17 @@ export const TEAMS = [
     ],
     benefits: 'At 2+: Lights ignore slot for Electronic Countermeasures. At 3+: Off-Table Assets +1 Damage Rating; Lights\' Target Designators are slot-free. At 4: TD and ECM cost 0; one Medium/Heavy gains Guidance Suite (MOVE) once per turn.',
     benefitsList: [
-      { gate: '2+', items: ['Lights ignore the slot cost for Electronic Countermeasures'] },
+      { gate: '2+', items: [
+        'LIGHT: Electronic Countermeasures do not use an Upgrade Slot.',
+        'MEDIUM/HEAVY: If one or more Medium or Heavy HE-V from this Team is within 18\" of an enemy Deployment Edge or Corner, you gain +1 to the Initiative Roll.',
+      ] },
       { gate: '3+', items: [
-        'Off-Table Support Assets gain +1 Damage Rating',
-        'Lights\' Target Designators are slot-free',
+        'ALL: Off-Table Support Assets gain +1 to their Damage Rating.',
+        'LIGHT: Target Designators do not use an Upgrade Slot.',
       ] },
       { gate: '4', items: [
-        'Target Designator and Electronic Countermeasures cost 0',
-        'One Medium or Heavy gains Guidance Suite (MOVE) once per turn',
+        'LIGHT: Electronic Countermeasures and Target Designators have their Cost reduced to 0.',
+        'MEDIUM/HEAVY: Once per turn, a Medium or Heavy HE-V of this team counts as having the Guidance Suite (MOVE) trait. Declare use at the beginning of that HE-V\'s activation.',
       ] },
     ],
     agenda: 'Death from Above: When checking for Victory, if 2 or more enemy HE-Vs have been Destroyed while resolving an Off-Table Asset called in using a Target Designator from a Unit on this Team, score 1 VP.',
@@ -448,17 +475,17 @@ export const TEAMS = [
     benefits: 'At 2+: HE-V gets a 2nd Defensive Configuration slot; Heavy/UH count as +5 Tons for scoring. At 3+: Defensive Configs cost 0; Mediums also score +5 Tons; Heavy/UH ignore Side Arc bonuses against them. At 4: Suppressive Fire trait; Mediums ignore Side Arc bonuses.',
     benefitsList: [
       { gate: '2+', items: [
-        'Each HE-V gets a 2nd Defensive Configuration slot',
-        'Heavy and Ultraheavy count as +5 Tons for scoring objectives',
+        'ALL: This HE-V may equip an additional Defensive Configuration. This uses an Upgrade slot.',
+        'HEAVY/ULTRAHEAVY: These Units count as 5 Tons heavier for the purpose of scoring.',
       ] },
       { gate: '3+', items: [
-        'Defensive Configurations cost 0',
-        'Mediums also score as +5 Tons',
-        'Heavy and Ultraheavy ignore Side Arc attack bonuses against them',
+        'ALL: Defensive Configuration Upgrades have their cost reduced to 0.',
+        'MEDIUM: These Units count as 5 Tons heavier for the purpose of the scoring.',
+        'HEAVY/ULTRAHEAVY: Enemy Units do not gain bonuses to their Attack Pool for Side Arcs.',
       ] },
       { gate: '4', items: [
-        'Team gains the Suppressive Fire trait',
-        'Mediums also ignore Side Arc attack bonuses',
+        'ALL: This HE-V has the Suppressive Fire trait.',
+        'MEDIUM: Enemy Units do not gain bonuses to their Attack Pool for Side Arcs.',
       ] },
     ],
     agenda: 'Don\'t Give an Inch: When checking for Victory, if there are more friendly HE-Vs than Enemy HE-Vs within 12" of your Deployment Corners or Edge, score 1 VP. In the case of multiple Corners, there must be a friendly HE-V in range of all of them for this Agenda to be scored.',
@@ -481,8 +508,8 @@ export const TEAMS = [
         'Lights\' Directional Thrusters are slot-free',
       ] },
       { gate: '4', items: [
-        'SMASH-interrupt: react to enemy MOVE with a SMASH Order',
-        'Mediums\' Directional Thrusters are slot-free',
+        'ALL: When Targeted by an ENGAGE or SMASH Order, an HE-V in this Team without an Activation Marker may gain an Activation Marker to interrupt and perform a SMASH Order. Once that SMASH Order is complete, finish the interrupted Order.',
+        'MEDIUM: Directional Thrusters do not take up an Upgrade Slot.',
       ] },
     ],
     agenda: 'Target Eliminated: When checking for Victory, if the heaviest HE-V deployed by the opposing Commander has been Destroyed by a member of this Team, score 1 VP. If the enemy Commander has multiple HE-Vs in that size class, select one and note that after Forces are Deployed.',
