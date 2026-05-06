@@ -232,31 +232,50 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
       )}
 
 
-      {/* Catalog tabs */}
-      <div style={{ marginTop: 28 }}>
-        <SectionTitle tag={
-          <span style={{ display: 'inline-flex', gap: 3, alignItems: 'center' }}>
+      {/* Cart summary */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 6, margin: '20px 0 0' }}>
+        <div style={{
+          background: 'var(--surface)', border: '1px solid var(--rule)',
+          padding: '10px 14px',
+        }}>
+          <div className="label" style={{ fontSize: 10, marginBottom: 4, letterSpacing: '0.14em' }}>TONNAGE REMAINING</div>
+          <div className="mono" style={{
+            fontSize: 28, fontWeight: 700, lineHeight: 1,
+            color: stats.overTons ? 'var(--rust)' : 'var(--ink)',
+          }}>
+            {stats.capTons - stats.totalUsed}t
+          </div>
+        </div>
+        <div style={{
+          background: 'var(--surface)', border: '1px solid var(--rule)',
+          padding: '10px 14px', minWidth: 100,
+        }}>
+          <div className="label" style={{ fontSize: 10, marginBottom: 6, letterSpacing: '0.14em' }}>SLOTS</div>
+          <div style={{ display: 'flex', gap: 3, marginBottom: 4 }}>
             {Array.from({ length: stats.capSlots }).map((_, i) => (
               <span key={i} style={{
-                width: 8, height: 8,
-                borderRadius: '50%',
+                width: 10, height: 10, borderRadius: '50%', display: 'inline-block',
                 background: i < stats.totalSlotsUsed
                   ? (stats.overSlots ? 'var(--rust)' : 'var(--teal)')
                   : 'transparent',
-                border: `1.5px solid ${
-                  i < stats.totalSlotsUsed
-                    ? (stats.overSlots ? 'var(--rust)' : 'var(--teal)')
-                    : 'var(--rule-strong)'
-                }`,
-                flexShrink: 0,
-                display: 'inline-block',
-                opacity: i < stats.totalSlotsUsed ? 0.85 : 0.45,
+                border: `1.5px solid ${i < stats.totalSlotsUsed
+                  ? (stats.overSlots ? 'var(--rust)' : 'var(--teal)')
+                  : 'var(--rule-strong)'}`,
+                opacity: i < stats.totalSlotsUsed ? 0.9 : 0.4,
               }} />
             ))}
-          </span>
-        }>
-          Loadout
-        </SectionTitle>
+          </div>
+          <div className="mono" style={{ fontSize: 11, color: stats.overSlots ? 'var(--rust)' : 'var(--mute)' }}>
+            {stats.overSlots
+              ? `${stats.totalSlotsUsed - stats.capSlots} over`
+              : `${stats.capSlots - stats.totalSlotsUsed} of ${stats.capSlots} free`}
+          </div>
+        </div>
+      </div>
+
+      {/* Catalog tabs */}
+      <div style={{ marginTop: 16 }}>
+        <SectionTitle>Loadout</SectionTitle>
         <div style={{ display: 'flex', gap: 4 }}>
           {(() => {
             const defCount = mech.defensive.length;
@@ -713,30 +732,49 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
           </div>
         </div>
 
-        {/* Cost table — aligned with +/- controls */}
-        {available && (
-          <div style={{
-            display: 'grid', gridTemplateColumns: 'repeat(4, auto)',
-            columnGap: 6, alignItems: 'end',
-            background: 'var(--surface-2)', border: '1px solid var(--rule)',
-            padding: '2px 6px', flexShrink: 0,
-          }}>
-            {weapon.cost.map((v, i) => (
-              <span key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <span style={{ fontSize: 9, color: 'var(--mute)', letterSpacing: '0.06em', fontFamily: 'var(--font-body)' }}>
-                  {WC_ABBR[i]}
-                </span>
-                <span style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: i === WC_IDX[cls] ? 15 : 11,
-                  fontWeight: 700,
-                  color: i === WC_IDX[cls] ? 'var(--rust)' : 'var(--mute)',
-                  lineHeight: 1.1,
-                }}>{v === '-' ? '–' : `${v}t`}</span>
-              </span>
-            ))}
+        {/* Cost columns — header row + costs, active class highlighted */}
+        <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
+          {/* Column headers */}
+          <div style={{ display: 'flex', gap: 0 }}>
+            {WC_ABBR.map((abbr, i) => {
+              const v = weapon.cost[i];
+              const isActive = i === WC_IDX[cls];
+              const isNA = v === '-' || v == null;
+              return (
+                <span key={i} style={{
+                  width: 32, textAlign: 'center',
+                  fontSize: 9, fontWeight: 700,
+                  letterSpacing: '0.06em',
+                  color: isActive ? 'var(--ink)' : 'var(--mute)',
+                  fontFamily: 'var(--font-body)',
+                  opacity: isNA ? 0.3 : 1,
+                }}>{abbr}</span>
+              );
+            })}
           </div>
-        )}
+          {/* Cost row */}
+          <div style={{ display: 'flex', gap: 0 }}>
+            {weapon.cost.map((v, i) => {
+              const isActive = i === WC_IDX[cls];
+              const isNA = v === '-' || v == null;
+              return (
+                <span key={i} style={{
+                  width: 32, textAlign: 'center',
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  height: 22,
+                  background: isActive && !isNA ? 'var(--rust)' : 'transparent',
+                  borderRadius: isActive ? 4 : 0,
+                  fontFamily: 'var(--font-display)',
+                  fontSize: isActive ? 13 : 12,
+                  fontWeight: 700,
+                  color: isActive && !isNA ? 'var(--surface)' : isNA ? 'var(--rule-strong)' : 'var(--mute)',
+                }}>
+                  {isNA ? '–' : `${v}t`}
+                </span>
+              );
+            })}
+          </div>
+        </div>
 
         {count > 0 ? (
           <>
