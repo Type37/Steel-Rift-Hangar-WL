@@ -9,6 +9,41 @@
 
 // Map keyword (lowercase, no parens) → definition object
 export const GLOSSARY = {
+
+  'command and control station': {
+    title: 'SUPPORT: Command and Control Station',
+    text: 'When performing the SUPPORT Order: select an HE-V and move it up to 3" immediately (once per turn per Unit). Additionally, when calculating Tonnage for any Objective, if a friendly Unit within 12" is contributing, the controlling Commander may choose to win or lose any ties.',
+  },
+  'combat supplies': {
+    title: 'SUPPORT: Combat Supplies',
+    text: 'When performing the SUPPORT Order: select one Unit within 2" and choose — restore 4 Armor to an HE-V (not above starting value), or restore one use of a Limited trait to a weapon, upgrade, or trait.',
+  },
+  'mine-drone layer': {
+    title: 'SUPPORT: Mine-Drone Layer (X)',
+    text: 'When performing the SUPPORT Order, counts as having the Minelayer (SUPPORT) trait. Limited (X).',
+  },
+  'multi-spectral obscuration emitter deployer': {
+    title: 'SUPPORT: MSOE Deployer',
+    text: 'When performing the SUPPORT Order, counts as having the MSOE Launcher (SUPPORT) trait, placing an Obscuration Emitter Token within 6". Units within 3" gain Covering Terrain and count as having Anti-Missile System and Electronic Countermeasures.',
+  },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   'anti-air': {
     title: 'Anti-Air',
     text: 'When targeting a Unit with the Flying trait, the Target is at -2 to Defense Rolls (e.g. normally avoids on 2+, now avoids on 4+). If this Weapon destroys a Model in a Flying Squadron, remaining damage may be applied to another Model in that Squadron as if it were not a Flying Squadron.',
@@ -252,10 +287,7 @@ export const GLOSSARY = {
     title: 'SUPPORT: Mine-Drone Layer (X)',
     text: 'When performing the SUPPORT Order, counts as having the Minelayer (SUPPORT) trait. Limited (X).',
   },
-  'support orders': {
-    title: 'Support Orders',
-    text: 'Units with this trait have one or more "SUPPORT:" traits. They may perform the SUPPORT Order, activating the effect of any or all SUPPORT: traits. In a Squadron, all models must perform the SUPPORT Order together; each model with a SUPPORT: trait activates it individually.',
-  },
+
   'smasher': {
     title: 'Smasher (X, Y)',
     text: 'This Unit may perform SMASH Orders even with the Auxiliary Unit Trait. It counts as Weight Class X when SMASHing and adds Y dice to the Attack Pool.',

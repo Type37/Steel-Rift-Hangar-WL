@@ -250,9 +250,9 @@ export function RowExpand({ open, onClick }) {
 }
 
 // Trait token wrapped in tooltip for definition on hover or tap
-export function TraitToken({ token }) {
-  const display = token.charAt(0).toUpperCase() + token.slice(1);
+export function TraitToken({ token, displayOverride }) {
   const def = defineToken(token);
+  const display = displayOverride || (def ? def.title : token.charAt(0).toUpperCase() + token.slice(1));
 
   if (!def) {
     // Unknown trait. Render plain text without a tooltip.
@@ -275,14 +275,13 @@ export function TraitList({ traits }) {
   return (
     <span style={{ lineHeight: 1.6 }}>
       {parts.map((part, i) => {
-        const m = part.match(/^([A-Za-z\-]+)(.*)$/);
-        if (!m) return <span key={i}>{part}{i < parts.length - 1 ? ', ' : ''}</span>;
-        const [, kw, rest] = m;
-        const tokenKey = kw.toLowerCase();
+        // Build the lookup key: full phrase minus parentheticals, lowercase
+        const displayParen = part.match(/\s*(\([^)]*\))\s*$/)?.[1] || '';
+        const phraseKey = part.replace(/\s*\([^)]*\)/g, '').replace(/"/g, '').trim().toLowerCase();
         return (
           <React.Fragment key={i}>
-            <TraitToken token={tokenKey} />
-            {rest && <span style={{ color: 'var(--ink-2)' }}>{rest}</span>}
+            <TraitToken token={phraseKey} displayOverride={part.replace(/\s*\([^)]*\)/g, '').trim()} />
+            {displayParen && <span style={{ color: 'var(--ink-2)' }}> {displayParen}</span>}
             {i < parts.length - 1 && <span style={{ color: 'var(--mute)' }}>, </span>}
           </React.Fragment>
         );
