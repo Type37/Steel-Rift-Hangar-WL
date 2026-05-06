@@ -103,11 +103,15 @@ export const resetMechToClass = (m, cls) => ({
 // Pragmatic checker: weight class, required upgrades/defensive, weapon constraints.
 // Returns counts per requirement and whether minimums are met.
 
+const clsMatch = (cls, weightClass) => {
+  if (cls === 'Any HE-V') return true;
+  if (cls === 'Medium or Heavy') return weightClass === 'Medium' || weightClass === 'Heavy';
+  if (cls === 'UL HE-V or Assault Vehicle Squadron') return false;
+  return cls === weightClass;
+};
+
 const checkMechAgainstReq = (m, req) => {
-  if (req.cls !== 'Any HE-V' && req.cls !== m.weightClass) {
-    if (req.cls === 'UL HE-V or Assault Vehicle Squadron') return false;
-    if (m.weightClass !== req.cls) return false;
-  }
+  if (!clsMatch(req.cls, m.weightClass)) return false;
 
   if (req.needs) {
     if (req.needsAny) {
@@ -183,12 +187,8 @@ export const checkTeamEligibility = (team, mechs, supportAssets = []) => {
       if (req.min > 0 && matching.length < req.min) minsMet = false;
       return { req, count, total: matching.length, supportSlot: true };
     }
-    let matching;
-    if (req.cls === 'Any HE-V') {
-      matching = mechs.filter(m => checkMechAgainstReq(m, { ...req, cls: m.weightClass }));
-    } else {
-      matching = mechs.filter(m => checkMechAgainstReq(m, req));
-    }
+    // checkMechAgainstReq now handles 'Any HE-V', 'Medium or Heavy', etc. via clsMatch
+    const matching = mechs.filter(m => checkMechAgainstReq(m, req));
     const count = Math.min(matching.length, req.max);
     totalEligible += count;
     if (req.min > 0 && matching.length < req.min) minsMet = false;
@@ -215,8 +215,7 @@ export const teamsForMech = (mech, mechs, teams) => {
   for (const team of teams) {
     for (const req of team.req) {
       if (req.cls === 'UL HE-V or Assault Vehicle Squadron') continue;
-      const clsMatch = req.cls === 'Any HE-V' || req.cls === mech.weightClass || req.cls === 'Medium or Heavy';
-      if (!clsMatch) continue;
+      if (!clsMatch(req.cls, mech.weightClass)) continue;
       // Use the existing per-mech checker with a tweaked req
       const effReq = req.cls === 'Medium or Heavy'
         ? { ...req, cls: mech.weightClass }
