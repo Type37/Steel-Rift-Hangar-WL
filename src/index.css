@@ -1369,39 +1369,3 @@ button:not(:disabled):active {
 
 /* Editor silhouette: clip overflow so it doesn't bleed outside the identity area */
 .editor-identity { overflow: hidden; }
-
-/* ── MOBILE SCREENS ───────────────────────────────────────── */
-/* On mobile the layout shows only one "screen" at a time.     */
-.mobile-back-btn {
-  display: none;
-}
-
-@media (max-width: 960px) {
-  /* Hide whichever column isn't active */
-  .mobile-hidden {
-    display: none !important;
-  }
-
-  /* Show the back button above the workshop */
-  .mobile-back-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    padding: 10px 16px;
-    background: var(--ink);
-    color: var(--surface);
-    border: none;
-    cursor: pointer;
-    font-family: var(--font-body);
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    flex-shrink: 0;
-  }
-
-  /* Make each screen fill the full viewport */
-  .sidebar, .editor-col {
-    min-height: calc(100dvh - 100px); /* below navbar, above bottombar */
-  }
-}
