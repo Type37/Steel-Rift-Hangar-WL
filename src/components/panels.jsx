@@ -12,9 +12,9 @@ const asset = (p) => `${BASE}${p.replace(/^\//, '')}`;
 // Pick one representative logo per faction for the hover-wash effect on
 // the faction picker tile. Order chosen for visual punch.
 const FACTION_HOVER_LOGO = {
-  Authorities:  'authorities/sahel-alliance.png',
-  Corporations: 'corporations/helios.png',
-  Freelancers:  'freelancers/cerberus-group.png',
+  Authorities:  'faction-logos/authorities/sahel-alliance.png',
+  Corporations: 'faction-logos/corporations/helios.png',
+  Freelancers:  'faction-logos/freelancers/cerberus-group.png',
 };
 
 // Map team name to its silhouette icon. Icons live in /public/icons/.
@@ -194,6 +194,26 @@ function SupportExpanded({ a }) {
       {traitNames.length > 0 && (
         <InlineTraitGlossary traits={traitNames} />
       )}
+      {/* Universal Secondary Agendas — separate from faction choice */}
+      <SectionTitle>Universal Secondary Agendas</SectionTitle>
+      <div style={{ marginBottom: 18, padding: '0 2px' }}>
+        <div style={{ fontSize: 12, color: 'var(--mute)', marginBottom: 12, lineHeight: 1.5 }}>
+          Available to any Force meeting the requirement. Faction does not matter.
+        </div>
+        {UNIVERSAL_AGENDAS.map(a => (
+          <div key={a.name} style={{
+            marginBottom: 12, padding: '10px 14px',
+            background: 'var(--surface)', border: '1px solid var(--rule)',
+            borderLeft: '3px solid var(--olive)',
+          }}>
+            <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--ink)', marginBottom: 2 }}>{a.name}</div>
+            <div style={{ fontSize: 11.5, color: 'var(--mute)', fontStyle: 'italic', marginBottom: 4 }}>
+              Requirement: {a.req}
+            </div>
+            <div style={{ fontSize: 12.5, color: 'var(--ink-2)', lineHeight: 1.55 }}>{a.text}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -814,6 +834,26 @@ export function SupportDetailView({ assetName, customName, loadout, onSetLoadout
       )}
 
       {traitNames.length > 0 && <InlineTraitGlossary traits={traitNames} />}
+      {/* Universal Secondary Agendas — separate from faction choice */}
+      <SectionTitle>Universal Secondary Agendas</SectionTitle>
+      <div style={{ marginBottom: 18, padding: '0 2px' }}>
+        <div style={{ fontSize: 12, color: 'var(--mute)', marginBottom: 12, lineHeight: 1.5 }}>
+          Available to any Force meeting the requirement. Faction does not matter.
+        </div>
+        {UNIVERSAL_AGENDAS.map(a => (
+          <div key={a.name} style={{
+            marginBottom: 12, padding: '10px 14px',
+            background: 'var(--surface)', border: '1px solid var(--rule)',
+            borderLeft: '3px solid var(--olive)',
+          }}>
+            <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--ink)', marginBottom: 2 }}>{a.name}</div>
+            <div style={{ fontSize: 11.5, color: 'var(--mute)', fontStyle: 'italic', marginBottom: 4 }}>
+              Requirement: {a.req}
+            </div>
+            <div style={{ fontSize: 12.5, color: 'var(--ink-2)', lineHeight: 1.55 }}>{a.text}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -1307,7 +1347,6 @@ export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
               }}
             >
               <span className="faction-tile-name">{f}</span>
-              <span className="faction-tile-blurb">{FACTIONS[f].blurb}</span>
             </button>
           );
         })}
@@ -1341,26 +1380,6 @@ export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
             <div style={{ fontSize: 13, color: 'var(--ink)', lineHeight: 1.55 }}>
               {data.agenda}
             </div>
-          </div>
-
-          {/* Universal Secondary Agendas */}
-          <div style={{
-            background: 'var(--surface)',
-            borderLeft: '3px solid var(--olive)',
-            padding: '10px 14px',
-            marginBottom: 18,
-          }}>
-            <div className="label" style={{ marginBottom: 6 }}>Universal Secondary Agendas</div>
-            <div style={{ fontSize: 12, color: 'var(--mute)', marginBottom: 8, lineHeight: 1.5 }}>
-              Available to any Force meeting the requirement, regardless of Faction.
-            </div>
-            {UNIVERSAL_AGENDAS.map(a => (
-              <div key={a.name} style={{ marginBottom: 10 }}>
-                <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--ink)', marginBottom: 2 }}>{a.name}</div>
-                <div style={{ fontSize: 11.5, color: 'var(--mute)', fontStyle: 'italic', marginBottom: 2 }}>{a.req}</div>
-                <div style={{ fontSize: 12.5, color: 'var(--ink-2)', lineHeight: 1.55 }}>{a.text}</div>
-              </div>
-            ))}
           </div>
 
           {/* Logo upload moved to Options. */}
@@ -1404,14 +1423,10 @@ export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
                       }}
                     >
                       <span style={{
-                        marginTop: 2, width: 18, height: 18,
-                        border: '1.5px solid var(--ink)',
-                        background: eq ? 'var(--ink)' : 'transparent',
-                        color: 'var(--surface)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      }}>
-                        {eq && <Check size={12} strokeWidth={3} />}
-                      </span>
+                        marginTop: 2, width: 16, height: 16, borderRadius: '50%', flexShrink: 0,
+                        border: `2px solid ${eq ? 'var(--rust)' : 'var(--rule-strong)'}`,
+                        background: eq ? 'var(--rust)' : 'transparent',
+                      }} />
                       <div>
                         <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--ink)' }}>{o.name}</div>
                         <div style={{ fontSize: 12.5, color: 'var(--ink-2)', lineHeight: 1.55, marginTop: 2 }}>
