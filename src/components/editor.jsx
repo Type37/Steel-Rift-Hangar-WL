@@ -233,7 +233,8 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
 
       {/* Catalog tabs + tonnage + slots all on one row */}
       <div style={{ marginTop: 16 }}>
-        <SectionTitle>Loadout</SectionTitle>
+        {/* LOADOUT title row with inline tonnage bar */}
+        <LoadoutHeader stats={stats} wc={wc} />
         <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexWrap: 'wrap' }}>
           {(() => {
             const defCount = mech.defensive.length;
@@ -278,9 +279,6 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
           })()}
 
         </div>
-
-        {/* Tonnage bar + slot pips — prominent, sits between tabs and weapon list */}
-        <TonBreakdown stats={stats} wc={wc} />
 
         <div style={{ borderTop: '2px solid var(--ink)', minHeight: 400 }}>
           {tab === 'ranged' && sortByAvail(RANGED, w => valForClass(w.cost, cls) !== '-' && valForClass(w.cost, cls) != null).map(w => (
@@ -369,8 +367,18 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
 // TONNAGE BREAKDOWN
 // ============================================================
 
-function TonBreakdown({ stats, wc }) {
-  if (!stats || !wc) return null;
+function LoadoutHeader({ stats, wc }) {
+  if (!stats || !wc) return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 12,
+      borderBottom: '2px solid var(--ink)', paddingBottom: 5, marginBottom: 14,
+    }}>
+      <h2 style={{ fontFamily: 'var(--font-stencil)', fontSize: 19, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>
+        Loadout
+      </h2>
+    </div>
+  );
+
   const total      = wc.tons;
   const armorPct   = (stats.armor / total) * 100;
   const structPct  = (stats.structure / total) * 100;
@@ -378,77 +386,57 @@ function TonBreakdown({ stats, wc }) {
   const upgradePct = ((stats.upgradesTons + stats.defensiveTons) / total) * 100;
   const over       = stats.overTons;
   const near       = !over && (stats.totalUsed / total) >= 0.85;
-  const remaining  = Math.max(0, total - stats.totalUsed);
   const statusColor = over ? 'var(--rust)' : near ? '#b97a1a' : 'var(--ink)';
 
   return (
-    <div style={{ padding: '8px 14px 10px', background: 'var(--surface-2)', borderBottom: '2px solid var(--ink)' }}>
-      {/* Segmented bar */}
-      <div style={{
-        height: 14, borderRadius: 2, background: 'var(--rule-strong)',
-        overflow: 'hidden', display: 'flex', marginBottom: 8,
-        outline: over ? '2px solid var(--rust)' : '1px solid var(--rule-strong)',
-        outlineOffset: 1,
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 12,
+      borderBottom: '2px solid var(--ink)', paddingBottom: 5, marginBottom: 14,
+    }}>
+      <h2 style={{
+        fontFamily: 'var(--font-stencil)', fontSize: 19, fontWeight: 700,
+        letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0, flexShrink: 0,
       }}>
-        <div style={{ width: `${armorPct}%`,   background: 'var(--teal)',        transition: 'width 150ms' }} />
-        <div style={{ width: `${structPct}%`,  background: '#8fa66e',            transition: 'width 150ms', borderLeft: '1px solid var(--surface-2)' }} />
-        <div style={{ width: `${weaponPct}%`,  background: 'var(--olive)',       transition: 'width 150ms', borderLeft: weaponPct > 0 ? '1px solid var(--surface-2)' : 'none' }} />
-        <div style={{ width: `${upgradePct}%`, background: '#b97a1a',            transition: 'width 150ms', borderLeft: upgradePct > 0 ? '1px solid var(--surface-2)' : 'none' }} />
+        Loadout
+      </h2>
+
+      {/* Segmented bar — fills remaining width */}
+      <div style={{
+        flex: 1, height: 10, borderRadius: 2,
+        background: 'rgba(255,255,255,0.55)',
+        overflow: 'hidden', display: 'flex',
+        outline: over ? '1.5px solid var(--rust)' : '1px solid var(--rule-strong)',
+        outlineOffset: 1,
+        minWidth: 60,
+      }}>
+        <div style={{ width: `${armorPct}%`,   background: 'var(--teal)',  transition: 'width 150ms' }} />
+        <div style={{ width: `${structPct}%`,  background: '#8fa66e',      transition: 'width 150ms', borderLeft: '1px solid rgba(255,255,255,0.35)' }} />
+        <div style={{ width: `${weaponPct}%`,  background: 'var(--olive)', transition: 'width 150ms', borderLeft: weaponPct > 0 ? '1px solid rgba(255,255,255,0.35)' : 'none' }} />
+        <div style={{ width: `${upgradePct}%`, background: '#b97a1a',      transition: 'width 150ms', borderLeft: upgradePct > 0 ? '1px solid rgba(255,255,255,0.35)' : 'none' }} />
       </div>
 
-      {/* Legend row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-mono)', fontSize: 11 }}>
-          <span style={{ width: 9, height: 9, borderRadius: 1, background: 'var(--teal)', display: 'inline-block', flexShrink: 0 }} />
-          <span style={{ color: 'var(--mute)', letterSpacing: '0.08em' }}>ARM</span>
-          <span style={{ color: 'var(--ink)', fontWeight: 700 }}>{stats.armor}t</span>
-        </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-mono)', fontSize: 11 }}>
-          <span style={{ width: 9, height: 9, borderRadius: 1, background: '#8fa66e', display: 'inline-block', flexShrink: 0 }} />
-          <span style={{ color: 'var(--mute)', letterSpacing: '0.08em' }}>STR</span>
-          <span style={{ color: 'var(--ink)', fontWeight: 700 }}>{stats.structure}t</span>
-        </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-mono)', fontSize: 11 }}>
-          <span style={{ width: 9, height: 9, borderRadius: 1, background: 'var(--olive)', display: 'inline-block', flexShrink: 0 }} />
-          <span style={{ color: 'var(--mute)', letterSpacing: '0.08em' }}>WPN</span>
-          <span style={{ color: 'var(--ink)', fontWeight: 700 }}>{stats.weaponsTons}t</span>
-        </span>
-        {(stats.upgradesTons + stats.defensiveTons) > 0 && (
-          <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-mono)', fontSize: 11 }}>
-            <span style={{ width: 9, height: 9, borderRadius: 1, background: '#b97a1a', display: 'inline-block', flexShrink: 0 }} />
-            <span style={{ color: 'var(--mute)', letterSpacing: '0.08em' }}>UPG</span>
-            <span style={{ color: 'var(--ink)', fontWeight: 700 }}>{stats.upgradesTons + stats.defensiveTons}t</span>
-          </span>
-        )}
-
-        {/* Spacer + slot pips + status */}
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
-          {/* Slot pips */}
-          <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-            {Array.from({ length: stats.capSlots }).map((_, i) => (
-              <span key={i} style={{
-                width: 10, height: 10, borderRadius: '50%', display: 'inline-block', flexShrink: 0,
-                background: i < stats.totalSlotsUsed
-                  ? (stats.overSlots ? 'var(--rust)' : 'var(--teal)')
-                  : 'transparent',
-                border: `2px solid ${i < stats.totalSlotsUsed
-                  ? (stats.overSlots ? 'var(--rust)' : 'var(--teal)')
-                  : 'var(--rule-strong)'}`,
-              }} />
-            ))}
-          </div>
-          {/* Ton count */}
-          <span className="mono" style={{ fontSize: 13, fontWeight: 700, color: statusColor, whiteSpace: 'nowrap' }}>
-            {over
-              ? `${stats.totalUsed}t OVER`
-              : `${stats.totalUsed} / ${total}t`}
-          </span>
-        </div>
+      {/* Slot pips */}
+      <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexShrink: 0 }}>
+        {Array.from({ length: stats.capSlots }).map((_, i) => (
+          <span key={i} style={{
+            width: 10, height: 10, borderRadius: '50%', display: 'inline-block',
+            background: i < stats.totalSlotsUsed
+              ? (stats.overSlots ? 'var(--rust)' : 'var(--teal)')
+              : 'rgba(255,255,255,0.55)',
+            border: `2px solid ${i < stats.totalSlotsUsed
+              ? (stats.overSlots ? 'var(--rust)' : 'var(--teal)')
+              : 'var(--rule-strong)'}`,
+          }} />
+        ))}
       </div>
+
+      {/* Ton count */}
+      <span className="mono" style={{ fontSize: 13, fontWeight: 700, color: statusColor, flexShrink: 0, whiteSpace: 'nowrap' }}>
+        {over ? `${stats.totalUsed}t OVER` : `${stats.totalUsed} / ${total}t`}
+      </span>
     </div>
   );
 }
-
 
 // ============================================================
 // ARMOR / STRUCTURE ADJUSTER
