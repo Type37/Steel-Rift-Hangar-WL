@@ -700,57 +700,26 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
         title={unavailableReason || undefined}
         style={{
           display: 'grid',
-          gridTemplateColumns: 'auto 1fr auto auto auto',
+          gridTemplateColumns: 'auto 1fr auto auto auto auto',
           alignItems: 'center', gap: 12,
           padding: '9px 14px',
         }}
       >
         <RowExpand open={expanded} onClick={onToggle} />
 
+        {/* Name + DMG */}
         <div style={{ minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, flexWrap: 'wrap' }}>
             <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--ink)' }}>{weapon.name}</span>
             <DmgBadge weapon={weapon} cls={cls} />
-            {available && (
-              <>
-                <span style={{
-                  display: 'inline-grid',
-                  gridTemplateColumns: 'repeat(4, auto)',
-                  columnGap: 7,
-                  alignItems: 'end',
-                  verticalAlign: 'middle',
-                  background: 'var(--surface-2)',
-                  border: '1px solid var(--rule)',
-                  padding: '2px 6px',
-                }}>
-                  {weapon.cost.map((v, i) => (
-                    <span key={i} style={{
-                      display: 'flex', flexDirection: 'column', alignItems: 'center',
-                    }}>
-                      <span style={{
-                        fontSize: 9, color: 'var(--mute)', letterSpacing: '0.06em',
-                        fontFamily: 'var(--font-body)',
-                      }}>{WC_ABBR[i]}</span>
-                      <span style={{
-                        fontFamily: 'var(--font-display)',
-                        fontSize: i === WC_IDX[cls] ? 16 : 11,
-                        fontWeight: 700,
-                        color: i === WC_IDX[cls] ? 'var(--rust)' : 'var(--mute)',
-                        lineHeight: 1.1,
-                      }}>{v === '-' ? '-' : `${v}t`}</span>
-                    </span>
-                  ))}
-                </span>
-              </>
-            )}
             {!available && (
               <span className="mono" style={{ fontSize: 11, color: 'var(--mute)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                Not available at {WC[cls].abbr}
+                N/A at {cls.slice(0,2).toUpperCase()}
               </span>
             )}
             {count > 1 && (
               <span className="mono" style={{ fontSize: 11, color: 'var(--warn)' }}>
-                ×{count} = {total}t (next +{next}t)
+                ×{count} = {total}t
               </span>
             )}
           </div>
@@ -759,17 +728,42 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
           </div>
         </div>
 
+        {/* Cost table — aligned with +/- controls */}
+        {available && (
+          <div style={{
+            display: 'grid', gridTemplateColumns: 'repeat(4, auto)',
+            columnGap: 6, alignItems: 'end',
+            background: 'var(--surface-2)', border: '1px solid var(--rule)',
+            padding: '2px 6px', flexShrink: 0,
+          }}>
+            {weapon.cost.map((v, i) => (
+              <span key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <span style={{ fontSize: 9, color: 'var(--mute)', letterSpacing: '0.06em', fontFamily: 'var(--font-body)' }}>
+                  {WC_ABBR[i]}
+                </span>
+                <span style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: i === WC_IDX[cls] ? 15 : 11,
+                  fontWeight: 700,
+                  color: i === WC_IDX[cls] ? 'var(--rust)' : 'var(--mute)',
+                  lineHeight: 1.1,
+                }}>{v === '-' ? '–' : `${v}t`}</span>
+              </span>
+            ))}
+          </div>
+        )}
+
         {count > 0 ? (
           <>
             <StepButton direction="down" accent="rust" onClick={() => onRemove(weapon.name)} />
             <span className="mono" style={{
-              minWidth: 28, textAlign: 'center', fontWeight: 700, fontSize: 17, color: 'var(--ink)',
+              minWidth: 24, textAlign: 'center', fontWeight: 700, fontSize: 17, color: 'var(--ink)',
             }}>×{count}</span>
             <StepButton direction="up" onClick={() => onAdd(weapon.name)} disabled={!available} />
           </>
         ) : (
           <>
-            <span /><span />
+            <span />{available && <span />}
             <StepButton direction="up" onClick={() => onAdd(weapon.name)} disabled={!available} />
           </>
         )}

@@ -717,7 +717,7 @@ function AssignmentStrip({
 // inline glossary of any traits referenced.
 // ============================================================
 
-export function SupportDetailView({ assetName, customName, loadout, onSetLoadout, garrisonLoadout, onSetGarrisonLoadout, onBack }) {
+export function SupportDetailView({ assetName, customName, loadout, onSetLoadout, garrisonLoadout, garrisonCount = 1, onSetGarrisonLoadout, onBack }) {
   const a = findAsset(assetName);
   if (!a) return null;
   const traitNames = collectTraits(a.stats?.Traits || '');
@@ -784,6 +784,7 @@ export function SupportDetailView({ assetName, customName, loadout, onSetLoadout
           loadout={effectiveLoadout}
           onChange={onSetLoadout || null}
           garrisonLoadout={garrisonLoadout}
+          garrisonCount={garrisonCount}
           onSetGarrisonLoadout={onSetGarrisonLoadout}
         />
       )}
@@ -793,6 +794,7 @@ export function SupportDetailView({ assetName, customName, loadout, onSetLoadout
         <GarrisonRef
           traitStr={a.stats.Traits}
           garrisonLoadout={garrisonLoadout}
+          garrisonCount={garrisonCount}
           onSetGarrisonLoadout={onSetGarrisonLoadout}
         />
       )}
@@ -868,13 +870,18 @@ function parseWeapons(str) {
   if (!str || str === '—') return [];
   return str
     .split(/,\s*/)
-    .map(w => w.replace(/\s*[×x]\d+$/, '').replace(/^.*\bor\b.*$/i, w).trim())
+    .map(w => w
+      .replace(/\s*[×x]\d+$/, '')           // strip ×2
+      .replace(/\s*\(each\)/i, '')           // strip (each)
+      .replace(/\s*\(per model\)/i, '')      // strip (per model)
+      .trim()
+    )
     .flatMap(w => w.split(/\s+or\s+/i).map(p => p.trim()))
     .filter(Boolean);
 }
 
 // Garrison reference: show infantry or power suit squad options inline.
-function GarrisonRef({ traitStr, garrisonLoadout, onSetGarrisonLoadout }) {
+function GarrisonRef({ traitStr, garrisonLoadout, garrisonCount = 1, onSetGarrisonLoadout }) {
   const infMatch = traitStr && traitStr.match(/Garrison\s*\(\s*(\d+)\s*Infantry/i);
   const psMatch  = traitStr && traitStr.match(/Garrison\s*\(\s*(\d+)\s*Power Suit/i);
   const ulMatch  = traitStr && /UL HE-V Squadron/i.test(traitStr);
@@ -884,7 +891,7 @@ function GarrisonRef({ traitStr, garrisonLoadout, onSetGarrisonLoadout }) {
   const squads = infMatch ? INFANTRY_SQUADS : psMatch ? POWER_SUIT_SQUADS : null;
   const sharedTraits = infMatch ? INFANTRY_SHARED_TRAITS : psMatch ? POWER_SUIT_SHARED_TRAITS : null;
   const label = infMatch ? 'Infantry Squads' : psMatch ? 'Power Suit Squads' : 'UL HE-V Squadron';
-  const maxCount = parseInt(infMatch?.[1] ?? psMatch?.[1] ?? '1', 10);
+  const maxCount = parseInt(infMatch?.[1] ?? psMatch?.[1] ?? '1', 10) * garrisonCount;
 
   // Count currently selected models
   const counts = (garrisonLoadout || []).reduce((acc, n) => { acc[n] = (acc[n] || 0) + 1; return acc; }, {});

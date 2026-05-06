@@ -435,6 +435,7 @@ export default function App() {
                   customName={supportNicknames[selectedSupportName]}
                   loadout={supportLoadouts[selectedSupportName]}
                   garrisonLoadout={garrisonLoadouts[selectedSupportName]}
+                  garrisonCount={supportAssets.filter(n => n === selectedSupportName).length}
                   onSetGarrisonLoadout={(v) => setGarrisonLoadouts(prev => ({ ...prev, [selectedSupportName]: v }))}
                   onSetLoadout={(l) => setSupportLoadout(selectedSupportName, l)}
                   onBack={() => setSelectedSupportName(null)}
