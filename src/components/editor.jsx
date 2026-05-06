@@ -76,6 +76,13 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete }) {
     else update({ defensive: [...mech.defensive, name] });
   };
 
+  const sortByAvail = (items, isAvail) =>
+    [...items].sort((a, b) => {
+      const aOk = isAvail(a), bOk = isAvail(b);
+      if (aOk !== bOk) return aOk ? -1 : 1;
+      return a.name.localeCompare(b.name);
+    });
+
   return (
     <div>
       {/* Identity strip */}
@@ -229,6 +236,7 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete }) {
         </div>
       )}
 
+
       {/* Catalog tabs */}
       <div style={{ marginTop: 28 }}>
         <SectionTitle tag={`${stats.totalSlotsUsed}/${stats.capSlots} slots used`}>
@@ -240,6 +248,7 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete }) {
             { id: 'melee', label: 'Melee' },
             { id: 'upgrades', label: 'Upgrades' },
             { id: 'defensive', label: 'Defensive' },
+            { id: 'motive', label: 'Motive' },
           ].map(t => (
             <button
               key={t.id}
@@ -264,41 +273,31 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete }) {
         </div>
 
         <div style={{ borderTop: '2px solid var(--ink)' }}>
-          {tab === 'ranged' && RANGED.map(w => (
+          {tab === 'ranged' && sortByAvail(RANGED, w => valForClass(w.cost, cls) !== '-' && valForClass(w.cost, cls) != null).map(w => (
             <WeaponRow key={w.name} weapon={w} mech={mech}
               equipped={equipped(w.name)} onAdd={addWeapon} onRemove={removeWeapon}
               expanded={expanded[w.name]} onToggle={() => toggleExpanded(w.name)} />
           ))}
-          {tab === 'melee' && MELEE.map(w => (
+          {tab === 'melee' && sortByAvail(MELEE, w => valForClass(w.cost, cls) !== '-' && valForClass(w.cost, cls) != null).map(w => (
             <WeaponRow key={w.name} weapon={w} mech={mech}
               equipped={equipped(w.name)} onAdd={addWeapon} onRemove={removeWeapon}
               expanded={expanded[w.name]} onToggle={() => toggleExpanded(w.name)} />
           ))}
           {tab === 'upgrades' && (() => {
-            const regular = UPGRADES.filter(u => !u.variant && !u.drone);
-            const variants = UPGRADES.filter(u => u.variant);
-            const drones = UPGRADES.filter(u => u.drone);
-            const hasVariant = mech.upgrades.some(n => variants.find(v => v.name === n));
+            const regular = sortByAvail(
+              UPGRADES.filter(u => !u.variant && !u.drone),
+              u => { const c = valForClass(u.cost, cls); return c !== '-' && c != null && c !== undefined; }
+            );
+            const drones = sortByAvail(
+              UPGRADES.filter(u => u.drone),
+              u => { const c = valForClass(u.cost, cls); return c !== '-' && c != null; }
+            );
             return (
               <>
                 {regular.map(u => (
                   <UpgradeRow key={u.name} upgrade={u} mech={mech} onToggle={toggleUpgrade} onAssignDrone={assignDrone}
                     expanded={expanded[u.name]} onExpand={() => toggleExpanded(u.name)} />
                 ))}
-                {/* Variant Motive Types */}
-                <div style={{
-                  padding: '8px 14px', fontSize: 11, fontWeight: 700, letterSpacing: '0.14em',
-                  textTransform: 'uppercase', color: 'var(--mute)',
-                  borderTop: '2px solid var(--rule)', borderBottom: '1px solid var(--rule)',
-                  background: 'var(--bg)',
-                }}>
-                  Variant Motive Types <span style={{ fontWeight: 400 }}>· one per HE-V · cost 0t</span>
-                </div>
-                {variants.map(u => (
-                  <UpgradeRow key={u.name} upgrade={u} mech={mech} onToggle={toggleUpgrade} onAssignDrone={assignDrone}
-                    expanded={expanded[u.name]} onExpand={() => toggleExpanded(u.name)} />
-                ))}
-                {/* AI Companion Drones */}
                 <div style={{
                   padding: '8px 14px', fontSize: 11, fontWeight: 700, letterSpacing: '0.14em',
                   textTransform: 'uppercase', color: 'var(--mute)',
@@ -308,6 +307,25 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete }) {
                   AI Companion Drones <span style={{ fontWeight: 400 }}>· Compact · assign to a weapon or upgrade</span>
                 </div>
                 {drones.map(u => (
+                  <UpgradeRow key={u.name} upgrade={u} mech={mech} onToggle={toggleUpgrade} onAssignDrone={assignDrone}
+                    expanded={expanded[u.name]} onExpand={() => toggleExpanded(u.name)} />
+                ))}
+              </>
+            );
+          })()}
+
+          {/* Motive tab: variant motive types */}
+          {tab === 'motive' && (() => {
+            const variants = UPGRADES.filter(u => u.variant);
+            return (
+              <>
+                <div style={{
+                  padding: '10px 14px 8px', fontSize: 12, color: 'var(--ink-2)', lineHeight: 1.55,
+                  borderBottom: '1px solid var(--rule)', background: 'var(--bg)',
+                }}>
+                  One per HE-V. Cost 0t. Mutually exclusive.
+                </div>
+                {variants.map(u => (
                   <UpgradeRow key={u.name} upgrade={u} mech={mech} onToggle={toggleUpgrade} onAssignDrone={assignDrone}
                     expanded={expanded[u.name]} onExpand={() => toggleExpanded(u.name)} />
                 ))}
@@ -324,7 +342,7 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete }) {
                 Defensive Configurations don't take an Upgrade slot. Lt/Md/Hv may equip 1; Ultraheavy may equip 2.
                 <strong style={{ marginLeft: 8 }}>{mech.defensive.length}/{defLimit} equipped.</strong>
               </div>
-              {DEFENSIVE.map(d => (
+              {sortByAvail(DEFENSIVE, d => { const c = valForClass(d.cost, cls); return c !== "-" && c != null; }).map(d => (
                 <DefRow key={d.name} def={d} mech={mech} onToggle={toggleDef}
                   atLimit={mech.defensive.length >= defLimit}
                   expanded={expanded[d.name]} onExpand={() => toggleExpanded(d.name)} />
