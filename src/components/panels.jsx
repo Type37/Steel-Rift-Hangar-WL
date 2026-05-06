@@ -1314,7 +1314,6 @@ export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
               }}
             >
               <span className="faction-tile-name">{f}</span>
-              <span className="faction-tile-blurb">{FACTIONS[f].blurb}</span>
             </button>
           );
         })}
@@ -1349,27 +1348,6 @@ export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
               {data.agenda}
             </div>
           </div>
-
-          {/* Universal Secondary Agendas */}
-          <div style={{
-            background: 'var(--surface)',
-            borderLeft: '3px solid var(--olive)',
-            padding: '10px 14px',
-            marginBottom: 18,
-          }}>
-            <div className="label" style={{ marginBottom: 6 }}>Universal Secondary Agendas</div>
-            <div style={{ fontSize: 12, color: 'var(--mute)', marginBottom: 8, lineHeight: 1.5 }}>
-              Available to any Force meeting the requirement, regardless of Faction.
-            </div>
-            {UNIVERSAL_AGENDAS.map(a => (
-              <div key={a.name} style={{ marginBottom: 10 }}>
-                <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--ink)', marginBottom: 2 }}>{a.name}</div>
-                <div style={{ fontSize: 11.5, color: 'var(--mute)', fontStyle: 'italic', marginBottom: 2 }}>{a.req}</div>
-                <div style={{ fontSize: 12.5, color: 'var(--ink-2)', lineHeight: 1.55 }}>{a.text}</div>
-              </div>
-            ))}
-          </div>
-
           {/* Logo upload moved to Options. */}
 
           <div className="label" style={{ marginBottom: 8 }}>Perks (pick 2, max 1 per group)</div>
@@ -1411,14 +1389,11 @@ export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
                       }}
                     >
                       <span style={{
-                        marginTop: 2, width: 18, height: 18,
-                        border: '1.5px solid var(--ink)',
-                        background: eq ? 'var(--ink)' : 'transparent',
-                        color: 'var(--surface)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      }}>
-                        {eq && <Check size={12} strokeWidth={3} />}
-                      </span>
+                        marginTop: 3, width: 14, height: 14, borderRadius: '50%', flexShrink: 0,
+                        border: `2px solid ${eq ? 'var(--rust)' : blocked ? 'var(--rule)' : 'var(--rule-strong)'}`,
+                        background: eq ? 'var(--rust)' : 'transparent',
+                        display: 'inline-block',
+                      }} />
                       <div>
                         <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--ink)' }}>{o.name}</div>
                         <div style={{ fontSize: 12.5, color: 'var(--ink-2)', lineHeight: 1.55, marginTop: 2 }}>

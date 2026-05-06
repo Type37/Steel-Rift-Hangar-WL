@@ -319,7 +319,7 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
           })()}
         </div>
 
-        <div style={{ borderTop: '2px solid var(--ink)' }}>
+        <div style={{ borderTop: '2px solid var(--ink)', minHeight: 400 }}>
           {tab === 'ranged' && sortByAvail(RANGED, w => valForClass(w.cost, cls) !== '-' && valForClass(w.cost, cls) != null).map(w => (
             <WeaponRow key={w.name} weapon={w} mech={mech}
               equipped={equipped(w.name)} onAdd={addWeapon} onRemove={removeWeapon}
