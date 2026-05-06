@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Dices, Info } from 'lucide-react';
+import { X, Dices, Info, ChevronDown } from 'lucide-react';
 import { WC, WC_ORDER, FACTION_LOGOS } from '../data';
 import { POOL_NAMES, rollCallsign } from '../callsigns';
 import { Modal, FieldLabel, PrimaryButton, TextButton, Chip } from './ui';
