@@ -260,7 +260,7 @@ export function TraitToken({ token }) {
   }
 
   return (
-    <Tooltip title={def.title} body={def.text}>
+    <Tooltip title={def.title} body={def.bullets ? def.bullets.join(' ') : def.text}>
       <span className="tok" style={{ fontSize: 'inherit' }}>
         {display}
       </span>
