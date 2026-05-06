@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { TEAMS, MISSIONS, MISSION_ORDER, FACTION_LOGOS, FREEFORM_MISSION } from './data';
+import { TEAMS, MISSIONS, MISSION_ORDER, FACTION_LOGOS, FREEFORM_MISSION, FACTIONS } from './data';
 import { POOL_NAMES } from './callsigns';
 import { calcMech, newMech, findAsset } from './calc';
 
@@ -242,8 +242,21 @@ export default function App() {
 
   const handleSetFaction = (f) => { setFaction(f); setPerks([]); };
 
-  const togglePerk = (name) =>
-    setPerks(prev => prev.includes(name) ? prev.filter(p => p !== name) : [...prev, name]);
+  const togglePerk = (name) => {
+    // Radio behavior: selecting a perk removes any other perk from the same group
+    if (!faction) return;
+    const factionPerks = FACTIONS[faction]?.perks || {};
+    // Find which group this perk belongs to
+    const groupPerks = Object.values(factionPerks).find(opts => opts.some(o => o.name === name)) || [];
+    const groupNames = groupPerks.map(o => o.name);
+    setPerks(prev => {
+      if (prev.includes(name)) return prev; // already selected, no-op (radio stays on)
+      // Remove any existing selection from this group, add new one
+      const withoutGroup = prev.filter(p => !groupNames.includes(p));
+      if (withoutGroup.length >= 2) return prev; // already have 2 from other groups
+      return [...withoutGroup, name];
+    });
+  };
 
   const handleAddSupport = () => {
     setSelectedMechId(null);
