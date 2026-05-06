@@ -232,46 +232,43 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
       )}
 
 
-      {/* Cart summary */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 6, margin: '20px 0 0' }}>
-        <div style={{
-          background: 'var(--surface)', border: '1px solid var(--rule)',
-          padding: '10px 14px',
-        }}>
-          <div className="label" style={{ fontSize: 10, marginBottom: 4, letterSpacing: '0.14em' }}>TONNAGE REMAINING</div>
-          <div className="mono" style={{
-            fontSize: 28, fontWeight: 700, lineHeight: 1,
-            color: stats.overTons ? 'var(--rust)' : 'var(--ink)',
-          }}>
-            {stats.capTons - stats.totalUsed}t
-          </div>
-        </div>
-        <div style={{
-          background: 'var(--surface)', border: '1px solid var(--rule)',
-          padding: '10px 14px', minWidth: 100,
-        }}>
-          <div className="label" style={{ fontSize: 10, marginBottom: 6, letterSpacing: '0.14em' }}>SLOTS</div>
-          <div style={{ display: 'flex', gap: 3, marginBottom: 4 }}>
-            {Array.from({ length: stats.capSlots }).map((_, i) => (
-              <span key={i} style={{
-                width: 10, height: 10, borderRadius: '50%', display: 'inline-block',
-                background: i < stats.totalSlotsUsed
-                  ? (stats.overSlots ? 'var(--rust)' : 'var(--teal)')
-                  : 'transparent',
-                border: `1.5px solid ${i < stats.totalSlotsUsed
-                  ? (stats.overSlots ? 'var(--rust)' : 'var(--teal)')
-                  : 'var(--rule-strong)'}`,
-                opacity: i < stats.totalSlotsUsed ? 0.9 : 0.4,
+      {/* Tonnage range — dot on line. Intentionally calm; spending everything is not required. */}
+      {(() => {
+        const pct = Math.min(1, stats.totalUsed / stats.capTons);
+        const near = pct >= 0.85 && !stats.overTons;
+        const dotColor = stats.overTons ? 'var(--rust)' : near ? '#b97a1a' : 'var(--ink)';
+        const slotsFree = stats.capSlots - stats.totalSlotsUsed;
+        return (
+          <div style={{ margin: '20px 0 0', padding: '12px 14px', background: 'var(--surface)', border: '1px solid var(--rule)' }}>
+            {/* Line + dot */}
+            <div style={{ position: 'relative', height: 18, marginBottom: 4 }}>
+              <div style={{
+                position: 'absolute', top: '50%', left: 0, right: 0,
+                height: 1.5, background: 'var(--rule-strong)', transform: 'translateY(-50%)',
               }} />
-            ))}
+              <div style={{
+                position: 'absolute', top: '50%',
+                left: `${Math.min(98, pct * 100)}%`,
+                width: 10, height: 10, borderRadius: '50%',
+                background: dotColor,
+                transform: 'translate(-50%, -50%)',
+                transition: 'left 150ms ease, background 150ms',
+                flexShrink: 0,
+              }} />
+            </div>
+            {/* Labels */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <span className="mono" style={{ fontSize: 13, color: stats.overTons ? 'var(--rust)' : near ? '#b97a1a' : 'var(--ink-2)' }}>
+                {stats.totalUsed}t
+                {stats.overTons && <span style={{ marginLeft: 6, fontSize: 11 }}>over by {stats.totalUsed - stats.capTons}t</span>}
+              </span>
+              <span className="mono" style={{ fontSize: 11, color: 'var(--mute)' }}>
+                {stats.capTons}t · {slotsFree < 0 ? `${-slotsFree} slots over` : `${slotsFree} slot${slotsFree !== 1 ? 's' : ''} free`}
+              </span>
+            </div>
           </div>
-          <div className="mono" style={{ fontSize: 11, color: stats.overSlots ? 'var(--rust)' : 'var(--mute)' }}>
-            {stats.overSlots
-              ? `${stats.totalSlotsUsed - stats.capSlots} over`
-              : `${stats.capSlots - stats.totalSlotsUsed} of ${stats.capSlots} free`}
-          </div>
-        </div>
-      </div>
+        );
+      })()}
 
       {/* Catalog tabs */}
       <div style={{ marginTop: 16 }}>
