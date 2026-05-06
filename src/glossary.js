@@ -182,7 +182,7 @@ export const GLOSSARY = {
   },
   'close support': {
     title: 'Close Support',
-    text: 'If a friendly Unit with this trait is within 6" of an enemy target of an ENGAGE or SMASH Order, add 1 to the Damage Rating of each weapon used in that Order. This bonus is only applied once regardless of how many Close Support Units are in range.',
+    text: 'If a friendly Unit with this trait is within 6\" of an enemy target of an ENGAGE or SMASH Order, add one to the Damage Rating of each weapon used in that ENGAGE or SMASH Order. This bonus is only applied once, regardless of the number of Units with this Trait in range.',
   },
   'fortification': {
     title: 'Fortification',
@@ -195,19 +195,19 @@ export const GLOSSARY = {
 
   'guidance suite': {
     title: 'Guidance Suite (X)',
-    text: 'At the start or end of Order (X), select an enemy Unit in LOS and place a Guidance Marker on it. When that Unit is later targeted by an ENGAGE, the attacking Commander may choose: (a) all weapons count as following a LOCK ON, or (b) one weapon gains +2 to its Damage Rating. Remove the Marker after the ENGAGE or when this Unit activates again.',
+    text: 'At the beginning or end of the Order listed in (X), select one enemy unit within LoS of this Model and place a Guidance Marker on it. When that Unit is Targeted by an ENGAGE Order, the attacker selects one effect: (a) all weapons count as having a LOCK ON Order, or (b) one weapon may have +2 added to its Damage Rating. Remove the Marker when the ENGAGE Order is complete, or when this Unit activates again.',
   },
   'msoe launcher': {
     title: 'MSOE Launcher (X)',
-    text: 'At the start or end of Order (X), place an Obscuration Emitter Token within 6" of this model. Units within 3" of the Token count as being in Covering Terrain and gain Anti-Missile System and Electronic Countermeasures. Token is removed when this Unit activates again.',
+    text: 'At the beginning or end of the Order listed in (X), place an Obscuration Emitter Token within 6\" of this model. Any Unit within 3\" of the Token counts as being within Covering Terrain; LoS drawn to those models is considered to pass through Covering Terrain. Those Units also count as having Anti-Missile System and Electronic Countermeasures. Remove the Token when the placing Unit activates again.',
   },
   'scramblers': {
     title: 'Scramblers',
-    text: 'All Units within 6" of a model with Scramblers, including its own Unit, count as equipped with Anti-Missile Systems and Electronic Countermeasures.',
+    text: 'All Units within 6\" of a model equipped with Scramblers, including its own Unit, count as being equipped with Anti-Missile Systems and Electronic Countermeasures.',
   },
   'inferno gear': {
     title: 'Inferno Gear',
-    text: 'If one or more Models in this Unit have this Trait, the Unit ignores the effects of the Disruptive Trait.',
+    text: 'If a Model or Models in the Unit have this Trait, the Unit ignores the effects of the Disruptive Trait.',
   },
   'magnetic grapples': {
     title: 'Magnetic Grapples',
@@ -215,15 +215,15 @@ export const GLOSSARY = {
   },
   'minesweeper': {
     title: 'Minesweeper',
-    text: 'This Unit may not be Targeted by Mine Drone Tokens. This Unit may ENGAGE Mine Drone Tokens as if equipped with the Mine Drone Tracking Munitions Upgrade.',
+    text: 'A Unit with this Trait may not be Targeted by a Mine Drone Token. This Unit may ENGAGE Mine Drone Tokens as if it had the Mine Drone Tracking Munitions Upgrade.',
   },
   'outrider': {
     title: 'Outrider',
-    text: 'If part of a Squadron, these Models may deploy and end moves within 12" of the Squadron Leader (instead of 3"). However, all Models with Outrider must stay within 3" of each other.',
+    text: 'If these Models are part of a Squadron, they may be deployed and end moves within 12\" of the Squadron Leader (instead of 3\"). However, all Models with this Trait in a Squadron must deploy and end moves within 3\" of all other Models with this Trait in the Squadron.',
   },
   'shield projector': {
     title: 'Shield Projector',
-    text: 'Friendly Units within 6" of a model with this trait count as carrying a Combat Shield Upgrade when making Defense Rolls. Not cumulative with an existing Combat Shield.',
+    text: 'When a friendly Unit within 6\" of the model with this trait makes a Defense Roll, it counts as carrying a Combat Shield Upgrade. This is not cumulative with an existing Combat Shield Upgrade on that Unit.',
   },
 
 
@@ -290,7 +290,7 @@ export const GLOSSARY = {
 
   'smasher': {
     title: 'Smasher (X, Y)',
-    text: 'This Unit may perform SMASH Orders even with the Auxiliary Unit Trait. It counts as Weight Class X when SMASHing and adds Y dice to the Attack Pool.',
+    text: 'This Unit is permitted to make the SMASH Order, even if it has the Auxiliary Unit Trait. The Unit is considered of Weight Class X when making a SMASH Order. Add Y dice to the Attack Pool when performing a SMASH Order.',
   },
   'squadron': {
     title: 'Squadron',
@@ -306,15 +306,15 @@ export const GLOSSARY = {
   },
   'suppressive fire': {
     title: 'Suppressive Fire',
-    text: 'If an enemy Unit within 6" of this Model performs an ENGAGE Order, the target of that ENGAGE gains +1 to its Defense Rolls.',
+    text: 'If an enemy Unit within 6\" of a friendly model with this Trait performs an ENGAGE Order, the target of that Order receives +1 to their Defense Rolls.',
   },
   'vulnerable': {
     title: 'Vulnerable',
-    text: 'This Unit takes full Damage from Weapons or effects with the Light trait (Light damage is NOT halved against it).',
+    text: 'This Unit receives full Damage to Armor and Structure from Weapons or effects with the Light trait.',
   },
   'yielding': {
     title: 'Yielding',
-    text: 'Models without Yielding may move through Models with Yielding. If a non-Yielding Model ends its move on top of a Yielding Model, move the Yielding Model the minimum distance to permit the placement.',
+    text: 'Any Model without the Yielding trait may move through any Model with the Yielding trait. If such a Model ends its move on top of a Model with the Yielding trait, move any Models with the Yielding trait the minimum distance possible to permit this.',
   },
 
   // Upgrade-specific keywords (some duplicated above for findability)
