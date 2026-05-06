@@ -168,7 +168,7 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
                 }}
               >
                 <span className="stencil" style={{
-                  fontSize: 12,
+                  fontSize: 13,
                   color: active ? 'var(--mute)' : 'rgba(241,234,218,0.5)',
                 }}>
                   {c}
@@ -295,9 +295,9 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
                     background: active ? accent : 'var(--surface)',
                     color: active ? 'var(--surface)' : (t.noSlots ? 'var(--teal)' : 'var(--ink)'),
                     border: `1.5px solid ${active ? accent : (t.noSlots ? 'var(--teal)' : 'var(--rule-strong)')}`,
-                    padding: '7px 11px',
+                    padding: '10px 14px',
                     fontFamily: 'var(--font-stencil)',
-                    fontSize: 12,
+                    fontSize: 13,
                     fontWeight: 700,
                     letterSpacing: '0.10em',
                     textTransform: 'uppercase',
@@ -400,28 +400,7 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
 // TONNAGE BREAKDOWN
 // ============================================================
 
-function TonBreakdown({ stats, cls, wc }) {
-  const pct = Math.min(100, (stats.totalUsed / wc.tons) * 100);
-  const remaining = wc.tons - stats.totalUsed;
-  return (
-    <div style={{ marginTop: 22 }}>
-      <div style={{
-        display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
-        marginBottom: 4,
-      }}>
-        <span className="label">{cls} Tonnage</span>
-        <span className="mono" style={{ fontSize: 14, fontWeight: 700, color: stats.overTons ? 'var(--rust)' : 'var(--ink)' }}>
-          {stats.totalUsed} / {wc.tons}t
-          <span style={{ color: 'var(--mute)', marginLeft: 8, fontWeight: 400 }}>
-            ({remaining >= 0 ? `${remaining} free` : `${-remaining} over`})
-          </span>
-        </span>
-      </div>
-
-
-    </div>
-  );
-}
+function TonBreakdown() { return null; }
 
 // ============================================================
 // ARMOR / STRUCTURE ADJUSTER
@@ -636,7 +615,7 @@ function DmgBadge({ weapon, cls }) {
   const active = vals[idx];
   if (!active || active === '-') return null;
 
-  const label = meleeVals ? '+DICE' : 'DMG';
+  const label = 'DMG';
 
   return (
     <span style={{
@@ -660,7 +639,7 @@ function DmgBadge({ weapon, cls }) {
             fontSize: i === idx ? 22 : 13,
             fontWeight: 700,
             lineHeight: 1,
-            color: i === idx ? 'var(--ink)' : 'var(--mute)',
+            color: i === idx ? 'var(--ink)' : 'var(--rule-strong)',
             transition: 'font-size 120ms',
           }}>{v}</span>
           {i < 3 && <span style={{ fontSize: 11, color: 'var(--rule-strong)', margin: '0 1px' }}>/</span>}
@@ -761,7 +740,7 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
                   fontFamily: 'var(--font-display)',
                   fontSize: isActive ? 13 : 12,
                   fontWeight: 700,
-                  color: isActive && !isNA ? 'var(--surface)' : isNA ? 'var(--rule-strong)' : 'var(--mute)',
+                  color: isActive && !isNA ? 'var(--surface)' : 'var(--rule-strong)',
                 }}>
                   {isNA ? '–' : `${v}t`}
                 </span>
