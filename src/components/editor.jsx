@@ -93,60 +93,47 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
 
   return (
     <div>
-      {/* Identity strip */}
-      <div style={{
-        display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
-        gap: 12, marginBottom: 18,
-        position: 'relative',
-      }}>
+      {/* Identity strip: name input + remove button on same line */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, position: 'relative' }}>
         <img src={asset('icons/hev.svg')} aria-hidden="true"
           style={{
             position: 'absolute', right: -20, top: '50%',
             transform: `translateY(-50%) scale(${
               cls === 'Light' ? 1.1 : cls === 'Medium' ? 1.3 : cls === 'Heavy' ? 1.5 : 1.7
             })`,
-            height: 56,
-            opacity: 0.045,
-            pointerEvents: 'none',
-            transformOrigin: 'right center',
+            height: 56, opacity: 0.045,
+            pointerEvents: 'none', transformOrigin: 'right center',
           }}
         />
-
+        <input
+          value={mech.name}
+          onChange={(e) => update({ name: e.target.value })}
+          placeholder={`${mech.weightClass.toUpperCase()} HE-V`}
+          style={{
+            flex: 1, minWidth: 0,
+            background: 'transparent', border: 'none',
+            borderBottom: '2px solid var(--ink)',
+            padding: '4px 0',
+            fontFamily: 'var(--font-display)',
+            fontSize: 28, fontWeight: 700,
+            letterSpacing: '0.04em', textTransform: 'uppercase',
+            color: 'var(--ink)', outline: 'none',
+          }}
+        />
         <button
           onClick={() => onDelete(mech.id)}
           className="add-btn"
+          title="Remove this HE-V"
           style={{
             border: '1.5px solid var(--rust)', background: 'transparent',
-            color: 'var(--rust)', padding: '5px 12px', cursor: 'pointer',
-            fontFamily: 'var(--font-stencil)', fontSize: 12, fontWeight: 700,
-            letterSpacing: '0.12em', textTransform: 'uppercase',
-            display: 'inline-flex', alignItems: 'center', gap: 5,
+            color: 'var(--rust)', padding: '4px 8px', cursor: 'pointer',
+            display: 'inline-flex', alignItems: 'center', gap: 4,
+            flexShrink: 0,
           }}
         >
-          <Trash2 size={12} strokeWidth={2.5} /> Remove
+          <Trash2 size={12} strokeWidth={2.5} />
         </button>
       </div>
-
-      {/* Name + description. Empty name falls back to "<CLASS> HE-V". */}
-      <input
-        value={mech.name}
-        onChange={(e) => update({ name: e.target.value })}
-        placeholder={`${mech.weightClass.toUpperCase()} HE-V`}
-        style={{
-          width: '100%',
-          background: 'transparent',
-          border: 'none',
-          borderBottom: '2px solid var(--ink)',
-          padding: '4px 0',
-          fontFamily: 'var(--font-display)',
-          fontSize: 34,
-          fontWeight: 700,
-          letterSpacing: '0.04em',
-          textTransform: 'uppercase',
-          color: 'var(--ink)',
-          outline: 'none',
-        }}
-      />
       {mech.description && (
         <div style={{
           marginTop: 8, fontSize: 14, color: 'var(--ink-2)', fontStyle: 'italic',
