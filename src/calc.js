@@ -110,9 +110,16 @@ const checkMechAgainstReq = (m, req) => {
   }
 
   if (req.needs) {
-    for (const n of req.needs) {
-      const has = m.upgrades.includes(n) || m.defensive.includes(n);
-      if (!has) return false;
+    if (req.needsAny) {
+      // needsAny: mech must have AT LEAST ONE of the listed items
+      const hasAny = req.needs.some(n => m.upgrades.includes(n) || m.defensive.includes(n));
+      if (!hasAny) return false;
+    } else {
+      // default: mech must have ALL of the listed items
+      for (const n of req.needs) {
+        const has = m.upgrades.includes(n) || m.defensive.includes(n);
+        if (!has) return false;
+      }
     }
   }
   if (req.needsDefensive && m.defensive.length === 0) return false;
@@ -130,7 +137,7 @@ const checkMechAgainstReq = (m, req) => {
   }
   if (req.noDup) {
     const seen = new Set();
-    for (const w of mech.weapons) {
+    for (const w of m.weapons) {
       if (seen.has(w.name)) return false;
       seen.add(w.name);
     }
@@ -150,10 +157,7 @@ const checkMechAgainstReq = (m, req) => {
     });
     if (hasBlast) return false;
   }
-  if (req.noDup) {
-    const dup = m.weapons.some(w => w.count > 1);
-    if (dup) return false;
-  }
+
   if (req.reinforced) {
     const wc = WC[m.weightClass];
     if (m.armor <= wc.baseArmor && m.structure <= wc.baseStructure) return false;
