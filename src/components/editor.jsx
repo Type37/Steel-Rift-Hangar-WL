@@ -96,16 +96,7 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete }) {
             transformOrigin: 'right center',
           }}
         />
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 14 }}>
-          <span className="roster-num" style={{ fontSize: 14 }}>
-            HE-V {String(mechIndex + 1).padStart(2, '0')}
-          </span>
-          <span className="stencil" style={{
-            fontSize: 12, padding: '3px 8px', border: '1.5px solid var(--ink)',
-          }}>
-            {wc.abbr}
-          </span>
-        </div>
+
         <button
           onClick={() => onDelete(mech.id)}
           className="add-btn"
@@ -428,66 +419,50 @@ function Adjuster({ kind, value, base, min, max, onChange }) {
     <div style={{
       border: `2px solid ${isArmor ? 'var(--steel)' : 'var(--olive-deep)'}`,
       background: 'var(--surface)',
-      padding: '14px 14px 12px',
+      padding: '8px 10px 8px',
       position: 'relative',
     }}>
-      {/* Heading row */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 10,
-        borderBottom: '1px solid var(--rule)',
-        paddingBottom: 10, marginBottom: 10,
-      }}>
+      {/* Compact heading row: icon + label + value + strip/reinforce inline */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
         {isArmor ? <ArmorIcon /> : <StructureIcon />}
-        <div style={{ flex: 1 }}>
-          <div className="stencil" style={{
-            fontSize: 14, letterSpacing: '0.14em', color: 'var(--ink)',
-          }}>
-            {isArmor ? 'Armor' : 'Structure'}
-          </div>
-          <div className="mono" style={{ fontSize: 11, color: 'var(--mute)', marginTop: 1 }}>
-            base {base}{delta !== 0 && (
-              <span style={{ color: delta > 0 ? 'var(--olive)' : 'var(--rust)', fontWeight: 700, marginLeft: 5 }}>
-                ({delta > 0 ? '+' : ''}{delta})
-              </span>
-            )}
-          </div>
-        </div>
-        <div className="mono" style={{
-          fontSize: 36, fontWeight: 700, lineHeight: 1, color: 'var(--ink)',
-          fontVariantNumeric: 'tabular-nums',
-        }}>
+        <span className="stencil" style={{ fontSize: 12, letterSpacing: '0.12em', color: 'var(--ink)', flex: 1 }}>
+          {isArmor ? 'Armor' : 'Structure'}
+        </span>
+        {delta !== 0 && (
+          <span className="mono" style={{ fontSize: 10, color: delta > 0 ? 'var(--olive)' : 'var(--rust)', fontWeight: 700 }}>
+            {delta > 0 ? '+' : ''}{delta}
+          </span>
+        )}
+        <div className="mono" style={{ fontSize: 26, fontWeight: 700, lineHeight: 1, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums', minWidth: 28, textAlign: 'right' }}>
           {value}
         </div>
       </div>
 
-      {/* Pip row: visualizes how many points of armor/structure the HE-V has.
-          For armor, plain squares. For structure, the M / D / Ø critical
-          markers land at the quarter-thresholds (per v1.5 p.37). */}
       <PipRow value={value} structure={!isArmor} accent={isArmor ? 'steel' : 'olive'} />
 
-      {/* Reinforce / Strip controls */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginTop: 10 }}>
+      {/* Inline strip / reinforce */}
+      <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
         <button
           onClick={() => onChange(Math.max(min, value - 2))}
           disabled={!canDown}
-          title={canDown ? `Strip ${isArmor ? 'Armor' : 'Structure'}: -2 points, refund 2 tons.` : 'At minimum.'}
+          title={canDown ? `Strip: -2 points, refund 2t` : 'At minimum.'}
           className="add-btn"
-          style={adjusterBtn('down', canDown)}
+          style={{ ...adjusterBtn('down', canDown), flex: 1, flexDirection: 'row', padding: '5px 8px', gap: 6 }}
         >
-          <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 16 }}>−2</span>
-          <span>Strip</span>
-          <span className="mono" style={{ opacity: 0.7, fontSize: 10 }}>+2t</span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 14 }}>−2</span>
+          <span style={{ fontSize: 11 }}>Strip</span>
+          <span className="mono" style={{ opacity: 0.65, fontSize: 10, marginLeft: 'auto' }}>+2t</span>
         </button>
         <button
           onClick={() => onChange(Math.min(max, value + 2))}
           disabled={!canUp}
-          title={canUp ? `Reinforce ${isArmor ? 'Armor' : 'Structure'}: +2 points, costs 2 tons.` : 'At maximum.'}
+          title={canUp ? `Reinforce: +2 points, costs 2t` : 'At maximum.'}
           className="add-btn"
-          style={adjusterBtn('up', canUp)}
+          style={{ ...adjusterBtn('up', canUp), flex: 1, flexDirection: 'row', padding: '5px 8px', gap: 6 }}
         >
-          <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 16 }}>+2</span>
-          <span>Reinforce</span>
-          <span className="mono" style={{ opacity: 0.7, fontSize: 10 }}>-2t</span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 14 }}>+2</span>
+          <span style={{ fontSize: 11 }}>Reinforce</span>
+          <span className="mono" style={{ opacity: 0.65, fontSize: 10, marginLeft: 'auto' }}>−2t</span>
         </button>
       </div>
     </div>
@@ -529,27 +504,28 @@ function PipRow({ value, structure, accent }) {
 
   return (
     <div style={{
-      padding: '6px 0 2px',
+      padding: '5px 0 2px',
       borderTop: '1px dotted var(--rule)',
       borderBottom: '1px dotted var(--rule)',
       marginBottom: 6,
+      display: 'flex', flexWrap: 'wrap', gap: '3px 6px',
     }}>
       {rows.map((row, ri) => (
-        <div key={ri} style={{ display: 'flex', gap: 3, marginBottom: ri < rows.length - 1 ? 3 : 0 }}>
+        <div key={ri} style={{ display: 'flex', gap: 2, flexShrink: 0 }}>
           {row.map((mark, bi) => (
             <span
               key={bi}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center', justifyContent: 'center',
-                width: structure ? 14 : 13,
-                height: structure ? 14 : 15,
-                border: `1.25px solid ${color}`,
+                width: structure ? 12 : 11,
+                height: structure ? 12 : 13,
+                border: `1px solid ${color}`,
                 borderRadius: structure ? '50%' : '50% 50% 50% 50% / 25% 25% 75% 75%',
                 background: mark ? color : 'transparent',
                 color: mark ? 'var(--surface)' : 'transparent',
                 fontFamily: 'var(--font-body)',
-                fontSize: 8, fontWeight: 700,
+                fontSize: 7, fontWeight: 700,
                 lineHeight: 1,
               }}
             >
