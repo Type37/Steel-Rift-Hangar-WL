@@ -448,22 +448,6 @@ function TeamRow({
         </button>
       </div>
 
-      {/* Assigned units strip. Always shown when team is selected so the
-          drop zone is visible even with no assignments yet. */}
-      {selected && (
-        <AssignmentStrip
-          team={team}
-          assignedUnits={assignedUnits}
-          assignedIds={assignedIds}
-          mechs={mechs}
-          supportAssets={supportAssets}
-          supportNicknames={supportNicknames}
-          onAssign={onAssign}
-          onUnassign={onUnassign}
-          onClearTeam={onClearTeam}
-        />
-      )}
-
       {open && (
         <div style={{ padding: '0 14px 16px 14px', background: 'var(--bg-deep)', borderTop: '1px dashed var(--rule)' }}>
           <div style={{ marginTop: 12 }}><span className="label">Requirements</span></div>
@@ -526,6 +510,22 @@ function TeamRow({
             </div>
           ) : (
             <div style={{ fontSize: 13, color: 'var(--ink)', lineHeight: 1.6, marginTop: 4 }}>{team.benefits}</div>
+          )}
+          {selected && (
+            <>
+              <div style={{ marginTop: 12 }}><span className="label">Assigned HE-Vs</span></div>
+              <AssignmentStrip
+                team={team}
+                assignedUnits={assignedUnits}
+                assignedIds={assignedIds}
+                mechs={mechs}
+                supportAssets={supportAssets}
+                supportNicknames={supportNicknames}
+                onAssign={onAssign}
+                onUnassign={onUnassign}
+                onClearTeam={onClearTeam}
+              />
+            </>
           )}
           <div style={{ marginTop: 10 }}><span className="label">Team Agenda</span></div>
           <div style={{ fontSize: 13, color: 'var(--steel)', lineHeight: 1.6, marginTop: 4, whiteSpace: 'pre-line' }}>{team.agenda}</div>

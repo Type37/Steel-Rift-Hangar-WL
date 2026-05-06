@@ -76,12 +76,20 @@ export function MechEditor({ mech, mechIndex, onChange, onDelete }) {
     else update({ defensive: [...mech.defensive, name] });
   };
 
-  const sortByAvail = (items, isAvail) =>
-    [...items].sort((a, b) => {
+  const sortByAvail = (items, isAvail) => {
+    const cls_ = mech.weightClass;
+    return [...items].sort((a, b) => {
       const aOk = isAvail(a), bOk = isAvail(b);
       if (aOk !== bOk) return aOk ? -1 : 1;
+      if (weaponSort === 'cost') {
+        const ac = valForClass(a.cost, cls_), bc = valForClass(b.cost, cls_);
+        const an = typeof ac === 'number' ? ac : 999;
+        const bn = typeof bc === 'number' ? bc : 999;
+        if (an !== bn) return an - bn;
+      }
       return a.name.localeCompare(b.name);
     });
+  };
 
   return (
     <div>

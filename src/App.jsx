@@ -54,6 +54,7 @@ export default function App() {
   const [teamAssignments, setTeamAssignments] = useState(stored.teamAssignments ?? {});
 
   const [simpleMode, setSimpleMode] = useState(stored.simpleMode ?? false);
+  const [weaponSort, setWeaponSort] = useState(stored.weaponSort ?? 'cost');
 
   const [addMechOpen, setAddMechOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
@@ -68,7 +69,7 @@ export default function App() {
         forceName, mission, customTons,
         faction, perks, factionLogo,
         mechs, supportAssets, selectedTeams,
-        callsignPools, customCallsigns, supportNicknames, supportLoadouts, garrisonLoadouts,
+        callsignPools, customCallsigns, supportNicknames, supportLoadouts, garrisonLoadouts, weaponSort,
         teamAssignments,
         simpleMode,
       }));
@@ -542,6 +543,7 @@ export default function App() {
           if (data.supportNicknames) setSupportNicknames(data.supportNicknames);
           if (data.supportLoadouts) setSupportLoadouts(data.supportLoadouts);
           if (data.garrisonLoadouts) setGarrisonLoadouts(data.garrisonLoadouts);
+          if (data.weaponSort) setWeaponSort(data.weaponSort);
           if (data.teamAssignments) setTeamAssignments(data.teamAssignments);
           if (data.simpleMode !== undefined) setSimpleMode(data.simpleMode);
           setSelectedMechId(null);
