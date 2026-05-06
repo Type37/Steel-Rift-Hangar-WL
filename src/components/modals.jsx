@@ -12,7 +12,7 @@ const asset = (p) => `${BASE}${p.replace(/^\//, '')}`;
 // ADD HE-V MODAL
 // ============================================================
 
-export function AddMechModal({ open, onClose, onConfirm, callsignPool: callsignPools, setCallsignPool, customCallsigns }) {
+export function AddMechModal({ open, onClose, onConfirm, callsignPool: callsignPools, customCallsigns }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [cls, setCls] = useState('Light');
@@ -25,7 +25,6 @@ export function AddMechModal({ open, onClose, onConfirm, callsignPool: callsignP
     }
   }, [open]);
 
-  const [poolOpen, setPoolOpen] = useState(false);
   const roll = () => setName(rollCallsign(callsignPools, customCallsigns));
   const submit = () => onConfirm({ name: name.trim(), description: description.trim(), cls });
 
@@ -66,75 +65,23 @@ export function AddMechModal({ open, onClose, onConfirm, callsignPool: callsignP
             placeholder="e.g. Ironwake, Saturn Forge, Silt-7"
             autoFocus
           />
-          {/* Split button: Roll | ▾ (opens pool picker) */}
-          <div style={{ display: 'flex', flexShrink: 0, border: '1px solid var(--rule)' }}>
-            <button
-              onClick={roll}
-              title="Roll a random callsign"
-              className="add-btn"
-              style={{
-                background: 'var(--surface)', padding: '0 14px', cursor: 'pointer',
-                display: 'inline-flex', alignItems: 'center', gap: 6, borderRight: '1px solid var(--rule)',
-                fontFamily: 'var(--font-stencil)', fontSize: 13, fontWeight: 700,
-                letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--ink)',
-              }}
-            >
-              <Dices size={15} strokeWidth={2.25} />
-              Roll
-            </button>
-            <button
-              onClick={() => setPoolOpen(p => !p)}
-              title="Callsign pool options"
-              className="add-btn"
-              style={{
-                background: poolOpen ? 'var(--surface-2)' : 'var(--surface)',
-                padding: '0 9px', cursor: 'pointer',
-                display: 'inline-flex', alignItems: 'center',
-                color: 'var(--mute)', transition: 'background 100ms',
-              }}
-            >
-              <ChevronDown size={13} strokeWidth={2.5}
-                style={{ transform: poolOpen ? 'rotate(180deg)' : 'none', transition: 'transform 150ms' }} />
-            </button>
-          </div>
+          <button
+            onClick={roll}
+            title="Roll a name"
+            className="add-btn"
+            style={{
+              border: '1px solid var(--rule)', background: 'var(--surface)',
+              padding: '0 16px', cursor: 'pointer',
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              fontFamily: 'var(--font-stencil)', fontSize: 13, fontWeight: 700,
+              letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--ink)',
+              flexShrink: 0,
+            }}
+          >
+            <Dices size={15} strokeWidth={2.25} />
+            Roll
+          </button>
         </div>
-
-        {/* Pool picker panel */}
-        {poolOpen && (
-          <div style={{
-            background: 'var(--surface-2)',
-            border: '1px solid var(--rule)',
-            borderTop: 'none',
-            padding: '10px 14px 12px',
-            marginBottom: 6,
-          }}>
-            <div className="label" style={{ fontSize: 10, marginBottom: 8 }}>CALLSIGN POOLS</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-              {[...POOL_NAMES, 'Custom'].map(p => {
-                const on = callsignPools.includes(p);
-                return (
-                  <label key={p} style={{
-                    display: 'flex', alignItems: 'center', gap: 8,
-                    cursor: 'pointer', fontSize: 13, color: 'var(--ink)',
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={on}
-                      onChange={() => {
-                        const next = on
-                          ? callsignPools.filter(x => x !== p)
-                          : [...callsignPools, p];
-                        if (next.length > 0 && typeof setCallsignPool === 'function') setCallsignPool(next);
-                      }}
-                      style={{ accentColor: 'var(--rust)', cursor: 'pointer' }}
-                    />
-                    {p}
-                  </label>
-                );
-              })}
-            </div>
-          </div>
-        )}
 
         <textarea
           className="txt"
