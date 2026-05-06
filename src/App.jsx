@@ -417,6 +417,7 @@ export default function App() {
                 <MechEditor
                   mech={selectedMech}
                   mechIndex={mechs.findIndex(m => m.id === selectedMech.id)}
+                  weaponSort={weaponSort}
                   onChange={handleUpdateMech}
                   onDelete={handleDeleteMech}
                 />
@@ -511,6 +512,8 @@ export default function App() {
         setCustomCallsigns={setCustomCallsigns}
         simpleMode={simpleMode}
         setSimpleMode={setSimpleMode}
+        weaponSort={weaponSort}
+        setWeaponSort={setWeaponSort}
         factionLogo={factionLogo}
         setFactionLogo={setFactionLogo}
       />

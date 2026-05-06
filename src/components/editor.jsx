@@ -10,7 +10,7 @@ import { SectionTitle, FieldLabel, StepButton, TraitList, TraitToken, RowExpand,
 const BASE = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '/');
 const asset = (p) => `${BASE}${p.replace(/^\//, '')}`;
 
-export function MechEditor({ mech, mechIndex, onChange, onDelete }) {
+export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onDelete }) {
   const stats = calcMech(mech);
   const cls = mech.weightClass;
   const wc = WC[cls];
