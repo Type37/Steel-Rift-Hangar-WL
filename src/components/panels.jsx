@@ -194,26 +194,7 @@ function SupportExpanded({ a }) {
       {traitNames.length > 0 && (
         <InlineTraitGlossary traits={traitNames} />
       )}
-      {/* Universal Secondary Agendas — separate from faction choice */}
-      <SectionTitle>Universal Secondary Agendas</SectionTitle>
-      <div style={{ marginBottom: 18, padding: '0 2px' }}>
-        <div style={{ fontSize: 12, color: 'var(--mute)', marginBottom: 12, lineHeight: 1.5 }}>
-          Available to any Force meeting the requirement. Faction does not matter.
-        </div>
-        {UNIVERSAL_AGENDAS.map(a => (
-          <div key={a.name} style={{
-            marginBottom: 12, padding: '10px 14px',
-            background: 'var(--surface)', border: '1px solid var(--rule)',
-            borderLeft: '3px solid var(--olive)',
-          }}>
-            <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--ink)', marginBottom: 2 }}>{a.name}</div>
-            <div style={{ fontSize: 11.5, color: 'var(--mute)', fontStyle: 'italic', marginBottom: 4 }}>
-              Requirement: {a.req}
-            </div>
-            <div style={{ fontSize: 12.5, color: 'var(--ink-2)', lineHeight: 1.55 }}>{a.text}</div>
-          </div>
-        ))}
-      </div>
+
     </div>
   );
 }
