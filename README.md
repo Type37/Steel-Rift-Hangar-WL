@@ -6,7 +6,7 @@ An army builder for [Steel Rift](https://www.steelrift.com), updated to the v1.5
 
 ## History
 
-Originally created by [Unstoppable Carl](https://github.com/unstoppablecarl) for Death Ray Designs LLC. That version was built against the v1.0 rules. This is a full v1.5 rebuild from scratch (Vite + React) by WarLore with Claude help. The MIT license from the original is preserved.
+Originally created by [Unstoppable Carl](https://github.com/unstoppablecarl) for Death Ray Designs LLC. That version was built against the v1.0 rules. This is a full v1.5 rebuild from scratch (Vite + React) by [WarLore](https://linktr.ee/warlore) with Claude help. The MIT license from the original is preserved.
 
 ## Run locally
 

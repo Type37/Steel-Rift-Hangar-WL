@@ -190,6 +190,9 @@ export function BottomBar({
           <span className="util-label">Print</span>
         </button>
       </div>
+      <div style={{ textAlign: 'center', fontSize: 10.5, color: 'var(--mute)', padding: '3px 0 4px', fontFamily: 'var(--font-mono)', borderTop: '1px solid var(--rule)' }}>
+        Originally built by unstoppable Carl. Forked and rebuilt for v1.5 by <a href="https://linktr.ee/warlore" target="_blank" rel="noreferrer" style={{ color: 'var(--mute)', textDecoration: 'underline' }}>WarLore</a>.
+      </div>
     </div>
   );
 }
