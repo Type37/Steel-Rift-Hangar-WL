@@ -10,8 +10,8 @@ import { SectionTitle, FieldLabel, StepButton, TraitList, TraitToken, RowExpand,
 const BASE = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '/');
 const asset = (p) => `${BASE}${p.replace(/^\//, '')}`;
 
-export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onDelete }) {
-  const stats = calcMech(mech);
+export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onDelete, activePerks = [] }) {
+  const stats = calcMech(mech, activePerks);
   const cls = mech.weightClass;
   const wc = WC[cls];
   const defLimit = cls === 'Ultraheavy' ? 2 : 1;
@@ -196,6 +196,7 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 22 }}>
         <Adjuster
           kind="armor"
+          reinforceCost={stats.reinforceCost}
           value={mech.armor}
           base={wc.baseArmor}
           min={Math.max(0, wc.baseArmor - 4)}
@@ -204,6 +205,7 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
         />
         <Adjuster
           kind="structure"
+          reinforceCost={stats.reinforceCost}
           value={mech.structure}
           base={wc.baseStructure}
           min={Math.max(0, wc.baseStructure - 4)}
@@ -234,7 +236,7 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
       {/* Catalog tabs + tonnage + slots all on one row */}
       <div style={{ marginTop: 16 }}>
         {/* LOADOUT title row with inline tonnage bar */}
-        <LoadoutHeader stats={stats} wc={wc} />
+        <LoadoutHeader stats={stats} wc={wc} activePerks={activePerks} />
         <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexWrap: 'wrap' }}>
           {(() => {
             const defCount = mech.defensive.length;
@@ -444,11 +446,9 @@ function LoadoutHeader({ stats, wc }) {
 // Up = "Reinforce", Down = "Strip".
 // ============================================================
 
-function Adjuster({ kind, value, base, min, max, onChange }) {
+function Adjuster({ kind, value, base, min, max, onChange, reinforceCost = 2 }) {
   const delta = value - base;
-  const tonsSpent = value; // 1 ton per point of armor/structure equipped
   const isArmor = kind === 'armor';
-  const stepLabel = (dir) => dir === 'up' ? 'Reinforce' : 'Strip';
   const canUp = value < max;
   const canDown = value > min;
 
@@ -459,7 +459,6 @@ function Adjuster({ kind, value, base, min, max, onChange }) {
       padding: '8px 10px 8px',
       position: 'relative',
     }}>
-      {/* Compact heading row: icon + label + value + strip/reinforce inline */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
         {isArmor ? <ArmorIcon /> : <StructureIcon />}
         <span className="stencil" style={{ fontSize: 12, letterSpacing: '0.12em', color: 'var(--ink)', flex: 1 }}>
@@ -477,7 +476,6 @@ function Adjuster({ kind, value, base, min, max, onChange }) {
 
       <PipRow value={value} structure={!isArmor} accent={isArmor ? 'steel' : 'olive'} />
 
-      {/* Inline strip / reinforce */}
       <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
         <button
           onClick={() => onChange(Math.max(min, value - 2))}
@@ -493,13 +491,13 @@ function Adjuster({ kind, value, base, min, max, onChange }) {
         <button
           onClick={() => onChange(Math.min(max, value + 2))}
           disabled={!canUp}
-          title={canUp ? `Reinforce: +2 points, costs 2t` : 'At maximum.'}
+          title={canUp ? `Reinforce: +2 points, costs ${reinforceCost}t` : 'At maximum.'}
           className="add-btn"
           style={{ ...adjusterBtn('up', canUp), flex: 1, flexDirection: 'row', padding: '5px 8px', gap: 6 }}
         >
           <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 14 }}>+2</span>
           <span style={{ fontSize: 11 }}>Reinforce</span>
-          <span className="mono" style={{ opacity: 0.65, fontSize: 10, marginLeft: 'auto' }}>−2t</span>
+          <span className="mono" style={{ opacity: 0.65, fontSize: 10, marginLeft: 'auto' }}>−{reinforceCost}t</span>
         </button>
       </div>
     </div>

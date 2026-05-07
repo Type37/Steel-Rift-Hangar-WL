@@ -1293,7 +1293,19 @@ const subTableTd = {
   lineHeight: 1.4,
 };
 
-export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
+
+const SUB_PERK_OPTIONS = {
+  'Tech Pirates': {
+    label: 'Choose R&D perk (Corporations)',
+    options: ['Advanced Hardpoint Design', 'Advanced Energy Management Systems', 'Advanced Structural Components'],
+  },
+  'Disgraced Trillionaire': {
+    label: 'Choose Deep War Chest perk (Corporations)',
+    options: ['Top End Hardware', 'Outrageous Support Budget', 'Purchased Outcomes'],
+  },
+};
+
+export function FactionPanel({ faction, perks, subPerkSelections = {}, onSetSubPerk, onSetFaction, onTogglePerk }) {
   const data = faction ? FACTIONS[faction] : null;
 
   return (
@@ -1369,8 +1381,8 @@ export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
                         : perks.length >= 2 ? 'You already picked 2 perks. Remove one first.' : null)
                     : null;
                   return (
+                    <React.Fragment key={o.name}>
                     <button
-                      key={o.name}
                       onClick={() => !blocked && onTogglePerk(o.name)}
                       disabled={blocked}
                       title={blockedReason || (eq ? `Remove ${o.name}.` : `Add ${o.name}.`)}
@@ -1401,6 +1413,38 @@ export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
                         </div>
                       </div>
                     </button>
+                    {/* Sub-perk selector for Tech Pirates / Disgraced Trillionaire */}
+                    {eq && SUB_PERK_OPTIONS[o.name] && (
+                      <div style={{ margin: '4px 10px 8px 34px', padding: '8px 10px', background: 'var(--surface-2)', border: '1px solid var(--rule)', borderRadius: 2 }}>
+                        <div style={{ fontSize: 11, color: 'var(--mute)', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em', marginBottom: 6 }}>
+                          {SUB_PERK_OPTIONS[o.name].label}
+                        </div>
+                        {SUB_PERK_OPTIONS[o.name].options.map(sub => {
+                          const active = subPerkSelections[o.name] === sub;
+                          return (
+                            <button
+                              key={sub}
+                              onClick={(e) => { e.stopPropagation(); onSetSubPerk(o.name, active ? null : sub); }}
+                              className="add-btn"
+                              style={{
+                                display: 'flex', alignItems: 'center', gap: 8,
+                                width: '100%', textAlign: 'left', padding: '5px 8px',
+                                background: active ? 'var(--surface)' : 'transparent',
+                                border: 'none', cursor: 'pointer', marginBottom: 2,
+                              }}
+                            >
+                              <span style={{
+                                width: 10, height: 10, borderRadius: '50%', flexShrink: 0,
+                                border: `2px solid ${active ? 'var(--olive)' : 'var(--rule-strong)'}`,
+                                background: active ? 'var(--olive)' : 'transparent',
+                              }} />
+                              <span style={{ fontSize: 13, color: 'var(--ink)', fontWeight: active ? 700 : 400 }}>{sub}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                    </React.Fragment>
                   );
                 })}
               </div>

@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { TEAMS, MISSIONS, MISSION_ORDER, FACTION_LOGOS, FREEFORM_MISSION, FACTIONS } from './data';
 import { POOL_NAMES } from './callsigns';
-import { calcMech, newMech, findAsset } from './calc';
+import { calcMech, newMech, findAsset, effectivePerks } from './calc';
 import { WC } from './data';
 
 import { Navbar, BottomBar, MechCard, EmptyRoster, SupportRosterCard } from './components/chrome';
@@ -32,6 +32,7 @@ export default function App() {
   const [faction, setFaction] = useState(stored.faction ?? null);
   const [perks, setPerks] = useState(stored.perks ?? []);
   const [factionLogo, setFactionLogo] = useState(stored.factionLogo ?? null);
+  const [subPerkSelections, setSubPerkSelections] = useState(stored.subPerkSelections ?? {});
 
   const [mechs, setMechs] = useState(stored.mechs ?? []);
   const [supportAssets, setSupportAssets] = useState(stored.supportAssets ?? []);
@@ -69,7 +70,7 @@ export default function App() {
       window.localStorage.setItem(STATE_KEY, JSON.stringify({
         forceName, mission, customTons,
         faction, perks, factionLogo,
-        mechs, supportAssets, selectedTeams,
+        mechs, supportAssets, selectedTeams, subPerkSelections,
         callsignPools, customCallsigns, supportNicknames, supportLoadouts, garrisonLoadouts, weaponSort,
         teamAssignments,
         simpleMode,
@@ -151,15 +152,29 @@ export default function App() {
   const isFreeform = mission === FREEFORM_MISSION;
   const cap = isFreeform ? Infinity : (useCustom ? customTons : MISSIONS[mission].tons);
   const supportLimit = isFreeform ? Infinity : (useCustom ? Math.max(1, Math.floor(customTons / 50)) : MISSIONS[mission].support);
+  // Resolve full effective perk list including sub-perks from Tech Pirates / Disgraced Trillionaire
+  const activePerks = useMemo(
+    () => effectivePerks(perks, subPerkSelections),
+    [perks, subPerkSelections]
+  );
+
   // Rules p.18: each HE-V costs its flat weight-class tonnage (20/30/40/50)
   // from the force budget. Weapons/upgrades are paid from within that
   // tonnage, not on top of it.
-  const totalTons = useMemo(
-    () =>
-      mechs.reduce((s, m) => s + WC[m.weightClass].tons, 0) +
-      supportAssets.reduce((s, n) => s + (findAsset(n)?.cost || 0), 0),
-    [mechs, supportAssets]
-  );
+  // Outrageous Support Budget: one off-table asset costing ≤10t is free.
+  const totalTons = useMemo(() => {
+    const mechTons = mechs.reduce((s, m) => s + WC[m.weightClass].tons, 0);
+    let assetTons = supportAssets.reduce((s, n) => s + (findAsset(n)?.cost || 0), 0);
+    if (activePerks.includes('Outrageous Support Budget')) {
+      // Find the most expensive off-table asset costing ≤10t and make it free
+      const qualifying = supportAssets
+        .map(n => findAsset(n))
+        .filter(a => a && a.kind === 'Off-Table' && a.cost <= 10)
+        .sort((a, b) => b.cost - a.cost);
+      if (qualifying.length > 0) assetTons -= qualifying[0].cost;
+    }
+    return mechTons + assetTons;
+  }, [mechs, supportAssets, activePerks]);
 
   const missionObj = isFreeform
     ? { ...MISSIONS['All-Out War'], teamCounts: { '2': 99, '2-3': 99, '3-4': 99 } }
@@ -438,6 +453,7 @@ export default function App() {
                   weaponSort={weaponSort}
                   onChange={handleUpdateMech}
                   onDelete={handleDeleteMech}
+                  activePerks={activePerks}
                 />
               )}
 
@@ -490,6 +506,8 @@ export default function App() {
                 <FactionPanel
                   faction={faction}
                   perks={perks}
+                  subPerkSelections={subPerkSelections}
+                  onSetSubPerk={(perk, sub) => setSubPerkSelections(s => ({ ...s, [perk]: sub }))}
                   onSetFaction={handleSetFaction}
                   onTogglePerk={togglePerk}
                 />
@@ -551,7 +569,7 @@ export default function App() {
         currentState={{
           forceName, mission, customTons,
           faction, perks, factionLogo,
-          mechs, supportAssets, selectedTeams,
+          mechs, supportAssets, selectedTeams, subPerkSelections,
           callsignPools, customCallsigns,
           supportNicknames, supportLoadouts,
           teamAssignments,
@@ -564,6 +582,7 @@ export default function App() {
           if (data.customTons != null) setCustomTons(data.customTons);
           if (data.faction !== undefined) setFaction(data.faction);
           if (data.perks) setPerks(data.perks);
+          if (data.subPerkSelections) setSubPerkSelections(data.subPerkSelections);
           if (data.factionLogo !== undefined) setFactionLogo(data.factionLogo);
           if (data.mechs) setMechs(data.mechs);
           if (data.supportAssets) setSupportAssets(data.supportAssets);

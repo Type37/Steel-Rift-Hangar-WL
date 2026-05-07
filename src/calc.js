@@ -34,10 +34,43 @@ export const findAsset = (name) =>
 export const findWeapon = (name) =>
   [...RANGED, ...MELEE].find(w => w.name === name);
 
-export const calcMech = (m) => {
+// Resolve the full effective perk list, including sub-perks granted by
+// Tech Pirates (one Corp R&D perk) and Disgraced Trillionaire (one Deep War
+// Chest perk). subPerkSelections maps perk name -> chosen sub-perk name.
+export const effectivePerks = (perks = [], subPerkSelections = {}) => {
+  const list = [...perks];
+  if (perks.includes('Tech Pirates') && subPerkSelections['Tech Pirates']) {
+    list.push(subPerkSelections['Tech Pirates']);
+  }
+  if (perks.includes('Disgraced Trillionaire') && subPerkSelections['Disgraced Trillionaire']) {
+    list.push(subPerkSelections['Disgraced Trillionaire']);
+  }
+  return list;
+};
+
+export const calcMech = (m, activePerks = []) => {
   const wc = WC[m.weightClass];
   const armor = m.armor;
   const structure = m.structure;
+
+  // Perk flags
+  const hasHardpoint  = activePerks.includes('Advanced Hardpoint Design');
+  const hasTopEnd     = activePerks.includes('Top End Hardware');
+  const hasMateriel   = activePerks.includes('Materiel Stockpiles');
+
+  // Materiel Stockpiles: reinforcing costs 1t per step instead of 2t.
+  // Stripping always refunds 2t per step regardless.
+  // Ton cost of armor/structure is base + reinforced-above-base * factor.
+  const reinforceFactor = hasMateriel ? 0.5 : 1.0;
+  const armorBase = wc.baseArmor;
+  const structBase = wc.baseStructure;
+  const armorTons = armor <= armorBase
+    ? armor
+    : armorBase + (armor - armorBase) * reinforceFactor;
+  const structureTons = structure <= structBase
+    ? structure
+    : structBase + (structure - structBase) * reinforceFactor;
+
   let weaponsTons = 0, weaponsSlots = 0;
   m.weapons.forEach(w => {
     const def = findWeapon(w.name);
@@ -62,17 +95,23 @@ export const calcMech = (m) => {
     if (c !== '-' && c != null) defensiveTons += Number(c);
     if (def.mod && def.mod.armor) defensiveArmorBonus += def.mod.armor;
   });
-  const totalUsed = armor + structure + weaponsTons + upgradesTons + defensiveTons;
+
+  const totalUsed = armorTons + structureTons + weaponsTons + upgradesTons + defensiveTons;
   const totalSlotsUsed = weaponsSlots + upgradesSlots;
+  const capTons  = wc.tons  + (hasTopEnd    ? 2 : 0);
+  const capSlots = wc.slots + (hasHardpoint ? 1 : 0);
+
   return {
-    armor, structure, weaponsTons, weaponsSlots, upgradesTons, upgradesSlots,
+    armor, structure, armorTons, structureTons,
+    weaponsTons, weaponsSlots, upgradesTons, upgradesSlots,
     defensiveTons, defensiveArmorBonus,
     effectiveArmor: armor + defensiveArmorBonus,
     totalUsed, totalSlotsUsed,
-    overTons: totalUsed > wc.tons,
-    overSlots: totalSlotsUsed > wc.slots,
-    capTons: wc.tons,
-    capSlots: wc.slots,
+    overTons:  totalUsed      > capTons,
+    overSlots: totalSlotsUsed > capSlots,
+    capTons, capSlots,
+    hasMateriel, hasTopEnd, hasHardpoint,
+    reinforceCost: hasMateriel ? 1 : 2,
   };
 };
 
