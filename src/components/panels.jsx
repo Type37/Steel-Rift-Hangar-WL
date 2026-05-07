@@ -289,7 +289,7 @@ function TeamRow({
   assignedIds = [], mechs = [], supportAssets = [], supportNicknames = {},
   onAssign, onUnassign, onClearTeam,
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [dragOver, setDragOver] = useState(false);
 
   // Drop handler: read the dragged unit ID and assign to this team.
@@ -1417,7 +1417,7 @@ export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
 // ============================================================
 
 function AgendaCard({ name, tag, text, req, qualified, dimReason }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   return (
     <div
       onClick={() => setOpen(o => !o)}
@@ -1554,7 +1554,7 @@ export function AgendasPanel({ mechs, faction, selectedTeams, supportAssets }) {
           Agendas
         </h2>
         <p style={{ margin: '4px 0 0', fontSize: 11, color: 'var(--mute)', fontFamily: 'var(--font-mono)' }}>
-          {qualified.length} available · {unqualified.length} not yet unlocked
+          {qualified.length} / {allAgendas.length} available
         </p>
       </div>
 
