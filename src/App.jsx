@@ -6,7 +6,7 @@ import { WC } from './data';
 
 import { Navbar, BottomBar, MechCard, EmptyRoster, SupportRosterCard } from './components/chrome';
 import { MechEditor } from './components/editor';
-import { SupportPanel, TeamPanel, FactionPanel, SupportDetailView } from './components/panels';
+import { SupportPanel, TeamPanel, FactionPanel, SupportDetailView, AgendasPanel } from './components/panels';
 import { AddMechModal, OptionsModal, ListsModal } from './components/modals';
 import { PrintView } from './components/print';
 import { SectionTitle, GhostButton } from './components/ui';
@@ -418,6 +418,7 @@ export default function App() {
                 { id: 'support', label: 'Support' },
                 { id: 'teams', label: 'Teams' },
                 { id: 'faction', label: 'Faction' },
+                { id: 'agendas', label: 'Agendas' },
               ].map(t => (
                 <button
                   key={t.id}
@@ -491,6 +492,15 @@ export default function App() {
                   perks={perks}
                   onSetFaction={handleSetFaction}
                   onTogglePerk={togglePerk}
+                />
+              )}
+
+              {sideTab === 'agendas' && (
+                <AgendasPanel
+                  mechs={mechs}
+                  faction={faction}
+                  selectedTeams={selectedTeams}
+                  supportAssets={supportAssets}
                 />
               )}
             </div>

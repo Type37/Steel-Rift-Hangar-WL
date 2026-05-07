@@ -1411,3 +1411,171 @@ export function FactionPanel({ faction, perks, onSetFaction, onTogglePerk }) {
     </div>
   );
 }
+
+// ============================================================
+// AGENDAS PANEL
+// ============================================================
+
+function AgendaCard({ name, tag, text, req, qualified, dimReason }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div
+      onClick={() => setOpen(o => !o)}
+      style={{
+        borderBottom: '1px solid var(--rule)',
+        padding: '10px 14px',
+        cursor: 'pointer',
+        opacity: qualified ? 1 : 0.4,
+        background: qualified ? 'var(--surface)' : 'var(--surface-2)',
+        transition: 'opacity 150ms',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span
+          className="stencil"
+          style={{
+            fontSize: 11, letterSpacing: '0.1em',
+            padding: '1px 5px', borderRadius: 1,
+            background: qualified ? 'var(--rust)' : 'var(--rule-strong)',
+            color: qualified ? 'var(--surface)' : 'var(--ink)',
+            flexShrink: 0, textTransform: 'uppercase',
+          }}
+        >
+          {tag}
+        </span>
+        <span style={{ fontFamily: 'var(--font-stencil)', fontSize: 13, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', flex: 1 }}>
+          {name}
+        </span>
+        <span style={{ fontSize: 11, color: 'var(--mute)' }}>{open ? '▲' : '▼'}</span>
+      </div>
+
+      {open && (
+        <div style={{ marginTop: 8, fontSize: 12, color: 'var(--ink-2)', lineHeight: 1.55 }}>
+          {req && (
+            <div style={{ marginBottom: 6, color: 'var(--mute)', fontSize: 11 }}>
+              <strong style={{ color: 'var(--ink)', letterSpacing: '0.06em' }}>REQUIRES: </strong>{req}
+            </div>
+          )}
+          {!qualified && dimReason && (
+            <div style={{ marginBottom: 6, fontStyle: 'italic', color: 'var(--rust)', fontSize: 11 }}>
+              {dimReason}
+            </div>
+          )}
+          <p style={{ margin: 0 }}>{text}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function AgendasPanel({ mechs, faction, selectedTeams, supportAssets }) {
+  const lightCount   = mechs.filter(m => m.weightClass === 'Light').length;
+  const mediumCount  = mechs.filter(m => m.weightClass === 'Medium').length;
+  const heavyCount   = mechs.filter(m => m.weightClass === 'Heavy').length;
+
+  // Build the full agenda list with qualified flag
+  const allAgendas = [];
+
+  // 1. Faction agenda
+  if (faction) {
+    const fdata = FACTIONS[faction];
+    const raw = fdata?.agenda || '';
+    const colonIdx = raw.indexOf(':');
+    const agendaName = colonIdx > -1 ? raw.slice(0, colonIdx).trim() : `${faction} Agenda`;
+    const agendaText = colonIdx > -1 ? raw.slice(colonIdx + 1).trim() : raw;
+    allAgendas.push({
+      name: agendaName,
+      tag: faction,
+      text: agendaText,
+      req: null,
+      qualified: true,
+      dimReason: null,
+      sortKey: 0,
+    });
+  } else {
+    allAgendas.push({
+      name: 'Faction Agenda',
+      tag: 'Faction',
+      text: 'Pick a faction to unlock your faction agenda.',
+      req: 'Select a faction.',
+      qualified: false,
+      dimReason: 'No faction selected.',
+      sortKey: 1,
+    });
+  }
+
+  // 2. Universal agendas
+  const universalQual = {
+    'Stalkers':     { ok: lightCount  >= 2, reason: `Requires 2+ Light HE-Vs (have ${lightCount}).`  },
+    'Brawlers':     { ok: mediumCount >= 2, reason: `Requires 2+ Medium HE-Vs (have ${mediumCount}).` },
+    'Enforcers':    { ok: heavyCount  >= 2, reason: `Requires 2+ Heavy HE-Vs (have ${heavyCount}).`  },
+    'Titan-Killers':{ ok: null,            reason: 'Depends on opponent\'s force — check before the game.' },
+  };
+  UNIVERSAL_AGENDAS.forEach(a => {
+    const q = universalQual[a.name];
+    const qualified = q?.ok === null ? true : (q?.ok ?? false);
+    allAgendas.push({
+      name: a.name,
+      tag: 'Universal',
+      text: a.text,
+      req: a.req,
+      qualified,
+      dimReason: qualified ? null : q?.reason,
+      sortKey: qualified ? 0 : 1,
+    });
+  });
+
+  // 3. Team agendas — selected teams first, then the rest
+  TEAMS.forEach(t => {
+    if (!t.agenda) return;
+    const inTeam = selectedTeams.includes(t.name);
+    const tRaw = t.agenda || '';
+    const tColon = tRaw.indexOf(':');
+    const tAgendaName = tColon > -1 ? tRaw.slice(0, tColon).trim() : t.name.replace(' Team', '');
+    const tAgendaText = tColon > -1 ? tRaw.slice(tColon + 1).trim() : tRaw;
+    allAgendas.push({
+      name: tAgendaName,
+      tag: 'Team',
+      text: tAgendaText,
+      req: `Requires ${t.name} in your force.`,
+      qualified: inTeam,
+      dimReason: inTeam ? null : `${t.name} not in your force.`,
+      sortKey: inTeam ? 0 : 1,
+    });
+  });
+
+  const qualified   = allAgendas.filter(a => a.qualified);
+  const unqualified = allAgendas.filter(a => !a.qualified);
+
+  return (
+    <div style={{ padding: '0 0 40px' }}>
+      <div style={{ padding: '12px 14px 6px', borderBottom: '2px solid var(--ink)' }}>
+        <h2 style={{ fontFamily: 'var(--font-stencil)', fontSize: 19, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>
+          Agendas
+        </h2>
+        <p style={{ margin: '4px 0 0', fontSize: 11, color: 'var(--mute)', fontFamily: 'var(--font-mono)' }}>
+          {qualified.length} available · {unqualified.length} not yet unlocked
+        </p>
+      </div>
+
+      {qualified.length > 0 && (
+        <div>
+          {qualified.map(a => (
+            <AgendaCard key={a.name + a.tag} {...a} />
+          ))}
+        </div>
+      )}
+
+      {unqualified.length > 0 && (
+        <div style={{ borderTop: unqualified.length && qualified.length ? '2px solid var(--rule)' : 'none' }}>
+          <div style={{ padding: '6px 14px 4px', fontSize: 10, color: 'var(--mute)', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+            Not available with current force
+          </div>
+          {unqualified.map(a => (
+            <AgendaCard key={a.name + a.tag} {...a} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
