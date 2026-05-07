@@ -1376,3 +1376,38 @@ button:not(:disabled):active {
 
 /* Editor silhouette: clip overflow so it doesn't bleed outside the identity area */
 .editor-identity { overflow: hidden; }
+
+/* ============================================================
+   WEAPON ROW — mobile reflow
+   On narrow screens the 7-column grid collapses to two rows:
+   row 1: expand toggle + name/dmg + traits
+   row 2: cost columns + add/remove controls
+   ============================================================ */
+.weapon-row-main {
+  display: grid;
+  grid-template-columns: auto 1fr 128px auto auto auto 28px;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 14px;
+}
+/* The bottom wrapper passes its children straight into the grid */
+.weapon-row-bottom {
+  display: contents;
+}
+@media (max-width: 540px) {
+  .weapon-row-main {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 8px 10px;
+  }
+  /* On mobile the bottom wrapper becomes a real flex row */
+  .weapon-row-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 6px;
+    gap: 6px;
+  }
+}

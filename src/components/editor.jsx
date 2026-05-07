@@ -702,6 +702,50 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
     ? `${weapon.name} is not available on a ${cls} HE-V (per the per-class cost table).`
     : null;
 
+  // Cost column shared between desktop grid and mobile flex row
+  const CostColumns = () => (
+    <div className="weapon-row-cost" style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
+      <div style={{ display: 'flex', gap: 0 }}>
+        {WC_ABBR.map((abbr, i) => {
+          const v = weapon.cost[i];
+          const isActive = i === WC_IDX[cls];
+          const isNA = v === '-' || v == null;
+          return (
+            <span key={i} style={{
+              width: 32, textAlign: 'center',
+              fontSize: 9, fontWeight: 700,
+              letterSpacing: '0.06em',
+              color: isActive ? 'var(--ink)' : 'var(--mute)',
+              fontFamily: 'var(--font-body)',
+              opacity: isNA ? 0.3 : 1,
+            }}>{abbr}</span>
+          );
+        })}
+      </div>
+      <div style={{ display: 'flex', gap: 0 }}>
+        {weapon.cost.map((v, i) => {
+          const isActive = i === WC_IDX[cls];
+          const isNA = v === '-' || v == null;
+          return (
+            <span key={i} style={{
+              width: 32, textAlign: 'center',
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              height: 22,
+              background: isActive && !isNA ? 'var(--rust)' : 'transparent',
+              borderRadius: isActive ? 4 : 0,
+              fontFamily: 'var(--font-display)',
+              fontSize: isActive ? 13 : 12,
+              fontWeight: 700,
+              color: isActive && !isNA ? 'var(--surface)' : 'var(--rule-strong)',
+            }}>
+              {isNA ? '–' : `${v}t`}
+            </span>
+          );
+        })}
+      </div>
+    </div>
+  );
+
   return (
     <div style={{
       borderBottom: '1px solid var(--rule)',
@@ -709,93 +753,48 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
       opacity: available ? 1 : 0.55,
       transition: 'background 100ms',
     }}>
-      <div
-        title={unavailableReason || undefined}
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'auto 1fr 128px auto auto auto 28px',
-          alignItems: 'center', gap: 12,
-          padding: '9px 14px',
-        }}
-      >
+      <div className="weapon-row-main" title={unavailableReason || undefined}>
+
+        {/* Expand toggle — always first */}
         <RowExpand open={expanded} onClick={onToggle} />
 
-        {/* Name + DMG */}
-        <div style={{ minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, flexWrap: 'wrap' }}>
-            <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--ink)' }}>{weapon.name}</span>
-            <DmgBadge weapon={weapon} cls={cls} />
-            {!available && (
-              <span className="mono" style={{ fontSize: 11, color: 'var(--mute)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                N/A at {cls.slice(0,2).toUpperCase()}
-              </span>
-            )}
-
-          </div>
-          <div style={{ fontSize: 12.5, color: 'var(--ink-2)', marginTop: 2 }}>
-            <TraitList traits={weapon.traits} />
-          </div>
-        </div>
-
-        {/* Cost columns — always rendered at fixed 128px so rows don't jump */}
-        <div style={{ width: 128, flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
-          {/* Column headers */}
-          <div style={{ display: 'flex', gap: 0 }}>
-            {WC_ABBR.map((abbr, i) => {
-              const v = weapon.cost[i];
-              const isActive = i === WC_IDX[cls];
-              const isNA = v === '-' || v == null;
-              return (
-                <span key={i} style={{
-                  width: 32, textAlign: 'center',
-                  fontSize: 9, fontWeight: 700,
-                  letterSpacing: '0.06em',
-                  color: isActive ? 'var(--ink)' : 'var(--mute)',
-                  fontFamily: 'var(--font-body)',
-                  opacity: isNA ? 0.3 : 1,
-                }}>{abbr}</span>
-              );
-            })}
-          </div>
-          {/* Cost row */}
-          <div style={{ display: 'flex', gap: 0 }}>
-            {weapon.cost.map((v, i) => {
-              const isActive = i === WC_IDX[cls];
-              const isNA = v === '-' || v == null;
-              return (
-                <span key={i} style={{
-                  width: 32, textAlign: 'center',
-                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                  height: 22,
-                  background: isActive && !isNA ? 'var(--rust)' : 'transparent',
-                  borderRadius: isActive ? 4 : 0,
-                  fontFamily: 'var(--font-display)',
-                  fontSize: isActive ? 13 : 12,
-                  fontWeight: 700,
-                  color: isActive && !isNA ? 'var(--surface)' : 'var(--rule-strong)',
-                }}>
-                  {isNA ? '–' : `${v}t`}
+        {/* Name + DMG + traits */}
+        <div className="weapon-row-name-block" style={{ minWidth: 0, flex: 1 }}>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, flexWrap: 'wrap' }}>
+              <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--ink)' }}>{weapon.name}</span>
+              <DmgBadge weapon={weapon} cls={cls} />
+              {!available && (
+                <span className="mono" style={{ fontSize: 11, color: 'var(--mute)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                  N/A at {cls.slice(0,2).toUpperCase()}
                 </span>
-              );
-            })}
+              )}
+            </div>
+            <div style={{ fontSize: 12.5, color: 'var(--ink-2)', marginTop: 2 }}>
+              <TraitList traits={weapon.traits} />
+            </div>
           </div>
         </div>
 
-        {/* Always render 3 fixed cells so the + never jumps */}
-        {count > 0 ? (
-          <StepButton direction="down" accent="rust" onClick={() => onRemove(weapon.name)} />
-        ) : <span style={{ width: 28 }} />}
-        <span className="mono" style={{
-          width: 28, textAlign: 'center', fontWeight: 700, fontSize: 17, color: 'var(--ink)',
-          visibility: count > 0 ? 'visible' : 'hidden',
-        }}>×{count}</span>
-        <StepButton direction="up" onClick={() => onAdd(weapon.name)} disabled={!available} />
-        <span className="mono" style={{
-          fontSize: 9, color: 'var(--mute)', letterSpacing: '0.04em',
-          alignSelf: 'flex-end', paddingBottom: 1,
-          minWidth: 24, textAlign: 'left',
-          visibility: next && count >= 1 ? 'visible' : 'hidden',
-        }}>{next && count >= 1 ? `+${next}t` : ''}</span>
+        {/* Cost + controls: display:contents on desktop so they slot into the 7-col grid.
+            On mobile the CSS switches this to display:flex so they form a single row. */}
+        <div className="weapon-row-bottom">
+          <CostColumns />
+          {count > 0 ? (
+            <StepButton direction="down" accent="rust" onClick={() => onRemove(weapon.name)} />
+          ) : <span style={{ width: 28 }} />}
+          <span className="mono" style={{
+            width: 28, textAlign: 'center', fontWeight: 700, fontSize: 17, color: 'var(--ink)',
+            visibility: count > 0 ? 'visible' : 'hidden',
+          }}>×{count}</span>
+          <StepButton direction="up" onClick={() => onAdd(weapon.name)} disabled={!available} />
+          <span className="mono" style={{
+            fontSize: 9, color: 'var(--mute)', letterSpacing: '0.04em',
+            alignSelf: 'flex-end', paddingBottom: 1,
+            minWidth: 24, textAlign: 'left',
+            visibility: next && count >= 1 ? 'visible' : 'hidden',
+          }}>{next && count >= 1 ? `+${next}t` : ''}</span>
+        </div>
       </div>
 
       {expanded && available && <ExpandedWeapon weapon={weapon} cls={cls} />}
