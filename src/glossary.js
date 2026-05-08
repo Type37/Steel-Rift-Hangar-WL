@@ -21,6 +21,7 @@ export const GLOSSARY = {
   'mine-drone layer': {
     title: 'SUPPORT: Mine-Drone Layer (X)',
     text: 'When performing the SUPPORT Order, immediately place one friendly Mine Drone Token within 3" of this model and not within 6" of another friendly Mine Drone Token. Limited (X).',
+    note: 'Two separate distance rules: the token must be close to this model (within 3"), but spread out from other tokens already on the table (at least 6" away from each).',
   },
   'multi-spectral obscuration emitter deployer': {
     title: 'SUPPORT: MSOE Deployer',
@@ -287,6 +288,7 @@ export const GLOSSARY = {
   'support: mine-drone layer': {
     title: 'SUPPORT: Mine-Drone Layer (X)',
     text: 'When performing the SUPPORT Order, immediately place one friendly Mine Drone Token within 3" of this model and not within 6" of another friendly Mine Drone Token. Limited (X).',
+    note: 'Two separate distance rules: the token must be close to this model (within 3"), but spread out from other tokens already on the table (at least 6" away from each).',
   },
 
   'smasher': {

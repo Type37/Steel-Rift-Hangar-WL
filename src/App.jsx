@@ -397,6 +397,7 @@ export default function App() {
                   <TeamSummaryCard
                     key={name}
                     teamName={name}
+                    mechs={mechs}
                     onClick={() => setSideTab('teams')}
                     onRemove={() => toggleTeam(name)}
                   />
@@ -685,41 +686,87 @@ function EmptyHint({ children }) {
 }
 
 // Small clickable card for a selected Team in the left summary.
-function TeamSummaryCard({ teamName, onClick, onRemove }) {
+function TeamSummaryCard({ teamName, mechs = [], onClick, onRemove }) {
   const team = TEAMS.find(t => t.name === teamName);
   if (!team) return null;
+
+  // Count qualifying mechs per requirement row
+  const reqRows = Array.isArray(team.req) ? team.req : [];
+
+  const countFor = (req) => {
+    return mechs.filter(m => {
+      if (m.weightClass !== req.cls) return false;
+      if (req.melee) {
+        const hasMelee = m.weapons.some(w => {
+          const wdef = WC[m.weightClass]; // just check names
+          return w.name && w.name.toLowerCase().includes('melee') ||
+            w.name && ['combat blade','demolition cutter','impact hammer','mass tetsubo','mega glaive','plasma blade','shock net','basic melee weapon'].includes(w.name.toLowerCase());
+        });
+        if (!hasMelee) return false;
+      }
+      if (req.needs) {
+        const allItems = [...m.weapons.map(w => w.name.toLowerCase()), ...m.upgrades.map(u => u.toLowerCase())];
+        const hasAll = req.needs.every(n => allItems.some(i => i.includes(n.toLowerCase())));
+        if (!hasAll) return false;
+      }
+      return true;
+    }).length;
+  };
+
   return (
     <div
       onClick={onClick}
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr auto',
-        gap: 8, alignItems: 'center',
-        padding: '8px 10px',
-        borderTop: '1px solid var(--rule)',
-        cursor: 'pointer',
-      }}
+      style={{ padding: '8px 10px', borderTop: '1px solid var(--rule)', cursor: 'pointer' }}
     >
-      <div>
-        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)' }}>
-          {team.name}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: reqRows.length ? 5 : 0 }}>
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)' }}>{team.name}</div>
+          <div className="mono" style={{ fontSize: 10.5, color: 'var(--mute)' }}>Team of {team.band}</div>
         </div>
-        <div className="mono" style={{ fontSize: 10.5, color: 'var(--mute)' }}>
-          Team of {team.band}
-        </div>
+        <button
+          onClick={(e) => { e.stopPropagation(); onRemove(); }}
+          title="Remove team"
+          style={{
+            background: 'transparent', border: '1px solid var(--rust)',
+            color: 'var(--rust)', padding: '3px 8px', cursor: 'pointer',
+            fontFamily: 'var(--font-stencil)', fontSize: 10,
+            fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', flexShrink: 0,
+          }}
+        >×</button>
       </div>
-      <button
-        onClick={(e) => { e.stopPropagation(); onRemove(); }}
-        title="Remove team"
-        style={{
-          background: 'transparent', border: '1px solid var(--rust)',
-          color: 'var(--rust)', padding: '3px 8px', cursor: 'pointer',
-          fontFamily: 'var(--font-stencil)', fontSize: 10,
-          fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
-        }}
-      >
-        ×
-      </button>
+
+      {reqRows.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          {reqRows.map((req, i) => {
+            const count = countFor(req);
+            const min = req.min || 0;
+            const max = req.max;
+            const met = count >= min && count <= max;
+            const over = count > max;
+            const statusColor = over ? 'var(--rust)' : met && count >= 1 ? 'var(--olive)' : 'var(--mute)';
+            const label = [
+              req.cls,
+              req.needs?.join(', '),
+              req.melee ? 'Melee weapon' : null,
+              req.noReach ? 'no Reach' : null,
+            ].filter(Boolean).join(', ');
+            return (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11 }}>
+                <span className="mono" style={{ color: statusColor, fontWeight: 700, minWidth: 28 }}>
+                  {count}/{max}
+                </span>
+                <span style={{ color: 'var(--mute)' }}>
+                  <span style={{ fontWeight: 600, color: 'var(--ink-2)' }}>{req.cls}</span>
+                  {req.needs || req.melee || req.noReach
+                    ? ` · ${[req.needs?.join(', '), req.melee ? 'Melee' : null, req.noReach ? 'no Reach' : null].filter(Boolean).join(', ')}`
+                    : ''}
+                  {` (need ${min === 0 ? '0' : min}–${max})`}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

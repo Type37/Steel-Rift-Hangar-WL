@@ -840,7 +840,7 @@ export function SupportDetailView({ assetName, customName, loadout, onSetLoadout
         </div>
       )}
 
-      {traitNames.length > 0 && <InlineTraitGlossary traits={traitNames} />}
+      {traitNames.length > 0 && <InlineTraitGlossary traitStr={hasOrbital ? bumpLimited(a.stats?.Traits || '') : (a.stats?.Traits || '')} />}
     </div>
   );
 }
