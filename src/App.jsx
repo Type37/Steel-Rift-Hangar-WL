@@ -475,6 +475,7 @@ export default function App() {
                   onSetGarrisonLoadout={(v) => setGarrisonLoadouts(prev => ({ ...prev, [selectedSupportName]: v }))}
                   onSetLoadout={(l) => setSupportLoadout(selectedSupportName, l)}
                   onBack={() => setSelectedSupportName(null)}
+                  activePerks={activePerks}
                 />
               )}
 

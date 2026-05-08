@@ -717,10 +717,12 @@ function AssignmentStrip({
 // inline glossary of any traits referenced.
 // ============================================================
 
-export function SupportDetailView({ assetName, customName, loadout, onSetLoadout, garrisonLoadout, garrisonCount = 1, onSetGarrisonLoadout, onBack }) {
+export function SupportDetailView({ assetName, customName, loadout, onSetLoadout, garrisonLoadout, garrisonCount = 1, onSetGarrisonLoadout, onBack, activePerks = [] }) {
   const a = findAsset(assetName);
   if (!a) return null;
-  const traitNames = collectTraits(a.stats?.Traits || '');
+  const hasOrbital = activePerks.includes('Orbital Stockpiles') && a.kind === 'Off-Table';
+  const applyPerk = (str) => hasOrbital ? bumpLimited(str) : str;
+  const traitNames = collectTraits(applyPerk(a.stats?.Traits || ''));
 
   // Resolve effective loadout. Defaults to empty so the user assembles
   // their squadron deliberately by clicking + on each desired type.
@@ -808,7 +810,7 @@ export function SupportDetailView({ assetName, customName, loadout, onSetLoadout
             <div key={k} style={{ display: 'flex', gap: 8, alignItems: 'baseline', flexWrap: 'wrap' }}>
               <span className="label" style={{ fontSize: 10, flexShrink: 0 }}>{k}</span>
               <span>
-                {/Trait|All models|Per model/i.test(k) ? <TraitList traits={v} /> : v}
+                {/Trait|All models|Per model/i.test(k) ? <TraitList traits={applyPerk(v)} /> : applyPerk(String(v))}
               </span>
             </div>
           ))}
