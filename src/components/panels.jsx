@@ -527,7 +527,15 @@ function TeamRow({
           )}
           {selected && (
             <>
-              <div style={{ marginTop: 12 }}><span className="label">Assigned HE-Vs</span></div>
+              <div style={{
+                marginTop: 14, marginBottom: 4,
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              }}>
+                <span className="label">Assigned HE-Vs</span>
+                <span style={{ fontSize: 11, color: 'var(--mute)', fontStyle: 'italic' }}>
+                  drag from roster or use + Assign
+                </span>
+              </div>
               <AssignmentStrip
                 team={team}
                 assignedUnits={assignedUnits}

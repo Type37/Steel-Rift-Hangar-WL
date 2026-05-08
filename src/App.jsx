@@ -401,6 +401,7 @@ export default function App() {
                     key={name}
                     teamName={name}
                     mechs={mechs}
+                    assignments={teamAssignments[name] || []}
                     onClick={() => { setSideTab('teams'); setFocusTeamName(name); }}
                     onRemove={() => toggleTeam(name)}
                   />
@@ -704,7 +705,7 @@ const TEAM_ICONS = {
 };
 
 // Small clickable card for a selected Team in the left summary.
-function TeamSummaryCard({ teamName, mechs = [], onClick, onRemove }) {
+function TeamSummaryCard({ teamName, mechs = [], assignments = [], onClick, onRemove }) {
   const team = TEAMS.find(t => t.name === teamName);
   if (!team) return null;
 
@@ -814,6 +815,28 @@ function TeamSummaryCard({ teamName, mechs = [], onClick, onRemove }) {
               </div>
             );
           })}
+        </div>
+      )}
+      {/* Assigned units */}
+      {assignments.length > 0 ? (
+        <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+          {assignments.map(id => {
+            const mechId = id.startsWith('hev:') ? id.slice(4) : null;
+            const m = mechId ? mechs.find(m => m.id === mechId) : null;
+            const label = m ? (m.name || `${m.weightClass} HE-V`) : id.replace(/^(hev|support):/, '');
+            return (
+              <span key={id} style={{
+                fontSize: 10.5, fontFamily: 'var(--font-stencil)', fontWeight: 700,
+                letterSpacing: '0.06em', textTransform: 'uppercase',
+                background: 'var(--olive)', color: 'var(--surface)',
+                padding: '2px 6px',
+              }}>{label}</span>
+            );
+          })}
+        </div>
+      ) : (
+        <div style={{ marginTop: 6, fontSize: 11, color: 'var(--mute)', fontStyle: 'italic' }}>
+          No HE-Vs assigned — open to assign
         </div>
       )}
     </div>
