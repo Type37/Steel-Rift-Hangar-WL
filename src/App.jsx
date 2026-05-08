@@ -11,7 +11,7 @@ import { MechEditor } from './components/editor';
 import { SupportPanel, TeamPanel, FactionPanel, SupportDetailView, AgendasPanel } from './components/panels';
 import { AddMechModal, OptionsModal, ListsModal, AboutModal } from './components/modals';
 import { PrintView } from './components/print';
-import { SectionTitle, GhostButton } from './components/ui';
+import { SectionTitle, GhostButton, HoverEditHint } from './components/ui';
 
 // localStorage key and helpers. Bump the version if the schema changes
 // in a non-backward-compatible way.
@@ -735,8 +735,10 @@ function TeamSummaryCard({ teamName, mechs = [], assignments = [], onClick, onRe
   return (
     <div
       onClick={onClick}
-      style={{ padding: '8px 10px', borderTop: '1px solid var(--rule)', cursor: 'pointer' }}
+      className="has-edit-hint"
+      style={{ padding: '8px 10px', borderTop: '1px solid var(--rule)', cursor: 'pointer', position: 'relative' }}
     >
+      <HoverEditHint />
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: reqRows.length ? 5 : 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {TEAM_ICONS[team.name] && (
@@ -834,11 +836,7 @@ function TeamSummaryCard({ teamName, mechs = [], assignments = [], onClick, onRe
             );
           })}
         </div>
-      ) : (
-        <div style={{ marginTop: 6, fontSize: 11, color: 'var(--mute)', fontStyle: 'italic' }}>
-          No HE-Vs assigned — open to assign
-        </div>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -881,8 +879,10 @@ function FactionSummaryCard({ faction, perks, subPerkSelections = {}, onClick })
   return (
     <div
       onClick={onClick}
-      style={{ padding: '10px 12px', borderTop: '1px solid var(--rule)', cursor: 'pointer' }}
+      className="has-edit-hint"
+      style={{ padding: '10px 12px', borderTop: '1px solid var(--rule)', cursor: 'pointer', position: 'relative' }}
     >
+      <HoverEditHint />
       <div style={{
         fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 700,
         color: 'var(--ink)', letterSpacing: '0.03em', textTransform: 'uppercase',

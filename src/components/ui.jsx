@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { Tooltip } from './tooltip';
 import { defineToken, resolveTraitDefs } from '../glossary';
@@ -101,11 +101,21 @@ export function StepButton({ direction, onClick, disabled, accent = 'olive', lab
   const hasLabel = label != null && label !== '';
   const symbolFont = { fontFamily: 'var(--font-mono)', fontSize: 18, fontWeight: 700 };
   const labelFont = { fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, letterSpacing: '0.02em' };
+
+  // Click feedback: bumping a counter creates a new key on the pulse ring so
+  // the CSS animation re-fires every press, not just the first one.
+  const [pulseId, setPulseId] = useState(0);
+  const handleClick = (e) => {
+    if (disabled) return;
+    setPulseId(id => id + 1);
+    onClick?.(e);
+  };
+
   return (
     <button
-      onClick={onClick}
+      onClick={handleClick}
       disabled={disabled}
-      className="step-hover"
+      className={`step-hover step-button step-button--${accent} ${direction === 'up' ? 'step-button--up' : 'step-button--down'}`}
       title={title}
       style={{
         width: 36, height: 32,
@@ -116,11 +126,37 @@ export function StepButton({ direction, onClick, disabled, accent = 'olive', lab
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         opacity: disabled ? 0.4 : 1,
         padding: 0,
+        position: 'relative',
         ...(hasLabel ? labelFont : symbolFont),
       }}
     >
-      {hasLabel ? label : (direction === 'up' ? '+' : '−')}
+      <span style={{ position: 'relative', zIndex: 2, lineHeight: 1 }}>
+        {hasLabel ? label : (direction === 'up' ? '+' : '−')}
+      </span>
+      {pulseId > 0 && (
+        <span
+          key={pulseId}
+          aria-hidden="true"
+          className="step-pulse-ring"
+          style={{ borderColor: c }}
+        />
+      )}
     </button>
+  );
+}
+
+// Material Design "edit" pencil used as a hover affordance on left-rail
+// cards and team chips. The parent needs class "has-edit-hint" plus
+// position: relative; the CSS controls the fade-in on hover.
+export function HoverEditHint({ size = 'md' }) {
+  const s = size === 'sm' ? 11 : 13;
+  return (
+    <span className="hover-edit-hint" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width={s} height={s} fill="currentColor">
+        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+      </svg>
+      <span className="hover-edit-hint-label">Edit</span>
+    </span>
   );
 }
 

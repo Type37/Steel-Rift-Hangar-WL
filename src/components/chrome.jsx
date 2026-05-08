@@ -2,6 +2,7 @@ import React from 'react';
 import { Printer, Settings as SettingsIcon, Plus, FolderOpen, ChevronDown } from 'lucide-react';
 import { WC, MISSION_ORDER, MISSIONS, FREEFORM_MISSION } from '../data';
 import { calcMech } from '../calc';
+import { HoverEditHint } from './ui';
 
 // Resolve absolute path with the configured base; works at root or under /Steel-Rift-Hangar-WL/
 const BASE = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '/');
@@ -216,7 +217,7 @@ export function BottomBar({
           ?
         </button>
       </div>
-      <div style={{ textAlign: 'center', fontSize: 10.5, color: 'var(--mute)', padding: '3px 0 4px', fontFamily: 'var(--font-mono)', borderTop: '1px solid var(--rule)' }}>
+      <div style={{ textAlign: 'center', fontSize: 10.5, color: 'var(--mute)', padding: '6px 0 0', fontFamily: 'var(--font-mono)' }}>
         Originally built by unstoppable Carl. Forked and rebuilt for v1.5 by <a href="https://linktr.ee/warlore" target="_blank" rel="noreferrer" style={{ color: 'var(--mute)', textDecoration: 'underline' }}>WarLore</a>.
       </div>
     </div>
@@ -261,7 +262,7 @@ export function MechCard({ mech, index, active, onSelect, assignedTo }) {
       onClick={() => onSelect(mech.id)}
       draggable
       onDragStart={handleDragStart}
-      className="add-btn drag-source"
+      className="add-btn drag-source has-edit-hint"
       
       style={{
         display: 'grid',
@@ -280,6 +281,7 @@ export function MechCard({ mech, index, active, onSelect, assignedTo }) {
         overflow: 'hidden',
       }}
     >
+      {!active && <HoverEditHint />}
       {/* Weight-class silhouette watermark */}
       <img src={asset('icons/hev.svg')} aria-hidden="true"
         style={{
@@ -451,7 +453,7 @@ export function SupportRosterCard({ asset: a, customName, loadout, onRemove, onC
       onClick={editing ? undefined : onClick}
       draggable={!editing}
       onDragStart={handleDragStart}
-      className="drag-source"
+      className={`drag-source ${onClick && !editing ? 'has-edit-hint' : ''}`}
       title={onClick && !editing ? 'Click to inspect, drag to assign to a team' : undefined}
       style={{
         display: 'grid',
@@ -462,8 +464,10 @@ export function SupportRosterCard({ asset: a, customName, loadout, onRemove, onC
         alignItems: 'center',
         cursor: onClick && !editing ? 'pointer' : 'default',
         background: active ? 'var(--surface-2)' : 'transparent',
+        position: 'relative',
       }}
     >
+      {onClick && !editing && !active && <HoverEditHint />}
       <span className="stencil" style={{
         fontSize: 10, padding: '2px 6px', border: '1.5px solid var(--steel)',
         color: 'var(--steel)',

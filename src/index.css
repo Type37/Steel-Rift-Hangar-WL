@@ -200,6 +200,99 @@ button:not(:disabled):active {
   transform: scale(1.07);
 }
 
+/* Tactile press: quick scale-down then settle. Combined with the pulse ring
+   below it gives a satisfying "thunk" when you tap the add button. */
+.step-button {
+  transition: transform 90ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.step-button:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+/* Pulse ring fired off on every successful click. The React side bumps a
+   key on the span so each press mounts a fresh node and the animation
+   always replays — CSS keyframes don't restart on the same element by
+   default. */
+.step-pulse-ring {
+  position: absolute;
+  inset: -2px;
+  border: 2px solid currentColor;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 1;
+  animation: step-pulse 520ms cubic-bezier(0.16, 0.84, 0.44, 1) forwards;
+}
+@keyframes step-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  60% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+/* Hover edit affordance. Parent gets has-edit-hint + position: relative.
+   The pencil + EDIT label sit in the top-right and fade in on hover. The
+   parent itself also picks up a subtle background tint so the whole row
+   reads as live. */
+.has-edit-hint {
+  position: relative;
+}
+.has-edit-hint .hover-edit-hint {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  background: var(--ink);
+  color: var(--surface);
+  font-family: var(--font-stencil);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-2px);
+  transition: opacity 140ms ease-out, transform 140ms ease-out;
+  z-index: 3;
+}
+.has-edit-hint:hover .hover-edit-hint,
+.has-edit-hint:focus-visible .hover-edit-hint {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* Inline variant for chip-style targets where the hint sits inside
+   the chip rather than overlaying a card. */
+.has-edit-hint-inline .hover-edit-hint {
+  position: static;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  margin-left: 4px;
+  font-size: 9.5px;
+  width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: width 160ms ease-out, opacity 140ms ease-out, margin-left 140ms ease-out;
+  display: inline-flex;
+}
+.has-edit-hint-inline:hover .hover-edit-hint,
+.has-edit-hint-inline:focus-visible .hover-edit-hint {
+  width: auto;
+  opacity: 1;
+  transform: none;
+}
+.hover-edit-hint-label { line-height: 1; }
+.hover-edit-hint svg { display: block; flex-shrink: 0; }
+
 /* Catalog Add buttons should feel tactile. Subtle rounding so they read
    as buttons rather than military stencils, but not so much that they
    look like pills or app-store CTAs. */
