@@ -716,13 +716,34 @@ function AssignmentStrip({
 // Shows everything: full description, statline as a table, and an
 // inline glossary of any traits referenced.
 // ============================================================
+// Orbital Stockpiles: bump Limited (N) → Limited (N+1) in trait strings
+
+function bumpLimited(str) {
+  if (!str) return str;
+  return str.replace(/Limited\s*\((\d+)\)/g, (_, n) => `Limited (${Number(n) + 1})`);
+}
+
+function BumpedText({ str, active }) {
+  if (!active || !str) return <>{str}</>;
+  const parts = String(str).split(/(Limited\s*\(\d+\))/g);
+  return (
+    <>
+      {parts.map((part, i) =>
+        /Limited\s*\(\d+\)/.test(part)
+          ? <span key={i} style={{ color: 'var(--perk)', fontWeight: 700 }}>
+              {part.replace(/Limited\s*\((\d+)\)/, (_, n) => `Limited (${Number(n) + 1})`)}
+            </span>
+          : part
+      )}
+    </>
+  );
+}
 
 export function SupportDetailView({ assetName, customName, loadout, onSetLoadout, garrisonLoadout, garrisonCount = 1, onSetGarrisonLoadout, onBack, activePerks = [] }) {
   const a = findAsset(assetName);
   if (!a) return null;
   const hasOrbital = activePerks.includes('Orbital Stockpiles') && a.kind === 'Off-Table';
-  const applyPerk = (str) => hasOrbital ? bumpLimited(str) : str;
-  const traitNames = collectTraits(applyPerk(a.stats?.Traits || ''));
+  const traitNames = collectTraits(hasOrbital ? bumpLimited(a.stats?.Traits || '') : (a.stats?.Traits || ''));
 
   // Resolve effective loadout. Defaults to empty so the user assembles
   // their squadron deliberately by clicking + on each desired type.
