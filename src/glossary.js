@@ -281,7 +281,7 @@ export const GLOSSARY = {
   },
   'support: multi-spectral obscuration emitter deployer': {
     title: 'SUPPORT: MSOE Deployer',
-    text: 'When performing the SUPPORT Order, this model counts as having the MSOE Launcher (SUPPORT) trait.',
+    text: 'When performing the SUPPORT Order, place an Obscuration Emitter Token (25mm circle) within 6" of this model. Any Unit within 3" of the Token counts as being within Covering Terrain — LoS drawn to those models passes through Covering Terrain. Those Units also count as having Anti-Missile System and Electronic Countermeasures. Remove the Token when the placing Unit activates again.',
   },
   'support: mine-drone layer': {
     title: 'SUPPORT: Mine-Drone Layer (X)',

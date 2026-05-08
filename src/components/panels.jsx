@@ -1209,6 +1209,15 @@ function SubUnitPicker({ asset: a, loadout, onChange, garrisonLoadout, onSetGarr
                     );
                   })}
                 </div>
+                {/* Footnote: explain (X) = Models in unit, if any weapon uses it */}
+                {parseWeapons(su.weapons).some(wname => {
+                  const w = findVehicleWeapon(wname);
+                  return w && /x\s*\(/i.test(w.dmg);
+                }) && (
+                  <div style={{ fontSize: 10.5, color: 'var(--mute)', fontStyle: 'italic', marginBottom: 2 }}>
+                    X = surviving Models in this unit
+                  </div>
+                )}
                 {su.traits && su.traits !== '—' && (
                   <div style={{ fontSize: 11.5, color: 'var(--mute)', lineHeight: 1.5 }}>
                     <TraitList traits={su.traits} />
