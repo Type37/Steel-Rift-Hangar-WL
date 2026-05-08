@@ -478,17 +478,23 @@ function TeamRow({
                     {matchCount}/{r.min}-{r.max}
                   </span>{' '}
                   <strong>{r.cls}</strong>
-                  {r.needs && <span> with {r.needs.join(', ')}</span>}
-                  {r.needsDefensive && <span> with any Defensive Configuration</span>}
-                  {r.melee && <span>, equipping a Melee weapon</span>}
-                  {r.noReach && <span>, no Reach</span>}
-                  {r.noDup && <span>, no duplicate weapons</span>}
-                  {r.reinforced && <span>, with Armor or Structure Reinforced</span>}
-                  {r.stripped && <span>, both Armor and Structure Stripped</span>}
-                  {r.shortMeleeOnly && <span style={{ color: 'var(--rust)' }}>, only Short-range or Melee weapons allowed</span>}
-                  {r.noBlast && <span>, no Blast weapons</span>}
-                  {r.hasDrone && <span> with any Companion Drone</span>}
-                  {r.noStripped && <span>, not Stripped</span>}
+                  {r.reqText && r.reqText !== '-' ? (
+                    <span> — {r.reqText}</span>
+                  ) : (
+                    <>
+                      {r.needs && <span> with {r.needs.join(', ')}</span>}
+                      {r.needsDefensive && <span> with any Defensive Configuration</span>}
+                      {r.melee && <span>, equipping a Melee weapon</span>}
+                      {r.noReach && <span>, no Reach</span>}
+                      {r.noDup && <span>, no duplicate weapons</span>}
+                      {r.reinforced && <span>, with Armor or Structure Reinforced</span>}
+                      {r.stripped && <span>, both Armor and Structure Stripped</span>}
+                      {r.shortMeleeOnly && <span style={{ color: 'var(--rust)' }}>, only Short-range or Melee weapons allowed</span>}
+                      {r.noBlast && <span>, no Blast weapons</span>}
+                      {r.hasDrone && <span> with any Companion Drone</span>}
+                      {r.noStripped && <span>, not Stripped</span>}
+                    </>
+                  )}
                 </div>
               );
             })}

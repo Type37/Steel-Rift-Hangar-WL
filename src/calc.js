@@ -150,6 +150,8 @@ export const resetMechToClass = (m, cls) => ({
 
 const clsMatch = (cls, weightClass) => {
   if (cls === 'Any HE-V') return true;
+  // Verbatim PDF wording for Coordinated Assets Team: synonym for any HE-V.
+  if (cls === 'Light, Medium, Heavy, or Ultraheavy HE-Vs') return true;
   if (cls === 'Medium or Heavy') return weightClass === 'Medium' || weightClass === 'Heavy';
   if (cls === 'UL HE-V or Assault Vehicle Squadron') return false;
   return cls === weightClass;
@@ -274,7 +276,9 @@ export const teamsForMech = (mech, mechs, teams) => {
         : req;
       // Import checkMechAgainstReq is private; re-check inline
       let pass = true;
-      if (effReq.cls !== 'Any HE-V' && effReq.cls !== mech.weightClass) pass = false;
+      const isAnyHevCls = effReq.cls === 'Any HE-V'
+        || effReq.cls === 'Light, Medium, Heavy, or Ultraheavy HE-Vs';
+      if (!isAnyHevCls && effReq.cls !== mech.weightClass) pass = false;
       if (pass && effReq.needs) {
         for (const n of effReq.needs) {
           if (!mech.upgrades.includes(n) && !mech.defensive.includes(n)) { pass = false; break; }

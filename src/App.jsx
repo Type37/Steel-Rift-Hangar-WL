@@ -418,6 +418,7 @@ export default function App() {
                     assignments={teamAssignments[name] || []}
                     onClick={() => { setSideTab('teams'); setFocusTeamName(name); }}
                     onRemove={() => toggleTeam(name)}
+                    onAssign={assignToTeam}
                   />
                 ))
               )}
@@ -720,9 +721,26 @@ const TEAM_ICONS = {
 };
 
 // Small clickable card for a selected Team in the left summary.
-function TeamSummaryCard({ teamName, mechs = [], assignments = [], onClick, onRemove }) {
+function TeamSummaryCard({ teamName, mechs = [], assignments = [], onClick, onRemove, onAssign }) {
   const team = TEAMS.find(t => t.name === teamName);
   if (!team) return null;
+
+  const [dragOver, setDragOver] = React.useState(false);
+
+  const handleDragOver = (e) => {
+    if (!onAssign) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (!dragOver) setDragOver(true);
+  };
+  const handleDragLeave = () => setDragOver(false);
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    if (!onAssign) return;
+    const unitId = e.dataTransfer.getData('text/plain');
+    if (unitId) onAssign(teamName, unitId);
+  };
 
   // Count qualifying mechs per requirement row
   const reqRows = Array.isArray(team.req) ? team.req : [];
@@ -750,7 +768,19 @@ function TeamSummaryCard({ teamName, mechs = [], assignments = [], onClick, onRe
   return (
     <div
       onClick={onClick}
-      style={{ padding: '8px 10px', borderTop: '1px solid var(--rule)', cursor: 'pointer', position: 'relative' }}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      style={{
+        padding: '8px 10px',
+        borderTop: '1px solid var(--rule)',
+        cursor: 'pointer',
+        position: 'relative',
+        background: dragOver ? 'rgba(79, 97, 50, 0.12)' : 'transparent',
+        outline: dragOver ? '2px dashed var(--olive)' : 'none',
+        outlineOffset: -2,
+        transition: 'background 100ms, outline 100ms',
+      }}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: reqRows.length ? 5 : 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -790,20 +820,24 @@ function TeamSummaryCard({ teamName, mechs = [], assignments = [], onClick, onRe
             const needsMet = met && !over;
             const accentColor = over ? 'var(--rust)' : needsMet ? 'var(--olive)' : 'var(--rule-strong)';
 
-            // Build the constraint text pieces
-            const constraints = [
-              req.needs ? `with ${req.needs.join(needsMet ? ' / ' : ', ')}` : null,
-              req.needsDefensive ? 'any Defensive Config' : null,
-              req.melee ? 'equipping a Melee weapon' : null,
-              req.noReach ? 'no Reach' : null,
-              req.stripped ? 'both Armor + Structure Stripped' : null,
-              req.reinforced ? 'Armor or Structure Reinforced' : null,
-              req.noStripped ? 'not Stripped' : null,
-              req.shortMeleeOnly ? 'only Short or Melee weapons' : null,
-              req.noBlast ? 'no Blast weapons' : null,
-              req.hasDrone ? 'any Companion Drone' : null,
-              req.noDup ? 'no duplicate weapons' : null,
-            ].filter(Boolean);
+            // Build the constraint text pieces. If a verbatim PDF reqText
+            // is present on the row, use it directly (per the rule that
+            // requirements text in this builder must be verbatim).
+            const constraints = req.reqText && req.reqText !== '-'
+              ? [req.reqText]
+              : [
+                req.needs ? `with ${req.needs.join(needsMet ? ' / ' : ', ')}` : null,
+                req.needsDefensive ? 'any Defensive Config' : null,
+                req.melee ? 'equipping a Melee weapon' : null,
+                req.noReach ? 'no Reach' : null,
+                req.stripped ? 'both Armor + Structure Stripped' : null,
+                req.reinforced ? 'Armor or Structure Reinforced' : null,
+                req.noStripped ? 'not Stripped' : null,
+                req.shortMeleeOnly ? 'only Short or Melee weapons' : null,
+                req.noBlast ? 'no Blast weapons' : null,
+                req.hasDrone ? 'any Companion Drone' : null,
+                req.noDup ? 'no duplicate weapons' : null,
+              ].filter(Boolean);
 
             return (
               <div key={i} style={{

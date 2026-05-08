@@ -456,8 +456,10 @@ export const TEAMS = [
     name: 'Reconnaissance Team', band: '2-3',
     blurb: 'Eyes on the ground. Target Designators feed off-table strikes.',
     req: [
-      { cls: 'Light',           min: 1, max: 4, needs: ['Target Designator'] },
-      { cls: 'Medium or Heavy', min: 0, max: 2, needs: ['Target Designator'], stripped: true },
+      { cls: 'Light',           min: 1, max: 4, needs: ['Target Designator'],
+        reqText: 'Target Designator' },
+      { cls: 'Medium or Heavy', min: 0, max: 2, needs: ['Target Designator'], stripped: true,
+        reqText: 'Target Designator. Must have both Armor and Structure Stripped.' },
     ],
     benefits: 'At 2+: Lights ignore slot for Electronic Countermeasures. At 3+: Off-Table Assets +1 Damage Rating; Lights\' Target Designators are slot-free. At 4: TD and ECM cost 0; one Medium/Heavy gains Guidance Suite (MOVE) once per turn.',
     benefitsList: [
@@ -480,9 +482,12 @@ export const TEAMS = [
     name: 'Security Team', band: '2-3',
     blurb: 'Hold ground. Defensive configurations are king.',
     req: [
-      { cls: 'Medium',     min: 1, max: 4, needsDefensive: true, reinforced: true, noStripped: true },
-      { cls: 'Heavy',      min: 1, max: 2, needsDefensive: true,                   noStripped: true },
-      { cls: 'Ultraheavy', min: 0, max: 2, needsDefensive: true,                   noStripped: true },
+      { cls: 'Medium',     min: 1, max: 4, needsDefensive: true, reinforced: true, noStripped: true,
+        reqText: 'Any Defensive Configuration. At least one Reinforcement. May not be Stripped.' },
+      { cls: 'Heavy',      min: 1, max: 2, needsDefensive: true,                   noStripped: true,
+        reqText: 'Any Defensive Configuration. May not be Stripped.' },
+      { cls: 'Ultraheavy', min: 0, max: 2, needsDefensive: true,                   noStripped: true,
+        reqText: 'Any Defensive Configuration. May not be Stripped.' },
     ],
     benefits: 'At 2+: HE-V gets a 2nd Defensive Configuration slot; Heavy/UH count as +5 Tons for scoring. At 3+: Defensive Configs cost 0; Mediums also score +5 Tons; Heavy/UH ignore Side Arc bonuses against them. At 4: Suppressive Fire trait; Mediums ignore Side Arc bonuses.',
     benefitsList: [
@@ -506,8 +511,10 @@ export const TEAMS = [
     name: 'Assassination Team', band: '2-3',
     blurb: 'Few in number. Bring down high-value targets fast.',
     req: [
-      { cls: 'Light', min: 1, max: 3, needs: ['Directional Thruster'], melee: true, noReach: true },
-      { cls: 'Medium', min: 1, max: 2, needs: ['Directional Thruster'], melee: true, noReach: true },
+      { cls: 'Light', min: 1, max: 3, needs: ['Directional Thruster'], melee: true, noReach: true,
+        reqText: 'Directional Thruster, Any Weapon with "Melee (X)". No weapon with "Reach"' },
+      { cls: 'Medium', min: 1, max: 2, needs: ['Directional Thruster'], melee: true, noReach: true,
+        reqText: 'Directional Thruster, Any Weapon with "Melee (X)". No weapon with "Reach"' },
     ],
     benefits: 'At 2+: deploy as Support Assets; Mediums get +1" JUMP. At 3+: Melee on enemies in B2B with 2+ team members gets Frag; Lights\' Directional Thrusters slot-free. At 4: SMASH-interrupt; Mediums\' Directional Thrusters slot-free.',
     benefitsList: [
@@ -530,10 +537,14 @@ export const TEAMS = [
     name: 'Berserker Team', band: '2-3',
     blurb: 'Close combat veterans. Defensive cost slashed for Lights.',
     req: [
-      { cls: 'Light', min: 0, max: 2, melee: true },
-      { cls: 'Medium', min: 1, max: 3, melee: true },
-      { cls: 'Heavy', min: 1, max: 2, melee: true, needs: ['Nitro Boost'] },
-      { cls: 'Ultraheavy', min: 0, max: 1, needs: ['Heavy Plating', 'Nitro Boost'] },
+      { cls: 'Light', min: 0, max: 2, melee: true,
+        reqText: 'Any Weapon with "Melee (X)"' },
+      { cls: 'Medium', min: 1, max: 3, melee: true,
+        reqText: 'Any Weapon with "Melee (X)"' },
+      { cls: 'Heavy', min: 1, max: 2, melee: true, needs: ['Nitro Boost'],
+        reqText: 'Any Weapon with "Melee (X)", Nitro Boost' },
+      { cls: 'Ultraheavy', min: 0, max: 1, needs: ['Heavy Plating', 'Nitro Boost'],
+        reqText: 'Heavy Plating, Nitro Boost' },
     ],
     benefits: 'At 2+: Lights\' Defensive Configs cost 0; Mediums\' & Heavies\' Directional Thrusters slot-free. At 3+: Lights\' Directional Thrusters slot-free; Mediums may buy a Shield for 3 Tons; UH gains Nitro Boost Limited (2). At 4: Heavies\' Nitro Boost Limited (2); UH\'s Directional Thrusters slot-free.',
     benefitsList: [
@@ -557,9 +568,12 @@ export const TEAMS = [
     name: 'Multirole Team', band: '2-3',
     blurb: 'Mixed-class team, no duplicate weapons.',
     req: [
-      { cls: 'Light', min: 1, max: 1, noDup: true },
-      { cls: 'Medium', min: 1, max: 2, noDup: true },
-      { cls: 'Heavy', min: 0, max: 1, noDup: true },
+      { cls: 'Light', min: 1, max: 1, noDup: true,
+        reqText: 'No Duplicate Weapons on any Team Member' },
+      { cls: 'Medium', min: 1, max: 2, noDup: true,
+        reqText: 'No Duplicate Weapons on any Team Member' },
+      { cls: 'Heavy', min: 0, max: 1, noDup: true,
+        reqText: 'No Duplicate Weapons on any Team Member' },
     ],
     benefits: 'Cumulative weapon-specific buffs (Light, Blast, Kinetic, Melee, Short, Draining handling) per class as the team grows.',
     benefitsList: [
@@ -578,9 +592,12 @@ export const TEAMS = [
     name: 'Gunslinger Team', band: '3-4',
     blurb: 'Short-range and melee specialists who return fire from any position.',
     req: [
-      { cls: 'Light', min: 0, max: 2, needs: ['Haptic Suit'], shortMeleeOnly: true },
-      { cls: 'Medium', min: 1, max: 2, needs: ['Haptic Suit'], shortMeleeOnly: true },
-      { cls: 'Heavy', min: 1, max: 2, needs: ['Haptic Suit'], shortMeleeOnly: true },
+      { cls: 'Light', min: 0, max: 2, needs: ['Haptic Suit'], shortMeleeOnly: true,
+        reqText: 'Haptic Suit, May not take weapons without the Short or Melee trait' },
+      { cls: 'Medium', min: 1, max: 2, needs: ['Haptic Suit'], shortMeleeOnly: true,
+        reqText: 'Haptic Suit, May not take weapons without the Short or Melee trait' },
+      { cls: 'Heavy', min: 1, max: 2, needs: ['Haptic Suit'], shortMeleeOnly: true,
+        reqText: 'Haptic Suit, May not take weapons without the Short or Melee trait' },
     ],
     benefits: 'At 2+: May Return Fire when it has an Activation Marker; takes Redline instead of Activation Marker. At 3+: Short (X) weapons add +2 to their Short (X) value. At 4: Return Smash.',
     benefitsList: [
@@ -603,8 +620,10 @@ export const TEAMS = [
     name: 'Fire Support Team', band: '2-3',
     blurb: 'Forward observers directing massed indirect fire from mobile artillery.',
     req: [
-      { cls: 'Light', min: 1, max: 2, needs: ['Target Designator'] },
-      { cls: 'Medium or Heavy', min: 1, max: 2, needs: ['Rocket Pack', 'Missiles', 'Howitzer'], needsAny: true },
+      { cls: 'Light', min: 1, max: 2, needs: ['Target Designator'],
+        reqText: 'Target Designator' },
+      { cls: 'Medium or Heavy', min: 1, max: 2, needs: ['Rocket Pack', 'Missiles', 'Howitzer'], needsAny: true,
+        reqText: 'Rocket Pack, Missiles, and Howitzer' },
     ],
     benefits: 'At 2+: Light TDs slot-free; Medium/Heavy Rocket Packs gain Smart and Short (16\"). At 3+: Light TDs cost 0; Smart weapons may target out of LoS with Short (6\"). At 4: Cluster Rockets +1 Limited.',
     benefitsList: [
@@ -626,10 +645,14 @@ export const TEAMS = [
     name: 'Networked AI Team', band: '2-3',
     blurb: 'Inter-networked Companion Drones that share their benefits across the team.',
     req: [
-      { cls: 'Light',      min: 0, max: 2, hasDrone: true },
-      { cls: 'Medium',     min: 1, max: 2, hasDrone: true },
-      { cls: 'Heavy',      min: 1, max: 2, hasDrone: true },
-      { cls: 'Ultraheavy', min: 0, max: 1, hasDrone: true },
+      { cls: 'Light',      min: 0, max: 2, hasDrone: true,
+        reqText: 'Companion Drone of any type' },
+      { cls: 'Medium',     min: 1, max: 2, hasDrone: true,
+        reqText: 'Companion Drone of any type' },
+      { cls: 'Heavy',      min: 1, max: 2, hasDrone: true,
+        reqText: 'Companion Drone of any type' },
+      { cls: 'Ultraheavy', min: 0, max: 1, hasDrone: true,
+        reqText: 'Companion Drone of any type' },
     ],
     benefits: 'At 2+: All Companion Drones may be taken more than once per HE-V (ignore Compact limit); no Weapon/Upgrade may have more than one Drone. At 3+: Shared Weapon/Upgrade gets benefits of all matching Drones in team. At 4: ENGAGE arc bonuses can use any team member in LoS within 12".',
     benefitsList: [
@@ -650,8 +673,10 @@ export const TEAMS = [
     name: 'Coordinated Assets Team', band: '3-4',
     blurb: 'HE-Vs and Support Assets training together.',
     req: [
-      { cls: 'Any HE-V', min: 1, max: 2, noBlast: true },
-      { cls: 'UL HE-V or Assault Vehicle Squadron', min: 1, max: 2 },
+      { cls: 'Light, Medium, Heavy, or Ultraheavy HE-Vs', min: 1, max: 2, noBlast: true,
+        reqText: 'No Weapon with the Blast trait may be equipped.' },
+      { cls: 'UL HE-V or Assault Vehicle Squadron', min: 1, max: 2,
+        reqText: '-' },
     ],
     benefits: 'At 2+: team members may move through each other. At 3+: stack a 2nd matching Support Asset. At 4: activation handoff between HE-V and Support Asset.',
     benefitsList: [
