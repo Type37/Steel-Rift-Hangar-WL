@@ -279,20 +279,20 @@ button:not(:disabled):active {
   flex-wrap: wrap;
 }
 
-/* Mission + tonnage cluster. The mission button doubles as a label
-   and a dropdown trigger, the tonnage bar shows fill. */
+/* Mission + tonnage cluster */
 .bottombar-points {
   position: relative;
   display: flex;
   align-items: stretch;
-  gap: 0;
-  flex: 0 0 auto;
+  flex: 1 1 0;
+  min-width: 160px;
+  max-width: 440px;
 }
 .bottombar-mission-button {
   border: 1.5px solid var(--ink);
   border-right: none;
-  padding: 4px 9px;
-  min-height: 36px;
+  padding: 0 10px;
+  height: 36px;
   cursor: pointer;
   font-family: var(--font-stencil);
   font-size: 11px;
@@ -304,34 +304,48 @@ button:not(:disabled):active {
   gap: 5px;
   white-space: nowrap;
   border-radius: 4px 0 0 4px;
+  flex-shrink: 0;
   transition: filter 100ms;
 }
 .bottombar-mission-button:hover { filter: brightness(1.08); }
 .bottombar-mission-label { line-height: 1; }
-.bottombar-ton-bar {
-  /* Track: a thin pill that fills remaining space */
-  flex: 1;
-  min-width: 80px;
-  height: 10px;
-  background: var(--rule);
-  border: none;
-  position: relative;
-  border-radius: 2px;
+
+/* The bar+count wrapper: fills the remaining width beside the mission button */
+.bottombar-bar-wrap {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  height: 36px;
+  border: 1.5px solid var(--ink);
+  border-left: none;
+  border-radius: 0 4px 4px 0;
+  background: var(--bg-deep);
   overflow: hidden;
 }
-.bottombar-ton-fill {
-  position: absolute;
-  inset: 0;
-  width: 0;
-  transition: width 180ms ease-out;
-  border-radius: 2px;
+
+/* Segmented block bar inside the wrapper */
+.bottombar-seg-bar {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  gap: 2px;
+  align-items: center;
 }
+.bottombar-seg-block {
+  flex: 1 1 0;
+  height: 12px;
+  border-radius: 1px;
+  min-width: 0;
+  transition: background 120ms;
+}
+
 .bottombar-ton-label {
-  /* Sits NEXT to the bar, not on top of it */
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: var(--ink);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -1395,7 +1409,6 @@ button:not(:disabled):active {
     gap: 5px !important;
   }
   .bottombar-points { flex: 1 1 100% !important; }
-  .bottombar-ton-bar { flex: 1; width: auto !important; }
   .bottombar-force-input {
     flex: 1 1 100% !important;
     margin-left: 0 !important;

@@ -80,39 +80,45 @@ export function BottomBar({
             </span>
             <ChevronDown size={11} strokeWidth={2.5} style={{ opacity: 0.85 }} />
           </button>
-          {/* Option C: segmented blocks fused to mission button, count right */}
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 0, minWidth: 0 }}>
-            {/* Blocks — butted flush against mission button */}
-            <div style={{
-              flex: 1, height: 36, minWidth: 0,
-              border: `1.5px solid ${over ? 'var(--rust)' : 'var(--ink)'}`,
-              borderLeft: 'none',
-              borderRadius: '0 4px 4px 0',
-              display: 'flex', alignItems: 'center',
-              padding: '0 8px', gap: 2, overflow: 'hidden',
-              background: 'var(--bg-deep)',
-            }}>
-              {cap && cap !== Infinity && Array.from({ length: cap }).map((_, i) => {
-                const filled = i < totalTons;
-                return (
-                  <div key={i} style={{
-                    flex: '1 1 0', minWidth: 0,
-                    height: 12, borderRadius: 1,
-                    background: filled
-                      ? (over ? 'var(--rust)' : 'var(--olive)')
-                      : 'var(--rule)',
-                    transition: 'background 120ms',
-                  }} />
-                );
-              })}
-            </div>
-            {/* Ton count sits outside, right-justified */}
-            <div className="bottombar-ton-label mono" style={{
-              color: over ? 'var(--rust)' : 'var(--ink)',
-              paddingLeft: 10, flexShrink: 0,
-            }}>
-              {totalTons}{cap === Infinity ? 't' : ` / ${cap}t`}
-            </div>
+          {/* Bar + count */}
+          <div
+            className="bottombar-bar-wrap"
+            style={{ borderColor: over ? 'var(--rust)' : 'var(--ink)' }}
+          >
+            {cap !== Infinity ? (
+              <>
+                <div className="bottombar-seg-bar">
+                  {/* 1 block per 10t — keeps block count reasonable at any mission size */}
+                  {Array.from({ length: Math.ceil(cap / 10) }).map((_, i) => {
+                    const blockFilled = (i + 1) * 10 <= totalTons;
+                    const blockPartial = !blockFilled && i * 10 < totalTons;
+                    return (
+                      <div
+                        key={i}
+                        className="bottombar-seg-block"
+                        style={{
+                          background: blockFilled
+                            ? (over ? 'var(--rust)' : 'var(--olive)')
+                            : blockPartial
+                              ? (over ? 'rgba(168,51,12,0.4)' : 'rgba(79,97,50,0.4)')
+                              : 'var(--rule)',
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+                <span
+                  className="bottombar-ton-label mono"
+                  style={{ color: over ? 'var(--rust)' : 'var(--ink)' }}
+                >
+                  {totalTons} / {cap}t
+                </span>
+              </>
+            ) : (
+              <span className="bottombar-ton-label mono" style={{ color: 'var(--ink)' }}>
+                {totalTons}t
+              </span>
+            )}
           </div>
 
           {missionOpen && (
