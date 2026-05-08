@@ -1,5 +1,5 @@
 import React from 'react';
-import { WC, MISSIONS, RANGED, MELEE, UPGRADES, DEFENSIVE, FACTIONS, TEAMS } from '../data';
+import { WC, MISSIONS, RANGED, MELEE, UPGRADES, DEFENSIVE, FACTIONS, TEAMS, UNIVERSAL_AGENDAS } from '../data';
 import { calcMech, valForClass, totalWeaponCost, findAsset, findWeapon } from '../calc';
 import { GLOSSARY } from '../glossary';
 import { collectTraits } from './ui';
@@ -15,7 +15,7 @@ import { collectTraits } from './ui';
 export function PrintView({
   forceName, mission, customTons, mechs,
   supportAssets, faction, perks, selectedTeams, simpleMode,
-  factionLogo, supportNicknames = {}, supportLoadouts = {},
+  factionLogo, supportNicknames = {}, supportLoadouts = {}, activePerks = [],
 }) {
   const useCustom = mission === 'Custom';
   const cap = useCustom ? customTons : MISSIONS[mission].tons;
@@ -67,6 +67,9 @@ export function PrintView({
           factionLogo={factionLogo}
         />
       </div>
+
+      {/* AGENDA PAGE — always page 1 after cover */}
+      <AgendaPage mechs={mechs} faction={faction} selectedTeams={selectedTeams} />
 
       {pages.map((page, pi) => (
         <div key={pi} className="print-page print-cards-page">
@@ -585,4 +588,80 @@ function filterDisplayTraits(traits) {
     .split(/,\s*/)
     .filter(t => !/Limited\s*\(/i.test(t) && !/Short\s*\(/i.test(t))
     .join(', ');
+}
+
+// ============================================================
+// AGENDA PAGE — page 1 after cover
+// Shows every secondary agenda the force qualifies for,
+// with full verbatim text. No summaries.
+// ============================================================
+
+function AgendaPage({ mechs, faction, selectedTeams }) {
+  const lightCount  = mechs.filter(m => m.weightClass === 'Light').length;
+  const mediumCount = mechs.filter(m => m.weightClass === 'Medium').length;
+  const heavyCount  = mechs.filter(m => m.weightClass === 'Heavy').length;
+
+  const qualified = [];
+
+  // 1. Faction agenda
+  if (faction) {
+    const fdata = FACTIONS[faction];
+    const raw = fdata?.agenda || '';
+    const colon = raw.indexOf(':');
+    qualified.push({
+      name: colon > -1 ? raw.slice(0, colon).trim() : faction,
+      source: faction,
+      req: null,
+      text: colon > -1 ? raw.slice(colon + 1).trim() : raw,
+    });
+  }
+
+  // 2. Universal agendas (check force composition)
+  const uQual = {
+    'Stalkers':      lightCount  >= 2,
+    'Brawlers':      mediumCount >= 2,
+    'Enforcers':     heavyCount  >= 2,
+    'Titan-Killers': true, // opponent-dependent; include always
+  };
+  UNIVERSAL_AGENDAS.forEach(a => {
+    if (uQual[a.name]) qualified.push({ name: a.name, source: 'Universal', req: a.req, text: a.text });
+  });
+
+  // 3. Team agendas for selected teams
+  TEAMS.forEach(t => {
+    if (!t.agenda || !selectedTeams.includes(t.name)) return;
+    const raw = t.agenda;
+    const colon = raw.indexOf(':');
+    qualified.push({
+      name: colon > -1 ? raw.slice(0, colon).trim() : t.name,
+      source: t.name,
+      req: null,
+      text: colon > -1 ? raw.slice(colon + 1).trim() : raw,
+    });
+  });
+
+  if (qualified.length === 0) return null;
+
+  return (
+    <div className="print-page print-agenda-page">
+      <div className="agenda-page-header">
+        <div className="agenda-page-title">Secondary Agendas</div>
+        <div className="agenda-page-sub">{qualified.length} available for this force</div>
+      </div>
+      <div className="agenda-list">
+        {qualified.map((a, i) => (
+          <div key={i} className="agenda-entry">
+            <div className="agenda-entry-head">
+              <span className="agenda-entry-name">{a.name}</span>
+              <span className="agenda-entry-source">{a.source}</span>
+            </div>
+            {a.req && (
+              <div className="agenda-entry-req">Requires: {a.req}</div>
+            )}
+            <div className="agenda-entry-text">{a.text}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }

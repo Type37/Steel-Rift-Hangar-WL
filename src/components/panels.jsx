@@ -1399,38 +1399,47 @@ export function FactionPanel({ faction, perks, subPerkSelections = {}, onSetSubP
                 {opts.map(o => {
                   const eq = perks.includes(o.name);
                   const blocked = !eq && !inGroup && perks.length >= 2;
-                  const blockedReason = blocked
-                    ? 'You already picked 2 perks. Remove one first.'
-                    : null;
                   return (
                     <React.Fragment key={o.name}>
                     <button
                       onClick={() => !blocked && onTogglePerk(o.name)}
                       disabled={blocked}
-                      title={blockedReason || (eq ? `Remove ${o.name}.` : `Add ${o.name}.`)}
+                      title={blocked ? 'You already picked 2 perks. Remove one first.' : undefined}
                       className="add-btn"
                       style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'auto 1fr',
-                        gap: 10, alignItems: 'flex-start',
-                        background: eq ? 'var(--surface)' : 'transparent',
-                        border: 'none',
-                        padding: '8px 10px',
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 10,
                         width: '100%', textAlign: 'left',
+                        padding: '8px 10px',
+                        marginBottom: 4,
+                        background: eq ? 'var(--surface)' : 'transparent',
+                        border: `1.5px solid ${eq ? 'var(--rust)' : 'var(--rule)'}`,
+                        borderRadius: 3,
                         cursor: blocked ? 'not-allowed' : 'pointer',
-                        opacity: blocked ? 0.45 : 1,
-                        marginBottom: 2,
+                        opacity: blocked ? 0.4 : 1,
+                        transition: 'border-color 120ms, background 120ms',
                       }}
                     >
+                      {/* Radio dot */}
                       <span style={{
-                        marginTop: 3, width: 14, height: 14, borderRadius: '50%', flexShrink: 0,
-                        border: `2px solid ${eq ? 'var(--rust)' : blocked ? 'var(--rule)' : 'var(--rule-strong)'}`,
-                        background: eq ? 'var(--rust)' : 'transparent',
-                        display: 'inline-block',
-                      }} />
-                      <div>
-                        <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--ink)' }}>{o.name}</div>
-                        <div style={{ fontSize: 12.5, color: 'var(--ink-2)', lineHeight: 1.55, marginTop: 2 }}>
+                        marginTop: 3, width: 13, height: 13, borderRadius: '50%', flexShrink: 0,
+                        border: `2px solid ${eq ? 'var(--rust)' : 'var(--rule-strong)'}`,
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        transition: 'border-color 120ms',
+                      }}>
+                        <span style={{
+                          width: 5, height: 5, borderRadius: '50%',
+                          background: 'var(--rust)',
+                          transform: eq ? 'scale(1)' : 'scale(0)',
+                          opacity: eq ? 1 : 0,
+                          transition: 'transform 120ms, opacity 120ms',
+                          display: 'block',
+                        }} />
+                      </span>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--ink)' }}>{o.name}</div>
+                        <div style={{ fontSize: 12, color: 'var(--ink-2)', lineHeight: 1.55, marginTop: 2 }}>
                           {o.text}
                         </div>
                       </div>

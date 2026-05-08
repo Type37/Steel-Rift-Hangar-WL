@@ -858,6 +858,83 @@ button:not(:disabled):active {
   }
 }
 
+
+/* ---- Agenda page ---- */
+.print-agenda-page {
+  padding: 0.55in 0.6in 0.5in;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.agenda-page-header {
+  border-bottom: 2px solid #15110d;
+  padding-bottom: 6pt;
+  margin-bottom: 18pt;
+  display: flex;
+  align-items: baseline;
+  gap: 14pt;
+}
+.agenda-page-title {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 22pt;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #15110d;
+}
+.agenda-page-sub {
+  font-size: 9pt;
+  color: #6e6552;
+  font-family: 'Schibsted Grotesk', sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.agenda-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14pt 24pt;
+  align-items: start;
+}
+.agenda-entry {
+  border-left: 3px solid #a8330c;
+  padding-left: 10pt;
+}
+.agenda-entry-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8pt;
+  margin-bottom: 3pt;
+}
+.agenda-entry-name {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 11pt;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #15110d;
+}
+.agenda-entry-source {
+  font-size: 8pt;
+  color: #a8330c;
+  font-family: 'Schibsted Grotesk', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.agenda-entry-req {
+  font-size: 8pt;
+  color: #6e6552;
+  font-family: 'Schibsted Grotesk', sans-serif;
+  font-style: italic;
+  margin-bottom: 4pt;
+}
+.agenda-entry-text {
+  font-size: 9pt;
+  color: #4a4339;
+  font-family: 'Schibsted Grotesk', sans-serif;
+  line-height: 1.55;
+}
+
 /* Cover sheet: force identity, mission, faction, teams. */
 .print-cover { padding: 0.6in 0.6in; }
 .print-cover-inner {
