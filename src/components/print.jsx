@@ -1,8 +1,37 @@
 import React from 'react';
-import { WC, MISSIONS, RANGED, MELEE, UPGRADES, DEFENSIVE, FACTIONS, TEAMS, UNIVERSAL_AGENDAS } from '../data';
+import { WC, MISSIONS, RANGED, MELEE, UPGRADES, DEFENSIVE, FACTIONS, TEAMS, UNIVERSAL_AGENDAS, INFANTRY_SQUADS, POWER_SUIT_SQUADS, VEHICLE_WEAPONS } from '../data';
 import { calcMech, valForClass, totalWeaponCost, findAsset, findWeapon } from '../calc';
 import { GLOSSARY, resolveTraitDefs } from '../glossary';
 import { collectTraits } from './ui';
+
+// Find a squad definition (infantry, power-suit) by name.
+function findSquadDef(name) {
+  return INFANTRY_SQUADS.find(s => s.name === name)
+      || POWER_SUIT_SQUADS.find(s => s.name === name);
+}
+
+// Look up a vehicle weapon by name (used for sub-unit weapon damage values).
+function findVehicleWeapon(name) {
+  if (!name || typeof name !== 'string') return null;
+  return VEHICLE_WEAPONS.find(w => w.name.toLowerCase() === name.toLowerCase().trim());
+}
+
+// Parse a weapon list string ("Autocannon, AG Missiles or Barrage Rockets")
+// into an array of {name, alts} where alts is the alternates after "or".
+function parseSubunitWeapons(str) {
+  if (!str || str === '—' || typeof str !== 'string') return [];
+  return str.split(/,\s*/).map(group => {
+    const cleaned = group
+      .replace(/\s*[×x]\d+$/, '')
+      .replace(/\s*\(each\)/i, '')
+      .replace(/\s*\(per model\)/i, '')
+      .trim();
+    const parts = cleaned.split(/\s+or\s+/i).map(p => p.trim()).filter(Boolean);
+    return parts.length > 1
+      ? { name: parts[0], alts: parts.slice(1) }
+      : { name: parts[0], alts: [] };
+  }).filter(g => g.name);
+}
 
 // ============================================================
 // PRINT VIEW
@@ -16,6 +45,7 @@ export function PrintView({
   forceName, mission, customTons, mechs,
   supportAssets, faction, perks, selectedTeams, simpleMode,
   factionLogo, supportNicknames = {}, supportLoadouts = {}, activePerks = [],
+  garrisonLoadouts = {},
   previewMode = false, onClosePreview,
 }) {
   const useCustom = mission === 'Custom';
@@ -24,17 +54,76 @@ export function PrintView({
     mechs.reduce((s, m) => s + calcMech(m).totalUsed, 0) +
     supportAssets.reduce((s, n) => s + (findAsset(n)?.cost || 0), 0);
 
-  // Build the deck: HE-V cards first, then a card per support asset.
+  // Build the deck: HE-V cards first, then for each support asset either
+  // its standalone card (off-table strikes) or one card per unique
+  // sub-unit type (vehicle squadrons, air squadrons, etc.) plus one card
+  // per unique garrison squad type held inside that asset.
   const deck = [];
   mechs.forEach((m, i) => deck.push({ kind: 'hev', mech: m, idx: i }));
+
+  // Track which asset names we've already emitted garrison cards for, so
+  // duplicate asset entries (taking 2 of the same Outpost) don't emit
+  // duplicate garrison cards.
+  const garrisonsEmitted = new Set();
+
   supportAssets.forEach((name) => {
     const a = findAsset(name);
-    if (a) deck.push({
-      kind: 'support',
-      asset: a,
-      customName: supportNicknames[name],
-      loadout: supportLoadouts[name],
-    });
+    if (!a) return;
+
+    const hasSubunits = a.subunits && a.subunits.length > 0;
+    if (!hasSubunits) {
+      // Off-table strike or singular asset: keep the existing one-card
+      // summary path.
+      deck.push({
+        kind: 'support',
+        asset: a,
+        customName: supportNicknames[name],
+        loadout: supportLoadouts[name],
+      });
+    } else {
+      // On-table squadron: one card per unique sub-unit type that's
+      // actually picked, with the count badge on the card.
+      const loadout = supportLoadouts[name] || [];
+      const counts = {};
+      loadout.forEach(n => {
+        if (typeof n !== 'string') return;
+        counts[n] = (counts[n] || 0) + 1;
+      });
+      Object.entries(counts).forEach(([subName, count]) => {
+        const sub = a.subunits.find(s => s.name === subName);
+        if (!sub) return;
+        deck.push({
+          kind: 'subunit',
+          parent: a,
+          parentName: supportNicknames[name] || a.name,
+          sub,
+          count,
+        });
+      });
+    }
+
+    // Garrison squads inside this asset: one card per squad type, deduped
+    // across multiple instances of the same asset.
+    const garrison = garrisonLoadouts[name];
+    if (garrison && garrison.length > 0 && !garrisonsEmitted.has(name)) {
+      garrisonsEmitted.add(name);
+      const squadCounts = {};
+      garrison.forEach(squadName => {
+        if (typeof squadName !== 'string') return;
+        squadCounts[squadName] = (squadCounts[squadName] || 0) + 1;
+      });
+      Object.entries(squadCounts).forEach(([squadName, count]) => {
+        const squad = findSquadDef(squadName);
+        if (!squad) return;
+        deck.push({
+          kind: 'garrison',
+          parent: a,
+          parentName: supportNicknames[name] || a.name,
+          squad,
+          count,
+        });
+      });
+    }
   });
 
   // Chunk into pages of 9.
@@ -95,9 +184,10 @@ export function PrintView({
           <div className="page-card-grid">
             {page.map((slot, ci) => (
               <div key={ci} className="game-card">
-                {slot.kind === 'hev'
-                  ? <HEVCard mech={slot.mech} index={slot.idx} />
-                  : <SupportCard asset={slot.asset} customName={slot.customName} loadout={slot.loadout} />}
+                {slot.kind === 'hev' && <HEVCard mech={slot.mech} index={slot.idx} />}
+                {slot.kind === 'support' && <SupportCard asset={slot.asset} customName={slot.customName} loadout={slot.loadout} />}
+                {slot.kind === 'subunit' && <UnitSubCard parent={slot.parent} parentName={slot.parentName} sub={slot.sub} count={slot.count} flavor="subunit" />}
+                {slot.kind === 'garrison' && <UnitSubCard parent={slot.parent} parentName={slot.parentName} sub={slot.squad} count={slot.count} flavor="garrison" />}
               </div>
             ))}
             {Array.from({ length: 9 - page.length }).map((_, i) => (
@@ -491,6 +581,108 @@ function SupportCard({ asset: a, customName, loadout }) {
         <div className="card-support-rules" style={{ fontSize: '6.5pt', marginTop: 4, color: '#555' }}>
           {a.fullDesc}
         </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================================
+// UNIT SUB-CARD
+// One card per sub-unit type (vehicle in a squadron, infantry squad
+// in a garrison, etc.). Same physical card size and structure as the
+// HE-V cards, with the parent asset name in the class band so the
+// player knows which support stack the unit belongs to.
+// ============================================================
+function UnitSubCard({ parent, parentName, sub, count, flavor }) {
+  const armVal = parseInt(sub.arm, 10) || 0;
+  const strVal = parseInt(sub.str, 10) || 0;
+  const spdVal = sub.spd || '';
+  const weaponGroups = parseSubunitWeapons(sub.weapons || '');
+  const flavorLabel = flavor === 'garrison' ? 'GARRISON' : (parent?.kind || '').toUpperCase();
+
+  return (
+    <div className="game-card-inner">
+      <header className="card-name-band">
+        {sub.name}
+        {count > 1 && (
+          <span style={{ marginLeft: 6, color: 'var(--rust)', fontFamily: 'var(--font-mono)', fontSize: '11pt' }}>
+            ×{count}
+          </span>
+        )}
+      </header>
+      <div className="card-row card-row-id">
+        <div className="card-class-band">
+          {flavorLabel} · {parentName}
+        </div>
+      </div>
+
+      {/* Stats line: SPD + Defend-On (Auxiliary units defend on 4+ standard) */}
+      <table className="card-stats-table" style={{ marginBottom: 2 }}>
+        <thead>
+          <tr>
+            <th>SPD</th>
+            <th>Def</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{spdVal || '—'}</td>
+            <td>4+</td>
+          </tr>
+        </tbody>
+      </table>
+
+      {/* Armor + Structure pips */}
+      <div className="card-row-damage" style={{ marginTop: 4 }}>
+        {armVal > 0 && (
+          <div className="card-armor-col">
+            <div className="hp-heading">ARMOR</div>
+            <PipBlock kind="armor" total={armVal} />
+          </div>
+        )}
+        {strVal > 0 && (
+          <div className="card-structure-col">
+            <div className="card-structure-stack">
+              <div className="hp-heading">STRUCTURE</div>
+              <PipBlock kind="structure" total={strVal} />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Weapons with damage + traits looked up from VEHICLE_WEAPONS */}
+      {weaponGroups.length > 0 && (
+        <>
+          <div className="card-section-heading">WEAPONS</div>
+          <div className="card-upgrades-list">
+            {weaponGroups.map((g, i) => {
+              const def = findVehicleWeapon(g.name);
+              const altDefs = g.alts.map(a => ({ name: a, def: findVehicleWeapon(a) }));
+              return (
+                <div key={i} style={{ marginBottom: 1 }}>
+                  <strong>{g.name}</strong>
+                  {def && <span style={{ color: '#555' }}> · DMG {def.dmg}</span>}
+                  {def?.traits && <span style={{ color: '#555' }}> · {def.traits}</span>}
+                  {altDefs.map((alt, ai) => (
+                    <div key={ai} style={{ marginLeft: 8 }}>
+                      or <strong>{alt.name}</strong>
+                      {alt.def && <span style={{ color: '#555' }}> · DMG {alt.def.dmg}</span>}
+                      {alt.def?.traits && <span style={{ color: '#555' }}> · {alt.def.traits}</span>}
+                    </div>
+                  ))}
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {/* Sub-unit traits */}
+      {sub.traits && sub.traits !== '—' && (
+        <>
+          <div className="card-section-heading">TRAITS</div>
+          <div className="card-upgrades-list">{sub.traits}</div>
+        </>
       )}
     </div>
   );

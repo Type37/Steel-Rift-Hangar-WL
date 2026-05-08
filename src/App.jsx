@@ -309,6 +309,7 @@ export default function App() {
         factionLogo={factionLogo}
         supportNicknames={supportNicknames}
         supportLoadouts={supportLoadouts}
+        garrisonLoadouts={garrisonLoadouts}
         previewMode={printPreviewOpen}
         onClosePreview={() => setPrintPreviewOpen(false)}
       />
