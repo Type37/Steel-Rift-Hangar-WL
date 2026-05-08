@@ -205,10 +205,19 @@ function SupportExpanded({ a }) {
 export function TeamPanel({
   mechs, supportAssets, selectedTeams, onToggleTeam, mission,
   teamAssignments = {}, onAssign, onUnassign, onClearTeam,
-  supportNicknames = {},
+  supportNicknames = {}, focusTeamName, onFocusConsumed,
 }) {
   const slotsRemaining = slotsForBand(mission, selectedTeams, TEAMS);
   const results = TEAMS.map(t => ({ t, ...checkTeamEligibility(t, mechs, supportAssets) }));
+
+  // Auto-open and scroll to focused team
+  const focusRef = React.useRef(null);
+  React.useEffect(() => {
+    if (focusTeamName && focusRef.current) {
+      focusRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      onFocusConsumed?.();
+    }
+  }, [focusTeamName]);
 
   return (
     <div>
@@ -254,13 +263,15 @@ export function TeamPanel({
       <div>
         {results.map(({ t, eligible, minsMet, perReq }) => {
           const sel = selectedTeams.includes(t.name);
-          // Team minimum size from band string ("2", "2-3", "3-4") = first number
+          const isFocused = focusTeamName === t.name;
           const minSize = parseInt(t.band.split('-')[0], 10);
           const canAssign = minsMet && eligible >= minSize;
           const slotLeft = slotsRemaining[t.band] > 0 || sel;
           return (
             <TeamRow
               key={t.name}
+              forwardRef={isFocused ? focusRef : null}
+              defaultOpen={isFocused}
               team={t}
               eligible={eligible}
               minSize={minSize}
@@ -287,9 +298,9 @@ export function TeamPanel({
 function TeamRow({
   team, eligible, minSize, canAssign, slotLeft, selected, onToggle, perReq,
   assignedIds = [], mechs = [], supportAssets = [], supportNicknames = {},
-  onAssign, onUnassign, onClearTeam,
+  onAssign, onUnassign, onClearTeam, forwardRef, defaultOpen,
 }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(defaultOpen ?? true);
   const [dragOver, setDragOver] = useState(false);
 
   // Drop handler: read the dragged unit ID and assign to this team.
@@ -382,6 +393,7 @@ function TeamRow({
 
   return (
     <div
+      ref={forwardRef}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -464,14 +476,14 @@ function TeamRow({
                     {matchCount}/{r.min}-{r.max}
                   </span>{' '}
                   <strong>{r.cls}</strong>
-                  {r.needs && <span> with {r.needs.join(' + ')}</span>}
+                  {r.needs && <span> with {r.needs.join(', ')}</span>}
                   {r.needsDefensive && <span> with any Defensive Configuration</span>}
                   {r.melee && <span>, equipping a Melee weapon</span>}
                   {r.noReach && <span>, no Reach</span>}
                   {r.noDup && <span>, no duplicate weapons</span>}
-                  {r.reinforced && <span>, with at least one Reinforcement</span>}
+                  {r.reinforced && <span>, with Armor or Structure Reinforced</span>}
                   {r.stripped && <span>, both Armor and Structure Stripped</span>}
-                  {r.shortMeleeOnly && <span>, only Short or Melee weapons</span>}
+                  {r.shortMeleeOnly && <span style={{ color: 'var(--rust)' }}>, only Short-range or Melee weapons allowed</span>}
                   {r.noBlast && <span>, no Blast weapons</span>}
                 </div>
               );

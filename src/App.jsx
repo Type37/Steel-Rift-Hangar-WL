@@ -57,6 +57,7 @@ export default function App() {
 
   const [simpleMode, setSimpleMode] = useState(stored.simpleMode ?? false);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [focusTeamName, setFocusTeamName] = useState(null);
   const [weaponSort, setWeaponSort] = useState(stored.weaponSort ?? 'cost');
 
   const [addMechOpen, setAddMechOpen] = useState(false);
@@ -398,7 +399,7 @@ export default function App() {
                     key={name}
                     teamName={name}
                     mechs={mechs}
-                    onClick={() => setSideTab('teams')}
+                    onClick={() => { setSideTab('teams'); setFocusTeamName(name); }}
                     onRemove={() => toggleTeam(name)}
                   />
                 ))
@@ -503,6 +504,8 @@ export default function App() {
                   onAssign={assignToTeam}
                   onUnassign={unassignFromTeams}
                   onClearTeam={clearTeamAssignments}
+                  focusTeamName={focusTeamName}
+                  onFocusConsumed={() => setFocusTeamName(null)}
                 />
               )}
 
@@ -769,16 +772,18 @@ function TeamSummaryCard({ teamName, mechs = [], onClick, onRemove }) {
               req.noReach ? 'no Reach' : null,
             ].filter(Boolean).join(', ');
             return (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11 }}>
-                <span className="mono" style={{ color: statusColor, fontWeight: 700, minWidth: 28 }}>
-                  {count}/{max}
+              <div key={i} style={{ display: 'flex', alignItems: 'baseline', gap: 6, fontSize: 11 }}>
+                <span className="mono" style={{ color: statusColor, fontWeight: 700, flexShrink: 0 }}>
+                  {count}/{min}-{max}
                 </span>
                 <span style={{ color: 'var(--mute)' }}>
                   <span style={{ fontWeight: 600, color: 'var(--ink-2)' }}>{req.cls}</span>
-                  {req.needs || req.melee || req.noReach
-                    ? ` · ${[req.needs?.join(', '), req.melee ? 'Melee' : null, req.noReach ? 'no Reach' : null].filter(Boolean).join(', ')}`
-                    : ''}
-                  {` (need ${min === 0 ? '0' : min}–${max})`}
+                  {req.needs ? ` with ${req.needs.join(', ')}` : ''}
+                  {req.melee ? ', equipping a Melee weapon' : ''}
+                  {req.noReach ? ', no Reach' : ''}
+                  {req.stripped ? ', both Armor and Structure Stripped' : ''}
+                  {req.reinforced ? ', Armor or Structure Reinforced' : ''}
+                  {req.shortMeleeOnly ? ', only Short or Melee weapons' : ''}
                 </span>
               </div>
             );
