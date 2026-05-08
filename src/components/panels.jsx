@@ -485,6 +485,8 @@ function TeamRow({
                   {r.stripped && <span>, both Armor and Structure Stripped</span>}
                   {r.shortMeleeOnly && <span style={{ color: 'var(--rust)' }}>, only Short-range or Melee weapons allowed</span>}
                   {r.noBlast && <span>, no Blast weapons</span>}
+                  {r.hasDrone && <span> with any Companion Drone</span>}
+                  {r.noStripped && <span>, not Stripped</span>}
                 </div>
               );
             })}

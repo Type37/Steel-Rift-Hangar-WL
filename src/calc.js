@@ -215,6 +215,13 @@ const checkMechAgainstReq = (m, req) => {
     const wc = WC[m.weightClass];
     if (m.armor >= wc.baseArmor || m.structure >= wc.baseStructure) return false;
   }
+  if (req.noStripped) {
+    const wc = WC[m.weightClass];
+    if (m.armor < wc.baseArmor || m.structure < wc.baseStructure) return false;
+  }
+  if (req.hasDrone) {
+    if (!m.drones || Object.keys(m.drones).length === 0) return false;
+  }
   return true;
 };
 

@@ -456,9 +456,8 @@ export const TEAMS = [
     name: 'Reconnaissance Team', band: '2-3',
     blurb: 'Eyes on the ground. Target Designators feed off-table strikes.',
     req: [
-      { cls: 'Light', min: 1, max: 4, needs: ['Target Designator'] },
-      { cls: 'Medium', min: 0, max: 2, needs: ['Target Designator'], stripped: true },
-      { cls: 'Heavy', min: 0, max: 2, needs: ['Target Designator'], stripped: true },
+      { cls: 'Light',           min: 1, max: 4, needs: ['Target Designator'] },
+      { cls: 'Medium or Heavy', min: 0, max: 2, needs: ['Target Designator'], stripped: true },
     ],
     benefits: 'At 2+: Lights ignore slot for Electronic Countermeasures. At 3+: Off-Table Assets +1 Damage Rating; Lights\' Target Designators are slot-free. At 4: TD and ECM cost 0; one Medium/Heavy gains Guidance Suite (MOVE) once per turn.',
     benefitsList: [
@@ -481,9 +480,9 @@ export const TEAMS = [
     name: 'Security Team', band: '2-3',
     blurb: 'Hold ground. Defensive configurations are king.',
     req: [
-      { cls: 'Medium', min: 1, max: 4, needsDefensive: true, reinforced: true },
-      { cls: 'Heavy', min: 1, max: 2, needsDefensive: true },
-      { cls: 'Ultraheavy', min: 0, max: 2, needsDefensive: true },
+      { cls: 'Medium',     min: 1, max: 4, needsDefensive: true, reinforced: true, noStripped: true },
+      { cls: 'Heavy',      min: 1, max: 2, needsDefensive: true,                   noStripped: true },
+      { cls: 'Ultraheavy', min: 0, max: 2, needsDefensive: true,                   noStripped: true },
     ],
     benefits: 'At 2+: HE-V gets a 2nd Defensive Configuration slot; Heavy/UH count as +5 Tons for scoring. At 3+: Defensive Configs cost 0; Mediums also score +5 Tons; Heavy/UH ignore Side Arc bonuses against them. At 4: Suppressive Fire trait; Mediums ignore Side Arc bonuses.',
     benefitsList: [
@@ -605,7 +604,7 @@ export const TEAMS = [
     blurb: 'Forward observers directing massed indirect fire from mobile artillery.',
     req: [
       { cls: 'Light', min: 1, max: 2, needs: ['Target Designator'] },
-      { cls: 'Medium or Heavy', min: 1, max: 2, needs: ['Rocket Pack', 'Missiles', 'Howitzer'] },
+      { cls: 'Medium or Heavy', min: 1, max: 2, needs: ['Rocket Pack', 'Missiles', 'Howitzer'], needsAny: true },
     ],
     benefits: 'At 2+: Light TDs slot-free; Medium/Heavy Rocket Packs gain Smart and Short (16\"). At 3+: Light TDs cost 0; Smart weapons may target out of LoS with Short (6\"). At 4: Cluster Rockets +1 Limited.',
     benefitsList: [
@@ -627,10 +626,10 @@ export const TEAMS = [
     name: 'Networked AI Team', band: '2-3',
     blurb: 'Inter-networked Companion Drones that share their benefits across the team.',
     req: [
-      { cls: 'Light',      min: 0, max: 2, needs: ['Targeting Support Drone', 'Tactical Awareness Drone', 'Mine Director Drone'], needsAny: true },
-      { cls: 'Medium',     min: 1, max: 2, needs: ['Targeting Support Drone', 'Tactical Awareness Drone', 'Mine Director Drone'], needsAny: true },
-      { cls: 'Heavy',      min: 1, max: 2, needs: ['Targeting Support Drone', 'Tactical Awareness Drone', 'Mine Director Drone'], needsAny: true },
-      { cls: 'Ultraheavy', min: 0, max: 1, needs: ['Targeting Support Drone', 'Tactical Awareness Drone', 'Mine Director Drone'], needsAny: true },
+      { cls: 'Light',      min: 0, max: 2, hasDrone: true },
+      { cls: 'Medium',     min: 1, max: 2, hasDrone: true },
+      { cls: 'Heavy',      min: 1, max: 2, hasDrone: true },
+      { cls: 'Ultraheavy', min: 0, max: 1, hasDrone: true },
     ],
     benefits: 'At 2+: All Companion Drones may be taken more than once per HE-V (ignore Compact limit); no Weapon/Upgrade may have more than one Drone. At 3+: Shared Weapon/Upgrade gets benefits of all matching Drones in team. At 4: ENGAGE arc bonuses can use any team member in LoS within 12".',
     benefitsList: [
