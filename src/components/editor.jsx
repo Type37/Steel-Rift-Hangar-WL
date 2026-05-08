@@ -815,7 +815,6 @@ function ExpandedWeapon({ weapon, cls }) {
       alignItems: 'start',
     }}>
     <div>
-      <div className="label" style={{ marginBottom: 6 }}>Per-Class</div>
       <table style={{ borderCollapse: 'collapse', fontFamily: 'var(--font-mono)', fontSize: 12.5, width: '100%', maxWidth: 520 }}>
         <thead>
           <tr>
@@ -858,7 +857,7 @@ function ExpandedWeapon({ weapon, cls }) {
           </tr>
         </tbody>
       </table>
-      <InlineTraitGlossary traitStr={weapon.traits} />
+      <InlineTraitGlossary traitStr={weapon.traits} cls={cls} />
     </div>
     {/* Weapon art */}
     <img

@@ -353,7 +353,20 @@ export function defineToken(token) {
 // resolveTraitDefs: like collectTraits+defineToken but substitutes
 // actual X values from the original trait string.
 // "Short (6"), Blast (3")" → [{title:'Short (6")', text:'...within 6"...'}...]
-export function resolveTraitDefs(traitStr) {
+// Class index: 0=Light 1=Medium 2=Heavy 3=Ultraheavy
+const WC_IDX_MAP = { Light: 0, Medium: 1, Heavy: 2, Ultraheavy: 3 };
+
+// Resolve a per-class value string like "1/1/2/3" for a given weight class.
+// Returns the resolved string, or the original if it isn't a slash-list.
+function resolvePerClass(raw, cls) {
+  if (!raw || !cls) return raw;
+  const parts = raw.split('/');
+  if (parts.length < 4) return raw;
+  const idx = WC_IDX_MAP[cls] ?? 0;
+  return parts[idx] !== undefined ? parts[idx] : raw;
+}
+
+export function resolveTraitDefs(traitStr, cls) {
   if (!traitStr) return [];
   const seen = new Set();
   const results = [];
@@ -361,8 +374,9 @@ export function resolveTraitDefs(traitStr) {
     part = part.trim();
     const valueMatch = part.match(/\(([^)]+)\)/);
     const rawValue = valueMatch ? valueMatch[1] : null;
-    // Numeric portion only (strip trailing " so we can re-add when needed)
-    const numStr = rawValue ? rawValue.replace(/"/g, '').trim() : null;
+    // If the value is a per-class list like "1/1/2/3", resolve to the active class
+    const resolvedRaw = rawValue && cls ? resolvePerClass(rawValue, cls) : rawValue;
+    const numStr = resolvedRaw ? resolvedRaw.replace(/"/g, '').trim() : null;
     const clean = part.replace(/\s*\([^)]*\)/g, '').replace(/"/g, '').trim();
     const key = clean.toLowerCase();
     if (!key || seen.has(key)) return;

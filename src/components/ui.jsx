@@ -329,9 +329,9 @@ export function RulesText({ text, size = 13 }) {
   );
 }
 
-export function InlineTraitGlossary({ traits, traitStr }) {
+export function InlineTraitGlossary({ traits, traitStr, cls }) {
   const defs = traitStr
-    ? resolveTraitDefs(traitStr)
+    ? resolveTraitDefs(traitStr, cls)
     : (traits || []).map(t => { const d = defineToken(t); return d ? { key: t, ...d } : null; }).filter(Boolean);
   if (!defs || defs.length === 0) return null;
   return (
