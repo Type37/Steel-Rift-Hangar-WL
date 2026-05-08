@@ -749,10 +749,8 @@ function TeamSummaryCard({ teamName, mechs = [], assignments = [], onClick, onRe
   return (
     <div
       onClick={onClick}
-      className="has-edit-hint"
       style={{ padding: '8px 10px', borderTop: '1px solid var(--rule)', cursor: 'pointer', position: 'relative' }}
     >
-      <HoverEditHint />
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: reqRows.length ? 5 : 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {TEAM_ICONS[team.name] && (

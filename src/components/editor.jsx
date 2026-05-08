@@ -31,10 +31,35 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
   };
 
   const equipped = (n) => mech.weapons.find(w => w.name === n);
-  const addWeapon = (name) => {
+
+  // Fly-bauble queue. Each entry has src (button rect), dest (equipped row
+  // rect), and a unique id so React can key the animations.
+  const [flyEvents, setFlyEvents] = useState([]);
+
+  const addWeapon = (name, sourceRect) => {
     const e = equipped(name);
     if (e) update({ weapons: mech.weapons.map(w => w.name === name ? { ...w, count: w.count + 1 } : w) });
     else update({ weapons: [...mech.weapons, { name, count: 1 }] });
+
+    // Queue the fly animation. Double-rAF gives React time to commit the
+    // state update, so the equipped-summary row exists in the DOM by the
+    // time we look for it.
+    if (sourceRect) {
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const dest = document.querySelector(`[data-equipped-name="${CSS.escape(name)}"]`);
+        if (!dest) return;
+        const destRect = dest.getBoundingClientRect();
+        const id = Date.now() + Math.random();
+        setFlyEvents(events => [...events, { id, src: sourceRect, dest: destRect }]);
+        // After the bauble lands, flash the destination row so the eye
+        // follows the impact.
+        setTimeout(() => {
+          dest.classList.add('fly-target-pulse');
+          setTimeout(() => dest.classList.remove('fly-target-pulse'), 620);
+        }, 560);
+        setTimeout(() => setFlyEvents(events => events.filter(ev => ev.id !== id)), 720);
+      }));
+    }
   };
   const removeWeapon = (name) => {
     const e = equipped(name);
@@ -237,6 +262,13 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
           the armor block and the catalog so you can see what's mounted
           without scanning the per-tab catalogs below. */}
       <EquippedSummary mech={mech} cls={cls} />
+
+      {/* Fly-bauble overlays. Fixed-position so they animate across the
+          viewport regardless of which scroll container the editor lives
+          in. They self-cleanup after their timer fires. */}
+      {flyEvents.map(ev => (
+        <FlyBauble key={ev.id} src={ev.src} dest={ev.dest} />
+      ))}
 
       {/* Catalog tabs + tonnage + slots all on one row */}
       <div style={{ marginTop: 16 }}>
@@ -771,7 +803,7 @@ function EquippedSummary({ mech, cls }) {
 function EquippedWeaponRow({ def, count, cls }) {
   const traits = collectTraits(def.traits || '');
   return (
-    <div className="equipped-weapon-row">
+    <div className="equipped-weapon-row" data-equipped-name={def.name}>
       <div className="equipped-name">
         {def.name}
         {count > 1 && <span className="equipped-count">×{count}</span>}
@@ -790,6 +822,31 @@ function EquippedRuleRow({ name, text }) {
       <div className="equipped-name">{name}</div>
       <div className="equipped-rule-text">{text}</div>
     </div>
+  );
+}
+
+// FlyBauble: a small olive coin that lifts off the click point and arcs
+// over to the equipped row that just received the new weapon. Position
+// is fixed (viewport coordinates), so the rects from
+// getBoundingClientRect feed straight into CSS custom properties.
+function FlyBauble({ src, dest }) {
+  const startX = src.left + src.width / 2;
+  const startY = src.top + src.height / 2;
+  const endX = dest.left + dest.width / 2;
+  const endY = dest.top + dest.height / 2;
+  const dx = endX - startX;
+  const dy = endY - startY;
+  return (
+    <div
+      className="fly-bauble"
+      style={{
+        left: `${startX}px`,
+        top: `${startY}px`,
+        '--fly-dx': `${dx}px`,
+        '--fly-dy': `${dy}px`,
+      }}
+      aria-hidden="true"
+    />
   );
 }
 
@@ -897,7 +954,10 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
           }}>×{count}</span>
           <StepButton
             direction="up"
-            onClick={() => onAdd(weapon.name)}
+            onClick={(e) => {
+              const rect = e?.currentTarget?.getBoundingClientRect();
+              onAdd(weapon.name, rect);
+            }}
             disabled={!available}
             label={available && next != null ? `${next}t` : null}
             title={available ? `Add for ${next}t` : unavailableReason}

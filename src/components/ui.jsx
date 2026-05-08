@@ -102,12 +102,18 @@ export function StepButton({ direction, onClick, disabled, accent = 'olive', lab
   const symbolFont = { fontFamily: 'var(--font-mono)', fontSize: 18, fontWeight: 700 };
   const labelFont = { fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, letterSpacing: '0.02em' };
 
-  // Click feedback: bumping a counter creates a new key on the pulse ring so
-  // the CSS animation re-fires every press, not just the first one.
-  const [pulseId, setPulseId] = useState(0);
+  // Click feedback: every press generates an entry with the click coordinates
+  // so the ripple grows from where the user actually tapped, plus a separate
+  // rectangular pulse ring that radiates outward from the button's edge.
+  const [pulses, setPulses] = useState([]);
   const handleClick = (e) => {
     if (disabled) return;
-    setPulseId(id => id + 1);
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const id = Date.now() + Math.random();
+    setPulses(p => [...p, { id, x, y }]);
+    setTimeout(() => setPulses(p => p.filter(pp => pp.id !== id)), 620);
     onClick?.(e);
   };
 
@@ -130,12 +136,29 @@ export function StepButton({ direction, onClick, disabled, accent = 'olive', lab
         ...(hasLabel ? labelFont : symbolFont),
       }}
     >
+      {/* Foreground glyph or label, kept above the ripple layer. */}
       <span style={{ position: 'relative', zIndex: 2, lineHeight: 1 }}>
         {hasLabel ? label : (direction === 'up' ? '+' : '−')}
       </span>
-      {pulseId > 0 && (
+
+      {/* Ripple layer: clipped to the button, ripples grow from click point. */}
+      <span style={{
+        position: 'absolute', inset: 0, overflow: 'hidden',
+        pointerEvents: 'none', zIndex: 1,
+      }}>
+        {pulses.map(p => (
+          <span
+            key={p.id}
+            className="step-ripple"
+            style={{ left: p.x, top: p.y }}
+          />
+        ))}
+      </span>
+
+      {/* Outer pulse ring: extends beyond the button edge, not clipped. */}
+      {pulses.length > 0 && (
         <span
-          key={pulseId}
+          key={pulses[pulses.length - 1].id}
           aria-hidden="true"
           className="step-pulse-ring"
           style={{ borderColor: c }}
