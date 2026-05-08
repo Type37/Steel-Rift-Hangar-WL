@@ -1338,6 +1338,17 @@ const SUB_PERK_OPTIONS = {
   },
 };
 
+// Look up a perk's description from Corporations or Authorities data.
+function getSubPerkText(name) {
+  for (const factionKey of ['Corporations', 'Authorities']) {
+    for (const opts of Object.values(FACTIONS[factionKey]?.perks || {})) {
+      const match = opts.find(o => o.name === name);
+      if (match) return match.text;
+    }
+  }
+  return null;
+}
+
 export function FactionPanel({ faction, perks, subPerkSelections = {}, onSetSubPerk, onSetFaction, onTogglePerk }) {
   const data = faction ? FACTIONS[faction] : null;
 
@@ -1484,24 +1495,35 @@ export function FactionPanel({ faction, perks, subPerkSelections = {}, onSetSubP
                         </div>
                         {SUB_PERK_OPTIONS[o.name].options.map(sub => {
                           const active = subPerkSelections[o.name] === sub;
+                          const subText = getSubPerkText(sub);
                           return (
                             <button
                               key={sub}
                               onClick={(e) => { e.stopPropagation(); onSetSubPerk(o.name, active ? null : sub); }}
                               className="add-btn"
                               style={{
-                                display: 'flex', alignItems: 'center', gap: 8,
-                                width: '100%', textAlign: 'left', padding: '5px 8px',
-                                background: active ? 'var(--surface)' : 'transparent',
-                                border: 'none', cursor: 'pointer', marginBottom: 2,
+                                display: 'flex', alignItems: 'flex-start', gap: 8,
+                                width: '100%', textAlign: 'left', padding: '6px 8px',
+                                background: active ? 'rgba(255,255,255,0.5)' : 'transparent',
+                                border: `1px solid ${active ? 'var(--olive)' : 'transparent'}`,
+                                borderRadius: 2,
+                                cursor: 'pointer', marginBottom: 3,
+                                transition: 'background 100ms, border-color 100ms',
                               }}
                             >
                               <span style={{
-                                width: 10, height: 10, borderRadius: '50%', flexShrink: 0,
+                                marginTop: 3, width: 10, height: 10, borderRadius: '50%', flexShrink: 0,
                                 border: `2px solid ${active ? 'var(--olive)' : 'var(--rule-strong)'}`,
                                 background: active ? 'var(--olive)' : 'transparent',
                               }} />
-                              <span style={{ fontSize: 13, color: 'var(--ink)', fontWeight: active ? 700 : 400 }}>{sub}</span>
+                              <div style={{ minWidth: 0 }}>
+                                <div style={{ fontSize: 13, color: 'var(--ink)', fontWeight: active ? 700 : 500 }}>{sub}</div>
+                                {subText && (
+                                  <div style={{ fontSize: 11.5, color: 'var(--mute)', marginTop: 2, lineHeight: 1.5 }}>
+                                    {subText}
+                                  </div>
+                                )}
+                              </div>
                             </button>
                           );
                         })}
