@@ -407,7 +407,6 @@ export default function App() {
             {/* Faction section */}
             <ForceSection
               title="Faction"
-              count={faction ? 1 : 0}
               addLabel={faction ? 'Edit' : 'Pick'}
               onAdd={() => setSideTab('faction')}
             >
@@ -415,6 +414,7 @@ export default function App() {
                 <FactionSummaryCard
                   faction={faction}
                   perks={perks}
+                  subPerkSelections={subPerkSelections}
                   onClick={() => setSideTab('faction')}
                 />
               ) : (
@@ -723,36 +723,108 @@ function TeamSummaryCard({ teamName, onClick, onRemove }) {
   );
 }
 
-// Faction summary card on the left.
-function FactionSummaryCard({ faction, perks, onClick }) {
+// Find a perk's text across all groups in a faction's perk definition.
+function findPerkText(factionName, perkName, subPerkSelections) {
+  const factionData = FACTIONS[factionName];
+  if (!factionData) return null;
+
+  // Search direct faction perks
+  for (const group of Object.values(factionData.perks || {})) {
+    const match = group.find(o => o.name === perkName);
+    if (match) return match.text;
+  }
+
+  // If this perk is a sub-perk grant (Tech Pirates / Disgraced Trillionaire),
+  // look it up in Corporations data
+  const corpData = FACTIONS['Corporations'];
+  for (const group of Object.values(corpData?.perks || {})) {
+    const match = group.find(o => o.name === perkName);
+    if (match) return match.text;
+  }
+  return null;
+}
+
+// Faction summary card on the left — shows perk names + truncated text,
+// including Freelancer sub-perks from Tech Pirates / Disgraced Trillionaire.
+function FactionSummaryCard({ faction, perks, subPerkSelections = {}, onClick }) {
+  const factionData = FACTIONS[faction];
+
+  // Build list of perks to display: selected perks + any sub-perk grants
+  const displayPerks = perks.map(perkName => {
+    const text = findPerkText(faction, perkName, subPerkSelections);
+    const subPerk = subPerkSelections[perkName];
+    const subText = subPerk ? findPerkText(faction, subPerk, {}) : null;
+    return { name: perkName, text, subPerk, subText };
+  });
+
   return (
     <div
       onClick={onClick}
-      style={{
-        padding: '10px 12px',
-        borderTop: '1px solid var(--rule)',
-        cursor: 'pointer',
-      }}
+      style={{ padding: '10px 12px', borderTop: '1px solid var(--rule)', cursor: 'pointer' }}
     >
       <div style={{
-        fontFamily: 'var(--font-display)',
-        fontSize: 17, fontWeight: 700, color: 'var(--ink)',
-        letterSpacing: '0.03em', textTransform: 'uppercase',
-        marginBottom: 4,
+        fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 700,
+        color: 'var(--ink)', letterSpacing: '0.03em', textTransform: 'uppercase',
+        marginBottom: 6,
       }}>
         {faction}
       </div>
-      {perks.length > 0 ? (
-        <ul style={{
-          margin: 0, paddingLeft: 16,
-          fontSize: 12, color: 'var(--ink-2)', lineHeight: 1.5,
-        }}>
-          {perks.map(p => <li key={p}>{p}</li>)}
-        </ul>
-      ) : (
-        <div style={{ fontSize: 12, color: 'var(--mute)', fontStyle: 'italic' }}>
-          No perks picked yet.
+
+      {/* Faction agenda — name bolded, body truncated */}
+      {factionData?.agenda && (() => {
+        const raw = factionData.agenda;
+        const colon = raw.indexOf(':');
+        const agendaName = colon > -1 ? raw.slice(0, colon).trim() : faction;
+        const agendaBody = colon > -1 ? raw.slice(colon + 1).trim() : raw;
+        return (
+          <div style={{ marginBottom: 8, paddingBottom: 8, borderBottom: '1px solid var(--rule)' }}>
+            <div style={{ fontSize: 10, fontFamily: 'var(--font-mono)', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--mute)', marginBottom: 2 }}>
+              Agenda
+            </div>
+            <div style={{ fontSize: 12.5, color: 'var(--ink)', fontWeight: 700, marginBottom: 2 }}>
+              {agendaName}
+            </div>
+            <div style={{ fontSize: 11.5, color: 'var(--ink-2)', lineHeight: 1.5,
+              overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
+              {agendaBody}
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Selected perks with text */}
+      {displayPerks.length > 0 ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {displayPerks.map(({ name, text, subPerk, subText }) => (
+            <div key={name}>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--ink)', marginBottom: 2 }}>
+                {name}
+              </div>
+              {text && (
+                <div style={{ fontSize: 11.5, color: 'var(--ink-2)', lineHeight: 1.5,
+                  overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
+                  {text}
+                </div>
+              )}
+              {/* Freelancer sub-perk (Tech Pirates / Disgraced Trillionaire) */}
+              {subPerk && (
+                <div style={{ marginTop: 6, paddingLeft: 10, borderLeft: '2px solid var(--perk)' }}>
+                  <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--perk)', marginBottom: 1 }}>
+                    {subPerk}
+                  </div>
+                  {subText && (
+                    <div style={{ fontSize: 11, color: 'var(--ink-2)', lineHeight: 1.5,
+                      overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                      {subText}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
+      ) : (
+        <div style={{ fontSize: 12, color: 'var(--mute)', fontStyle: 'italic' }}>No perks picked.</div>
       )}
     </div>
   );

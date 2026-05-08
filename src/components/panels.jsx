@@ -1374,27 +1374,51 @@ export function FactionPanel({ faction, perks, subPerkSelections = {}, onSetSubP
               {data.perkNote}
             </div>
           )}
-          <div style={{
-            background: 'var(--surface)',
-            borderLeft: '3px solid var(--steel)',
-            padding: '10px 14px',
-            marginBottom: 18,
-          }}>
-            <div className="label" style={{ marginBottom: 4 }}>Faction Agenda</div>
-            <div><RulesText text={data.agenda} size={13} /></div>
-          </div>
+          {data.agenda && (() => {
+            const raw = data.agenda;
+            const colon = raw.indexOf(':');
+            const agendaName = colon > -1 ? raw.slice(0, colon).trim() : null;
+            const agendaBody = colon > -1 ? raw.slice(colon + 1).trim() : raw;
+            return (
+              <div style={{
+                background: 'var(--surface)',
+                borderLeft: '3px solid var(--steel)',
+                padding: '10px 14px',
+                marginBottom: 18,
+              }}>
+                <div style={{ fontSize: 9.5, fontFamily: 'var(--font-mono)', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--mute)', marginBottom: 3 }}>
+                  Faction Agenda
+                </div>
+                {agendaName && (
+                  <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--ink)', marginBottom: 4, letterSpacing: '0.02em' }}>
+                    {agendaName}
+                  </div>
+                )}
+                <RulesText text={agendaBody} size={12.5} />
+              </div>
+            );
+          })()}
           {/* Logo upload moved to Options. */}
 
-          <div className="label" style={{ marginBottom: 8 }}>Perks (pick 2, max 1 per group)</div>
+          <div style={{ marginBottom: 12 }}>
+            <div className="stencil" style={{ fontSize: 13, letterSpacing: '0.12em', color: 'var(--ink)', marginBottom: 2 }}>
+              Perks
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--mute)', fontFamily: 'var(--font-mono)' }}>
+              Pick 2 max, 1 per group
+            </div>
+          </div>
           {Object.entries(data.perks).map(([group, opts]) => {
             const inGroup = opts.find(o => perks.includes(o.name));
             return (
               <div key={group} style={{ marginBottom: 14 }}>
-                <div className="stencil" style={{
-                  fontSize: 12, color: 'var(--mute)',
-                  paddingBottom: 2, borderBottom: '1px dotted var(--rule)', marginBottom: 6,
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8,
                 }}>
-                  {group}
+                  <div style={{ fontSize: 9.5, fontFamily: 'var(--font-mono)', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--mute)', flexShrink: 0 }}>
+                    {group}
+                  </div>
+                  <div style={{ flex: 1, height: 1, background: 'var(--rule)' }} />
                 </div>
                 {opts.map(o => {
                   const eq = perks.includes(o.name);
