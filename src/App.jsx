@@ -1,4 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+const BASE = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '/');
+const asset = (p) => `${BASE}${p.replace(/^\//, '')}`;
 import { TEAMS, MISSIONS, MISSION_ORDER, FACTION_LOGOS, FREEFORM_MISSION, FACTIONS } from './data';
 import { POOL_NAMES } from './callsigns';
 import { calcMech, newMech, findAsset, effectivePerks } from './calc';
