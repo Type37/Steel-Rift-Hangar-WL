@@ -3,7 +3,7 @@ const BASE = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '/');
 const asset = (p) => `${BASE}${p.replace(/^\//, '')}`;
 import { TEAMS, MISSIONS, MISSION_ORDER, FACTION_LOGOS, FREEFORM_MISSION, FACTIONS } from './data';
 import { POOL_NAMES } from './callsigns';
-import { calcMech, newMech, findAsset, effectivePerks } from './calc';
+import { calcMech, newMech, findAsset, effectivePerks, mechQualifiesForTeam } from './calc';
 import { WC } from './data';
 
 import { Navbar, BottomBar, MechCard, EmptyRoster, SupportRosterCard } from './components/chrome';
@@ -873,13 +873,48 @@ function TeamSummaryCard({ teamName, mechs = [], assignments = [], onClick, onRe
             const mechId = id.startsWith('hev:') ? id.slice(4) : null;
             const m = mechId ? mechs.find(m => m.id === mechId) : null;
             const label = m ? (m.name || `${m.weightClass} HE-V`) : id.replace(/^(hev|support):/, '');
+            const isHev = !!m;
+            const qualifiedReqIdx = isHev ? mechQualifiesForTeam(m, team) : -1;
+            const qualified = qualifiedReqIdx >= 0;
+            const matchedReq = qualified ? team.req[qualifiedReqIdx] : null;
+            const tooltip = isHev
+              ? (qualified
+                  ? `Qualifies: ${matchedReq?.reqText || matchedReq?.cls || ''}`
+                  : 'Does not satisfy any requirement row for this team')
+              : undefined;
             return (
-              <span key={id} style={{
-                fontSize: 10.5, fontFamily: 'var(--font-stencil)', fontWeight: 700,
-                letterSpacing: '0.06em', textTransform: 'uppercase',
-                background: 'var(--olive)', color: 'var(--surface)',
-                padding: '2px 6px',
-              }}>{label}</span>
+              <span
+                key={id}
+                title={tooltip}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  fontSize: 10.5, fontFamily: 'var(--font-stencil)', fontWeight: 700,
+                  letterSpacing: '0.06em', textTransform: 'uppercase',
+                  background: !isHev
+                    ? 'var(--steel)'
+                    : (qualified ? 'var(--olive)' : 'var(--mute)'),
+                  color: 'var(--surface)',
+                  padding: '2px 6px',
+                  outline: qualified ? '1px solid rgba(241,234,218,0.4)' : 'none',
+                }}
+              >
+                {isHev && (
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                      width: 12, height: 12, borderRadius: '50%',
+                      background: qualified ? '#fff' : 'rgba(255,255,255,0.25)',
+                      color: qualified ? 'var(--olive)' : 'rgba(255,255,255,0.6)',
+                      fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 700,
+                      flexShrink: 0,
+                    }}
+                  >
+                    {qualified ? '✓' : '·'}
+                  </span>
+                )}
+                {label}
+              </span>
             );
           })}
         </div>

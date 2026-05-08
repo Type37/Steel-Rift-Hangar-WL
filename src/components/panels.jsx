@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Check, Plus, Minus } from 'lucide-react';
 import { OFF_TABLE_ASSETS, ADVANCED_ASSETS, FACTIONS, FACTION_LOGOS, TEAMS, VEHICLE_WEAPONS, INFANTRY_SQUADS, INFANTRY_SHARED_TRAITS, POWER_SUIT_SQUADS, POWER_SUIT_SHARED_TRAITS, UNIVERSAL_AGENDAS } from '../data';
-import { checkTeamEligibility, slotsForBand, findAsset } from '../calc';
+import { checkTeamEligibility, slotsForBand, findAsset, mechQualifiesForTeam } from '../calc';
 import { SectionTitle, Chip, TextButton, TraitList, RowExpand, InlineTraitGlossary, RulesText, collectTraits, HoverEditHint } from './ui';
 import { Tooltip } from './tooltip';
 
@@ -329,6 +329,8 @@ function TeamRow({
         id,
         label: m.name || `${m.weightClass.toUpperCase()} HE-V`,
         kind: 'hev',
+        mech: m,
+        qualifiedReqIdx: mechQualifiesForTeam(m, team),
       };
     } else if (id.startsWith('support:')) {
       const name = id.slice(8);
@@ -635,24 +637,55 @@ function AssignmentStrip({
         const isHev = u.kind === 'hev';
         const mechId = isHev ? u.id.slice(4) : null;
         const editable = isHev && onSelectMech;
+        const qualified = isHev && u.qualifiedReqIdx >= 0;
+        const matchedReqText = qualified
+          ? team.req[u.qualifiedReqIdx]?.reqText || team.req[u.qualifiedReqIdx]?.cls
+          : null;
         return (
           <span
             key={u.id}
             onClick={editable ? (e) => { e.stopPropagation(); onSelectMech(mechId); } : undefined}
-            title={editable ? 'Edit this HE-V' : undefined}
+            title={
+              isHev
+                ? (qualified
+                    ? `Qualifies: ${matchedReqText}` + (editable ? ' · click to edit' : '')
+                    : 'Does not satisfy any requirement row for this team')
+                : undefined
+            }
             className={editable ? 'has-edit-hint-inline' : ''}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 4,
-              padding: '2px 4px 2px 8px',
-              background: u.kind === 'support' ? 'var(--steel)' : 'var(--olive)',
+              padding: '2px 4px 2px 6px',
+              background: u.kind === 'support'
+                ? 'var(--steel)'
+                : (qualified ? 'var(--olive)' : 'var(--mute)'),
               color: 'var(--surface)',
               fontFamily: 'var(--font-stencil)',
               fontSize: 11, fontWeight: 700,
               letterSpacing: '0.04em', textTransform: 'uppercase',
               cursor: editable ? 'pointer' : 'default',
               transition: 'filter 100ms ease-out',
+              outline: qualified ? '1px solid rgba(241,234,218,0.4)' : 'none',
             }}
           >
+            {/* Qualification badge: green ✓ if this HE-V matches a req row,
+                neutral · otherwise. Worn on the chip so you can scan a row
+                of assigned units and see at a glance which ones count. */}
+            {isHev && (
+              <span
+                aria-hidden="true"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  width: 14, height: 14, borderRadius: '50%',
+                  background: qualified ? '#fff' : 'rgba(255,255,255,0.25)',
+                  color: qualified ? 'var(--olive)' : 'rgba(255,255,255,0.6)',
+                  fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 700,
+                  flexShrink: 0,
+                }}
+              >
+                {qualified ? '✓' : '·'}
+              </span>
+            )}
             {u.label}
             {editable && <HoverEditHint size="sm" />}
             <button

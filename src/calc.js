@@ -157,7 +157,7 @@ const clsMatch = (cls, weightClass) => {
   return cls === weightClass;
 };
 
-const checkMechAgainstReq = (m, req) => {
+export const checkMechAgainstReq = (m, req) => {
   if (!clsMatch(req.cls, m.weightClass)) return false;
 
   if (req.needs) {
@@ -225,6 +225,21 @@ const checkMechAgainstReq = (m, req) => {
     if (!m.drones || Object.keys(m.drones).length === 0) return false;
   }
   return true;
+};
+
+// Given a mech and a team definition, return the first req row index this
+// mech satisfies, or -1 if none. Used to flag assigned HE-V chips with a
+// qualification badge so the player gets visible confirmation that the
+// unit they dropped into the team actually counts toward its requirements.
+export const mechQualifiesForTeam = (mech, team) => {
+  if (!team || !Array.isArray(team.req)) return -1;
+  for (let i = 0; i < team.req.length; i++) {
+    const req = team.req[i];
+    // Skip support-asset slots; those don't apply to HE-Vs.
+    if (req.cls === 'UL HE-V or Assault Vehicle Squadron') continue;
+    if (checkMechAgainstReq(mech, req)) return i;
+  }
+  return -1;
 };
 
 const SUPPORT_TEAM_SLOTS = ['UL HE-V or Assault Vehicle Squadron'];
