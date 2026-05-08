@@ -1398,10 +1398,9 @@ export function FactionPanel({ faction, perks, subPerkSelections = {}, onSetSubP
                 </div>
                 {opts.map(o => {
                   const eq = perks.includes(o.name);
-                  const blocked = !eq && (inGroup || perks.length >= 2);
-                  const blockedReason = !eq
-                    ? (inGroup ? `You already picked "${inGroup.name}" from this group; only one perk per group allowed.`
-                        : perks.length >= 2 ? 'You already picked 2 perks. Remove one first.' : null)
+                  const blocked = !eq && !inGroup && perks.length >= 2;
+                  const blockedReason = blocked
+                    ? 'You already picked 2 perks. Remove one first.'
                     : null;
                   return (
                     <React.Fragment key={o.name}>

@@ -1168,22 +1168,6 @@ function DefRow({ def, mech, onToggle, atLimit }) {
           </div>
         );
       })()}
-      {expanded && (
-        <div style={{
-          padding: '4px 14px 16px 14px',
-          background: 'var(--bg-deep)',
-          borderTop: '1px dashed var(--rule)',
-        }}>
-          <div style={{ fontSize: 14, color: 'var(--ink)', lineHeight: 1.6 }}>{def.rule}</div>
-          <div style={{ marginTop: 10 }}>
-            <span className="label" style={{ marginRight: 6 }}>Cost (Lt/Md/Hv/UH):</span>
-            <span className="mono" style={{ fontSize: 13 }}>
-              {def.cost.map(c => c === '-' ? '-' : `${c}t`).join(' / ')}
-            </span>
-          </div>
-          <InlineTraitGlossary traits={collectTraits(def.rule)} />
-        </div>
-      )}
     </div>
   );
 }
