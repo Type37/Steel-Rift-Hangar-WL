@@ -1338,6 +1338,24 @@ const SUB_PERK_OPTIONS = {
   },
 };
 
+// Which non-Freelancer faction does a sub-perk come from?
+function getSubPerkFaction(name) {
+  for (const factionKey of ['Corporations', 'Authorities']) {
+    for (const opts of Object.values(FACTIONS[factionKey]?.perks || {})) {
+      if (opts.find(o => o.name === name)) return factionKey;
+    }
+  }
+  return null;
+}
+
+// Map of parent Freelancer perk → which non-Freelancer faction its sub-perk comes from
+const GRANT_PERK_FACTION = {
+  'Tech Pirates': 'Corporations',
+  'Disgraced Trillionaire': 'Corporations',
+  'Political Extremists': 'Authorities',
+  'Ex-Military Veterans': 'Authorities',
+};
+
 // Look up a perk's description from Corporations or Authorities data.
 function getSubPerkText(name) {
   for (const factionKey of ['Corporations', 'Authorities']) {
@@ -1503,7 +1521,8 @@ export function FactionPanel({ faction, perks, subPerkSelections = {}, onSetSubP
                                 background: active ? 'rgba(255,255,255,0.5)' : 'transparent',
                                 border: `1px solid ${active ? 'var(--olive)' : 'transparent'}`,
                                 borderRadius: 2,
-                                cursor: 'pointer', marginBottom: 3,
+                                cursor: wouldConflict ? 'not-allowed' : 'pointer', marginBottom: 3,
+                                opacity: wouldConflict ? 0.45 : 1,
                                 transition: 'background 100ms, border-color 100ms',
                               }}
                             >

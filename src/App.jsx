@@ -548,6 +548,7 @@ export default function App() {
         onClose={() => setAddMechOpen(false)}
         onConfirm={handleConfirmAddMech}
         callsignPool={callsignPools}
+        setCallsignPool={setCallsignPools}
         customCallsigns={customCallsigns}
       />
 
