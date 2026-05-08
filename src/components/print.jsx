@@ -51,7 +51,7 @@ export function PrintView({
   const useCustom = mission === 'Custom';
   const cap = useCustom ? customTons : MISSIONS[mission].tons;
   const totalTons =
-    mechs.reduce((s, m) => s + calcMech(m).totalUsed, 0) +
+    mechs.reduce((s, m) => s + WC[m.weightClass].tons, 0) +
     supportAssets.reduce((s, n) => s + (findAsset(n)?.cost || 0), 0);
 
   // Build the deck: HE-V cards first, then for each support asset either
@@ -133,7 +133,7 @@ export function PrintView({
   // Collect every trait used in this force for the reference section.
   const traitsUsed = new Set();
   mechs.forEach(m => {
-    m.weapons.forEach(w => collectTraits(findWeapon(w)?.traits || '').forEach(t => traitsUsed.add(t)));
+    m.weapons.forEach(w => collectTraits(findWeapon(w.name)?.traits || '').forEach(t => traitsUsed.add(t)));
   });
   supportAssets.forEach(n => {
     const a = findAsset(n);
@@ -272,16 +272,22 @@ function HEVCard({ mech, index }) {
   const jumpVal = jumpDefault(cls, mech);
   const def = defDefault(cls);
 
-  const weapons = mech.weapons.map(name => {
+  // Detect melee weapons by membership in MELEE array (no .kind property on data)
+  const meleeNames = new Set(MELEE.map(m => m.name));
+
+  // mech.weapons is [{name, count}] — was wrongly passing the whole object to findWeapon
+  const weapons = mech.weapons.map(({ name, count }) => {
     const w = findWeapon(name);
     if (!w) return null;
     const dmg = valForClass(w.dmg, cls);
     const cost = valForClass(w.cost, cls);
     if (cost === '-') return null;
     const range = inferRange(w.traits);
+    const isMelee = meleeNames.has(name);
     return {
       name,
-      dmg: w.kind === 'melee' ? meleeDamage(w, cls) : `${dmg}`,
+      count,
+      dmg: isMelee ? meleeDamage(w, cls) : `${dmg}`,
       range,
       traits: filterDisplayTraits(w.traits),
     };
@@ -294,6 +300,21 @@ function HEVCard({ mech, index }) {
     .map(n => DEFENSIVE.find(d => d.name === n))
     .filter(d => d && valForClass(d.cost, cls) !== '-');
 
+  // Equipped tonnage = base class cost (weapons/upgrades are within that envelope)
+  const equippedTons = wc.tons;
+
+  // Keyword definitions block: weapon traits + class-specific rules (Fragile Internals etc.)
+  // All resolved to the correct class so AP (1/1/2/3) shows the right number.
+  const allWeaponTraitStr = weapons
+    .map(w => {
+      // Use original trait string (not the filtered display one) for full glossary lookup
+      const def = findWeapon(w.name);
+      return def?.traits || '';
+    })
+    .filter(Boolean)
+    .join(', ');
+  const weaponTraitDefs = allWeaponTraitStr ? resolveTraitDefs(allWeaponTraitStr, cls) : [];
+
   return (
     <div className="game-card-inner">
       {/* Header band */}
@@ -301,7 +322,7 @@ function HEVCard({ mech, index }) {
         {mech.name || `${cls.toUpperCase()} HE-V`}
       </header>
 
-      {/* Class + stats row, two columns */}
+      {/* Class + stats row */}
       <div className="card-row card-row-id">
         <div className="card-class-band">{cls.toUpperCase()} HE-V</div>
         <table className="card-stats-table">
@@ -310,7 +331,7 @@ function HEVCard({ mech, index }) {
           </thead>
           <tbody>
             <tr>
-              <td>{wc.baseTons}</td>
+              <td>{equippedTons}t</td>
               <td>{move}"</td>
               <td>{jumpVal != null ? `${jumpVal}"` : '—'}</td>
               <td>{def}+</td>
@@ -319,7 +340,7 @@ function HEVCard({ mech, index }) {
         </table>
       </div>
 
-      {/* Damage row: ARMOR (col-5) | STRUCTURE + CRIT legend (col-7) */}
+      {/* Damage row: ARMOR | STRUCTURE + CRIT legend */}
       <div className="card-row-damage">
         <div className="card-armor-col">
           <div className="hp-heading">ARMOR</div>
@@ -344,88 +365,93 @@ function HEVCard({ mech, index }) {
       </div>
 
       {/* Weapons table */}
-      <div className="card-section-heading">WEAPONS</div>
-      <table className="card-weapons-table">
-        <thead>
-          <tr>
-            <th>Weapon</th>
-            <th className="num">Dmg</th>
-            <th className="num">Rng</th>
-            <th>Traits</th>
-          </tr>
-        </thead>
-        <tbody>
-          {weapons.map((w, i) => (
-            <tr key={i}>
-              <td>{w.name}</td>
-              <td className="num">{w.dmg}</td>
-              <td className="num">{w.range}</td>
-              <td className="card-traits">{w.traits}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {weapons.length > 0 && (
+        <>
+          <div className="card-section-heading">WEAPONS</div>
+          <table className="card-weapons-table">
+            <thead>
+              <tr>
+                <th>Weapon</th>
+                <th className="num">Dmg</th>
+                <th className="num">Rng</th>
+                <th>Traits</th>
+              </tr>
+            </thead>
+            <tbody>
+              {weapons.map((w, i) => (
+                <tr key={i}>
+                  <td>{w.count > 1 ? `${w.name} ×${w.count}` : w.name}</td>
+                  <td className="num">{w.dmg}</td>
+                  <td className="num">{w.range}</td>
+                  <td className="card-traits">{w.traits}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
 
-      {/* Per-weapon trait explanations with resolved X values */}
-      {(() => {
-        // Collect all unique trait strings across all weapons
-        const allTraits = weapons.map(w => w.traits).filter(Boolean).join(', ');
-        if (!allTraits) return null;
-        const defs = resolveTraitDefs(allTraits);
-        if (!defs.length) return null;
-        return (
-          <div className="card-trait-defs">
-            {defs.map(d => (
-              <div key={d.key || d.title} className="card-trait-def-entry">
-                <span className="card-trait-def-name">{d.title}:</span>{' '}
-                {d.text}
-              </div>
-            ))}
-          </div>
-        );
-      })()}
-
+      {/* Upgrades with rule text */}
       {(upgrades.length > 0 || defensive.length > 0) && (
         <>
           <div className="card-section-heading">UPGRADES</div>
-          <div className="card-upgrades-list">
+          <div className="card-upgrade-defs">
             {[...upgrades, ...defensive].map(u => {
               const drones = mech.drones || {};
-              // If a drone is assigned to this upgrade, show the target
-              const droneEntries = Object.entries(drones).filter(([,target]) => target === u.name);
+              const droneEntries = Object.entries(drones).filter(([, target]) => target === u.name);
               const suffix = droneEntries.length > 0 ? ` [${droneEntries.map(([d]) => d).join(', ')}]` : '';
-              return u.name + suffix;
-            }).join(' · ')}
+              return (
+                <div key={u.name} className="card-upgrade-def-entry">
+                  <span className="card-trait-def-name">{u.name}{suffix}:</span>{' '}
+                  <span className="card-upgrade-def-rule">{u.rule}</span>
+                </div>
+              );
+            })}
           </div>
-          {/* Show drones and their targets */}
-          {Object.keys(mech.drones || {}).length > 0 && (
-            <div className="card-upgrades-list" style={{ marginTop: 2, fontStyle: 'italic', fontSize: '6.5pt' }}>
-              {Object.entries(mech.drones).map(([drone, target]) => (
-                <span key={drone}>{drone}{target ? ` → ${target}` : ' (unassigned)'} · </span>
-              ))}
-            </div>
-          )}
         </>
       )}
-      {/* Light: Fragile Internals reminder */}
-      {cls === 'Light' && (
-        <div className="card-section-heading" style={{ marginTop: 4 }}>FRAGILE INTERNALS</div>
-      )}
-      {cls === 'Light' && (
-        <div className="card-upgrades-list" style={{ fontSize: '6pt', lineHeight: 1.4 }}>
-          Roll 1D6 per point of Structure Damage lost. On 5+, suffer 1 additional point of Damage. This does not trigger further Fragile Internals rolls.
-        </div>
-      )}
 
-      {/* Ultraheavy: Backup Systems Engage reminder */}
-      {cls === 'Ultraheavy' && (
-        <div className="card-section-heading" style={{ marginTop: 4 }}>BACKUP SYSTEMS ENGAGE</div>
-      )}
-      {cls === 'Ultraheavy' && (
-        <div className="card-upgrades-list" style={{ fontSize: '6pt', lineHeight: 1.4 }}>
-          Roll 1D6 per point of Structure Damage lost. On 5+, a point of Damage is ignored and the Structure is not reduced.
-        </div>
-      )}
+      {/* SPECIAL RULES: weapon trait glossary + class-specific keywords
+          (Fragile Internals, Backup Systems Engage) all in one block.
+          No section header of their own — they're keywords, not sections. */}
+      {(() => {
+        const entries = [];
+        // Weapon trait definitions with class-resolved X values
+        weaponTraitDefs.forEach(d => {
+          if (d.text || d.bullets) {
+            entries.push(
+              <div key={d.key || d.title} className="card-trait-def-entry">
+                <span className="card-trait-def-name">{d.title}:</span>{' '}
+                {d.text || (d.bullets && d.bullets.join(' '))}
+              </div>
+            );
+          }
+        });
+        // Class-specific keyword rules
+        if (cls === 'Light') {
+          entries.push(
+            <div key="fragile" className="card-trait-def-entry">
+              <span className="card-trait-def-name">Fragile Internals:</span>{' '}
+              Whenever this Unit suffers Structure Damage, the Target Commander rolls 1D6 per point of Structure Damage lost. On a 5+, the Unit suffers one additional point of Damage. This does not trigger further Fragile Internals rolls.
+            </div>
+          );
+        }
+        if (cls === 'Ultraheavy') {
+          entries.push(
+            <div key="backup" className="card-trait-def-entry">
+              <span className="card-trait-def-name">Backup Systems Engage:</span>{' '}
+              Whenever this Unit suffers Structure Damage, the Target Commander rolls 1D6 per point of Structure Damage lost. On a 5+, a point of Damage is ignored and the Structure is not reduced.
+            </div>
+          );
+        }
+        if (entries.length === 0) return null;
+        return (
+          <>
+            <div className="card-section-heading">SPECIAL RULES</div>
+            <div className="card-trait-defs">{entries}</div>
+          </>
+        );
+      })()}
     </div>
   );
 }
@@ -859,7 +885,7 @@ function AgendaPage({ mechs, faction, selectedTeams }) {
   });
 
   // 3. Team agendas for selected teams
-  TEAMS.forEach(t => {
+  [...TEAMS].sort((a, b) => a.name.localeCompare(b.name)).forEach(t => {
     if (!t.agenda || !selectedTeams.includes(t.name)) return;
     const raw = t.agenda;
     const colon = raw.indexOf(':');

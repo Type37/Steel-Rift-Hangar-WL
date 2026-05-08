@@ -212,7 +212,7 @@ export function TeamPanel({
   onSelectMech,
 }) {
   const slotsRemaining = slotsForBand(mission, selectedTeams, TEAMS);
-  const results = TEAMS.map(t => ({ t, ...checkTeamEligibility(t, mechs, supportAssets) }));
+  const results = [...TEAMS].sort((a, b) => a.name.localeCompare(b.name)).map(t => ({ t, ...checkTeamEligibility(t, mechs, supportAssets) }));
 
   // Auto-open and scroll to focused team
   const focusRef = React.useRef(null);
@@ -1772,7 +1772,7 @@ export function AgendasPanel({ mechs, faction, selectedTeams, supportAssets }) {
   });
 
   // 3. Team agendas — selected teams first, then the rest
-  TEAMS.forEach(t => {
+  [...TEAMS].sort((a, b) => a.name.localeCompare(b.name)).forEach(t => {
     if (!t.agenda) return;
     const inTeam = selectedTeams.includes(t.name);
     const tRaw = t.agenda || '';
