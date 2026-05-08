@@ -17,7 +17,7 @@ export const WC_ORDER = ['Light', 'Medium', 'Heavy', 'Ultraheavy'];
 // ---- Mission sizes (p. 18, 84) ----
 // teamCounts is the number of teams of each member-count band the mission allows.
 export const MISSIONS = {
-  'Recon':       { tons: 100, support: 1, agendas: 1, teamCounts: { '2': 1, '2-3': 0, '3-4': 0 }, board: '3×3', terrain: 8 },
+  'Recon':       { tons: 100, support: 1, agendas: 1, teamCounts: { '2-3': 1, '3-4': 0 }, board: '3×3', terrain: 8 },
   'Strike':      { tons: 150, support: 2, agendas: 2, teamCounts: { '2': 0, '2-3': 2, '3-4': 0 }, board: '3×3', terrain: 8 },
   'Battle':      { tons: 200, support: 3, agendas: 3, teamCounts: { '2': 0, '2-3': 2, '3-4': 1 }, board: '3×3', terrain: 8 },
   'All-Out War': { tons: 350, support: 4, agendas: 4, teamCounts: { '2': 0, '2-3': 2, '3-4': 2 }, board: '4×4', terrain: 14 },

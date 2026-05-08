@@ -181,9 +181,9 @@ export default function App() {
   }, [mechs, supportAssets, activePerks]);
 
   const missionObj = isFreeform
-    ? { ...MISSIONS['All-Out War'], teamCounts: { '2': 99, '2-3': 99, '3-4': 99 } }
+    ? { ...MISSIONS['All-Out War'], teamCounts: { '2-3': 99, '3-4': 99 } }
     : useCustom
-      ? { ...MISSIONS['Battle'], teamCounts: { '2': 1, '2-3': 2, '3-4': 2 } }
+      ? { ...MISSIONS['Battle'], teamCounts: { '2-3': 2, '3-4': 2 } }
       : MISSIONS[mission];
   const teamMax = isFreeform ? 999 : Object.values(missionObj.teamCounts).reduce((a, b) => a + b, 0);
 

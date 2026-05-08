@@ -234,7 +234,6 @@ export function TeamPanel({
         background: 'var(--ink)', padding: 4, marginBottom: 16,
       }}>
         {[
-          { label: 'Teams of 2', key: '2' },
           { label: 'Teams of 2-3', key: '2-3' },
           { label: 'Teams of 3-4', key: '3-4' },
         ]
