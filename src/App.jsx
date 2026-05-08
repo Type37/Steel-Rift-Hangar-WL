@@ -759,34 +759,58 @@ function TeamSummaryCard({ teamName, mechs = [], onClick, onRemove }) {
       </div>
 
       {reqRows.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <div style={{
+          marginTop: 6,
+          borderTop: '1px solid var(--rule)',
+          paddingTop: 7,
+          display: 'flex', flexDirection: 'column', gap: 6,
+        }}>
           {reqRows.map((req, i) => {
             const count = countFor(req);
             const min = req.min || 0;
             const max = req.max;
-            const met = count >= min && count <= max;
+            const met = count >= min;
             const over = count > max;
-            const statusColor = over ? 'var(--rust)' : met && count >= 1 ? 'var(--olive)' : 'var(--mute)';
-            const label = [
-              req.cls,
-              req.needs?.join(', '),
-              req.melee ? 'Melee weapon' : null,
+            const needsMet = met && !over;
+            const accentColor = over ? 'var(--rust)' : needsMet ? 'var(--olive)' : 'var(--rule-strong)';
+
+            // Build the constraint text pieces
+            const constraints = [
+              req.needs ? `with ${req.needs.join(needsMet ? ' / ' : ', ')}` : null,
+              req.needsDefensive ? 'any Defensive Config' : null,
+              req.melee ? 'equipping a Melee weapon' : null,
               req.noReach ? 'no Reach' : null,
-            ].filter(Boolean).join(', ');
+              req.stripped ? 'both Armor + Structure Stripped' : null,
+              req.reinforced ? 'Armor or Structure Reinforced' : null,
+              req.noStripped ? 'not Stripped' : null,
+              req.shortMeleeOnly ? 'only Short or Melee weapons' : null,
+              req.noBlast ? 'no Blast weapons' : null,
+              req.hasDrone ? 'any Companion Drone' : null,
+              req.noDup ? 'no duplicate weapons' : null,
+            ].filter(Boolean);
+
             return (
-              <div key={i} style={{ display: 'flex', alignItems: 'baseline', gap: 6, fontSize: 11 }}>
-                <span className="mono" style={{ color: statusColor, fontWeight: 700, flexShrink: 0 }}>
-                  {count}/{min}-{max}
-                </span>
-                <span style={{ color: 'var(--mute)' }}>
-                  <span style={{ fontWeight: 600, color: 'var(--ink-2)' }}>{req.cls}</span>
-                  {req.needs ? ` with ${req.needs.join(', ')}` : ''}
-                  {req.melee ? ', equipping a Melee weapon' : ''}
-                  {req.noReach ? ', no Reach' : ''}
-                  {req.stripped ? ', both Armor and Structure Stripped' : ''}
-                  {req.reinforced ? ', Armor or Structure Reinforced' : ''}
-                  {req.shortMeleeOnly ? ', only Short or Melee weapons' : ''}
-                </span>
+              <div key={i} style={{
+                borderLeft: `3px solid ${accentColor}`,
+                paddingLeft: 8,
+              }}>
+                {/* Count + class on one line */}
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: constraints.length ? 2 : 0 }}>
+                  <span className="mono" style={{
+                    fontSize: 13, fontWeight: 700, color: accentColor, flexShrink: 0,
+                  }}>
+                    {count}/{min === max ? max : `${min}–${max}`}
+                  </span>
+                  <span style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--ink)' }}>
+                    {req.cls}
+                  </span>
+                </div>
+                {/* Constraints on second line */}
+                {constraints.length > 0 && (
+                  <div style={{ fontSize: 11.5, color: 'var(--mute)', lineHeight: 1.4 }}>
+                    {constraints.join(' · ')}
+                  </div>
+                )}
               </div>
             );
           })}
