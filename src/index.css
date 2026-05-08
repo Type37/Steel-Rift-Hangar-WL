@@ -1836,3 +1836,95 @@ button:not(:disabled):active {
     gap: 6px;
   }
 }
+
+/* ============================================================
+   EQUIPPED SUMMARY — read-only block beneath armor/structure
+   showing what's mounted on the chassis with full detail.
+   ============================================================ */
+.equipped-summary {
+  margin-top: 18px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+.equipped-summary--empty {
+  padding: 14px 16px;
+  font-size: 12.5px;
+  color: var(--mute);
+  font-style: italic;
+  text-align: center;
+  background: var(--surface-2);
+}
+.equipped-summary-head {
+  font-family: var(--font-stencil);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--surface-2);
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--rule);
+  font-weight: 700;
+}
+.equipped-block + .equipped-block {
+  border-top: 1px solid var(--rule);
+}
+.equipped-block-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mute);
+  padding: 6px 12px 2px;
+  font-weight: 700;
+}
+.equipped-weapon-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 200px) auto 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 5px 12px 7px;
+}
+.equipped-rule-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 200px) 1fr;
+  gap: 10px;
+  align-items: baseline;
+  padding: 5px 12px 7px;
+}
+.equipped-rule-row + .equipped-rule-row,
+.equipped-weapon-row + .equipped-weapon-row {
+  border-top: 1px dashed var(--rule);
+}
+.equipped-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--ink);
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.equipped-count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--rust);
+  letter-spacing: 0.04em;
+}
+.equipped-traits {
+  font-size: 11.5px;
+  color: var(--ink-2);
+  line-height: 1.4;
+}
+.equipped-rule-text {
+  font-size: 11.5px;
+  color: var(--ink-2);
+  line-height: 1.55;
+}
+@media (max-width: 760px) {
+  .equipped-weapon-row,
+  .equipped-rule-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}

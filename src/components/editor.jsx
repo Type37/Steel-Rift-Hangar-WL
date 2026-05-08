@@ -233,6 +233,11 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
       </div>
 
 
+      {/* Currently equipped weapons + upgrades, in detail. Sits between
+          the armor block and the catalog so you can see what's mounted
+          without scanning the per-tab catalogs below. */}
+      <EquippedSummary mech={mech} cls={cls} />
+
       {/* Catalog tabs + tonnage + slots all on one row */}
       <div style={{ marginTop: 16 }}>
         {/* LOADOUT title row with inline tonnage bar */}
@@ -680,6 +685,111 @@ function DmgBadge({ weapon, cls }) {
         </React.Fragment>
       ))}
     </span>
+  );
+}
+
+// ============================================================
+// EQUIPPED SUMMARY
+// Shows everything currently mounted on the mech in detail. Sits
+// between the armor block and the catalog so you don't have to scan
+// each tab to see what's on the chassis. Read-only by design — adds
+// and removes still happen through the catalog rows below.
+// ============================================================
+
+function EquippedSummary({ mech, cls }) {
+  // Resolve weapon attachments to their definitions
+  const weapons = mech.weapons.map(w => {
+    const def = [...RANGED, ...MELEE].find(d => d.name === w.name);
+    return def ? { def, count: w.count } : null;
+  }).filter(Boolean);
+
+  const upgradeDefs = (mech.upgrades || [])
+    .map(name => UPGRADES.find(u => u.name === name))
+    .filter(Boolean);
+  const regularUpgrades = upgradeDefs.filter(u => !u.variant);
+  const motive = upgradeDefs.find(u => u.variant);
+
+  const defensive = (mech.defensive || [])
+    .map(name => DEFENSIVE.find(d => d.name === name))
+    .filter(Boolean);
+
+  const isEmpty =
+    weapons.length === 0 &&
+    regularUpgrades.length === 0 &&
+    defensive.length === 0 &&
+    !motive;
+
+  if (isEmpty) {
+    return (
+      <div className="equipped-summary equipped-summary--empty">
+        Nothing mounted yet. Pick weapons and gear from the catalogs below.
+      </div>
+    );
+  }
+
+  return (
+    <div className="equipped-summary">
+      <div className="equipped-summary-head">Equipped</div>
+
+      {weapons.length > 0 && (
+        <div className="equipped-block">
+          <div className="equipped-block-label">Weapons</div>
+          {weapons.map(({ def, count }) => (
+            <EquippedWeaponRow key={def.name} def={def} count={count} cls={cls} />
+          ))}
+        </div>
+      )}
+
+      {regularUpgrades.length > 0 && (
+        <div className="equipped-block">
+          <div className="equipped-block-label">Upgrades</div>
+          {regularUpgrades.map(u => (
+            <EquippedRuleRow key={u.name} name={u.name} text={u.rule} />
+          ))}
+        </div>
+      )}
+
+      {defensive.length > 0 && (
+        <div className="equipped-block">
+          <div className="equipped-block-label">Defensive Configuration</div>
+          {defensive.map(d => (
+            <EquippedRuleRow key={d.name} name={d.name} text={d.rule} />
+          ))}
+        </div>
+      )}
+
+      {motive && (
+        <div className="equipped-block">
+          <div className="equipped-block-label">Motive System</div>
+          <EquippedRuleRow name={motive.name} text={motive.rule} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EquippedWeaponRow({ def, count, cls }) {
+  const traits = collectTraits(def.traits || '');
+  return (
+    <div className="equipped-weapon-row">
+      <div className="equipped-name">
+        {def.name}
+        {count > 1 && <span className="equipped-count">×{count}</span>}
+      </div>
+      <DmgBadge weapon={def} cls={cls} />
+      <div className="equipped-traits">
+        {traits.length > 0 ? <TraitList traits={def.traits} /> : <span style={{ color: 'var(--mute)' }}>—</span>}
+      </div>
+    </div>
+  );
+}
+
+function EquippedRuleRow({ name, text }) {
+  return (
+    <div className="equipped-rule-row">
+      <div className="equipped-name">{name}</div>
+      <div className="equipped-rule-text">{text}</div>
+    </div>
   );
 }
 
