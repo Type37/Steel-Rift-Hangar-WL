@@ -94,26 +94,32 @@ export function TextButton({ children, onClick, disabled }) {
 }
 
 // Tiny circular +/- buttons used in catalog rows
-export function StepButton({ direction, onClick, disabled, accent = 'olive' }) {
+export function StepButton({ direction, onClick, disabled, accent = 'olive', label, title }) {
   const c = accent === 'olive' ? 'var(--olive)' : 'var(--rust)';
+  // When a label is provided (e.g. "6t" for next-copy cost), use a tighter
+  // typographic style than the default symbolic + / − glyph.
+  const hasLabel = label != null && label !== '';
+  const symbolFont = { fontFamily: 'var(--font-mono)', fontSize: 18, fontWeight: 700 };
+  const labelFont = { fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, letterSpacing: '0.02em' };
   return (
     <button
       onClick={onClick}
       disabled={disabled}
       className="step-hover"
+      title={title}
       style={{
-        width: 32, height: 32,
+        width: 36, height: 32,
         border: `1.5px solid ${disabled ? 'var(--rule)' : c}`,
         background: direction === 'up' ? c : 'var(--surface)',
         color: direction === 'up' ? 'var(--surface)' : c,
         cursor: disabled ? 'not-allowed' : 'pointer',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontFamily: 'var(--font-mono)', fontSize: 18, fontWeight: 700,
         opacity: disabled ? 0.4 : 1,
         padding: 0,
+        ...(hasLabel ? labelFont : symbolFont),
       }}
     >
-      {direction === 'up' ? '+' : '−'}
+      {hasLabel ? label : (direction === 'up' ? '+' : '−')}
     </button>
   );
 }

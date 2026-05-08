@@ -779,19 +779,19 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
         <div className="weapon-row-bottom">
           <CostColumns />
           {count > 0 ? (
-            <StepButton direction="down" accent="rust" onClick={() => onRemove(weapon.name)} />
-          ) : <span style={{ width: 28 }} />}
+            <StepButton direction="down" accent="rust" onClick={() => onRemove(weapon.name)} title="Remove one copy" />
+          ) : <span style={{ width: 32 }} />}
           <span className="mono" style={{
             width: 28, textAlign: 'center', fontWeight: 700, fontSize: 17, color: 'var(--ink)',
             visibility: count > 0 ? 'visible' : 'hidden',
           }}>×{count}</span>
-          <StepButton direction="up" onClick={() => onAdd(weapon.name)} disabled={!available} />
-          <span className="mono" style={{
-            fontSize: 9, color: 'var(--mute)', letterSpacing: '0.04em',
-            alignSelf: 'flex-end', paddingBottom: 1,
-            minWidth: 24, textAlign: 'left',
-            visibility: next && count >= 1 ? 'visible' : 'hidden',
-          }}>{next && count >= 1 ? `+${next}t` : ''}</span>
+          <StepButton
+            direction="up"
+            onClick={() => onAdd(weapon.name)}
+            disabled={!available}
+            label={available && next != null ? `${next}t` : null}
+            title={available ? `Add for ${next}t` : unavailableReason}
+          />
         </div>
       </div>
 
