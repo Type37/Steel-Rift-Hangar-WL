@@ -685,6 +685,19 @@ function EmptyHint({ children }) {
   );
 }
 
+
+const TEAM_ICONS = {
+  'Reconnaissance Team': 'icons/team-recon.svg',
+  'Security Team':        'icons/team-security.svg',
+  'Assassination Team':   'icons/team-assassination.svg',
+  'Berserker Team':       'icons/team-berserker.svg',
+  'Multirole Team':       'icons/team-multirole.svg',
+  'Gunslinger Team':      'icons/team-gunslinger.svg',
+  'Fire Support Team':    'icons/team-fire-support.svg',
+  'Networked AI Team':    'icons/team-networked-ai.svg',
+  'Coordinated Assets Team': 'icons/team-coordinated-assets.svg',
+};
+
 // Small clickable card for a selected Team in the left summary.
 function TeamSummaryCard({ teamName, mechs = [], onClick, onRemove }) {
   const team = TEAMS.find(t => t.name === teamName);
@@ -719,9 +732,14 @@ function TeamSummaryCard({ teamName, mechs = [], onClick, onRemove }) {
       style={{ padding: '8px 10px', borderTop: '1px solid var(--rule)', cursor: 'pointer' }}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: reqRows.length ? 5 : 0 }}>
-        <div>
-          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)' }}>{team.name}</div>
-          <div className="mono" style={{ fontSize: 10.5, color: 'var(--mute)' }}>Team of {team.band}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {TEAM_ICONS[team.name] && (
+            <img src={asset(TEAM_ICONS[team.name])} alt="" style={{ width: 22, height: 22, opacity: 0.7, flexShrink: 0 }} />
+          )}
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)' }}>{team.name}</div>
+            <div className="mono" style={{ fontSize: 10.5, color: 'var(--mute)' }}>Team of {team.band}</div>
+          </div>
         </div>
         <button
           onClick={(e) => { e.stopPropagation(); onRemove(); }}

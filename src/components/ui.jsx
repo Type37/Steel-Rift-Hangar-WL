@@ -342,8 +342,14 @@ export function InlineTraitGlossary({ traits, traitStr, cls }) {
             <div style={{
               fontFamily: 'var(--font-stencil)', fontSize: 11.5, fontWeight: 700,
               letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--ink)', marginBottom: 4,
+              display: 'flex', alignItems: 'baseline', gap: 8,
             }}>
-              {def.title}
+              <span>{def.title}</span>
+              {def.page && (
+                <span style={{ fontSize: 9.5, fontFamily: 'var(--font-mono)', fontWeight: 400, color: 'var(--mute)', letterSpacing: '0.04em', textTransform: 'none' }}>
+                  p. {def.page}
+                </span>
+              )}
             </div>
             {def.bullets ? (
               <ul style={{ margin: 0, paddingLeft: 16, display: 'flex', flexDirection: 'column', gap: 3 }}>

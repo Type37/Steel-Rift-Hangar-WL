@@ -46,94 +46,117 @@ export const GLOSSARY = {
 
 
   'anti-air': {
+    page: 22,
     title: 'Anti-Air',
     text: 'When targeting a Unit with the Flying trait, the Target is at -2 to Defense Rolls (e.g. normally avoids on 2+, now avoids on 4+). If this Weapon destroys a Model in a Flying Squadron, remaining damage may be applied to another Model in that Squadron as if it were not a Flying Squadron.',
   },
   'ap': {
+    page: 22,
     title: 'AP (X)',
     text: 'When a Target Unit suffers Damage from this Weapon, apply AP(Lt/Md/Hv/UH) Damage directly to the Target Unit\'s Structure (bypassing remaining Armor).',
   },
   'blast': {
+    page: 22,
     title: 'Blast (X")',
     text: 'All Units (friend or foe) within (X)" of the Target Model must also make a Defense Roll using the same total Attack Pool as the main target. Each Unit\'s Defense Roll is based on its own Weight Class. Units making these rolls are not considered Targeted.',
   },
   'bulky': {
+    page: 22,
     title: 'Bulky',
     text: 'This Weapon/Upgrade takes two of the HE-V\'s Weapon/Upgrade Slots to equip rather than one.',
   },
   'concussive': {
+    page: 22,
     title: 'Concussive (X)',
     text: 'On damage: roll 1D6, +1 per Weight Class larger than the Target, -1 per smaller. On 4+, move Target up to (X)" directly away. If it contacts Blocking Terrain or another Unit, it stops in base contact and both take 1 Damage with no Defense Roll.',
   },
   'compact': {
+    page: 25,
     title: 'Compact',
     text: 'This Upgrade does not take an Upgrade Slot. No HE-V may be equipped with more than one Upgrade with the Compact trait.',
   },
   'dash': {
+    page: 24,
     title: 'Dash (X)',
     text: 'New Order. DASH: move up to X" ignoring Rough Terrain, then immediately resolve a SMASH or ENGAGE Order. The secondary Order does not count toward the 2-Order limit. DASH counts as a MOVE for movement-based bonuses to SMASH.',
   },
   'disruptive': {
+    page: 22,
     title: 'Disruptive',
     text: 'On damage, roll 1D6. On 3+, mark the Target with a Redline Marker. If the Unit already has one or cannot receive one, it takes 1 Structure Damage instead.',
   },
   'draining': {
+    page: 22,
     title: 'Draining',
     text: 'After completing Orders in the Activation this Weapon was used, the Unit receives a Redline Marker (in addition to an Activation Marker). While the Unit already has a Redline Marker, it may not use this Weapon.',
   },
   'drag': {
+    page: 22,
     title: 'Drag',
     text: 'On damage: roll 1D6+4, +1 per Weight Class larger than the Target, -1 per smaller. Move Target that many inches directly toward the Active Unit, stopping at base contact with the Active Unit. If it contacts Blocking Terrain or another Unit (not the Active Unit), it stops and both take 1 Damage with no Defense Roll.',
   },
   'flak': {
+    page: 22,
     title: 'Flak',
     text: 'When this Unit is Targeted by a Weapon with "Missile" or "Rocket" in the name and the Active Unit is in this Model\'s front 180°, reduce that Attack Pool by 1. Also reduces Mine Drone Attack Pools by 1.',
   },
   'frag': {
+    page: 22,
     title: 'Frag',
     text: 'Targets of this Weapon are -1 to Defense Rolls caused by this Weapon.',
   },
   'kinetic': {
+    page: 22,
     title: 'Kinetic',
     text: 'When the Target suffers Damage, roll 1D6 (+1 per Class larger Active is, -1 per Class smaller). On 4+, rotate the Target 45° away from the Active Unit, in a direction chosen by the Active Commander. If Class modifiers make the roll impossible, no effect.',
   },
   'light': {
+    page: 22,
     title: 'Light',
     text: 'When applying Damage from this Weapon (or its Blast effect), Damage is halved, rounded down.',
   },
   'limited': {
+    page: 22,
     title: 'Limited (X)',
     text: 'This Weapon, Upgrade, or Asset may only be used X times per Mission. Track uses remaining.',
   },
   'melee': {
+    page: 22,
     title: 'Melee (X)',
     text: 'This Unit counts as one Weight Class larger during a SMASH Order. Add X to the Attack Pool when performing SMASH. The Weapon is not used during ENGAGE. Multiple Melee weapons do not stack this bonus.',
   },
   'minelayer': {
+    page: 22,
     title: 'Minelayer (Order)',
     text: 'Immediately before or after resolving the named Order, place one friendly Mine Drone Token within 3" of the Active Model and not within 6" of another friendly Mine Drone Token.',
   },
   'parry': {
+    page: 22,
     title: 'Parry',
     text: 'Once per ENGAGE or SMASH Order where the Active Unit is in this Unit\'s LoS, this Unit may re-roll up to 2 Defense Dice.',
   },
   'reach': {
+    page: 22,
     title: 'Reach (X)',
     text: 'In SMASH using this Weapon, Units in LoS within X" count as in base contact. Once Attack Pool is determined, you may reduce it by 1 to nominate a secondary Target in B2B and LoS, dividing the Attack Pool between primary and secondary.',
   },
   'short': {
+    page: 22,
     title: 'Short (X)',
     text: 'This Weapon may only Target Units within X" of the Active Unit.',
   },
   'smart': {
+    page: 22,
     title: 'Smart',
     text: 'At the start of an ENGAGE, you may select a friendly Model with a Target Designator Marker. The selected Model counts as the Active Unit when drawing LoS and determining Side/Rear Arc. Attack Pool -1 when used this way. Marker is removed at the end of the Order.',
   },
   'stagger': {
+    page: 22,
     title: 'Stagger',
     text: 'On damage, Target receives a Stagger Marker. Staggered Units apply -1 to Defense Roll dice when Targeted by ENGAGE or SMASH; Marker is removed after that Order. If a Unit has a Stagger Marker at start of its Activation, it may only perform one Order and may not MOVE; Marker removed at end of Activation.',
   },
   'tether': {
+    page: 22,
     title: 'Tether',
     text: 'On damage, Target receives a Tether Marker and the Active Unit receives an Anchor Marker. The Tethered Unit may not end a MOVE or JUMP further from the Anchor Unit. At end of the Tethered Unit\'s Activation roll D6 — on 4+, remove both Markers. Anchor Unit destroyed removes all corresponding Tethers. Overdrive does not remove the Marker.',
   },
@@ -142,6 +165,7 @@ export const GLOSSARY = {
 
 
   'auxiliary unit': {
+    page: 75,
     title: 'Auxiliary Unit (X)',
     bullets: [
       'Defends against ENGAGE and SMASH as if it were Weight Class (X).',
@@ -155,10 +179,12 @@ export const GLOSSARY = {
   },
 
   'flying': {
+    page: 60,
     title: 'Flying',
     text: 'MOVE Order is replaced by a FLYING MOVE: place the Unit within its Speed horizontally, ignoring Terrain and Unit movement restrictions provided the base fits and faces any direction. Targeting a Flying Unit gives +1 to Defense vs ENGAGE; not modified by Covered or Blocked. Blast Weapons targeting a Flying Unit do not affect non-Flying Units; Flying Units in Blast range of a non-Flying Target do not roll Defense. Cannot SMASH or be SMASHed. Silhouette extends 4" above the base.',
   },
   'flying squadron': {
+    page: 76,
     title: 'Flying Squadron',
     text: 'Multiple Models that activate together and share Orders. Movement: all Models must end within 6" of the Squadron Leader (not 3"). Attacking (ENGAGE): same as Squadron — all Models with LOS and Range fire as one Attack Pool. Targeting a Flying Squadron (ENGAGE): damage does not spill. If a weapon destroys the Target Model, remaining damage from that weapon is discarded. Blast against a Flying Squadron: do not add +2 to the Attack Pool.',
     note: 'The key difference from regular Squadron: damage does not cascade through a Flying Squadron. Each kill requires a fresh attack on a new target.',
@@ -179,51 +205,63 @@ export const GLOSSARY = {
     text: 'Units with this Trait ignore the movement penalty for Rough Terrain.',
   },
   'asset command': {
+    page: 75,
     title: 'Asset Command',
     text: 'All Units in this Asset are issued Orders during the same Activation. When activating one, select any Unit from this Asset and resolve its Activation, then continue until all Units have Activated. The opponent then becomes Active Commander.',
   },
   'close support': {
+    page: 77,
     title: 'Close Support',
     text: 'If a friendly Unit with this trait is within 6\" of an enemy target of an ENGAGE or SMASH Order, add one to the Damage Rating of each weapon used in that ENGAGE or SMASH Order. This bonus is only applied once, regardless of the number of Units with this Trait in range.',
   },
   'fortification': {
+    page: 77,
     title: 'Fortification',
     text: 'Once placed in Deployment, this Unit may not be moved or placed by any Order or effect, voluntarily or involuntarily.',
   },
   'garrison': {
+    page: 75,
     title: 'Garrison (X)',
     text: 'This Model contains a garrisoned Unit (specified in X). The Garrison is placed off-table until it performs the MUSTER Order: place the Garrisoned Unit within 1" of its Garrison. If the Garrison Model is Destroyed before MUSTER, the garrisoned Unit is also Destroyed.',
   },
 
   'guidance suite': {
+    page: 77,
     title: 'Guidance Suite (X)',
     text: 'At the beginning or end of the Order listed in (X), select one enemy unit within LoS of this Model and place a Guidance Marker on it. When that Unit is Targeted by an ENGAGE Order, the attacker selects one effect: (a) all weapons count as having a LOCK ON Order, or (b) one weapon may have +2 added to its Damage Rating. Remove the Marker when the ENGAGE Order is complete, or when this Unit activates again.',
   },
   'msoe launcher': {
+    page: 77,
     title: 'MSOE Launcher (X)',
     text: 'At the beginning or end of the Order listed in (X), place an Obscuration Emitter Token within 6\" of this model. Any Unit within 3\" of the Token counts as being within Covering Terrain; LoS drawn to those models is considered to pass through Covering Terrain. Those Units also count as having Anti-Missile System and Electronic Countermeasures. Remove the Token when the placing Unit activates again.',
   },
   'scramblers': {
+    page: 77,
     title: 'Scramblers',
     text: 'All Units within 6\" of a model equipped with Scramblers, including its own Unit, count as being equipped with Anti-Missile Systems and Electronic Countermeasures.',
   },
   'inferno gear': {
+    page: 77,
     title: 'Inferno Gear',
     text: 'If a Model or Models in the Unit have this Trait, the Unit ignores the effects of the Disruptive Trait.',
   },
   'magnetic grapples': {
+    page: 77,
     title: 'Magnetic Grapples',
     text: 'When this Unit MOVEs or JUMPs into base contact with an Enemy Unit, that Enemy Unit receives a Tether Marker and the Active Unit receives a corresponding Anchor Marker.',
   },
   'minesweeper': {
+    page: 77,
     title: 'Minesweeper',
     text: 'A Unit with this Trait may not be Targeted by a Mine Drone Token. This Unit may ENGAGE Mine Drone Tokens as if it had the Mine Drone Tracking Munitions Upgrade.',
   },
   'outrider': {
+    page: 77,
     title: 'Outrider',
     text: 'If these Models are part of a Squadron, they may be deployed and end moves within 12\" of the Squadron Leader (instead of 3\"). However, all Models with this Trait in a Squadron must deploy and end moves within 3\" of all other Models with this Trait in the Squadron.',
   },
   'shield projector': {
+    page: 77,
     title: 'Shield Projector',
     text: 'When a friendly Unit within 6\" of the model with this trait makes a Defense Roll, it counts as carrying a Combat Shield Upgrade. This is not cumulative with an existing Combat Shield Upgrade on that Unit.',
   },
@@ -231,24 +269,29 @@ export const GLOSSARY = {
 
 
   'infantry': {
+    page: 73,
     title: 'Infantry',
     text: 'Infantry Activate with a special Order list: MUSTER, MOVE (may be performed twice per Activation), LOCK ON, ENGAGE, DIG IN. Infantry suffer -1 to Defense Rolls when not in Rough or Covering Terrain. Infantry count as 0 Tons for scoring.',
   },
 
 
   'overdrive': {
+    page: 37,
     title: 'Overdrive',
     text: 'When a Commander would Activate a Unit but all their Units have Activation Markers and the opponent has at least one without: select a Unit (not one with a Redline Marker or only 1 Structure remaining) to Overdrive. It receives a Redline Marker, suffers 1 Structure Damage, then performs a single Order.',
   },
   'return fire': {
+    page: 37,
     title: 'Return Fire',
     text: 'When targeted by an ENGAGE Order, a Unit may declare Return Fire if: (a) it has LoS to the Active Unit, (b) it has no Activation Marker, and (c) it has no Redline Marker. If declared, the Target may re-roll natural 1s in their Defense Roll. Once the Active Unit\'s Order is complete, if LoS still exists, the Target Unit may immediately ENGAGE the Active Unit. The returning unit is then marked with an Activation Marker.',
   },
   'fragile internals': {
+    page: 37,
     title: 'Fragile Internals',
     text: 'Light HE-Vs only. Whenever this Unit suffers Structure Damage, the Target Commander rolls 1D6 per point of Structure Damage lost. On a 5+, the Unit suffers one additional point of Damage. This does not trigger further Fragile Internals rolls.',
   },
   'backup systems engage': {
+    page: 37,
     title: 'Backup Systems Engage',
     text: 'Ultraheavy HE-Vs only. Whenever this Unit suffers Structure Damage, the Target Commander rolls 1D6 per point of Structure Damage lost. On a 5+, one point of Damage is ignored and the Structure is not reduced.',
   },
@@ -257,14 +300,17 @@ export const GLOSSARY = {
     text: 'Variant Motive Type upgrade (cost 0). Grants the PLOW THROUGH Order: pivot up to 90°, then move up to the HE-V\'s current move speed in a straight line, ignoring Rough Terrain. Facing may not change at the end of this Order. Does not count as a MOVE Order.',
   },
   'plow through': {
+    page: 41,
     title: 'Plow Through',
     text: 'Available to Tracked HE-Vs. Pivot up to 90°, then move up to current move speed in a straight line, ignoring Rough Terrain. Facing may not change at end of Order. Does not count as a MOVE Order.',
   },
   'multi-limbed': {
+    page: 41,
     title: 'Multi-Limbed',
     text: 'Variant Motive Type upgrade (cost 0). Grants the HUNKER DOWN Order: move following all MOVE rules except distance is 10\"/8\"/6\"/4\". Counts as a MOVE Order. The Unit receives a Hunkered Down Marker, which modifies incoming ENGAGE attacks as Covered (or Blocked if already Covered). Marker is removed if the Unit moves or is SMASHed.',
   },
   'hunker down': {
+    page: 41,
     title: 'Hunker Down',
     text: 'Available to Multi-Limbed HE-Vs. Move up to 10\"/8\"/6\"/4\" (counts as a MOVE Order), then place a Hunkered Down Marker. While Hunkered Down, incoming ENGAGE attacks treat this unit as Covered (or Blocked if already Covered). Removed if the Unit moves or is SMASHed.',
   },
@@ -292,10 +338,12 @@ export const GLOSSARY = {
   },
 
   'smasher': {
+    page: 77,
     title: 'Smasher (X, Y)',
     text: 'This Unit is permitted to make the SMASH Order, even if it has the Auxiliary Unit Trait. The Unit is considered of Weight Class X when making a SMASH Order. Add Y dice to the Attack Pool when performing a SMASH Order.',
   },
   'squadron': {
+    page: 75,
     title: 'Squadron',
     text: 'Multiple Models that activate together and share the same Orders. Movement: nominate a Squadron Leader each time the unit moves; all other Models must end within 3" of the Leader. Attacking (ENGAGE): all Models with the same weapon fire it as a single Attack Pool — only Models with LOS and Range participate. Arc modifiers use the lowest applicable modifier; cover uses the largest. Targeting a Squadron (ENGAGE): pick one Model as the Target. If a weapon deals enough damage to destroy it, excess damage spills to the nearest other Model in LOS, repeating until damage is exhausted or no eligible Models remain. Blast against a Squadron: skip individual Defense Rolls for non-target Models; instead add +2 to the Attack Pool. X values on weapons equal the number of Models participating in that Order.',
     note: 'In play: a 4-vehicle squadron with Vehicle Autocannon fires one pool of 2×4 dice. Kill a vehicle and it drops to 2×3. Damage rolls through the unit — a big hit can kill two or three models in a single order.',
@@ -305,18 +353,22 @@ export const GLOSSARY = {
     text: 'Like Garrison, but the whole Unit collectively carries the Garrisoned Unit. Pick one Member Model to count as the Garrison for MUSTER. If a Member is lost, drop a proportional number of Garrisoned Models, rounding up.',
   },
   'support orders': {
+    page: 77,
     title: 'Support Orders',
     text: 'Units with this trait may perform the SUPPORT Order to activate any number of their "SUPPORT:" prefixed traits. If a Squadron contains Support Orders Models, the whole Squadron performs SUPPORT, and each Support Model activates its trait in any order chosen.',
   },
   'suppressive fire': {
+    page: 77,
     title: 'Suppressive Fire',
     text: 'If an enemy Unit within 6\" of a friendly model with this Trait performs an ENGAGE Order, the target of that Order receives +1 to their Defense Rolls.',
   },
   'vulnerable': {
+    page: 77,
     title: 'Vulnerable',
     text: 'This Unit receives full Damage to Armor and Structure from Weapons or effects with the Light trait.',
   },
   'yielding': {
+    page: 77,
     title: 'Yielding',
     text: 'Any Model without the Yielding trait may move through any Model with the Yielding trait. If such a Model ends its move on top of a Model with the Yielding trait, move any Models with the Yielding trait the minimum distance possible to permit this.',
   },

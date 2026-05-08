@@ -199,8 +199,8 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
           reinforceCost={stats.reinforceCost}
           value={mech.armor}
           base={wc.baseArmor}
-          min={Math.max(0, wc.baseArmor - 4)}
-          max={wc.baseArmor + 6}
+          min={0}
+          max={wc.baseArmor + 20}
           onChange={(v) => update({ armor: v })}
         />
         <Adjuster
@@ -208,8 +208,8 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
           reinforceCost={stats.reinforceCost}
           value={mech.structure}
           base={wc.baseStructure}
-          min={Math.max(0, wc.baseStructure - 4)}
-          max={wc.baseStructure + 6}
+          min={0}
+          max={wc.baseStructure + 20}
           onChange={(v) => update({ structure: v })}
         />
       </div>
