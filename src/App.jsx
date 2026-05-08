@@ -269,7 +269,7 @@ export default function App() {
     const groupPerks = Object.values(factionPerks).find(opts => opts.some(o => o.name === name)) || [];
     const groupNames = groupPerks.map(o => o.name);
     setPerks(prev => {
-      if (prev.includes(name)) return prev; // already selected, no-op (radio stays on)
+      if (prev.includes(name)) return prev.filter(p => p !== name); // click again to deselect
       // Remove any existing selection from this group, add new one
       const withoutGroup = prev.filter(p => !groupNames.includes(p));
       if (withoutGroup.length >= 2) return prev; // already have 2 from other groups
