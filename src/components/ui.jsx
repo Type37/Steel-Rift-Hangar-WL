@@ -352,6 +352,11 @@ export function InlineTraitGlossary({ traits, traitStr, cls }) {
             ) : (
               <RulesText text={def.text} size={12.5} />
             )}
+            {def.note && (
+              <div style={{ marginTop: 6, fontSize: 11.5, color: 'var(--mute)', fontStyle: 'italic', lineHeight: 1.55 }}>
+                {def.note}
+              </div>
+            )}
           </div>
         ))}
       </div>

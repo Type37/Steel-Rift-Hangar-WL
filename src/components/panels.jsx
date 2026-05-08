@@ -1519,10 +1519,25 @@ export function FactionPanel({ faction, perks, subPerkSelections = {}, onSetSubP
                         {SUB_PERK_OPTIONS[o.name].options.map(sub => {
                           const active = subPerkSelections[o.name] === sub;
                           const subText = getSubPerkText(sub);
+                          const thisFaction = GRANT_PERK_FACTION[o.name];
+                          const conflictingGrant = thisFaction && Object.entries(GRANT_PERK_FACTION)
+                            .find(([grantPerk, grantFaction]) =>
+                              grantFaction === thisFaction &&
+                              grantPerk !== o.name &&
+                              subPerkSelections[grantPerk]
+                            );
+                          const wouldConflict = !active && !!conflictingGrant;
                           return (
                             <button
                               key={sub}
-                              onClick={(e) => { e.stopPropagation(); onSetSubPerk(o.name, active ? null : sub); }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (wouldConflict) {
+                                  alert(`Freelancers may never select two Perks from the same Faction. You already have a ${thisFaction} perk from ${conflictingGrant[0]}.`);
+                                  return;
+                                }
+                                onSetSubPerk(o.name, active ? null : sub);
+                              }}
                               className="add-btn"
                               style={{
                                 display: 'flex', alignItems: 'flex-start', gap: 8,

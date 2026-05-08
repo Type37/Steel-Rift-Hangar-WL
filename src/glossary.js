@@ -159,7 +159,8 @@ export const GLOSSARY = {
   },
   'flying squadron': {
     title: 'Flying Squadron',
-    text: 'Follows all Squadron rules with three differences. Movement: Models must end within 6" of the Leader, not 3". ENGAGE damage overflow: if a weapon destroys the Target Model, remaining damage is not carried to another Model in the Squadron — this is the key exception from regular Squadron. Blast: a Blast Weapon targeting this Unit does not add 2 to its Attack Pool.',
+    text: 'Multiple Models that activate together and share Orders. Movement: all Models must end within 6" of the Squadron Leader (not 3"). Attacking (ENGAGE): same as Squadron — all Models with LOS and Range fire as one Attack Pool. Targeting a Flying Squadron (ENGAGE): damage does not spill. If a weapon destroys the Target Model, remaining damage from that weapon is discarded. Blast against a Flying Squadron: do not add +2 to the Attack Pool.',
+    note: 'The key difference from regular Squadron: damage does not cascade through a Flying Squadron. Each kill requires a fresh attack on a new target.',
   },
 
 
@@ -294,7 +295,8 @@ export const GLOSSARY = {
   },
   'squadron': {
     title: 'Squadron',
-    text: 'A Unit of multiple Models that activates together and shares Orders. On deploy or movement, nominate a Squadron Leader; all other Models must end within 3" of the Leader. Damage from ENGAGE spills to other Models if the Target is destroyed; Blast adds 2 to the Attack Pool when targeting the Squadron.',
+    text: 'Multiple Models that activate together and share the same Orders. Movement: nominate a Squadron Leader each time the unit moves; all other Models must end within 3" of the Leader. Attacking (ENGAGE): all Models with the same weapon fire it as a single Attack Pool — only Models with LOS and Range participate. Arc modifiers use the lowest applicable modifier; cover uses the largest. Targeting a Squadron (ENGAGE): pick one Model as the Target. If a weapon deals enough damage to destroy it, excess damage spills to the nearest other Model in LOS, repeating until damage is exhausted or no eligible Models remain. Blast against a Squadron: skip individual Defense Rolls for non-target Models; instead add +2 to the Attack Pool. X values on weapons equal the number of Models participating in that Order.',
+    note: 'In play: a 4-vehicle squadron with Vehicle Autocannon fires one pool of 2×4 dice. Kill a vehicle and it drops to 2×3. Damage rolls through the unit — a big hit can kill two or three models in a single order.',
   },
   'squadron garrison': {
     title: 'Squadron Garrison (X)',
