@@ -305,6 +305,30 @@ export function collectTraits(str) {
 // hover each tag.
 // Pass traitStr (raw comma-separated trait string) to get X-value resolved definitions.
 // Falls back to the old key-array path for backwards compatibility.
+
+const ORDER_WORDS = new Set([
+  'ENGAGE','SMASH','MOVE','JUMP','SUPPORT','CAPTURE','LOCK ON','OVERDRIVE',
+  'DASH','RETURN FIRE','FLYING MOVE',
+]);
+
+export function RulesText({ text, size = 13 }) {
+  if (!text) return null;
+  const parts = text.split(/(\bENGAGE\b|\bSMASH\b|\bMOVE\b|\bJUMP\b|\bSUPPORT\b|\bCAPTURE\b|\bLOCK ON\b|\bOVERDRIVE\b|\bDASH\b|\bRETURN FIRE\b|\bFLYING MOVE\b)/g);
+  return (
+    <span style={{ fontSize: size, lineHeight: 1.65, color: 'var(--ink-2)' }}>
+      {parts.map((part, i) =>
+        ORDER_WORDS.has(part)
+          ? <span key={i} style={{
+              fontFamily: 'var(--font-stencil)', fontWeight: 700,
+              fontSize: size - 1, letterSpacing: '0.06em', color: 'var(--ink)',
+              background: 'rgba(21,17,13,0.07)', borderRadius: 2, padding: '0 3px',
+            }}>{part}</span>
+          : part
+      )}
+    </span>
+  );
+}
+
 export function InlineTraitGlossary({ traits, traitStr }) {
   const defs = traitStr
     ? resolveTraitDefs(traitStr)
@@ -312,22 +336,21 @@ export function InlineTraitGlossary({ traits, traitStr }) {
   if (!defs || defs.length === 0) return null;
   return (
     <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px dotted var(--rule)' }}>
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-        gap: '10px 18px',
-      }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {defs.map((def) => (
-          <div key={def.key || def.title} style={{ fontSize: 12.5, lineHeight: 1.5 }}>
-            <div className="stencil" style={{ fontSize: 11, color: 'var(--ink)', marginBottom: 2 }}>
+          <div key={def.key || def.title} style={{ borderLeft: '2px solid var(--rule-strong)', paddingLeft: 10 }}>
+            <div style={{
+              fontFamily: 'var(--font-stencil)', fontSize: 11.5, fontWeight: 700,
+              letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--ink)', marginBottom: 4,
+            }}>
               {def.title}
             </div>
             {def.bullets ? (
-              <ul style={{ margin: '4px 0 0', paddingLeft: 16, color: 'var(--ink-2)', fontSize: 12 }}>
-                {def.bullets.map((b, i) => <li key={i} style={{ marginBottom: 2 }}>{b}</li>)}
+              <ul style={{ margin: 0, paddingLeft: 16, display: 'flex', flexDirection: 'column', gap: 3 }}>
+                {def.bullets.map((b, i) => <li key={i}><RulesText text={b} size={12} /></li>)}
               </ul>
             ) : (
-              <div style={{ color: 'var(--ink-2)' }}>{def.text}</div>
+              <RulesText text={def.text} size={12.5} />
             )}
           </div>
         ))}
@@ -335,3 +358,4 @@ export function InlineTraitGlossary({ traits, traitStr }) {
     </div>
   );
 }
+

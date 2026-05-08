@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Trash2 } from 'lucide-react';
 import { WC, WC_ORDER, RANGED, MELEE, UPGRADES, DEFENSIVE } from '../data';
 import { calcMech, valForClass, copyCost, totalWeaponCost, resetMechToClass } from '../calc';
-import { SectionTitle, FieldLabel, StepButton, TraitList, TraitToken, RowExpand, InlineTraitGlossary, collectTraits } from './ui';
+import { SectionTitle, FieldLabel, StepButton, TraitList, TraitToken, RowExpand, InlineTraitGlossary, RulesText, collectTraits } from './ui';
 
 // ============================================================
 // HE-V EDITOR
@@ -1033,9 +1033,7 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand, onAssignDrone
           background: 'var(--bg-deep)',
           borderTop: '1px dashed var(--rule)',
         }}>
-          <div style={{ fontSize: 14, color: 'var(--ink)', lineHeight: 1.6 }}>
-            {upgrade.rule}
-          </div>
+          <RulesText text={upgrade.rule} size={13.5} />
           <div style={{ marginTop: 10 }}>
             <span className="label" style={{ marginRight: 6 }}>Cost (Lt/Md/Hv/UH):</span>
             <span className="mono" style={{ fontSize: 13 }}>
@@ -1095,9 +1093,7 @@ function DefRow({ def, mech, onToggle, atLimit }) {
               </span>
             )}
           </div>
-          <div style={{ fontSize: 12.5, color: 'var(--ink-2)', marginTop: 2 }}>
-            {def.rule}
-          </div>
+          <div style={{ marginTop: 2 }}><RulesText text={def.rule} size={12.5} /></div>
         </div>
         {available && (
           <button

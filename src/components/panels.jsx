@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Check, Plus, Minus } from 'lucide-react';
 import { OFF_TABLE_ASSETS, ADVANCED_ASSETS, FACTIONS, FACTION_LOGOS, TEAMS, VEHICLE_WEAPONS, INFANTRY_SQUADS, INFANTRY_SHARED_TRAITS, POWER_SUIT_SQUADS, POWER_SUIT_SHARED_TRAITS, UNIVERSAL_AGENDAS } from '../data';
 import { checkTeamEligibility, slotsForBand, findAsset } from '../calc';
-import { SectionTitle, Chip, TextButton, TraitList, RowExpand, InlineTraitGlossary, collectTraits } from './ui';
+import { SectionTitle, Chip, TextButton, TraitList, RowExpand, InlineTraitGlossary, RulesText, collectTraits } from './ui';
 import { Tooltip } from './tooltip';
 
 // Resolve absolute asset path through Vite's base
@@ -1381,9 +1381,7 @@ export function FactionPanel({ faction, perks, subPerkSelections = {}, onSetSubP
             marginBottom: 18,
           }}>
             <div className="label" style={{ marginBottom: 4 }}>Faction Agenda</div>
-            <div style={{ fontSize: 13, color: 'var(--ink)', lineHeight: 1.55 }}>
-              {data.agenda}
-            </div>
+            <div><RulesText text={data.agenda} size={13} /></div>
           </div>
           {/* Logo upload moved to Options. */}
 
@@ -1441,9 +1439,7 @@ export function FactionPanel({ faction, perks, subPerkSelections = {}, onSetSubP
                       </span>
                       <div style={{ minWidth: 0 }}>
                         <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--ink)' }}>{o.name}</div>
-                        <div style={{ fontSize: 12, color: 'var(--ink-2)', lineHeight: 1.55, marginTop: 2 }}>
-                          {o.text}
-                        </div>
+                        <div style={{ marginTop: 2 }}><RulesText text={o.text} size={12} /></div>
                       </div>
                     </button>
                     {/* Sub-perk selector for Tech Pirates / Disgraced Trillionaire */}
@@ -1538,7 +1534,7 @@ function AgendaCard({ name, tag, text, req, qualified, dimReason }) {
               {dimReason}
             </div>
           )}
-          <p style={{ margin: 0 }}>{text}</p>
+          <div style={{ marginTop: 4 }}><RulesText text={text} size={13} /></div>
         </div>
       )}
     </div>
