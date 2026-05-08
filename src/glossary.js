@@ -440,7 +440,7 @@ export function resolveTraitDefs(traitStr, cls) {
     const def = GLOSSARY[key];
     if (!def) return;
     if (numStr) {
-      const sub = (s) => s
+      const sub = (s) => s == null ? s : String(s)
         .replace(/\(X"\)/g, `(${numStr}")`)
         .replace(/\bX"/g, `${numStr}"`)
         .replace(/\(X\)/g, `(${numStr})`)

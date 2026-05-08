@@ -168,6 +168,47 @@ export function StepButton({ direction, onClick, disabled, accent = 'olive', lab
   );
 }
 
+// BuyButton: like a standard add-btn but with the same click-ripple
+// feedback as StepButton. Drop-in for any "Add / Remove" toggle in the
+// right-hand catalog panes.
+export function BuyButton({ onClick, disabled, title, className = '', style = {}, children }) {
+  const [pulses, setPulses] = useState([]);
+  const handleClick = (e) => {
+    if (disabled) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const id = Date.now() + Math.random();
+    setPulses(p => [...p, { id, x, y }]);
+    setTimeout(() => setPulses(p => p.filter(pp => pp.id !== id)), 620);
+    onClick?.(e);
+  };
+  return (
+    <button
+      onClick={handleClick}
+      disabled={disabled}
+      title={title}
+      className={`add-btn ${className}`}
+      style={{ position: 'relative', overflow: 'hidden', ...style }}
+    >
+      <span style={{ position: 'relative', zIndex: 2 }}>{children}</span>
+      <span style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 1 }}>
+        {pulses.map(p => (
+          <span key={p.id} className="step-ripple" style={{ left: p.x, top: p.y }} />
+        ))}
+      </span>
+      {pulses.length > 0 && (
+        <span
+          key={pulses[pulses.length - 1].id}
+          aria-hidden="true"
+          className="step-pulse-ring"
+          style={{ borderColor: style.background === 'transparent' ? 'var(--rust)' : 'var(--olive)' }}
+        />
+      )}
+    </button>
+  );
+}
+
 // Material Design "edit" pencil used as a hover affordance on left-rail
 // cards and team chips. The parent needs class "has-edit-hint" plus
 // position: relative; the CSS controls the fade-in on hover.

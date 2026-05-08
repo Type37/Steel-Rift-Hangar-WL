@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Check, Plus, Minus } from 'lucide-react';
 import { OFF_TABLE_ASSETS, ADVANCED_ASSETS, FACTIONS, FACTION_LOGOS, TEAMS, VEHICLE_WEAPONS, INFANTRY_SQUADS, INFANTRY_SHARED_TRAITS, POWER_SUIT_SQUADS, POWER_SUIT_SHARED_TRAITS, UNIVERSAL_AGENDAS } from '../data';
 import { checkTeamEligibility, slotsForBand, findAsset, mechQualifiesForTeam } from '../calc';
-import { SectionTitle, Chip, TextButton, TraitList, RowExpand, InlineTraitGlossary, RulesText, collectTraits, HoverEditHint } from './ui';
+import { SectionTitle, Chip, TextButton, TraitList, RowExpand, InlineTraitGlossary, RulesText, collectTraits, HoverEditHint, BuyButton } from './ui';
 import { Tooltip } from './tooltip';
 
 // Resolve absolute asset path through Vite's base
@@ -112,11 +112,10 @@ function SupportRow({ a, eq, atLimit, onToggle, expanded, onExpand }) {
           </div>
         </div>
         <span />
-        <button
+        <BuyButton
           onClick={() => onToggle(a.name)}
           disabled={atLimit}
           title={disabledReason || (eq ? `Remove ${a.name} from your support list.` : `Add ${a.name} (${a.cost}t).`)}
-          className="add-btn"
           style={{
             border: `1.5px solid ${eq ? 'var(--rust)' : (atLimit ? 'var(--rule)' : 'var(--olive)')}`,
             background: eq ? 'transparent' : (atLimit ? 'var(--bg-deep)' : 'var(--olive)'),
@@ -124,10 +123,14 @@ function SupportRow({ a, eq, atLimit, onToggle, expanded, onExpand }) {
             padding: '7px 14px', cursor: atLimit ? 'not-allowed' : 'pointer',
             fontFamily: 'var(--font-stencil)', fontSize: 12, fontWeight: 700,
             letterSpacing: '0.12em', textTransform: 'uppercase',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
           }}
         >
-          {eq ? 'Remove' : 'Add'}
-        </button>
+          <span>{eq ? 'Remove' : 'Add'}</span>
+          {!eq && !atLimit && (
+            <span style={{ fontSize: 10, fontFamily: 'var(--font-display)', letterSpacing: '0.04em' }}>{a.cost}t</span>
+          )}
+        </BuyButton>
       </div>
       {expanded && <SupportExpanded a={a} />}
     </div>

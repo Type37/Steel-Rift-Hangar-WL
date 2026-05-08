@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Trash2 } from 'lucide-react';
 import { WC, WC_ORDER, RANGED, MELEE, UPGRADES, DEFENSIVE } from '../data';
 import { calcMech, valForClass, copyCost, totalWeaponCost, resetMechToClass } from '../calc';
-import { SectionTitle, FieldLabel, StepButton, TraitList, TraitToken, RowExpand, InlineTraitGlossary, RulesText, collectTraits } from './ui';
+import { SectionTitle, FieldLabel, StepButton, TraitList, TraitToken, RowExpand, InlineTraitGlossary, RulesText, collectTraits, BuyButton } from './ui';
 
 // ============================================================
 // HE-V EDITOR
@@ -34,32 +34,18 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
 
   // Fly-bauble queue. Each entry has src (button rect), dest (equipped row
   // rect), and a unique id so React can key the animations.
-  const [flyEvents, setFlyEvents] = useState([]);
-
-  const addWeapon = (name, sourceRect) => {
+  const addWeapon = (name) => {
     const e = equipped(name);
     if (e) update({ weapons: mech.weapons.map(w => w.name === name ? { ...w, count: w.count + 1 } : w) });
     else update({ weapons: [...mech.weapons, { name, count: 1 }] });
 
-    // Queue the fly animation. Double-rAF gives React time to commit the
-    // state update, so the equipped-summary row exists in the DOM by the
-    // time we look for it.
-    if (sourceRect) {
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        const dest = document.querySelector(`[data-equipped-name="${CSS.escape(name)}"]`);
-        if (!dest) return;
-        const destRect = dest.getBoundingClientRect();
-        const id = Date.now() + Math.random();
-        setFlyEvents(events => [...events, { id, src: sourceRect, dest: destRect }]);
-        // After the bauble lands, flash the destination row so the eye
-        // follows the impact.
-        setTimeout(() => {
-          dest.classList.add('fly-target-pulse');
-          setTimeout(() => dest.classList.remove('fly-target-pulse'), 620);
-        }, 560);
-        setTimeout(() => setFlyEvents(events => events.filter(ev => ev.id !== id)), 720);
-      }));
-    }
+    // Flash the equipped-summary row after React commits the state update.
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const dest = document.querySelector(`[data-equipped-name="${CSS.escape(name)}"]`);
+      if (!dest) return;
+      dest.classList.add('fly-target-pulse');
+      setTimeout(() => dest.classList.remove('fly-target-pulse'), 620);
+    }));
   };
   const removeWeapon = (name) => {
     const e = equipped(name);
@@ -263,13 +249,6 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
           without scanning the per-tab catalogs below. */}
       <EquippedSummary mech={mech} cls={cls} />
 
-      {/* Fly-bauble overlays. Fixed-position so they animate across the
-          viewport regardless of which scroll container the editor lives
-          in. They self-cleanup after their timer fires. */}
-      {flyEvents.map(ev => (
-        <FlyBauble key={ev.id} src={ev.src} dest={ev.dest} />
-      ))}
-
       {/* Catalog tabs + tonnage + slots all on one row */}
       <div style={{ marginTop: 16 }}>
         {/* LOADOUT title row with inline tonnage bar */}
@@ -456,17 +435,25 @@ function LoadoutHeader({ stats, wc }) {
 
       {/* Slot pips */}
       <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexShrink: 0 }}>
-        {Array.from({ length: stats.capSlots }).map((_, i) => (
-          <span key={i} style={{
-            width: 10, height: 10, borderRadius: '50%', display: 'inline-block',
-            background: i < stats.totalSlotsUsed
-              ? (stats.overSlots ? 'var(--rust)' : 'var(--teal)')
-              : 'rgba(255,255,255,0.55)',
-            border: `2px solid ${i < stats.totalSlotsUsed
-              ? (stats.overSlots ? 'var(--rust)' : 'var(--teal)')
-              : 'var(--rule-strong)'}`,
-          }} />
-        ))}
+        {Array.from({ length: stats.capSlots }).map((_, i) => {
+          const filled = i < stats.totalSlotsUsed;
+          const over = stats.overSlots && filled;
+          return (
+            <span
+              key={`pip-${i}-${filled ? 'f' : 'e'}`}
+              className={`slot-pip${filled ? ' slot-pip-filled' : ''}`}
+              style={{
+                width: 10, height: 10,
+                background: filled
+                  ? (over ? 'var(--rust)' : 'var(--teal)')
+                  : 'rgba(255,255,255,0.55)',
+                border: `2px solid ${filled
+                  ? (over ? 'var(--rust)' : 'var(--teal)')
+                  : 'var(--rule-strong)'}`,
+              }}
+            />
+          );
+        })}
       </div>
 
       {/* Ton count */}
@@ -825,31 +812,6 @@ function EquippedRuleRow({ name, text }) {
   );
 }
 
-// FlyBauble: a small olive coin that lifts off the click point and arcs
-// over to the equipped row that just received the new weapon. Position
-// is fixed (viewport coordinates), so the rects from
-// getBoundingClientRect feed straight into CSS custom properties.
-function FlyBauble({ src, dest }) {
-  const startX = src.left + src.width / 2;
-  const startY = src.top + src.height / 2;
-  const endX = dest.left + dest.width / 2;
-  const endY = dest.top + dest.height / 2;
-  const dx = endX - startX;
-  const dy = endY - startY;
-  return (
-    <div
-      className="fly-bauble"
-      style={{
-        left: `${startX}px`,
-        top: `${startY}px`,
-        '--fly-dx': `${dx}px`,
-        '--fly-dy': `${dy}px`,
-      }}
-      aria-hidden="true"
-    />
-  );
-}
-
 // ============================================================
 // CATALOG ROWS
 // ============================================================
@@ -955,8 +917,7 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
           <StepButton
             direction="up"
             onClick={(e) => {
-              const rect = e?.currentTarget?.getBoundingClientRect();
-              onAdd(weapon.name, rect);
+              onAdd(weapon.name);
             }}
             disabled={!available}
             label={available && next != null ? `${next}t` : null}
@@ -1128,10 +1089,9 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand, onAssignDrone
         </div>
 
         {available && (
-          <button
+          <BuyButton
             onClick={() => onToggle(upgrade.name)}
             title={eq ? `Remove ${upgrade.name}.` : `Add ${upgrade.name} (${cost}t).`}
-            className="add-btn"
             style={{
               border: `1.5px solid ${eq ? 'var(--rust)' : 'var(--olive)'}`,
               background: eq ? 'transparent' : 'var(--olive)',
@@ -1142,7 +1102,7 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand, onAssignDrone
             }}
           >
             {eq ? 'Remove' : 'Add'}
-          </button>
+          </BuyButton>
         )}
       </div>
 
@@ -1265,11 +1225,10 @@ function DefRow({ def, mech, onToggle, atLimit }) {
           <div style={{ marginTop: 2 }}><RulesText text={def.rule} size={12.5} /></div>
         </div>
         {available && (
-          <button
+          <BuyButton
             onClick={() => onToggle(def.name)}
             disabled={blockedByLimit}
             title={reason || (eq ? `Remove ${def.name}.` : `Add ${def.name} (${cost}t).`)}
-            className="add-btn"
             style={{
               border: `1.5px solid ${eq ? 'var(--rust)' : (blockedByLimit ? 'var(--rule)' : 'var(--olive)')}`,
               background: eq ? 'transparent' : (blockedByLimit ? 'var(--bg-deep)' : 'var(--olive)'),
@@ -1280,7 +1239,7 @@ function DefRow({ def, mech, onToggle, atLimit }) {
             }}
           >
             {eq ? 'Remove' : 'Add'}
-          </button>
+          </BuyButton>
         )}
       </div>
 

@@ -262,7 +262,7 @@ export function MechCard({ mech, index, active, onSelect, assignedTo }) {
       onClick={() => onSelect(mech.id)}
       draggable
       onDragStart={handleDragStart}
-      className="add-btn drag-source has-edit-hint"
+      className="add-btn drag-source has-edit-hint chip-popin"
       
       style={{
         display: 'grid',
@@ -437,7 +437,7 @@ export function SupportRosterCard({ asset: a, customName, loadout, onRemove, onC
       onClick={editing ? undefined : onClick}
       draggable={!editing}
       onDragStart={handleDragStart}
-      className={`drag-source ${onClick && !editing ? 'has-edit-hint' : ''}`}
+      className={`drag-source chip-popin ${onClick && !editing ? 'has-edit-hint' : ''}`}
       title={onClick && !editing ? 'Click to inspect, drag to assign to a team' : undefined}
       style={{
         display: 'grid',
