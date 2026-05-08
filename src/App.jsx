@@ -734,12 +734,13 @@ function findPerkText(factionName, perkName, subPerkSelections) {
     if (match) return match.text;
   }
 
-  // If this perk is a sub-perk grant (Tech Pirates / Disgraced Trillionaire),
-  // look it up in Corporations data
-  const corpData = FACTIONS['Corporations'];
-  for (const group of Object.values(corpData?.perks || {})) {
-    const match = group.find(o => o.name === perkName);
-    if (match) return match.text;
+  // Sub-perk grants — search Corporations and Authorities
+  for (const factionKey of ['Corporations', 'Authorities']) {
+    const fData = FACTIONS[factionKey];
+    for (const group of Object.values(fData?.perks || {})) {
+      const match = group.find(o => o.name === perkName);
+      if (match) return match.text;
+    }
   }
   return null;
 }

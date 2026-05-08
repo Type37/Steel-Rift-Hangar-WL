@@ -1328,6 +1328,14 @@ const SUB_PERK_OPTIONS = {
     label: 'Choose Deep War Chest perk (Corporations)',
     options: ['Top End Hardware', 'Outrageous Support Budget', 'Purchased Outcomes'],
   },
+  'Political Extremists': {
+    label: 'Choose Political Priority perk (Authorities)',
+    options: ['Expansionist', 'Protectivist', 'Ideological'],
+  },
+  'Ex-Military Veterans': {
+    label: 'Choose Military Training perk (Authorities) — applied at Deployment',
+    options: ['Coordinated Assaults', 'Covered Advances', 'Elite Pilot Program'],
+  },
 };
 
 export function FactionPanel({ faction, perks, subPerkSelections = {}, onSetSubPerk, onSetFaction, onTogglePerk }) {
@@ -1386,26 +1394,28 @@ export function FactionPanel({ faction, perks, subPerkSelections = {}, onSetSubP
                 padding: '10px 14px',
                 marginBottom: 18,
               }}>
-                <div style={{ fontSize: 9.5, fontFamily: 'var(--font-mono)', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--mute)', marginBottom: 3 }}>
-                  Faction Agenda
-                </div>
-                {agendaName && (
-                  <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--ink)', marginBottom: 4, letterSpacing: '0.02em' }}>
-                    {agendaName}
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 5 }}>
+                  <div style={{ fontSize: 9.5, fontFamily: 'var(--font-mono)', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--mute)', flexShrink: 0 }}>
+                    Agenda
                   </div>
-                )}
-                <RulesText text={agendaBody} size={12.5} />
+                  {agendaName && (
+                    <div style={{ fontSize: 11.5, color: 'var(--mute)', fontStyle: 'italic' }}>
+                      {agendaName}
+                    </div>
+                  )}
+                </div>
+                <RulesText text={agendaBody} size={13} />
               </div>
             );
           })()}
           {/* Logo upload moved to Options. */}
 
-          <div style={{ marginBottom: 12 }}>
-            <div className="stencil" style={{ fontSize: 13, letterSpacing: '0.12em', color: 'var(--ink)', marginBottom: 2 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 12 }}>
+            <div className="stencil" style={{ fontSize: 13, letterSpacing: '0.12em', color: 'var(--ink)' }}>
               Perks
             </div>
             <div style={{ fontSize: 11, color: 'var(--mute)', fontFamily: 'var(--font-mono)' }}>
-              Pick 2 max, 1 per group
+              pick 2 max · 1 per group
             </div>
           </div>
           {Object.entries(data.perks).map(([group, opts]) => {

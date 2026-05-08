@@ -37,13 +37,18 @@ export const findWeapon = (name) =>
 // Resolve the full effective perk list, including sub-perks granted by
 // Tech Pirates (one Corp R&D perk) and Disgraced Trillionaire (one Deep War
 // Chest perk). subPerkSelections maps perk name -> chosen sub-perk name.
+// All four Freelancer "grants another faction's perk" abilities are handled:
+//   Tech Pirates          → one Corp R&D perk (builder effect possible)
+//   Disgraced Trillionaire → one Corp Deep War Chest perk (builder effect possible)
+//   Political Extremists  → one Authorities Political Priority perk (game-day only)
+//   Ex-Military Veterans  → one Authorities Military Training perk (at Deployment)
 export const effectivePerks = (perks = [], subPerkSelections = {}) => {
   const list = [...perks];
-  if (perks.includes('Tech Pirates') && subPerkSelections['Tech Pirates']) {
-    list.push(subPerkSelections['Tech Pirates']);
-  }
-  if (perks.includes('Disgraced Trillionaire') && subPerkSelections['Disgraced Trillionaire']) {
-    list.push(subPerkSelections['Disgraced Trillionaire']);
+  const GRANT_PERKS = ['Tech Pirates', 'Disgraced Trillionaire', 'Political Extremists', 'Ex-Military Veterans'];
+  for (const grantPerk of GRANT_PERKS) {
+    if (perks.includes(grantPerk) && subPerkSelections[grantPerk]) {
+      list.push(subPerkSelections[grantPerk]);
+    }
   }
   return list;
 };
