@@ -31,7 +31,21 @@ export const POOLS = {
 
 
   '🎌': [
-    'Amne', 'Are', 'Ari', 'Bakuretsu', 'Bankai', 'Batouyue', 'Bengé', 'Bierce', 'Bijima', 'Borgoff', 'Braujou', 'Bullow', 'Byakuya', 'Cusuico', 'Defnete', 'Defneti', 'Dolreack', 'Dyalhis', 'Dynus', 'Eckiray', 'Fubuki', 'Fugai', 'Fugare', 'Fujin', 'Garou', 'Gaskell', 'Gekkou', 'Giacago', 'Gii', 'Gillis', 'Gilzen', 'Goseau', 'Gourai', 'Greylancer', 'Groveck', 'Hagane', 'Hiziri', 'Homura', 'Iriya', 'Izanami', 'Jessup-the-Beheader', 'Jinrai', 'Jiu', 'Kagami', 'Kagerou', 'Kagura', 'Kamikaze', 'Karasu', 'Kenbu', 'Kinoue', 'Kipsch', 'Krolock', 'Kuentz', 'Kurenai', 'Kururu', 'Lagan', 'Lancan', 'Laurencin', 'Lorets', 'Malloid', 'Manago', 'Mashira', 'Mayerling', 'Minaye', 'Mosui', 'Muramasa', 'Murasame', 'Murtock', 'Naginata', 'Nolt', 'Nucago', 'Nushi', 'Odama', 'Pluto-VIII', 'Raijin', 'Raikiri', 'Rei-Ginsei', 'Rocambole', 'Ryuusei', 'Sakuya', 'Sengoku', 'Shiga', 'Shinigami', 'Shinkansen', 'Shizam', 'Shuma', 'Shusha', 'Speeny', 'Stanza', 'Su-In', 'Sunhawk', 'Suzumiya', 'Taion', 'Taki', 'Tamahagane', 'Tenka', 'Tenrou', 'Tsurugi', 'Valcua', 'Wu-Lin', 'Xenon', 'Zangetsu', 'Zankoku',
+    // Gravity Rush — Nevi names
+    'Are', 'Ari', 'Jiu', 'Fugare', 'Fugai', 'Lancan', 'Defnete', 'Defneti',
+    'Mosui', 'Malloid', 'Giacago', 'Eckiray', 'Kinoue', 'Lorets', 'Shiga',
+    'Manago', 'Batouyue', 'Minaye',
+    // Gravity Rush — Boss Nevi
+    'Taion', 'Cusuico', 'Lagan', 'Nucago', 'Nushi',
+    // Vampire Hunter D — filtered (real names removed)
+    'Garou', 'Rei-Ginsei', 'Mayerling', 'Borgoff', 'Nolt', 'Groveck',
+    'Bengé', 'Mashira', 'Pluto-VIII', 'Bullow', 'Wu-Lin', 'Su-In',
+    'Krolock', 'Kipsch', 'Taki', 'Gii', 'Shusha', 'Rocambole', 'Kuentz',
+    'Gaskell', 'Laurencin', 'Shuma', 'Xenon', 'Gillis', 'Braujou', 'Valcua',
+    'Dyalhis', 'Speeny', 'Jessup-the-Beheader', 'Goseau', 'Bierce', 'Kururu',
+    'Stanza', 'Dolreack', 'Odama', 'Gilzen', 'Iriya', 'Bijima', 'Amne',
+    'Murtock', 'Dynus', 'Greylancer', 'Shizam', 'Sunhawk', 'Bingo',
+    'Samon', 'Curio', 'Wiseman',
   ],
 
   // Two-word combinations, drawn from these halves

@@ -1477,6 +1477,26 @@ button:not(:disabled):active {
 /* ============================================================
    SLOT PIPS — prominent dots in the loadout header
    ============================================================ */
+
+/* ── Loadout chips on roster HEV card ─────────────────────────────── */
+.loadout-chip {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 1px 5px;
+  border-radius: 2px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  animation: chip-load 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: left center;
+}
+@keyframes chip-load {
+  from { opacity: 0; transform: scaleX(0.5) translateX(-4px); }
+  to   { opacity: 1; transform: scaleX(1)   translateX(0); }
+}
+
 .slot-pip {
   width: 13px;
   height: 13px;
@@ -1505,6 +1525,26 @@ button:not(:disabled):active {
 /* ============================================================
    SLOT PIPS — prominent dots in the loadout header
    ============================================================ */
+
+/* ── Loadout chips on roster HEV card ─────────────────────────────── */
+.loadout-chip {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 1px 5px;
+  border-radius: 2px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  animation: chip-load 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: left center;
+}
+@keyframes chip-load {
+  from { opacity: 0; transform: scaleX(0.5) translateX(-4px); }
+  to   { opacity: 1; transform: scaleX(1)   translateX(0); }
+}
+
 .slot-pip {
   width: 13px;
   height: 13px;
@@ -1541,6 +1581,26 @@ button:not(:disabled):active {
 /* ============================================================
    SLOT PIPS — prominent dots in the loadout header
    ============================================================ */
+
+/* ── Loadout chips on roster HEV card ─────────────────────────────── */
+.loadout-chip {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 1px 5px;
+  border-radius: 2px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  animation: chip-load 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: left center;
+}
+@keyframes chip-load {
+  from { opacity: 0; transform: scaleX(0.5) translateX(-4px); }
+  to   { opacity: 1; transform: scaleX(1)   translateX(0); }
+}
+
 .slot-pip {
   width: 13px;
   height: 13px;
@@ -1569,6 +1629,26 @@ button:not(:disabled):active {
 /* ============================================================
    SLOT PIPS — prominent dots in the loadout header
    ============================================================ */
+
+/* ── Loadout chips on roster HEV card ─────────────────────────────── */
+.loadout-chip {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 1px 5px;
+  border-radius: 2px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  animation: chip-load 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: left center;
+}
+@keyframes chip-load {
+  from { opacity: 0; transform: scaleX(0.5) translateX(-4px); }
+  to   { opacity: 1; transform: scaleX(1)   translateX(0); }
+}
+
 .slot-pip {
   width: 13px;
   height: 13px;

@@ -343,6 +343,38 @@ export function MechCard({ mech, index, active, onSelect, assignedTo }) {
             </span>
           )}
         </div>
+
+        {/* Loadout gear — weapons then upgrades/defensive */}
+        {(mech.weapons.length > 0 || mech.upgrades.length > 0 || mech.defensive.length > 0) && (
+          <div style={{ marginTop: 5, display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+            {mech.weapons.map(w => (
+              <span
+                key={w.name + w.count}
+                className="loadout-chip loadout-chip-weapon"
+                style={{
+                  background: active ? 'rgba(241,234,218,0.12)' : 'rgba(79,97,50,0.12)',
+                  color: active ? 'rgba(241,234,218,0.85)' : 'var(--olive)',
+                  borderColor: active ? 'rgba(241,234,218,0.2)' : 'rgba(79,97,50,0.3)',
+                }}
+              >
+                {w.count > 1 ? `${w.count}× ` : ''}{w.name}
+              </span>
+            ))}
+            {[...mech.upgrades, ...mech.defensive].map(u => (
+              <span
+                key={u}
+                className="loadout-chip loadout-chip-upgrade"
+                style={{
+                  background: active ? 'rgba(241,234,218,0.08)' : 'rgba(138,90,9,0.1)',
+                  color: active ? 'rgba(241,234,218,0.65)' : 'var(--perk)',
+                  borderColor: active ? 'rgba(241,234,218,0.15)' : 'rgba(138,90,9,0.25)',
+                }}
+              >
+                {u}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
       <div style={{ textAlign: 'right' }}>
         <div className="mono" style={{
