@@ -11,7 +11,8 @@ import { MechEditor } from './components/editor';
 import { SupportPanel, TeamPanel, FactionPanel, SupportDetailView, AgendasPanel } from './components/panels';
 import { AddMechModal, OptionsModal, ListsModal, AboutModal } from './components/modals';
 import { PrintView } from './components/print';
-import { SectionTitle, GhostButton, HoverEditHint } from './components/ui';
+import { SectionTitle, GhostButton, HoverEditHint, Modal } from './components/ui';
+import { X } from 'lucide-react';
 
 // localStorage key and helpers. Bump the version if the schema changes
 // in a non-backward-compatible way.
@@ -387,12 +388,8 @@ export default function App() {
                       assignedTo={assignmentLookup[`support:${name}`]}
                       onRemove={toggleSupport}
                       onRename={(nick) => renameSupport(name, nick)}
-                      active={selectedSupportName === name && sideTab === 'support'}
-                      onClick={() => {
-                        setSelectedMechId(null);
-                        setSelectedSupportName(name);
-                        setSideTab('support');
-                      }}
+                      active={selectedSupportName === name}
+                      onClick={() => setSelectedSupportName(name)}
                     />
                   );
                 })
@@ -487,24 +484,11 @@ export default function App() {
                 <FirstRunBriefing onAdd={() => setAddMechOpen(true)} simpleMode={simpleMode} />
               )}
 
-              {sideTab === 'support' && selectedSupportName && (
-                <SupportDetailView
-                  assetName={selectedSupportName}
-                  customName={supportNicknames[selectedSupportName]}
-                  loadout={supportLoadouts[selectedSupportName]}
-                  garrisonLoadout={garrisonLoadouts[selectedSupportName]}
-                  garrisonCount={supportAssets.filter(n => n === selectedSupportName).length}
-                  onSetGarrisonLoadout={(v) => setGarrisonLoadouts(prev => ({ ...prev, [selectedSupportName]: v }))}
-                  onSetLoadout={(l) => setSupportLoadout(selectedSupportName, l)}
-                  onBack={() => setSelectedSupportName(null)}
-                  activePerks={activePerks}
-                />
-              )}
-
-              {sideTab === 'support' && !selectedSupportName && (
+              {sideTab === 'support' && (
                 <SupportPanel
                   selected={supportAssets}
                   onToggle={toggleSupport}
+                  onInspect={(name) => setSelectedSupportName(name)}
                   limit={supportLimit}
                   simpleMode={simpleMode}
                 />
@@ -626,6 +610,56 @@ export default function App() {
           setSelectedSupportName(null);
         }}
       />
+
+      {/* Support asset detail / loadout modal */}
+      <Modal
+        open={!!selectedSupportName}
+        onClose={() => setSelectedSupportName(null)}
+        width={640}
+      >
+        {selectedSupportName && (() => {
+          const a = findAsset(selectedSupportName);
+          if (!a) return null;
+          return (
+            <>
+              <div style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: '13px 16px',
+                borderBottom: '1.5px solid var(--ink)',
+                background: 'var(--ink)', color: 'var(--surface)',
+                gap: 12,
+              }}>
+                <div style={{ minWidth: 0 }}>
+                  <div className="display" style={{ fontSize: 17, letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1.1 }}>
+                    {supportNicknames[selectedSupportName] || a.name}
+                  </div>
+                  <div className="mono" style={{ fontSize: 10, opacity: 0.65, marginTop: 2, letterSpacing: '0.16em' }}>
+                    SUPPORT ASSET · {a.kind.toUpperCase()}
+                  </div>
+                </div>
+                <button onClick={() => setSelectedSupportName(null)} className="add-btn" style={{
+                  background: 'transparent', border: '1.5px solid var(--surface)',
+                  color: 'var(--surface)', width: 32, height: 32, flexShrink: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                }}>
+                  <X size={15} strokeWidth={2.5} />
+                </button>
+              </div>
+
+              <SupportDetailView
+                assetName={selectedSupportName}
+                customName={supportNicknames[selectedSupportName]}
+                loadout={supportLoadouts[selectedSupportName]}
+                garrisonLoadout={garrisonLoadouts[selectedSupportName]}
+                garrisonCount={supportAssets.filter(n => n === selectedSupportName).length}
+                onSetGarrisonLoadout={(v) => setGarrisonLoadouts(prev => ({ ...prev, [selectedSupportName]: v }))}
+                onSetLoadout={(l) => setSupportLoadout(selectedSupportName, l)}
+                activePerks={activePerks}
+              />
+            </>
+          );
+        })()}
+      </Modal>
     </>
   );
 }

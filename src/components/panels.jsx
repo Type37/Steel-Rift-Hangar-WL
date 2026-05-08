@@ -34,8 +34,7 @@ const TEAM_ICONS = {
 // SUPPORT PANEL
 // ============================================================
 
-export function SupportPanel({ selected, onToggle, limit, simpleMode }) {
-  const [expanded, setExpanded] = useState({});
+export function SupportPanel({ selected, onToggle, onInspect, limit, simpleMode }) {
   const tag = `${selected.length}/${limit} taken`;
 
   return (
@@ -48,7 +47,7 @@ export function SupportPanel({ selected, onToggle, limit, simpleMode }) {
           <SupportRow key={a.name} a={a} eq={selected.includes(a.name)}
             atLimit={selected.length >= limit && !selected.includes(a.name)}
             onToggle={onToggle}
-            expanded={expanded[a.name]} onExpand={() => setExpanded(s => ({ ...s, [a.name]: !s[a.name] }))} />
+            onInspect={onInspect} />
         ))}
       </div>
 
@@ -60,7 +59,7 @@ export function SupportPanel({ selected, onToggle, limit, simpleMode }) {
               <SupportRow key={a.name} a={a} eq={selected.includes(a.name)}
                 atLimit={selected.length >= limit && !selected.includes(a.name)}
                 onToggle={onToggle}
-                expanded={expanded[a.name]} onExpand={() => setExpanded(s => ({ ...s, [a.name]: !s[a.name] }))} />
+                onInspect={onInspect} />
             ))}
           </div>
         </>
@@ -80,7 +79,8 @@ function SubHeader({ children }) {
   );
 }
 
-function SupportRow({ a, eq, atLimit, onToggle, expanded, onExpand }) {
+function SupportRow({ a, eq, atLimit, onToggle, onInspect }) {
+  const hasDetail = !!(a.subunits?.length || a.fullDesc || a.stats);
   const disabledReason = atLimit
     ? `Support cap reached for this mission. Remove another asset or pick a larger mission to add ${a.name}.`
     : null;
@@ -92,13 +92,19 @@ function SupportRow({ a, eq, atLimit, onToggle, expanded, onExpand }) {
       transition: 'background 100ms',
     }}>
       <div style={{
-        display: 'grid', gridTemplateColumns: 'auto 1fr auto auto', alignItems: 'center', gap: 12,
+        display: 'grid', gridTemplateColumns: 'auto 1fr auto', alignItems: 'center', gap: 12,
         padding: '11px 12px',
       }}>
-        <RowExpand open={expanded} onClick={onExpand} />
-        <div>
+        <div
+          onClick={hasDetail && onInspect ? () => onInspect(a.name) : undefined}
+          style={{ cursor: hasDetail && onInspect ? 'pointer' : 'default', minWidth: 0 }}
+        >
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--ink)' }}>{a.name}</span>
+            <span style={{
+              fontWeight: 600, fontSize: 15, color: 'var(--ink)',
+              textDecoration: hasDetail && onInspect ? 'underline dotted' : 'none',
+              textUnderlineOffset: 3,
+            }}>{a.name}</span>
             <span className="mono" style={{ fontSize: 13, color: 'var(--rust)', fontWeight: 700 }}>{a.cost}t</span>
             <span className="stencil" style={{
               fontSize: 9.5, padding: '1px 6px', border: '1px solid var(--steel)',
@@ -111,7 +117,7 @@ function SupportRow({ a, eq, atLimit, onToggle, expanded, onExpand }) {
             {a.summary}
           </div>
         </div>
-        <span />
+
         <BuyButton
           onClick={() => onToggle(a.name)}
           disabled={atLimit}
@@ -132,7 +138,6 @@ function SupportRow({ a, eq, atLimit, onToggle, expanded, onExpand }) {
           )}
         </BuyButton>
       </div>
-      {expanded && <SupportExpanded a={a} />}
     </div>
   );
 }
@@ -828,40 +833,11 @@ export function SupportDetailView({ assetName, customName, loadout, onSetLoadout
   const effectiveLoadout = loadout || [];
 
   return (
-    <div style={{ maxWidth: 760 }}>
-      {onBack && (
-        <button onClick={onBack} className="add-btn" style={{
-          background: 'transparent', border: '1.5px solid var(--rule-strong)',
-          color: 'var(--ink-2)', padding: '6px 14px', cursor: 'pointer',
-          fontFamily: 'var(--font-stencil)', fontSize: 11.5, fontWeight: 700,
-          letterSpacing: '0.10em', textTransform: 'uppercase', marginBottom: 16,
-        }}>
-          ← Browse all
-        </button>
-      )}
-
+    <div style={{ padding: '20px 20px 28px' }}>
       <div className="stencil" style={{
-        fontSize: 12, color: 'var(--rust)', letterSpacing: '0.22em', marginBottom: 6,
+        fontSize: 11, color: 'var(--rust)', letterSpacing: '0.22em', marginBottom: 4,
       }}>
-        SUPPORT ASSET · {a.kind.toUpperCase()}
-      </div>
-      <h1 style={{
-        fontFamily: 'var(--font-display)',
-        fontSize: 32, fontWeight: 700, letterSpacing: '0.03em',
-        textTransform: 'uppercase', margin: '0 0 4px',
-        lineHeight: 1.05,
-      }}>
-        {customName || a.name}
-      </h1>
-      {customName && (
-        <div className="mono" style={{ fontSize: 12, color: 'var(--mute)', marginBottom: 8 }}>
-          ({a.name})
-        </div>
-      )}
-      <div className="mono" style={{
-        fontSize: 14, color: 'var(--rust)', fontWeight: 700, marginBottom: 16,
-      }}>
-        {a.cost} tons
+        {a.kind.toUpperCase()} · {a.cost}t
       </div>
 
       {!(a.subunits && a.subunits.length > 0) && a.summary && (
