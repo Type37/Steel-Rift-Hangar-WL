@@ -1421,13 +1421,9 @@ export function FactionPanel({ faction, perks, subPerkSelections = {}, onSetSubP
           })()}
           {/* Logo upload moved to Options. */}
 
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 12 }}>
-            <div className="stencil" style={{ fontSize: 13, letterSpacing: '0.12em', color: 'var(--ink)' }}>
-              Perks
-            </div>
-            <div style={{ fontSize: 11, color: 'var(--mute)', fontFamily: 'var(--font-mono)' }}>
-              pick 2 max · 1 per group
-            </div>
+          <div style={{ marginBottom: 12 }}>
+            <span className="stencil" style={{ fontSize: 13, letterSpacing: '0.12em', color: 'var(--ink)' }}>Perks</span>
+            <span style={{ fontSize: 11.5, color: 'var(--mute)', marginLeft: 8 }}>pick 2 max, 1 per group</span>
           </div>
           {Object.entries(data.perks).map(([group, opts]) => {
             const inGroup = opts.find(o => perks.includes(o.name));
