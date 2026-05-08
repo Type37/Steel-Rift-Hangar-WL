@@ -355,7 +355,7 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
               {sortByAvail(DEFENSIVE, d => { const c = valForClass(d.cost, cls); return c !== "-" && c != null; }).map(d => (
                 <DefRow key={d.name} def={d} mech={mech} onToggle={toggleDef}
                   atLimit={mech.defensive.length >= defLimit}
-                  expanded={expanded[d.name]} onExpand={() => toggleExpanded(d.name)} />
+                  />
               ))}
             </>
           )}
@@ -1049,7 +1049,7 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand, onAssignDrone
   );
 }
 
-function DefRow({ def, mech, onToggle, atLimit, expanded, onExpand }) {
+function DefRow({ def, mech, onToggle, atLimit }) {
   const cls = mech.weightClass;
   const cost = valForClass(def.cost, cls);
   const available = cost !== '-' && cost != null;
@@ -1073,12 +1073,11 @@ function DefRow({ def, mech, onToggle, atLimit, expanded, onExpand }) {
         title={reason || undefined}
         style={{
           display: 'grid',
-          gridTemplateColumns: 'auto 1fr 128px auto',
+          gridTemplateColumns: '1fr 128px auto',
           alignItems: 'center', gap: 12,
           padding: '9px 14px',
         }}
       >
-        <RowExpand open={expanded} onClick={onExpand} />
         <div style={{ minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
             <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--ink)' }}>{def.name}</span>
@@ -1096,12 +1095,9 @@ function DefRow({ def, mech, onToggle, atLimit, expanded, onExpand }) {
               </span>
             )}
           </div>
-          {!expanded && (
-            <div style={{ fontSize: 12.5, color: 'var(--ink-2)', marginTop: 2,
-              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {def.rule}
-            </div>
-          )}
+          <div style={{ fontSize: 12.5, color: 'var(--ink-2)', marginTop: 2 }}>
+            {def.rule}
+          </div>
         </div>
         {available && (
           <button
