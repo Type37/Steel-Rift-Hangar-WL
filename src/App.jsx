@@ -7,7 +7,7 @@ import { WC } from './data';
 import { Navbar, BottomBar, MechCard, EmptyRoster, SupportRosterCard } from './components/chrome';
 import { MechEditor } from './components/editor';
 import { SupportPanel, TeamPanel, FactionPanel, SupportDetailView, AgendasPanel } from './components/panels';
-import { AddMechModal, OptionsModal, ListsModal } from './components/modals';
+import { AddMechModal, OptionsModal, ListsModal, AboutModal } from './components/modals';
 import { PrintView } from './components/print';
 import { SectionTitle, GhostButton } from './components/ui';
 
@@ -56,6 +56,7 @@ export default function App() {
   const [teamAssignments, setTeamAssignments] = useState(stored.teamAssignments ?? {});
 
   const [simpleMode, setSimpleMode] = useState(stored.simpleMode ?? false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const [weaponSort, setWeaponSort] = useState(stored.weaponSort ?? 'cost');
 
   const [addMechOpen, setAddMechOpen] = useState(false);

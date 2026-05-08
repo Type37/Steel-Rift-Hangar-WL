@@ -240,11 +240,7 @@ export function RowExpand({ open, onClick }) {
       title={open ? 'Collapse' : 'Expand for full rules'}
       aria-label={open ? 'Collapse' : 'Expand'}
     >
-      {open ? (
-        <ChevronDown size={15} strokeWidth={2.5} />
-      ) : (
-        <ChevronRight size={15} strokeWidth={2.5} />
-      )}
+      {open ? '−' : '+'}
     </button>
   );
 }

@@ -405,23 +405,23 @@ export const FACTIONS = {
 // pick one as their default or upload a custom file.
 export const FACTION_LOGOS = {
   Authorities: [
-    { name: '67th North Horizon Corps', file: 'authorities/67th-north-horizon-corp.png' },
-    { name: 'Knight Watch',             file: 'authorities/knight-watch.png' },
-    { name: 'Old Solar Republic',       file: 'authorities/old-solar-republic.png' },
-    { name: 'Sahel Alliance',           file: 'authorities/sahel-alliance.png' },
+    { name: '67th North Horizon Corps', file: 'faction-logos/authorities/67th-north-horizon-corp.png' },
+    { name: 'Knight Watch',             file: 'faction-logos/authorities/knight-watch.png' },
+    { name: 'Old Solar Republic',       file: 'faction-logos/authorities/old-solar-republic.png' },
+    { name: 'Sahel Alliance',           file: 'faction-logos/authorities/sahel-alliance.png' },
   ],
   Corporations: [
-    { name: 'Akamatsu',              file: 'corporations/akamatsu.png' },
-    { name: 'Empyrean Reach',        file: 'corporations/empyrean-reach.png' },
-    { name: 'Helios',                file: 'corporations/helios.png' },
-    { name: 'The Echelon Group',     file: 'corporations/the-echelon-group.png' },
-    { name: 'The Selegin Cooperative', file: 'corporations/the-selegin-cooperative.png' },
-    { name: 'Visal Corp',            file: 'corporations/visal-corp.png' },
-    { name: 'WegMaCo',               file: 'corporations/wegmaco.png' },
+    { name: 'Akamatsu',                 file: 'faction-logos/corporations/akamatsu.png' },
+    { name: 'Empyrean Reach',           file: 'faction-logos/corporations/empyrean-reach.png' },
+    { name: 'Helios',                   file: 'faction-logos/corporations/helios.png' },
+    { name: 'The Echelon Group',        file: 'faction-logos/corporations/the-echelon-group.png' },
+    { name: 'The Selegin Cooperative',  file: 'faction-logos/corporations/the-selegin-cooperative.png' },
+    { name: 'Visal Corp',               file: 'faction-logos/corporations/visal-corp.png' },
+    { name: 'WegMaCo',                  file: 'faction-logos/corporations/wegmaco.png' },
   ],
   Freelancers: [
-    { name: 'Cerberus Group',   file: 'freelancers/cerberus-group.png' },
-    { name: "Roland's Reavers", file: 'freelancers/rolands-reavers.png' },
+    { name: 'Cerberus Group',   file: 'faction-logos/freelancers/cerberus-group.png' },
+    { name: "Roland's Reavers", file: 'faction-logos/freelancers/rolands-reavers.png' },
   ],
 };
 

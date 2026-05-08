@@ -36,7 +36,7 @@ export function Navbar() {
 // BOTTOM BAR: force name + mission selection + the two big CTAs
 // ============================================================
 export function BottomBar({
-  forceName, onForceName, onPrint, onOptions, onLists,
+  forceName, onForceName, onPrint, onOptions, onLists, onAbout,
   mission, customTons, onMission, onCustomTons,
   totalTons, supportCount, mechCount,
   onAddMech, onAddSupport,
@@ -188,6 +188,9 @@ export function BottomBar({
         <button onClick={onPrint} className="add-btn util-btn util-btn-print" title="Print roster">
           <Printer size={13} strokeWidth={2.25} />
           <span className="util-label">Print</span>
+        </button>
+        <button onClick={onAbout} className="add-btn util-btn" title="About this builder" style={{ minWidth: 28, fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 13 }}>
+          ?
         </button>
       </div>
       <div style={{ textAlign: 'center', fontSize: 10.5, color: 'var(--mute)', padding: '3px 0 4px', fontFamily: 'var(--font-mono)', borderTop: '1px solid var(--rule)' }}>

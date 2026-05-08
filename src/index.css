@@ -510,29 +510,31 @@ button:not(:disabled):active {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--surface-2);
-  border: 1.5px dashed var(--rule-strong);
-  color: var(--mute);
-  width: 28px;
-  height: 28px;
+  background: transparent;
+  border: 1.5px solid var(--rule-strong);
+  color: var(--rule-strong);
+  width: 22px;
+  height: 22px;
   cursor: pointer;
-  border-radius: 4px;
-  transition: background 110ms, color 110ms, border-color 110ms, border-style 110ms;
+  border-radius: 3px;
+  font-size: 16px;
+  line-height: 1;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  transition: background 100ms, color 100ms, border-color 100ms;
   flex-shrink: 0;
+  user-select: none;
 }
 .row-expand:hover {
   background: var(--ink);
   color: var(--surface);
   border-color: var(--ink);
-  border-style: solid;
 }
 .row-expand.open {
-  background: var(--steel);
+  background: var(--ink);
   color: var(--surface);
-  border-color: var(--steel);
-  border-style: solid;
+  border-color: var(--ink);
 }
-.row-expand svg { display: block; }
 
 /* ============================================================
    FACTION TILES. Three big buttons for picking a faction.

@@ -771,3 +771,60 @@ function smallBtn(bg, color, border) {
     whiteSpace: 'nowrap',
   };
 }
+
+// ============================================================
+// ABOUT MODAL
+// ============================================================
+export function AboutModal({ open, onClose }) {
+  if (!open) return null;
+  return (
+    <Modal onClose={onClose} title="Steel Rift Hangar">
+      <div style={{ padding: '0 2px 8px', lineHeight: 1.65, fontSize: 14, color: 'var(--ink-2)' }}>
+        <p style={{ marginBottom: 12 }}>
+          Unofficial list builder for Steel Rift v1.5 by Death Ray Designs.
+        </p>
+        <p style={{ marginBottom: 12 }}>
+          Originally built by <strong style={{ color: 'var(--ink)' }}>unstoppable Carl</strong>.
+          Forked and rebuilt for v1.5 by <a href="https://linktr.ee/warlore" target="_blank" rel="noreferrer" style={{ color: 'var(--rust)', fontWeight: 700 }}>WarLore</a>.
+        </p>
+        <p style={{ marginBottom: 20 }}>
+          Source code, issue tracker, and full changelog live on GitHub.
+        </p>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <a
+            href="https://github.com/Type37/Steel-Rift-Hangar-WL"
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              background: 'var(--ink)', color: 'var(--surface)',
+              padding: '8px 16px',
+              fontFamily: 'var(--font-stencil)', fontSize: 12, fontWeight: 700,
+              letterSpacing: '0.1em', textTransform: 'uppercase',
+              textDecoration: 'none', border: '1.5px solid var(--ink)',
+              borderRadius: 3,
+            }}
+          >
+            View on GitHub
+          </a>
+          <a
+            href="https://linktr.ee/warlore"
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              background: 'transparent', color: 'var(--ink)',
+              padding: '8px 16px',
+              fontFamily: 'var(--font-stencil)', fontSize: 12, fontWeight: 700,
+              letterSpacing: '0.1em', textTransform: 'uppercase',
+              textDecoration: 'none', border: '1.5px solid var(--rule-strong)',
+              borderRadius: 3,
+            }}
+          >
+            WarLore
+          </a>
+        </div>
+      </div>
+    </Modal>
+  );
+}

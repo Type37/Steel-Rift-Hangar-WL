@@ -4,7 +4,7 @@ Army builder for [Steel Rift](https://www.steelrift.com), v1.5 rules.
 
 **Live:** https://type37.github.io/Steel-Rift-Hangar-WL/
 
-Originally built by [Unstoppable Carl](https://github.com/unstoppablecarl) for Death Ray Designs LLC against the v1.0 rules. This is a full v1.5 rebuild by [WarLore](https://linktr.ee/warlore). MIT license preserved.
+Originally built by [Unstoppable Carl](https://github.com/unstoppablecarl) for Death Ray Designs LLC against the v1.0 rules. This is a full v1.5 rebuild by [WarLore](https://linktr.ee/warlore) — see WarLore's mech content at [warlore.neocities.org](https://warlore.neocities.org). MIT license preserved.
 
 ---
 
