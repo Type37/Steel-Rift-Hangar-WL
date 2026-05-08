@@ -192,8 +192,10 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
 
       {/* Armor / structure adjusters. Each Reinforce step adds 2 points
           and costs 2 tons; each Strip step removes 2 points and refunds
-          2 tons. (v1.5 rules p. 18.) */}
-      <div className="adjuster-grid">
+          2 tons. (v1.5 rules p. 18.) Light and Ultraheavy weight classes
+          have a special structure rule (Fragile Internals / Backup
+          Systems) which sits beside the adjusters when there's room. */}
+      <div className={`adjuster-grid ${(cls === 'Light' || cls === 'Ultraheavy') ? 'adjuster-grid--with-rule' : ''}`}>
         <Adjuster
           kind="armor"
           reinforceCost={stats.reinforceCost}
@@ -212,25 +214,23 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
           max={wc.baseStructure + 2}
           onChange={(v) => update({ structure: v })}
         />
+        {cls === 'Light' && (
+          <div className="adjuster-rule-card">
+            <div className="adjuster-rule-card-title">Fragile Internals</div>
+            <div className="adjuster-rule-card-body">
+              Whenever this Unit suffers Structure Damage, the Target Commander rolls 1D6 per point of Structure Damage lost. On a 5+, the Unit suffers one additional point of Damage. This does not trigger further Fragile Internals rolls.
+            </div>
+          </div>
+        )}
+        {cls === 'Ultraheavy' && (
+          <div className="adjuster-rule-card">
+            <div className="adjuster-rule-card-title">Backup Systems Engage</div>
+            <div className="adjuster-rule-card-body">
+              Whenever this Unit suffers Structure Damage, the Target Commander rolls 1D6 per point of Structure Damage lost. On a 5+, a point of Damage is ignored and the Structure is not reduced.
+            </div>
+          </div>
+        )}
       </div>
-
-      {/* Light / Ultraheavy structure rules reminder */}
-      {(cls === 'Light' || cls === 'Ultraheavy') && (
-        <div style={{
-          margin: '6px 0 0',
-          padding: '7px 12px',
-          background: 'var(--surface-2)',
-          border: '1px solid var(--rule)',
-          fontSize: 12, color: 'var(--ink-2)', lineHeight: 1.5,
-        }}>
-          {cls === 'Light' && (
-            <><strong>Fragile Internals:</strong> Whenever this Unit suffers Structure Damage, the Target Commander rolls 1D6 per point of Structure Damage lost. On a 5+, the Unit suffers one additional point of Damage. This does not trigger further Fragile Internals rolls.</>
-          )}
-          {cls === 'Ultraheavy' && (
-            <><strong>Backup Systems Engage:</strong> Whenever this Unit suffers Structure Damage, the Target Commander rolls 1D6 per point of Structure Damage lost. On a 5+, a point of Damage is ignored and the Structure is not reduced.</>
-          )}
-        </div>
-      )}
 
 
       {/* Catalog tabs + tonnage + slots all on one row */}
