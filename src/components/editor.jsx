@@ -497,7 +497,7 @@ function Adjuster({ kind, value, base, min, max, onChange, reinforceCost = 2 }) 
         >
           <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 14 }}>+2</span>
           <span style={{ fontSize: 11 }}>Reinforce</span>
-          <span className="mono" style={{ opacity: 0.65, fontSize: 10, marginLeft: 'auto' }}>−{reinforceCost}t</span>
+          <span className="mono" style={{ opacity: reinforceCost < 2 ? 1 : 0.65, fontSize: 10, marginLeft: 'auto', color: reinforceCost < 2 ? 'var(--perk)' : 'inherit', fontWeight: reinforceCost < 2 ? 700 : 400 }}>−{reinforceCost}t</span>
         </button>
       </div>
     </div>

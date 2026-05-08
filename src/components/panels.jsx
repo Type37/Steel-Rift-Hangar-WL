@@ -810,7 +810,7 @@ export function SupportDetailView({ assetName, customName, loadout, onSetLoadout
             <div key={k} style={{ display: 'flex', gap: 8, alignItems: 'baseline', flexWrap: 'wrap' }}>
               <span className="label" style={{ fontSize: 10, flexShrink: 0 }}>{k}</span>
               <span>
-                {/Trait|All models|Per model/i.test(k) ? <TraitList traits={applyPerk(v)} /> : applyPerk(String(v))}
+                {/Trait|All models|Per model/i.test(k) ? <BumpedText str={v} active={hasOrbital} /> : <BumpedText str={String(v)} active={hasOrbital} />}
               </span>
             </div>
           ))}

@@ -36,6 +36,7 @@
   --teal-deep:    #0e424a;
   --teal-bright:  #1f7886;
   --warn:         #8a5a09;
+  --perk:         #8a5a09; /* amber: value changed by a faction perk */
   --orange:       #e07a26; /* "Buy Now" warm */
 
   /* Chakra Petch is reserved for marquee headings */
