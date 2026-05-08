@@ -20,11 +20,11 @@ export const GLOSSARY = {
   },
   'mine-drone layer': {
     title: 'SUPPORT: Mine-Drone Layer (X)',
-    text: 'When performing the SUPPORT Order, counts as having the Minelayer (SUPPORT) trait. Limited (X).',
+    text: 'When performing the SUPPORT Order, immediately place one friendly Mine Drone Token within 3" of this model and not within 6" of another friendly Mine Drone Token. Limited (X).',
   },
   'multi-spectral obscuration emitter deployer': {
     title: 'SUPPORT: MSOE Deployer',
-    text: 'When performing the SUPPORT Order, counts as having the MSOE Launcher (SUPPORT) trait, placing an Obscuration Emitter Token within 6". Units within 3" gain Covering Terrain and count as having Anti-Missile System and Electronic Countermeasures.',
+    text: 'When performing the SUPPORT Order, place an Obscuration Emitter Token (25mm circle) within 6" of this model. Any Unit within 3" of the Token counts as being within Covering Terrain — LoS drawn to those models passes through Covering Terrain. Those Units also count as having Anti-Missile System and Electronic Countermeasures. Remove the Token when the placing Unit activates again.',
   },
 
 
@@ -277,7 +277,7 @@ export const GLOSSARY = {
   },
   'support: guidance suite': {
     title: 'SUPPORT: Guidance Suite',
-    text: 'When performing the SUPPORT Order, this model counts as having the Guidance Suite (SUPPORT) trait.',
+    text: 'When performing the SUPPORT Order, select one enemy unit within LoS of this Model and place a Guidance Marker on it. When that Unit is Targeted by an ENGAGE Order, the attacker selects one effect: (a) all weapons count as having a LOCK ON Order, or (b) one weapon may have +2 added to its Damage Rating. Remove the Marker when the ENGAGE Order is complete, or when this Unit activates again.',
   },
   'support: multi-spectral obscuration emitter deployer': {
     title: 'SUPPORT: MSOE Deployer',
@@ -285,7 +285,7 @@ export const GLOSSARY = {
   },
   'support: mine-drone layer': {
     title: 'SUPPORT: Mine-Drone Layer (X)',
-    text: 'When performing the SUPPORT Order, counts as having the Minelayer (SUPPORT) trait. Limited (X).',
+    text: 'When performing the SUPPORT Order, immediately place one friendly Mine Drone Token within 3" of this model and not within 6" of another friendly Mine Drone Token. Limited (X).',
   },
 
   'smasher': {
