@@ -299,7 +299,7 @@ function TeamRow({
   assignedIds = [], mechs = [], supportAssets = [], supportNicknames = {},
   onAssign, onUnassign, onClearTeam, forwardRef, defaultOpen,
 }) {
-  const [open, setOpen] = useState(defaultOpen ?? true);
+  const [open, setOpen] = useState(defaultOpen != null ? defaultOpen : selected);
   const [dragOver, setDragOver] = useState(false);
 
   // Drop handler: read the dragged unit ID and assign to this team.
