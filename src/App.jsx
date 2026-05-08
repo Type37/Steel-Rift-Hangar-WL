@@ -509,6 +509,7 @@ export default function App() {
                   onClearTeam={clearTeamAssignments}
                   focusTeamName={focusTeamName}
                   onFocusConsumed={() => setFocusTeamName(null)}
+                  onSelectMech={(id) => { setSelectedMechId(id); setSideTab('roster'); }}
                 />
               )}
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Check, Plus, Minus } from 'lucide-react';
 import { OFF_TABLE_ASSETS, ADVANCED_ASSETS, FACTIONS, FACTION_LOGOS, TEAMS, VEHICLE_WEAPONS, INFANTRY_SQUADS, INFANTRY_SHARED_TRAITS, POWER_SUIT_SQUADS, POWER_SUIT_SHARED_TRAITS, UNIVERSAL_AGENDAS } from '../data';
 import { checkTeamEligibility, slotsForBand, findAsset } from '../calc';
-import { SectionTitle, Chip, TextButton, TraitList, RowExpand, InlineTraitGlossary, RulesText, collectTraits } from './ui';
+import { SectionTitle, Chip, TextButton, TraitList, RowExpand, InlineTraitGlossary, RulesText, collectTraits, HoverEditHint } from './ui';
 import { Tooltip } from './tooltip';
 
 // Resolve absolute asset path through Vite's base
@@ -206,6 +206,7 @@ export function TeamPanel({
   mechs, supportAssets, selectedTeams, onToggleTeam, mission,
   teamAssignments = {}, onAssign, onUnassign, onClearTeam,
   supportNicknames = {}, focusTeamName, onFocusConsumed,
+  onSelectMech,
 }) {
   const slotsRemaining = slotsForBand(mission, selectedTeams, TEAMS);
   const results = TEAMS.map(t => ({ t, ...checkTeamEligibility(t, mechs, supportAssets) }));
@@ -286,6 +287,7 @@ export function TeamPanel({
               onAssign={onAssign}
               onUnassign={onUnassign}
               onClearTeam={onClearTeam}
+              onSelectMech={onSelectMech}
             />
           );
         })}
@@ -298,6 +300,7 @@ function TeamRow({
   team, eligible, minSize, canAssign, slotLeft, selected, onToggle, perReq,
   assignedIds = [], mechs = [], supportAssets = [], supportNicknames = {},
   onAssign, onUnassign, onClearTeam, forwardRef, defaultOpen,
+  onSelectMech,
 }) {
   const [open, setOpen] = useState(defaultOpen != null ? defaultOpen : selected);
   const [dragOver, setDragOver] = useState(false);
@@ -545,6 +548,7 @@ function TeamRow({
                 onAssign={onAssign}
                 onUnassign={onUnassign}
                 onClearTeam={onClearTeam}
+                onSelectMech={onSelectMech}
               />
             </>
           )}
@@ -563,7 +567,7 @@ function TeamRow({
 function AssignmentStrip({
   team, assignedUnits, assignedIds,
   mechs, supportAssets, supportNicknames,
-  onAssign, onUnassign, onClearTeam,
+  onAssign, onUnassign, onClearTeam, onSelectMech,
 }) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const ref = React.useRef(null);
@@ -621,34 +625,45 @@ function AssignmentStrip({
           Drag units here or use + Assign.
         </span>
       )}
-      {assignedUnits.map(u => (
-        <span
-          key={u.id}
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: 4,
-            padding: '2px 4px 2px 8px',
-            background: u.kind === 'support' ? 'var(--steel)' : 'var(--olive)',
-            color: 'var(--surface)',
-            fontFamily: 'var(--font-stencil)',
-            fontSize: 11, fontWeight: 700,
-            letterSpacing: '0.04em', textTransform: 'uppercase',
-          }}
-        >
-          {u.label}
-          <button
-            onClick={(e) => { e.stopPropagation(); onUnassign?.(u.id); }}
-            title="Remove from team"
+      {assignedUnits.map(u => {
+        const isHev = u.kind === 'hev';
+        const mechId = isHev ? u.id.slice(4) : null;
+        const editable = isHev && onSelectMech;
+        return (
+          <span
+            key={u.id}
+            onClick={editable ? (e) => { e.stopPropagation(); onSelectMech(mechId); } : undefined}
+            title={editable ? 'Edit this HE-V' : undefined}
+            className={editable ? 'has-edit-hint-inline' : ''}
             style={{
-              background: 'transparent', border: 'none',
-              color: 'rgba(241,234,218,0.85)',
-              padding: '0 4px', cursor: 'pointer',
-              fontSize: 13, lineHeight: 1,
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              padding: '2px 4px 2px 8px',
+              background: u.kind === 'support' ? 'var(--steel)' : 'var(--olive)',
+              color: 'var(--surface)',
+              fontFamily: 'var(--font-stencil)',
+              fontSize: 11, fontWeight: 700,
+              letterSpacing: '0.04em', textTransform: 'uppercase',
+              cursor: editable ? 'pointer' : 'default',
+              transition: 'filter 100ms ease-out',
             }}
           >
-            ×
-          </button>
-        </span>
-      ))}
+            {u.label}
+            {editable && <HoverEditHint size="sm" />}
+            <button
+              onClick={(e) => { e.stopPropagation(); onUnassign?.(u.id); }}
+              title="Remove from team"
+              style={{
+                background: 'transparent', border: 'none',
+                color: 'rgba(241,234,218,0.85)',
+                padding: '0 4px', cursor: 'pointer',
+                fontSize: 13, lineHeight: 1,
+              }}
+            >
+              ×
+            </button>
+          </span>
+        );
+      })}
 
       {/* + Assign tap button. Always available; popover lists available units. */}
       {candidates.length > 0 && (
