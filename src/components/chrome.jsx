@@ -80,20 +80,37 @@ export function BottomBar({
             </span>
             <ChevronDown size={11} strokeWidth={2.5} style={{ opacity: 0.85 }} />
           </button>
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10, padding: '0 10px' }}>
-            <div
-              className="bottombar-ton-bar"
-              style={{ background: over ? 'rgba(168,51,12,0.25)' : 'var(--rule)' }}
-            >
-              <div
-                className="bottombar-ton-fill"
-                style={{
-                  width: `${pct}%`,
-                  background: over ? 'var(--rust)' : 'var(--olive)',
-                }}
-              />
+          {/* Option C: segmented blocks fused to mission button, count right */}
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 0, minWidth: 0 }}>
+            {/* Blocks — butted flush against mission button */}
+            <div style={{
+              flex: 1, height: 36, minWidth: 0,
+              border: `1.5px solid ${over ? 'var(--rust)' : 'var(--ink)'}`,
+              borderLeft: 'none',
+              borderRadius: '0 4px 4px 0',
+              display: 'flex', alignItems: 'center',
+              padding: '0 8px', gap: 2, overflow: 'hidden',
+              background: 'var(--bg-deep)',
+            }}>
+              {cap && cap !== Infinity && Array.from({ length: cap }).map((_, i) => {
+                const filled = i < totalTons;
+                return (
+                  <div key={i} style={{
+                    flex: '1 1 0', minWidth: 0,
+                    height: 12, borderRadius: 1,
+                    background: filled
+                      ? (over ? 'var(--rust)' : 'var(--olive)')
+                      : 'var(--rule)',
+                    transition: 'background 120ms',
+                  }} />
+                );
+              })}
             </div>
-            <div className="bottombar-ton-label mono" style={{ color: over ? 'var(--rust)' : 'var(--ink)' }}>
+            {/* Ton count sits outside, right-justified */}
+            <div className="bottombar-ton-label mono" style={{
+              color: over ? 'var(--rust)' : 'var(--ink)',
+              paddingLeft: 10, flexShrink: 0,
+            }}>
               {totalTons}{cap === Infinity ? 't' : ` / ${cap}t`}
             </div>
           </div>
