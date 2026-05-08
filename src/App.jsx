@@ -40,6 +40,9 @@ export default function App() {
   const [supportAssets, setSupportAssets] = useState(stored.supportAssets ?? []);
   const [selectedTeams, setSelectedTeams] = useState(stored.selectedTeams ?? []);
   const [selectedMechId, setSelectedMechId] = useState(null);
+  // Print preview overlay. When true, the PrintView renders on screen
+  // wrapped in preview chrome (gray bg, page shadows, top toolbar).
+  const [printPreviewOpen, setPrintPreviewOpen] = useState(false);
   // When the user adds or clicks a support asset, it gets shown in the
   // right pane with full details. Lives in memory only (not persisted).
   const [selectedSupportName, setSelectedSupportName] = useState(null);
@@ -149,6 +152,14 @@ export default function App() {
       editorRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [selectedMechId]);
+
+  // ESC closes the print preview overlay.
+  useEffect(() => {
+    if (!printPreviewOpen) return;
+    const onKey = (e) => { if (e.key === 'Escape') setPrintPreviewOpen(false); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [printPreviewOpen]);
 
   // ---- Derived ----
   const selectedMech = mechs.find(m => m.id === selectedMechId) || null;
@@ -298,6 +309,8 @@ export default function App() {
         factionLogo={factionLogo}
         supportNicknames={supportNicknames}
         supportLoadouts={supportLoadouts}
+        previewMode={printPreviewOpen}
+        onClosePreview={() => setPrintPreviewOpen(false)}
       />
 
       <div className="app-shell no-print">
@@ -538,7 +551,7 @@ export default function App() {
 
         <BottomBar
           forceName={forceName} onForceName={setForceName}
-          onPrint={() => window.print()}
+          onPrint={() => setPrintPreviewOpen(true)}
           onOptions={() => setOptionsOpen(true)}
           onLists={() => setListsOpen(true)}
           mission={mission} customTons={customTons}

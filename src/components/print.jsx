@@ -16,6 +16,7 @@ export function PrintView({
   forceName, mission, customTons, mechs,
   supportAssets, faction, perks, selectedTeams, simpleMode,
   factionLogo, supportNicknames = {}, supportLoadouts = {}, activePerks = [],
+  previewMode = false, onClosePreview,
 }) {
   const useCustom = mission === 'Custom';
   const cap = useCustom ? customTons : MISSIONS[mission].tons;
@@ -51,7 +52,25 @@ export function PrintView({
   });
 
   return (
-    <div className="print-only">
+    <div className={previewMode ? 'print-preview-mode' : 'print-only'}>
+      {previewMode && (
+        <div className="print-preview-toolbar no-print">
+          <div className="print-preview-toolbar-left">
+            <span className="print-preview-toolbar-title">Print Preview</span>
+            <span className="print-preview-toolbar-meta">{pages.length + 2} pages</span>
+          </div>
+          <div className="print-preview-toolbar-right">
+            <button className="add-btn" onClick={() => window.print()}>
+              Print
+            </button>
+            <button className="add-btn" onClick={onClosePreview}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className={previewMode ? 'print-preview-pages' : ''}>
       <div className="print-page print-cover">
         <ForceHeader
           forceName={forceName}
@@ -99,6 +118,7 @@ export function PrintView({
           />
         </div>
       )}
+      </div>
     </div>
   );
 }
