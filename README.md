@@ -1,12 +1,44 @@
-# Steel Rift: Hangar (v1.5 — The Forge rebuild)
+# Steel Rift Hangar
 
-An army builder for [Steel Rift](https://www.steelrift.com), updated to the v1.5 rules.
+Army builder for [Steel Rift](https://www.steelrift.com), v1.5 rules.
 
 **Live:** https://type37.github.io/Steel-Rift-Hangar-WL/
 
-## History
+Originally built by [Unstoppable Carl](https://github.com/unstoppablecarl) for Death Ray Designs LLC against the v1.0 rules. This is a full v1.5 rebuild by [WarLore](https://linktr.ee/warlore). MIT license preserved.
 
-Originally created by [Unstoppable Carl](https://github.com/unstoppablecarl) for Death Ray Designs LLC. That version was built against the v1.0 rules. This is a full v1.5 rebuild from scratch (Vite + React) by [WarLore](https://linktr.ee/warlore) with Claude help. The MIT license from the original is preserved.
+---
+
+## What it does
+
+**Force building**
+Add HE-Vs at any weight class. Name them manually or generate a callsign from several name pools. Each HE-V tracks tonnage and slots live as you load it out — armor, structure, weapons (with duplicate cost scaling), upgrades, and defensive configs all draw from the same internal budget.
+
+**Faction and perks**
+Pick a faction and select perks from its groups. Perks with builder effects are wired in: Advanced Hardpoint Design adds a slot, Top End Hardware expands your tonnage cap, Materiel Stockpiles cuts reinforce cost to 1t, Outrageous Support Budget comps your cheapest qualifying off-table asset. Tech Pirates and Disgraced Trillionaire prompt sub-perk selection. Values changed by an active perk show in amber.
+
+**Teams and agendas**
+Teams you qualify for are shown as you build. The Agendas tab shows every secondary agenda your force can field — faction, universal, and team — with live qualification checks. Ones you don't yet qualify for are grayed and separated below.
+
+**Support assets**
+Add off-table and on-table support assets up to the mission limit. Full stats and rules are expandable inline. Orbital Stockpiles bumps Limited trait values in amber on any off-table asset you've recruited.
+
+**Mission size**
+Recon / Strike / Battle / All-Out War presets, or a custom tonnage cap. The force budget bar updates live.
+
+**Print**
+Clean roster printout from the top bar.
+
+---
+
+## Data
+
+`src/data.js` — all game data: HE-Vs, weapons, upgrades, defensive configs, support assets, factions, perks, teams.
+`src/glossary.js` — trait definitions surfaced when you click any underlined trait token in the UI.
+`src/callsigns.js` — name pools for the callsign generator.
+
+Every entry is annotated with its v1.5 PDF page reference. Fix a number: open the file, find the entry, change it, push.
+
+---
 
 ## Run locally
 
@@ -15,37 +47,22 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:5173.
+Opens at http://localhost:5173.
 
 ## Deploy
 
-Push to `main`. The workflow at `.github/workflows/static.yml` builds and deploys to GitHub Pages automatically. The base path is set in `vite.config.js` to `/Steel-Rift-Hangar-WL/` — change it if you fork the repo to a different name.
+Push to `main`. The workflow at `.github/workflows/static.yml` builds and deploys to GitHub Pages automatically. The Vite base path is `/Steel-Rift-Hangar-WL/` — change it in `vite.config.js` if you fork.
 
-## Editing the data
+---
 
-All Steel Rift data lives in `src/data.js`. Trait definitions are in `src/glossary.js`. Mech callsign pools are in `src/callsigns.js`. Each entry is annotated with the page reference where it was pulled from the v1.5 PDF, so corrections are quick: open the file, find the entry, fix the number, push.
+## Known gaps
 
-## Icons
+- Some advanced rules aren't modeled: Ultralight HE-Vs as team members, Garrison details, and a few edge-case Support Asset interactions.
+- The team eligibility checker is a heuristic. It covers weight class, required weapons, and upgrade constraints but isn't a rules arbiter — always cross-check against the team's printed card.
+- Titan-Killers agenda eligibility depends on the opponent's force, so it can't be checked at list-building time.
 
-Drop SVG or PNG icons into `public/icons/` and reference them by filename in `src/data.js` (each weapon, upgrade, support asset, and HE-V class has an optional `icon` field). The current build falls back to lucide icons when no file is provided.
-
-## What it does
-
-- Add HE-Vs at any weight class. Name them yourself or roll a callsign from one of several name pools (configurable in Options).
-- Configure armor, structure, weapons (with duplicate cost scaling), upgrades, and defensive configurations. Slots and tonnage tracked live.
-- Pick mission size from Recon / Strike / Battle / All-Out War, or set a custom tonnage.
-- Add support assets up to the mission's allowed limit, with full rules and stats expandable before committing.
-- Pick a faction and its perks (one per group, max 2).
-- See which HE-V Teams your roster qualifies for as you build, with the team-count limits the mission allows surfaced at the top.
-- Click any underlined trait token anywhere in the UI to surface its definition in the glossary band.
-- Print a clean army roster from the top bar.
-
-## Caveats
-
-- The team eligibility checker is a heuristic, not a rules referee. It checks weight class, required upgrades, and weapon constraints; always cross-check against the team's printed requirements.
-- Duplicate weapon costs follow the v1.5 formula: the Nth copy costs `floor(base * (1 + 0.5 * (N - 1)))`. So a 5-ton Autocannon goes 5 → 7 → 10 → 12 → 15.
-- Some advanced rules (Ultralight HE-Vs, Squadrons as team members, Garrisons in detail) are not modeled.
+---
 
 ## License
 
-MIT, see [LICENSE](./LICENSE). Original copyright Death Ray Designs LLC.
+MIT. See [LICENSE](./LICENSE). Original copyright Death Ray Designs LLC.
