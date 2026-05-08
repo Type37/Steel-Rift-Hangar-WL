@@ -1335,7 +1335,7 @@ export function FactionPanel({ faction, perks, subPerkSelections = {}, onSetSubP
 
   return (
     <div>
-      <SectionTitle tag={faction ? `${perks.length}/2 perks` : 'none'}>Faction</SectionTitle>
+      <SectionTitle tag={faction ? `${perks.length}/2 perks` : 'none'} action={faction ? <button onClick={() => onSetFaction(faction)} style={{ fontSize: 11, color: 'var(--mute)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-mono)', padding: '0 2px' }} title='Clear faction'>✕ clear</button> : null}>Faction</SectionTitle>
 
       <div className="faction-tiles">
         {Object.keys(FACTIONS).map(f => {

@@ -260,7 +260,7 @@ export default function App() {
   const toggleTeam = (name) =>
     setSelectedTeams(prev => prev.includes(name) ? prev.filter(n => n !== name) : [...prev, name]);
 
-  const handleSetFaction = (f) => { setFaction(f); setPerks([]); };
+  const handleSetFaction = (f) => { setFaction(prev => prev === f ? null : f); setPerks([]); setSubPerkSelections({}); };
 
   const togglePerk = (name) => {
     // Radio behavior: selecting a perk removes any other perk from the same group
