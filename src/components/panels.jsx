@@ -786,14 +786,16 @@ export function SupportDetailView({ assetName, customName, loadout, onSetLoadout
         {a.cost} tons
       </div>
 
-      <div style={{
-        borderLeft: '3px solid var(--steel)',
-        paddingLeft: 14,
-        marginBottom: 18,
-        fontSize: 14, color: 'var(--ink-2)', fontStyle: 'italic',
-      }}>
-        {a.summary}
-      </div>
+      {!(a.subunits && a.subunits.length > 0) && a.summary && (
+        <div style={{
+          borderLeft: '3px solid var(--steel)',
+          paddingLeft: 14,
+          marginBottom: 18,
+          fontSize: 14, color: 'var(--ink-2)', fontStyle: 'italic',
+        }}>
+          {a.summary}
+        </div>
+      )}
 
       {a.fullDesc && (
         <div style={{ fontSize: 13.5, color: 'var(--ink-2)', lineHeight: 1.65, marginBottom: 18 }}>

@@ -1458,6 +1458,16 @@ button:not(:disabled):active {
    row 1: expand toggle + name/dmg + traits
    row 2: cost columns + add/remove controls
    ============================================================ */
+.adjuster-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 22px;
+}
+@media (max-width: 540px) {
+  .adjuster-grid { grid-template-columns: 1fr; }
+}
+
 .weapon-row-main {
   display: grid;
   grid-template-columns: auto 1fr 128px auto auto auto 28px;
@@ -1470,7 +1480,17 @@ button:not(:disabled):active {
   display: contents;
 }
 @media (max-width: 540px) {
-  .weapon-row-main {
+  .adjuster-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 22px;
+}
+@media (max-width: 540px) {
+  .adjuster-grid { grid-template-columns: 1fr; }
+}
+
+.weapon-row-main {
     display: flex;
     flex-direction: column;
     align-items: stretch;

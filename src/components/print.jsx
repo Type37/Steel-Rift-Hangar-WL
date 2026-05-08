@@ -1,7 +1,7 @@
 import React from 'react';
 import { WC, MISSIONS, RANGED, MELEE, UPGRADES, DEFENSIVE, FACTIONS, TEAMS, UNIVERSAL_AGENDAS } from '../data';
 import { calcMech, valForClass, totalWeaponCost, findAsset, findWeapon } from '../calc';
-import { GLOSSARY } from '../glossary';
+import { GLOSSARY, resolveTraitDefs } from '../glossary';
 import { collectTraits } from './ui';
 
 // ============================================================
@@ -255,6 +255,25 @@ function HEVCard({ mech, index }) {
           ))}
         </tbody>
       </table>
+
+      {/* Per-weapon trait explanations with resolved X values */}
+      {(() => {
+        // Collect all unique trait strings across all weapons
+        const allTraits = weapons.map(w => w.traits).filter(Boolean).join(', ');
+        if (!allTraits) return null;
+        const defs = resolveTraitDefs(allTraits);
+        if (!defs.length) return null;
+        return (
+          <div className="card-trait-defs">
+            {defs.map(d => (
+              <div key={d.key || d.title} className="card-trait-def-entry">
+                <span className="card-trait-def-name">{d.title}:</span>{' '}
+                {d.text}
+              </div>
+            ))}
+          </div>
+        );
+      })()}
 
       {(upgrades.length > 0 || defensive.length > 0) && (
         <>

@@ -193,7 +193,7 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
       {/* Armor / structure adjusters. Each Reinforce step adds 2 points
           and costs 2 tons; each Strip step removes 2 points and refunds
           2 tons. (v1.5 rules p. 18.) */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 22 }}>
+      <div className="adjuster-grid">
         <Adjuster
           kind="armor"
           reinforceCost={stats.reinforceCost}
@@ -858,7 +858,7 @@ function ExpandedWeapon({ weapon, cls }) {
           </tr>
         </tbody>
       </table>
-      <InlineTraitGlossary traits={traits} />
+      <InlineTraitGlossary traitStr={weapon.traits} />
     </div>
     {/* Weapon art */}
     <img

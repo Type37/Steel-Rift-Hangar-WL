@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { Tooltip } from './tooltip';
-import { defineToken } from '../glossary';
+import { defineToken, resolveTraitDefs } from '../glossary';
 
 // Schibsted Grotesk for buttons (was Chakra Petch; restricted now to banner heads only)
 const stencilButton = {
@@ -307,10 +307,13 @@ export function collectTraits(str) {
 // Inline glossary block: shows every referenced trait with its full rule text.
 // Use after expanding a row so the user sees all the rules without having to
 // hover each tag.
-export function InlineTraitGlossary({ traits }) {
-  if (!traits || traits.length === 0) return null;
-  const defs = traits.map(t => ({ key: t, def: defineToken(t) })).filter(x => x.def);
-  if (defs.length === 0) return null;
+// Pass traitStr (raw comma-separated trait string) to get X-value resolved definitions.
+// Falls back to the old key-array path for backwards compatibility.
+export function InlineTraitGlossary({ traits, traitStr }) {
+  const defs = traitStr
+    ? resolveTraitDefs(traitStr)
+    : (traits || []).map(t => { const d = defineToken(t); return d ? { key: t, ...d } : null; }).filter(Boolean);
+  if (!defs || defs.length === 0) return null;
   return (
     <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px dotted var(--rule)' }}>
       <div style={{
@@ -318,13 +321,9 @@ export function InlineTraitGlossary({ traits }) {
         gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
         gap: '10px 18px',
       }}>
-        {defs.map(({ key, def }) => (
-          <div key={key} style={{ fontSize: 12.5, lineHeight: 1.5 }}>
-            <div className="stencil" style={{
-              fontSize: 11,
-              color: 'var(--ink)',
-              marginBottom: 2,
-            }}>
+        {defs.map((def) => (
+          <div key={def.key || def.title} style={{ fontSize: 12.5, lineHeight: 1.5 }}>
+            <div className="stencil" style={{ fontSize: 11, color: 'var(--ink)', marginBottom: 2 }}>
               {def.title}
             </div>
             {def.bullets ? (

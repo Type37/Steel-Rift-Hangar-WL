@@ -349,3 +349,37 @@ export function defineToken(token) {
   const k = token.toLowerCase().trim().replace(/\s*\([^)]*\)/g, '').replace(/"/g, '').trim();
   return GLOSSARY[k] || null;
 }
+
+// resolveTraitDefs: like collectTraits+defineToken but substitutes
+// actual X values from the original trait string.
+// "Short (6"), Blast (3")" → [{title:'Short (6")', text:'...within 6"...'}...]
+export function resolveTraitDefs(traitStr) {
+  if (!traitStr) return [];
+  const seen = new Set();
+  const results = [];
+  traitStr.split(/,\s*/).forEach(part => {
+    part = part.trim();
+    const valueMatch = part.match(/\(([^)]+)\)/);
+    const rawValue = valueMatch ? valueMatch[1] : null;
+    // Numeric portion only (strip trailing " so we can re-add when needed)
+    const numStr = rawValue ? rawValue.replace(/"/g, '').trim() : null;
+    const clean = part.replace(/\s*\([^)]*\)/g, '').replace(/"/g, '').trim();
+    const key = clean.toLowerCase();
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    const def = GLOSSARY[key];
+    if (!def) return;
+    if (numStr) {
+      const sub = (s) => s
+        .replace(/\(X"\)/g, `(${numStr}")`)
+        .replace(/\bX"/g, `${numStr}"`)
+        .replace(/\(X\)/g, `(${numStr})`)
+        .replace(/\bX\b/g, numStr);
+      results.push({ key, title: sub(def.title), text: sub(def.text), bullets: def.bullets });
+    } else {
+      results.push({ key, title: def.title, text: def.text, bullets: def.bullets });
+    }
+  });
+  return results;
+}
+
