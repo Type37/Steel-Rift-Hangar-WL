@@ -928,7 +928,7 @@ function findVehicleWeapon(name) {
 
 // Parse a weapons string like "Vehicle Autocannon, Submunitions" into an array of lookups.
 function parseWeapons(str) {
-  if (!str || str === '—') return [];
+  if (!str || str === '—' || typeof str !== 'string') return [];
   return str
     .split(/,\s*/)
     .map(w => w

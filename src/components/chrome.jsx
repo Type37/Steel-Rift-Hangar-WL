@@ -604,6 +604,7 @@ export function EmptyRoster({ onAdd }) {
 // "Reconnaissance and Disruption LAS Wing" -> "Recon/Disruption LAS Wing"
 // "Infantry Fighting Vehicle" -> "IFV"
 function shortenSubName(name) {
+  if (typeof name !== 'string') return String(name ?? '');
   return name
     .replace(/Reconnaissance and Disruption/gi, 'Recon/Disruption')
     .replace(/Infantry Fighting Vehicle/gi, 'IFV')
