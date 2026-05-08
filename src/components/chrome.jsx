@@ -80,20 +80,20 @@ export function BottomBar({
             </span>
             <ChevronDown size={11} strokeWidth={2.5} style={{ opacity: 0.85 }} />
           </button>
-          <div
-            className="bottombar-ton-bar"
-            style={{
-              borderColor: over ? 'var(--rust)' : 'var(--rule-strong)',
-            }}
-          >
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10, padding: '0 10px' }}>
             <div
-              className="bottombar-ton-fill"
-              style={{
-                width: `${pct}%`,
-                background: over ? 'var(--rust)' : 'var(--olive)',
-              }}
-            />
-            <div className="bottombar-ton-label mono">
+              className="bottombar-ton-bar"
+              style={{ background: over ? 'rgba(168,51,12,0.25)' : 'var(--rule)' }}
+            >
+              <div
+                className="bottombar-ton-fill"
+                style={{
+                  width: `${pct}%`,
+                  background: over ? 'var(--rust)' : 'var(--olive)',
+                }}
+              />
+            </div>
+            <div className="bottombar-ton-label mono" style={{ color: over ? 'var(--rust)' : 'var(--ink)' }}>
               {totalTons}{cap === Infinity ? 't' : ` / ${cap}t`}
             </div>
           </div>
