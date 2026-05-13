@@ -89,9 +89,9 @@ export default function App() {
   }, [
     forceName, mission, customTons,
     faction, perks, factionLogo,
-    mechs, supportAssets, selectedTeams,
+    mechs, supportAssets, selectedTeams, subPerkSelections,
     callsignPools, customCallsigns, supportNicknames, supportLoadouts,
-    teamAssignments,
+    garrisonLoadouts, teamAssignments, weaponSort,
     simpleMode,
   ]);
 

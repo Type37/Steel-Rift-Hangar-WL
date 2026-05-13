@@ -162,13 +162,20 @@ export const checkMechAgainstReq = (m, req) => {
 
   if (req.needs) {
     if (req.needsAny) {
-      // needsAny: mech must have AT LEAST ONE of the listed items
-      const hasAny = req.needs.some(n => m.upgrades.includes(n) || m.defensive.includes(n));
+      // needsAny: mech must have AT LEAST ONE of the listed items (weapon, upgrade, or defensive config)
+      const hasAny = req.needs.some(n =>
+        m.upgrades.includes(n) ||
+        m.defensive.includes(n) ||
+        m.weapons.some(w => w.name === n)
+      );
       if (!hasAny) return false;
     } else {
       // default: mech must have ALL of the listed items
       for (const n of req.needs) {
-        const has = m.upgrades.includes(n) || m.defensive.includes(n);
+        const has =
+          m.upgrades.includes(n) ||
+          m.defensive.includes(n) ||
+          m.weapons.some(w => w.name === n);
         if (!has) return false;
       }
     }
@@ -278,35 +285,14 @@ export const slotsForBand = (mission, selectedTeams, teamsData) => {
 };
 
 // Returns team names a single mech qualifies for (as an individual slot filler).
-// Used for roster badge display. Pass the full mechs array for noDup checks.
-export const teamsForMech = (mech, mechs, teams) => {
-  const qualifying = [];
-  for (const team of teams) {
-    for (const req of team.req) {
-      if (req.cls === 'UL HE-V or Assault Vehicle Squadron') continue;
-      if (!clsMatch(req.cls, mech.weightClass)) continue;
-      // Use the existing per-mech checker with a tweaked req
-      const effReq = req.cls === 'Medium or Heavy'
-        ? { ...req, cls: mech.weightClass }
-        : req;
-      // Import checkMechAgainstReq is private; re-check inline
-      let pass = true;
-      const isAnyHevCls = effReq.cls === 'Any HE-V'
-        || effReq.cls === 'Light, Medium, Heavy, or Ultraheavy HE-Vs';
-      if (!isAnyHevCls && effReq.cls !== mech.weightClass) pass = false;
-      if (pass && effReq.needs) {
-        for (const n of effReq.needs) {
-          if (!mech.upgrades.includes(n) && !mech.defensive.includes(n)) { pass = false; break; }
-        }
-      }
-      if (pass && effReq.needsDefensive && mech.defensive.length === 0) pass = false;
-      if (pass && effReq.melee) {
-        const { MELEE } = require ? {} : {};
-        const hasMelee = mech.weapons.some(w => w.name && /Blade|Claw|Fist|Slam|Cleaver|Hammer|Spike|Talon|Punch|Strike|Sweep|Crush|Stomp|Melee/i.test(w.name));
-        if (!hasMelee) pass = false;
-      }
-      if (pass) { qualifying.push(team.name); break; }
-    }
-  }
-  return qualifying;
+// A mech qualifies if it satisfies at least one non-support req row in the team.
+export const teamsForMech = (mech, teams) => {
+  return teams
+    .filter(team =>
+      team.req.some(req =>
+        req.cls !== 'UL HE-V or Assault Vehicle Squadron' &&
+        checkMechAgainstReq(mech, req)
+      )
+    )
+    .map(team => team.name);
 };
