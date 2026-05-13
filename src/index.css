@@ -2127,3 +2127,27 @@ button:not(:disabled):active {
   80%  { transform: scale(0.9); }
   100% { transform: scale(1); }
 }
+
+/* ============================================================
+   COST FLOAT — "+Xt" label that rises and fades on buy.
+   Rendered outside the clipped button via a wrapper div.
+   ============================================================ */
+.cost-float {
+  position: absolute;
+  pointer-events: none;
+  font-family: var(--font-stencil);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--rust);
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
+  animation: cost-float 750ms cubic-bezier(0.16, 0.84, 0.44, 1) forwards;
+  z-index: 200;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.18);
+}
+@keyframes cost-float {
+  0%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  18%  { opacity: 1; transform: translate(-50%, calc(-50% - 6px)) scale(1.22); }
+  100% { opacity: 0; transform: translate(-50%, calc(-50% - 40px)) scale(0.75); }
+}

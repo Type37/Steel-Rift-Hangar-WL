@@ -92,7 +92,7 @@ function SupportRow({ a, eq, atLimit, onToggle, onInspect }) {
       transition: 'background 100ms',
     }}>
       <div style={{
-        display: 'grid', gridTemplateColumns: 'auto 1fr auto', alignItems: 'center', gap: 12,
+        display: 'grid', gridTemplateColumns: '1fr auto', alignItems: 'center', gap: 12,
         padding: '11px 12px',
       }}>
         <div
@@ -121,20 +121,22 @@ function SupportRow({ a, eq, atLimit, onToggle, onInspect }) {
         <BuyButton
           onClick={() => onToggle(a.name)}
           disabled={atLimit}
+          floatLabel={!eq && !atLimit ? `+${a.cost}t` : undefined}
           title={disabledReason || (eq ? `Remove ${a.name} from your support list.` : `Add ${a.name} (${a.cost}t).`)}
           style={{
             border: `1.5px solid ${eq ? 'var(--rust)' : (atLimit ? 'var(--rule)' : 'var(--olive)')}`,
             background: eq ? 'transparent' : (atLimit ? 'var(--bg-deep)' : 'var(--olive)'),
             color: eq ? 'var(--rust)' : (atLimit ? 'var(--mute)' : 'var(--surface)'),
-            padding: '7px 14px', cursor: atLimit ? 'not-allowed' : 'pointer',
+            padding: '8px 18px', cursor: atLimit ? 'not-allowed' : 'pointer',
             fontFamily: 'var(--font-stencil)', fontSize: 12, fontWeight: 700,
             letterSpacing: '0.12em', textTransform: 'uppercase',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+            minWidth: 80,
           }}
         >
           <span>{eq ? 'Remove' : 'Add'}</span>
           {!eq && !atLimit && (
-            <span style={{ fontSize: 10, fontFamily: 'var(--font-display)', letterSpacing: '0.04em' }}>{a.cost}t</span>
+            <span style={{ fontSize: 11, fontFamily: 'var(--font-mono)', fontWeight: 700, letterSpacing: '0.04em', opacity: 0.85 }}>{a.cost}t</span>
           )}
         </BuyButton>
       </div>

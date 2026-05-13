@@ -921,6 +921,7 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
             }}
             disabled={!available}
             label={available && next != null ? `${next}t` : null}
+            floatLabel={available && next != null ? `+${next}t` : undefined}
             title={available ? `Add for ${next}t` : unavailableReason}
           />
         </div>
@@ -1091,6 +1092,7 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand, onAssignDrone
         {available && (
           <BuyButton
             onClick={() => onToggle(upgrade.name)}
+            floatLabel={!eq ? `+${cost}t` : undefined}
             title={eq ? `Remove ${upgrade.name}.` : `Add ${upgrade.name} (${cost}t).`}
             style={{
               border: `1.5px solid ${eq ? 'var(--rust)' : 'var(--olive)'}`,
@@ -1228,6 +1230,7 @@ function DefRow({ def, mech, onToggle, atLimit }) {
           <BuyButton
             onClick={() => onToggle(def.name)}
             disabled={blockedByLimit}
+            floatLabel={!eq && !blockedByLimit ? `+${cost}t` : undefined}
             title={reason || (eq ? `Remove ${def.name}.` : `Add ${def.name} (${cost}t).`)}
             style={{
               border: `1.5px solid ${eq ? 'var(--rust)' : (blockedByLimit ? 'var(--rule)' : 'var(--olive)')}`,

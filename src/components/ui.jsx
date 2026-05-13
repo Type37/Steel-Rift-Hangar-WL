@@ -94,18 +94,14 @@ export function TextButton({ children, onClick, disabled }) {
 }
 
 // Tiny circular +/- buttons used in catalog rows
-export function StepButton({ direction, onClick, disabled, accent = 'olive', label, title }) {
+export function StepButton({ direction, onClick, disabled, accent = 'olive', label, title, floatLabel }) {
   const c = accent === 'olive' ? 'var(--olive)' : 'var(--rust)';
-  // When a label is provided (e.g. "6t" for next-copy cost), use a tighter
-  // typographic style than the default symbolic + / − glyph.
   const hasLabel = label != null && label !== '';
   const symbolFont = { fontFamily: 'var(--font-mono)', fontSize: 18, fontWeight: 700 };
   const labelFont = { fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, letterSpacing: '0.02em' };
 
-  // Click feedback: every press generates an entry with the click coordinates
-  // so the ripple grows from where the user actually tapped, plus a separate
-  // rectangular pulse ring that radiates outward from the button's edge.
   const [pulses, setPulses] = useState([]);
+  const [floats, setFloats] = useState([]);
   const handleClick = (e) => {
     if (disabled) return;
     const rect = e.currentTarget.getBoundingClientRect();
@@ -114,65 +110,69 @@ export function StepButton({ direction, onClick, disabled, accent = 'olive', lab
     const id = Date.now() + Math.random();
     setPulses(p => [...p, { id, x, y }]);
     setTimeout(() => setPulses(p => p.filter(pp => pp.id !== id)), 620);
+    if (floatLabel) {
+      setFloats(f => [...f, { id, x, y }]);
+      setTimeout(() => setFloats(f => f.filter(ff => ff.id !== id)), 800);
+    }
     onClick?.(e);
   };
 
   return (
-    <button
-      onClick={handleClick}
-      disabled={disabled}
-      className={`step-hover step-button step-button--${accent} ${direction === 'up' ? 'step-button--up' : 'step-button--down'}`}
-      title={title}
-      style={{
-        width: 36, height: 32,
-        border: `1.5px solid ${disabled ? 'var(--rule)' : c}`,
-        background: direction === 'up' ? c : 'var(--surface)',
-        color: direction === 'up' ? 'var(--surface)' : c,
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        opacity: disabled ? 0.4 : 1,
-        padding: 0,
-        position: 'relative',
-        ...(hasLabel ? labelFont : symbolFont),
-      }}
-    >
-      {/* Foreground glyph or label, kept above the ripple layer. */}
-      <span style={{ position: 'relative', zIndex: 2, lineHeight: 1 }}>
-        {hasLabel ? label : (direction === 'up' ? '+' : '−')}
-      </span>
-
-      {/* Ripple layer: clipped to the button, ripples grow from click point. */}
-      <span style={{
-        position: 'absolute', inset: 0, overflow: 'hidden',
-        pointerEvents: 'none', zIndex: 1,
-      }}>
-        {pulses.map(p => (
+    // Wrapper not clipped so float labels can escape the button bounds.
+    <div style={{ position: 'relative', display: 'inline-flex', width: 36 }}>
+      <button
+        onClick={handleClick}
+        disabled={disabled}
+        className={`step-hover step-button step-button--${accent} ${direction === 'up' ? 'step-button--up' : 'step-button--down'}`}
+        title={title}
+        style={{
+          width: 36, height: 32,
+          border: `1.5px solid ${disabled ? 'var(--rule)' : c}`,
+          background: direction === 'up' ? c : 'var(--surface)',
+          color: direction === 'up' ? 'var(--surface)' : c,
+          cursor: disabled ? 'not-allowed' : 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          opacity: disabled ? 0.4 : 1,
+          padding: 0,
+          position: 'relative',
+          ...(hasLabel ? labelFont : symbolFont),
+        }}
+      >
+        <span style={{ position: 'relative', zIndex: 2, lineHeight: 1 }}>
+          {hasLabel ? label : (direction === 'up' ? '+' : '−')}
+        </span>
+        <span style={{
+          position: 'absolute', inset: 0, overflow: 'hidden',
+          pointerEvents: 'none', zIndex: 1,
+        }}>
+          {pulses.map(p => (
+            <span key={p.id} className="step-ripple" style={{ left: p.x, top: p.y }} />
+          ))}
+        </span>
+        {pulses.length > 0 && (
           <span
-            key={p.id}
-            className="step-ripple"
-            style={{ left: p.x, top: p.y }}
+            key={pulses[pulses.length - 1].id}
+            aria-hidden="true"
+            className="step-pulse-ring"
+            style={{ borderColor: c }}
           />
-        ))}
-      </span>
-
-      {/* Outer pulse ring: extends beyond the button edge, not clipped. */}
-      {pulses.length > 0 && (
-        <span
-          key={pulses[pulses.length - 1].id}
-          aria-hidden="true"
-          className="step-pulse-ring"
-          style={{ borderColor: c }}
-        />
-      )}
-    </button>
+        )}
+      </button>
+      {floats.map(f => (
+        <span key={f.id} className="cost-float" style={{ left: f.x, top: f.y }}>
+          {floatLabel}
+        </span>
+      ))}
+    </div>
   );
 }
 
 // BuyButton: like a standard add-btn but with the same click-ripple
-// feedback as StepButton. Drop-in for any "Add / Remove" toggle in the
-// right-hand catalog panes.
-export function BuyButton({ onClick, disabled, title, className = '', style = {}, children }) {
+// feedback as StepButton. Pass floatLabel (e.g. "+10t") to get a
+// video-game-style cost pop that rises and fades on each buy.
+export function BuyButton({ onClick, disabled, title, className = '', style = {}, children, floatLabel }) {
   const [pulses, setPulses] = useState([]);
+  const [floats, setFloats] = useState([]);
   const handleClick = (e) => {
     if (disabled) return;
     const rect = e.currentTarget.getBoundingClientRect();
@@ -181,31 +181,43 @@ export function BuyButton({ onClick, disabled, title, className = '', style = {}
     const id = Date.now() + Math.random();
     setPulses(p => [...p, { id, x, y }]);
     setTimeout(() => setPulses(p => p.filter(pp => pp.id !== id)), 620);
+    if (floatLabel) {
+      setFloats(f => [...f, { id, x, y }]);
+      setTimeout(() => setFloats(f => f.filter(ff => ff.id !== id)), 800);
+    }
     onClick?.(e);
   };
   return (
-    <button
-      onClick={handleClick}
-      disabled={disabled}
-      title={title}
-      className={`add-btn ${className}`}
-      style={{ position: 'relative', overflow: 'hidden', ...style }}
-    >
-      <span style={{ position: 'relative', zIndex: 2 }}>{children}</span>
-      <span style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 1 }}>
-        {pulses.map(p => (
-          <span key={p.id} className="step-ripple" style={{ left: p.x, top: p.y }} />
-        ))}
-      </span>
-      {pulses.length > 0 && (
-        <span
-          key={pulses[pulses.length - 1].id}
-          aria-hidden="true"
-          className="step-pulse-ring"
-          style={{ borderColor: style.background === 'transparent' ? 'var(--rust)' : 'var(--olive)' }}
-        />
-      )}
-    </button>
+    // Wrapper is not clipped so the float label can rise above the button.
+    <div style={{ position: 'relative', display: 'inline-flex' }}>
+      <button
+        onClick={handleClick}
+        disabled={disabled}
+        title={title}
+        className={`add-btn ${className}`}
+        style={{ position: 'relative', overflow: 'hidden', ...style }}
+      >
+        <span style={{ position: 'relative', zIndex: 2 }}>{children}</span>
+        <span style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 1 }}>
+          {pulses.map(p => (
+            <span key={p.id} className="step-ripple" style={{ left: p.x, top: p.y }} />
+          ))}
+        </span>
+        {pulses.length > 0 && (
+          <span
+            key={pulses[pulses.length - 1].id}
+            aria-hidden="true"
+            className="step-pulse-ring"
+            style={{ borderColor: style.background === 'transparent' ? 'var(--rust)' : 'var(--olive)' }}
+          />
+        )}
+      </button>
+      {floats.map(f => (
+        <span key={f.id} className="cost-float" style={{ left: f.x, top: f.y }}>
+          {floatLabel}
+        </span>
+      ))}
+    </div>
   );
 }
 
