@@ -92,12 +92,12 @@ function SupportRow({ a, eq, atLimit, onToggle, onInspect }) {
       transition: 'background 100ms',
     }}>
       <div style={{
-        display: 'grid', gridTemplateColumns: '1fr auto', alignItems: 'center', gap: 12,
+        display: 'flex', alignItems: 'center', gap: 12,
         padding: '11px 12px',
       }}>
         <div
           onClick={hasDetail && onInspect ? () => onInspect(a.name) : undefined}
-          style={{ cursor: hasDetail && onInspect ? 'pointer' : 'default', minWidth: 0 }}
+          style={{ cursor: hasDetail && onInspect ? 'pointer' : 'default', minWidth: 0, flex: '1 1 0' }}
         >
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
             <span style={{
@@ -124,6 +124,7 @@ function SupportRow({ a, eq, atLimit, onToggle, onInspect }) {
           floatLabel={!eq && !atLimit ? `+${a.cost}t` : undefined}
           title={disabledReason || (eq ? `Remove ${a.name} from your support list.` : `Add ${a.name} (${a.cost}t).`)}
           style={{
+            flexShrink: 0,
             border: `1.5px solid ${eq ? 'var(--rust)' : (atLimit ? 'var(--rule)' : 'var(--olive)')}`,
             background: eq ? 'transparent' : (atLimit ? 'var(--bg-deep)' : 'var(--olive)'),
             color: eq ? 'var(--rust)' : (atLimit ? 'var(--mute)' : 'var(--surface)'),
@@ -131,7 +132,6 @@ function SupportRow({ a, eq, atLimit, onToggle, onInspect }) {
             fontFamily: 'var(--font-stencil)', fontSize: 12, fontWeight: 700,
             letterSpacing: '0.12em', textTransform: 'uppercase',
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-            minWidth: 80,
           }}
         >
           <span>{eq ? 'Remove' : 'Add'}</span>

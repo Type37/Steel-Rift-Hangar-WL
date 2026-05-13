@@ -189,7 +189,8 @@ export function BuyButton({ onClick, disabled, title, className = '', style = {}
   };
   return (
     // Wrapper is not clipped so the float label can rise above the button.
-    <div style={{ position: 'relative', display: 'inline-flex' }}>
+    // flex-shrink:0 + width:fit-content prevents it from stretching in grid/flex parents.
+    <div style={{ position: 'relative', display: 'inline-block', flexShrink: 0, width: 'fit-content' }}>
       <button
         onClick={handleClick}
         disabled={disabled}
