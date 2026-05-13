@@ -3,7 +3,7 @@ const BASE = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '/');
 const asset = (p) => `${BASE}${p.replace(/^\//, '')}`;
 import { TEAMS, MISSIONS, MISSION_ORDER, FACTION_LOGOS, FREEFORM_MISSION, FACTIONS } from './data';
 import { POOL_NAMES } from './callsigns';
-import { calcMech, newMech, findAsset, effectivePerks, mechQualifiesForTeam } from './calc';
+import { calcMech, newMech, findAsset, effectivePerks, mechQualifiesForTeam, teamsForMech } from './calc';
 import { WC } from './data';
 
 import { Navbar, BottomBar, MechCard, EmptyRoster, SupportRosterCard } from './components/chrome';
@@ -353,6 +353,7 @@ export default function App() {
                     index={i}
                     active={selectedMechId === m.id && sideTab === 'roster'}
                     assignedTo={assignmentLookup[`hev:${m.id}`]}
+                    qualifyingTeams={teamsForMech(m, TEAMS)}
                     onSelect={(id) => {
                       setSelectedMechId(id);
                       setSideTab('roster');

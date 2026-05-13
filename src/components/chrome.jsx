@@ -8,6 +8,18 @@ import { HoverEditHint } from './ui';
 const BASE = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '/');
 const asset = (p) => `${BASE}${p.replace(/^\//, '')}`;
 
+const TEAM_ICONS = {
+  'Reconnaissance Team':     'icons/team-recon.svg',
+  'Security Team':           'icons/team-security.svg',
+  'Assassination Team':      'icons/team-assassination.svg',
+  'Berserker Team':          'icons/team-berserker.svg',
+  'Multirole Team':          'icons/team-multirole.svg',
+  'Gunslinger Team':         'icons/team-gunslinger.svg',
+  'Fire Support Team':       'icons/team-fire-support.svg',
+  'Networked AI Team':       'icons/team-networked-ai.svg',
+  'Coordinated Assets Team': 'icons/team-coordinated-assets.svg',
+};
+
 // ============================================================
 // NAVBAR: top strip with Steel Rift logo + outbound links
 // ============================================================
@@ -248,7 +260,7 @@ function MissionChip({ m, active, onClick }) {
 // ============================================================
 // MECH CARD: roster list item with HE-V silhouette icon
 // ============================================================
-export function MechCard({ mech, index, active, onSelect, assignedTo }) {
+export function MechCard({ mech, index, active, onSelect, assignedTo, qualifyingTeams = [] }) {
   const stats = calcMech(mech);
   const wc = WC[mech.weightClass];
 
@@ -359,6 +371,53 @@ export function MechCard({ mech, index, active, onSelect, assignedTo }) {
                 {u}
               </span>
             ))}
+          </div>
+        )}
+
+        {/* Team eligibility icons — which teams this HE-V currently qualifies for */}
+        {qualifyingTeams.length > 0 && (
+          <div style={{
+            marginTop: 5,
+            display: 'flex', flexWrap: 'wrap', gap: 3, alignItems: 'center',
+          }}>
+            <span className="mono" style={{
+              fontSize: 9.5, letterSpacing: '0.12em', textTransform: 'uppercase',
+              color: active ? 'rgba(241,234,218,0.4)' : 'var(--mute)',
+              marginRight: 2, flexShrink: 0,
+            }}>
+              TEAMS
+            </span>
+            {qualifyingTeams.map(teamName => {
+              const iconSrc = TEAM_ICONS[teamName];
+              const isAssigned = assignedTo === teamName;
+              return (
+                <span
+                  key={teamName}
+                  title={teamName}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    width: 18, height: 18,
+                    background: isAssigned
+                      ? (active ? 'rgba(241,234,218,0.25)' : 'var(--olive)')
+                      : 'transparent',
+                    borderRadius: 2,
+                    flexShrink: 0,
+                  }}
+                >
+                  {iconSrc && (
+                    <img
+                      src={asset(iconSrc)}
+                      alt={teamName}
+                      style={{
+                        width: 13, height: 13,
+                        opacity: isAssigned ? (active ? 0.9 : 0.85) : (active ? 0.45 : 0.35),
+                        filter: active ? 'invert(1) brightness(0.9)' : 'none',
+                      }}
+                    />
+                  )}
+                </span>
+              );
+            })}
           </div>
         )}
       </div>
