@@ -230,7 +230,7 @@ export function BottomBar({
         </button>
       </div>
       <div style={{ textAlign: 'center', fontSize: 10.5, color: 'var(--mute)', padding: '6px 0 0', fontFamily: 'var(--font-mono)' }}>
-        Originally built by unstoppable Carl. Forked and rebuilt for v1.5 by <a href="https://linktr.ee/warlore" target="_blank" rel="noreferrer" style={{ color: 'var(--mute)', textDecoration: 'underline' }}>WarLore</a>.
+        Originally built by unstoppable Carl. Forked and rebuilt for v1.5 by <a href="https://linktr.ee/warlore" target="_blank" rel="noreferrer" className="warlore-mark" style={{ color: 'var(--mute)', textDecoration: 'underline', fontSize: 14 }}>WarLore</a>.
       </div>
     </div>
   );

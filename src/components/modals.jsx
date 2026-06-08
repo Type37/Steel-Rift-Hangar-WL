@@ -785,7 +785,7 @@ export function AboutModal({ open, onClose }) {
         </p>
         <p style={{ marginBottom: 12 }}>
           Originally built by <strong style={{ color: 'var(--ink)' }}>unstoppable Carl</strong>.
-          Forked and rebuilt for v1.5 by <a href="https://linktr.ee/warlore" target="_blank" rel="noreferrer" style={{ color: 'var(--rust)', fontWeight: 700 }}>WarLore</a>.
+          Forked and rebuilt for v1.5 by <a href="https://linktr.ee/warlore" target="_blank" rel="noreferrer" className="warlore-mark" style={{ color: 'var(--rust)', fontWeight: 700, fontSize: '1.15em' }}>WarLore</a>.
         </p>
         <p style={{ marginBottom: 20 }}>
           Source code, issue tracker, and full changelog live on GitHub.
@@ -811,12 +811,13 @@ export function AboutModal({ open, onClose }) {
             href="https://linktr.ee/warlore"
             target="_blank"
             rel="noreferrer"
+            className="warlore-mark"
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
               background: 'transparent', color: 'var(--ink)',
               padding: '8px 16px',
-              fontFamily: 'var(--font-stencil)', fontSize: 12, fontWeight: 700,
-              letterSpacing: '0.1em', textTransform: 'uppercase',
+              fontSize: 18, fontWeight: 400,
+              letterSpacing: '0.04em',
               textDecoration: 'none', border: '1.5px solid var(--rule-strong)',
               borderRadius: 3,
             }}
