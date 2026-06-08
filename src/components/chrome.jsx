@@ -1,8 +1,9 @@
 import React from 'react';
 import { Printer, Settings as SettingsIcon, Plus, FolderOpen, ChevronDown } from 'lucide-react';
-import { WC, MISSION_ORDER, MISSIONS, FREEFORM_MISSION } from '../data';
-import { calcMech } from '../calc';
+import { WC, MISSION_ORDER, MISSIONS, FREEFORM_MISSION, TEAMS } from '../data';
+import { calcMech, mechQualifiesForTeam } from '../calc';
 import { HoverEditHint } from './ui';
+import { Tooltip } from './tooltip';
 
 // Resolve absolute path with the configured base; works at root or under /Steel-Rift-Hangar-WL/
 const BASE = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '/');
@@ -401,32 +402,39 @@ export function MechCard({ mech, index, active, onSelect, assignedTo, qualifying
             {qualifyingTeams.map(teamName => {
               const iconSrc = TEAM_ICONS[teamName];
               const isAssigned = assignedTo === teamName;
+              const teamDef = TEAMS.find(t => t.name === teamName);
+              const reqIdx = teamDef ? mechQualifiesForTeam(mech, teamDef) : -1;
+              const reqText = reqIdx >= 0 ? teamDef.req[reqIdx]?.reqText : null;
+              const body = `${isAssigned
+                ? '✓ Enlisted in this team.'
+                : 'Eligible — drag this HE-V onto the team to enlist it.'}${reqText ? `\n\nMeets requirement: ${reqText}` : ''}`;
               return (
-                <span
-                  key={teamName}
-                  title={teamName}
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                    width: 18, height: 18,
-                    background: isAssigned
-                      ? (active ? 'rgba(241,234,218,0.25)' : 'var(--olive)')
-                      : 'transparent',
-                    borderRadius: 2,
-                    flexShrink: 0,
-                  }}
-                >
-                  {iconSrc && (
-                    <img
-                      src={asset(iconSrc)}
-                      alt={teamName}
-                      style={{
-                        width: 13, height: 13,
-                        opacity: isAssigned ? (active ? 0.9 : 0.85) : (active ? 0.45 : 0.35),
-                        filter: active ? 'invert(1) brightness(0.9)' : 'none',
-                      }}
-                    />
-                  )}
-                </span>
+                <Tooltip key={teamName} title={teamName} body={body}>
+                  <span
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                      width: 18, height: 18,
+                      background: isAssigned
+                        ? (active ? 'rgba(241,234,218,0.25)' : 'var(--olive)')
+                        : 'transparent',
+                      borderRadius: 2,
+                      flexShrink: 0,
+                      cursor: 'help',
+                    }}
+                  >
+                    {iconSrc && (
+                      <img
+                        src={asset(iconSrc)}
+                        alt={teamName}
+                        style={{
+                          width: 13, height: 13,
+                          opacity: isAssigned ? (active ? 0.9 : 0.85) : (active ? 0.45 : 0.35),
+                          filter: active ? 'invert(1) brightness(0.9)' : 'none',
+                        }}
+                      />
+                    )}
+                  </span>
+                </Tooltip>
               );
             })}
           </div>
