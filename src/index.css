@@ -1070,6 +1070,47 @@ button:not(:disabled):active {
   background: var(--ink);
   color: var(--surface);
 }
+
+/* ── Site footer credit bar (uniformity with the Pacific Command builder) ── */
+.bottombar-credit {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  padding: 7px 2px 1px; margin-top: 4px;
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-mono); font-size: 10.5px; color: var(--mute);
+}
+.bottombar-credit a { color: var(--ink-2); text-decoration: none; }
+.bottombar-credit a:hover { color: var(--rust); text-decoration: underline; }
+.bbc-game { font-family: var(--font-stencil); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); }
+.bbc-sep { color: var(--rule-strong); }
+.bbc-linkbtn { background: none; border: none; padding: 0; cursor: pointer; font: inherit; color: var(--ink-2); }
+.bbc-linkbtn:hover { color: var(--rust); text-decoration: underline; }
+.bbc-builder { margin-left: auto; }
+.bbc-builder a { font-size: 14px; color: var(--ink); }
+@media (max-width: 600px) { .bbc-builder { margin-left: 0; } }
+
+/* ── Loadout catalog controls: live search + sort order ── */
+.loadout-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 8px 0 9px; }
+.loadout-search {
+  flex: 1 1 180px; min-width: 140px;
+  padding: 8px 10px; font-size: 13px;
+  background: var(--surface); color: var(--ink);
+  border: 1.5px solid var(--rule-strong); border-radius: 3px;
+}
+.loadout-search:focus { outline: none; border-color: var(--rust); box-shadow: 0 0 0 2px rgba(168,51,12,0.12); }
+.loadout-search-clear {
+  margin-left: -34px; width: 24px; height: 24px; border: none; background: none;
+  cursor: pointer; color: var(--mute); font-size: 18px; line-height: 1;
+}
+.loadout-search-clear:hover { color: var(--rust); }
+.loadout-sort { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; }
+.loadout-sort-label { font-family: var(--font-stencil); font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mute); margin-right: 2px; }
+.loadout-sort-btn {
+  border: 1.5px solid var(--rule-strong); background: transparent; color: var(--ink-2);
+  padding: 7px 13px; cursor: pointer; border-radius: 3px;
+  font-family: var(--font-stencil); font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.loadout-sort-btn.is-active { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+.loadout-sort-btn:not(.is-active):hover { border-color: var(--rust); color: var(--rust); }
 .print-preview-toolbar .add-btn {
   background: var(--surface);
   color: var(--ink);

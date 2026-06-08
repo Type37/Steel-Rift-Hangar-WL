@@ -10,8 +10,10 @@ import { SectionTitle, FieldLabel, StepButton, TraitList, TraitToken, RowExpand,
 const BASE = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '/');
 const asset = (p) => `${BASE}${p.replace(/^\//, '')}`;
 
-export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onDelete, activePerks = [] }) {
+export function MechEditor({ mech, mechIndex, weaponSort = "cost", setWeaponSort, onChange, onDelete, activePerks = [] }) {
   const stats = calcMech(mech, activePerks);
+  // Loadout catalog search — filters weapons/gear by name across the active tab.
+  const [search, setSearch] = useState('');
   const cls = mech.weightClass;
   const wc = WC[cls];
   const defLimit = cls === 'Ultraheavy' ? 2 : 1;
@@ -89,7 +91,8 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
 
   const sortByAvail = (items, isAvail) => {
     const cls_ = mech.weightClass;
-    return [...items].sort((a, b) => {
+    const q = search.trim().toLowerCase();
+    return [...items].filter(it => !q || it.name.toLowerCase().includes(q)).sort((a, b) => {
       const aOk = isAvail(a), bOk = isAvail(b);
       if (aOk !== bOk) return aOk ? -1 : 1;
       if (weaponSort === 'cost') {
@@ -296,6 +299,34 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", onChange, onD
             });
           })()}
 
+        </div>
+
+        {/* Loadout controls: live catalog search + weapon sort order
+            (sort lives here on the loadout screen, not buried in Options). */}
+        <div className="loadout-controls">
+          <input
+            className="loadout-search"
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search weapons & gear…"
+            aria-label="Search loadout catalog"
+          />
+          {search && (
+            <button className="loadout-search-clear" onClick={() => setSearch('')} title="Clear search" aria-label="Clear search">×</button>
+          )}
+          <div className="loadout-sort" role="group" aria-label="Sort order">
+            <span className="loadout-sort-label">Sort</span>
+            {[{ id: 'cost', label: 'Cost' }, { id: 'alpha', label: 'A–Z' }].map(opt => (
+              <button
+                key={opt.id}
+                onClick={() => setWeaponSort && setWeaponSort(opt.id)}
+                className={`loadout-sort-btn${weaponSort === opt.id ? ' is-active' : ''}`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div style={{ borderTop: '2px solid var(--ink)', minHeight: 400 }}>

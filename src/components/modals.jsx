@@ -374,30 +374,10 @@ export function OptionsModal({
         </div>
 
 
-        {/* Callsign pools - checkboxes, all on by default */}
-        <FieldLabel>Weapon Sort Order</FieldLabel>
-        <div style={{ display: 'flex', gap: 6, marginBottom: 18 }}>
-          {[
-            { id: 'cost', label: 'Cost (cheap first)' },
-            { id: 'alpha', label: 'A–Z' },
-          ].map(opt => (
-            <button key={opt.id}
-              onClick={() => setWeaponSort && setWeaponSort(opt.id)}
-              className="add-btn"
-              style={{
-                border: '1.5px solid var(--ink)',
-                background: weaponSort === opt.id ? 'var(--ink)' : 'transparent',
-                color: weaponSort === opt.id ? 'var(--surface)' : 'var(--ink)',
-                padding: '6px 14px', cursor: 'pointer',
-                fontFamily: 'var(--font-stencil)', fontSize: 11.5, fontWeight: 700,
-                letterSpacing: '0.10em', textTransform: 'uppercase',
-              }}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
+        {/* Weapon sort order now lives on the loadout screen (next to the
+            catalog search), so it's removed from Options. */}
 
+        {/* Callsign pools - checkboxes, all on by default */}
         <FieldLabel>Callsign Pools</FieldLabel>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 18 }}>
           {[...POOL_NAMES, 'Custom'].map(p => {

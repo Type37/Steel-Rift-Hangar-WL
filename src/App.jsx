@@ -471,6 +471,7 @@ export default function App() {
                   mech={selectedMech}
                   mechIndex={mechs.findIndex(m => m.id === selectedMech.id)}
                   weaponSort={weaponSort}
+                  setWeaponSort={setWeaponSort}
                   onChange={handleUpdateMech}
                   onDelete={handleDeleteMech}
                   activePerks={activePerks}

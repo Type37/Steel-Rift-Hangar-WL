@@ -229,8 +229,19 @@ export function BottomBar({
           ?
         </button>
       </div>
-      <div style={{ textAlign: 'center', fontSize: 10.5, color: 'var(--mute)', padding: '6px 0 0', fontFamily: 'var(--font-mono)' }}>
-        Originally built by unstoppable Carl. Forked and rebuilt for v1.5 by <a href="https://linktr.ee/warlore" target="_blank" rel="noreferrer" className="warlore-mark" style={{ color: 'var(--mute)', textDecoration: 'underline', fontSize: 14 }}>WarLore</a>.
+      {/* Site footer — game credits + links, matching the Pacific Command
+          builder for uniformity across WarLore's tools. */}
+      <div className="bottombar-credit">
+        <span className="bbc-game">Steel Rift</span>
+        <span className="bbc-sep">·</span>
+        <span>Rules &amp; IP <a href="https://www.steelrift.com" target="_blank" rel="noreferrer">Death Ray Designs</a></span>
+        <span className="bbc-sep">·</span>
+        <span>Original by <a href="https://github.com/unstoppablecarl" target="_blank" rel="noreferrer">Unstoppable Carl</a></span>
+        <span className="bbc-sep">·</span>
+        <a href="https://github.com/Type37/Steel-Rift-Hangar-WL" target="_blank" rel="noreferrer">Source on GitHub</a>
+        <span className="bbc-sep">·</span>
+        <button type="button" className="bbc-linkbtn" onClick={onAbout}>About</button>
+        <span className="bbc-builder">Builder by <a href="https://linktr.ee/warlore" target="_blank" rel="noreferrer" className="warlore-mark">WarLore</a></span>
       </div>
     </div>
   );
