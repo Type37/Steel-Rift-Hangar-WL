@@ -5,8 +5,28 @@
    - Schibsted Grotesk for stencil/uppercase labels
    - Space Grotesk for body
    - JetBrains Mono for data
+   - Terminal Grotesque for the WarLore wordmark
    - Single rust accent for actions, olive for positive
    ============================================================ */
+
+/* Terminal Grotesque — Tyler Finck, SIL OFL 1.1 (Velvetyne / StudioTriple).
+   Reserved for the WarLore wordmark. Self-hosted from src/assets so Vite
+   hashes it and rewrites the URL for the GitHub Pages base path. */
+@font-face {
+  font-family: 'Terminal Grotesque';
+  src: url('./assets/fonts/terminal-grotesque.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* The WarLore signature, wherever the brand name appears. */
+.warlore-mark {
+  font-family: 'Terminal Grotesque', 'Chakra Petch', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
 
 :root {
   --bg:           #e8dfc9;
@@ -632,7 +652,13 @@ button:not(:disabled):active {
   50%      { box-shadow: 0 0 0 10px rgba(168, 51, 12, 0); }
 }
 .cta-pulse {
-  animation: cta-pulse 1.6s ease-out infinite;
+  /* Pulse a handful of times to draw the eye on an empty roster, then
+     settle. Avoids an infinite animation burning battery/GPU on mobile
+     (and pinning the renderer so it never reaches an idle frame). */
+  animation: cta-pulse 1.6s ease-out 6;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cta-pulse { animation: none; }
 }
 
 /* Bigger, more obvious row expand button. Replaces tiny chevron. */
@@ -1019,6 +1045,31 @@ button:not(:disabled):active {
   display: flex;
   gap: 8px;
 }
+/* Poker / Tarot segmented control. */
+.print-size-toggle {
+  display: inline-flex;
+  align-self: center;
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.print-size-toggle button {
+  font-family: var(--font-stencil);
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  background: var(--surface);
+  color: var(--ink-2);
+  border: none;
+  border-right: 1px solid var(--rule-strong);
+  cursor: pointer;
+}
+.print-size-toggle button:last-child { border-right: none; }
+.print-size-toggle button.is-active {
+  background: var(--ink);
+  color: var(--surface);
+}
 .print-preview-toolbar .add-btn {
   background: var(--surface);
   color: var(--ink);
@@ -1253,6 +1304,16 @@ button:not(:disabled):active {
   position: relative;
 }
 .game-card-blank { outline: 1px dashed #ccc; }
+
+/* Tarot-size cards: 2.75" x 4.75" (fits standard tarot penny sleeves),
+   2x2 = 4 per Letter sheet. Gives loaded HE-Vs ~36% more height. */
+.page-card-grid.tarot {
+  grid-template-columns: repeat(2, 2.75in);
+  grid-template-rows: repeat(2, 4.75in);
+  width: 5.5in;
+}
+.page-card-grid.tarot .game-card { width: 2.75in; height: 4.75in; }
+.page-card-grid.tarot .game-card-inner { font-size: 9pt; }
 
 .game-card-inner {
   padding: 4pt 4pt;
@@ -1658,18 +1719,34 @@ button:not(:disabled):active {
     order: 1;
   }
   .bottombar-force-input input { font-size: 15px !important; }
-  .util-btn { padding: 5px 8px; font-size: 10.5px; }
 
-  /* Tighten editor spacing */
-  .workshop-tab { font-size: 11px; padding: 9px 10px; }
+  /* Tighten editor spacing — but keep tap targets at the ~44px guideline. */
+  .workshop-tab { font-size: 11px; padding: 9px 10px; min-height: 44px; }
   .workshop-content { padding: 12px 10px; }
   .section-title { font-size: 11px; }
   .util-label { display: none; }
   .bottombar-add-mech, .bottombar-add-support {
-  min-height: 36px;
-    padding: 5px 9px !important;
+    min-height: 44px;
+    padding: 7px 9px !important;
     font-size: 10.5px !important;
   }
+
+  /* Every .add-btn (section CTAs, loadout tabs, armor/structure adjusters,
+     icon buttons) was 26–38px tall — below the 44px touch guideline. One
+     blanket lift via min-height (grows vertically only, no reflow). */
+  .add-btn { min-height: 44px; }
+  .force-section > .add-btn {
+    padding: 11px 14px !important;
+  }
+  .util-btn { padding: 9px 8px; font-size: 10.5px; min-height: 42px; }
+
+  /* The core +/- weapon & gear stepper. Inline-styled to 36x32 for the
+     desktop grid; min-height (which inline `height` can't override) lifts
+     it to a thumb-friendly 44px on phones without widening the column. */
+  .step-button { min-height: 44px; }
+
+  /* Weapon-detail disclosure toggle — bump the 22px square for touch. */
+  .row-expand { width: 36px; height: 36px; }
 
   .sidebar { padding: 14px 12px 20px !important; }
   .editor-col { padding: 18px 14px 28px !important; }
