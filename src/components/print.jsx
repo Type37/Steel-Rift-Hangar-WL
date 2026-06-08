@@ -48,6 +48,11 @@ export function PrintView({
   garrisonLoadouts = {},
   previewMode = false, onClosePreview,
 }) {
+  // Card size: 'poker' = 2.5x3.5" (9 per Letter sheet), 'tarot' = 2.75x4.75"
+  // (4 per sheet, fits standard tarot sleeves and gives loaded mechs more room).
+  const [cardSize, setCardSize] = React.useState('poker');
+  const perPage = cardSize === 'tarot' ? 4 : 9;
+
   const useCustom = mission === 'Custom';
   const cap = useCustom ? customTons : MISSIONS[mission].tons;
   const totalTons =
@@ -126,9 +131,9 @@ export function PrintView({
     }
   });
 
-  // Chunk into pages of 9.
+  // Chunk into pages (9 poker / 4 tarot per Letter sheet).
   const pages = [];
-  for (let i = 0; i < deck.length; i += 9) pages.push(deck.slice(i, i + 9));
+  for (let i = 0; i < deck.length; i += perPage) pages.push(deck.slice(i, i + perPage));
 
   // Collect every trait used in this force for the reference section.
   const traitsUsed = new Set();
@@ -147,6 +152,20 @@ export function PrintView({
           <div className="print-preview-toolbar-left">
             <span className="print-preview-toolbar-title">Print Preview</span>
             <span className="print-preview-toolbar-meta">{pages.length + 2} pages</span>
+            <div className="print-size-toggle" role="group" aria-label="Card size">
+              <button
+                className={cardSize === 'poker' ? 'is-active' : ''}
+                onClick={() => setCardSize('poker')}
+              >
+                Poker · 9/pg
+              </button>
+              <button
+                className={cardSize === 'tarot' ? 'is-active' : ''}
+                onClick={() => setCardSize('tarot')}
+              >
+                Tarot · 4/pg
+              </button>
+            </div>
           </div>
           <div className="print-preview-toolbar-right">
             <button className="add-btn" onClick={() => window.print()}>
@@ -181,7 +200,7 @@ export function PrintView({
 
       {pages.map((page, pi) => (
         <div key={pi} className="print-page print-cards-page">
-          <div className="page-card-grid">
+          <div className={`page-card-grid ${cardSize === 'tarot' ? 'tarot' : ''}`}>
             {page.map((slot, ci) => (
               <div key={ci} className="game-card">
                 {slot.kind === 'hev' && <HEVCard mech={slot.mech} index={slot.idx} />}
@@ -190,7 +209,7 @@ export function PrintView({
                 {slot.kind === 'garrison' && <UnitSubCard parent={slot.parent} parentName={slot.parentName} sub={slot.squad} count={slot.count} flavor="garrison" />}
               </div>
             ))}
-            {Array.from({ length: 9 - page.length }).map((_, i) => (
+            {Array.from({ length: perPage - page.length }).map((_, i) => (
               <div key={`pad-${i}`} className="game-card game-card-blank" />
             ))}
           </div>
@@ -303,18 +322,6 @@ function HEVCard({ mech, index }) {
   // Equipped tonnage = base class cost (weapons/upgrades are within that envelope)
   const equippedTons = wc.tons;
 
-  // Keyword definitions block: weapon traits + class-specific rules (Fragile Internals etc.)
-  // All resolved to the correct class so AP (1/1/2/3) shows the right number.
-  const allWeaponTraitStr = weapons
-    .map(w => {
-      // Use original trait string (not the filtered display one) for full glossary lookup
-      const def = findWeapon(w.name);
-      return def?.traits || '';
-    })
-    .filter(Boolean)
-    .join(', ');
-  const weaponTraitDefs = allWeaponTraitStr ? resolveTraitDefs(allWeaponTraitStr, cls) : [];
-
   return (
     <div className="game-card-inner">
       {/* Header band */}
@@ -411,22 +418,13 @@ function HEVCard({ mech, index }) {
         </>
       )}
 
-      {/* SPECIAL RULES: weapon trait glossary + class-specific keywords
-          (Fragile Internals, Backup Systems Engage) all in one block.
-          No section header of their own — they're keywords, not sections. */}
+      {/* SPECIAL RULES: class-specific unit keywords only (Fragile Internals,
+          Backup Systems Engage). The weapon-trait glossary (Smart, Blast, AP…)
+          is intentionally NOT repeated here — it lives once on the reference
+          sheet so loaded cards don't overflow. Per-weapon values (e.g.
+          AP (1/1/2/3)) still print inline in the weapons table above. */}
       {(() => {
         const entries = [];
-        // Weapon trait definitions with class-resolved X values
-        weaponTraitDefs.forEach(d => {
-          if (d.text || d.bullets) {
-            entries.push(
-              <div key={d.key || d.title} className="card-trait-def-entry">
-                <span className="card-trait-def-name">{d.title}:</span>{' '}
-                {d.text || (d.bullets && d.bullets.join(' '))}
-              </div>
-            );
-          }
-        });
         // Class-specific keyword rules
         if (cls === 'Light') {
           entries.push(
@@ -826,11 +824,11 @@ function defDefault(cls) {
   return { Light: 4, Medium: 5, Heavy: 6, Ultraheavy: 6 }[cls] || 5;
 }
 function inferRange(traits) {
-  if (!traits) return 'std';
+  if (!traits) return '∞';
   const m = traits.match(/Short\s*\(([^)]+)\)/i);
   if (m) return m[1];
   if (/Melee/i.test(traits)) return 'melee';
-  return 'std';
+  return '∞';
 }
 function meleeDamage(w, cls) {
   const m = (w.traits || '').match(/Melee\s*\(([^)]+)\)/i);

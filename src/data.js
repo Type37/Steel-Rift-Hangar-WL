@@ -33,7 +33,7 @@ export const RANGED = [
   { name: 'Arc Gun',         cost: [2,'-','-','-'], dmg: ['6','-','-','-'], traits: 'Light, Short (6"), Stagger' },
   { name: 'Autocannon',      cost: [3,4,5,6],   dmg: ['3','4','5','6'],   traits: 'Kinetic' },
   { name: 'Cluster Rockets', cost: [2,4,6,8],   dmg: ['4','8','11','15'], traits: 'Blast (3"), Light, Limited (2)' },
-  { name: 'Harpoon Gun',     cost: ['-','-','-',7], dmg: ['-','-','-','6'], traits: 'Short (12), Drag, Tether' },
+  { name: 'Harpoon Gun',     cost: ['-','-','-',7], dmg: ['-','-','-','6'], traits: 'Short (12"), Drag, Tether' },
   { name: 'Howitzer',        cost: [2,3,4,5],   dmg: ['2','3','4','5'],   traits: 'Smart, Blast (3"), Kinetic' },
   { name: 'Laser',           cost: [3,4,6,7],   dmg: ['2','2','2','2'],   traits: 'AP (1/1/2/3), Draining' },
   { name: 'Mag Tether',      cost: [3,4,5,6],   dmg: ['2','3','4','5'],   traits: 'Short (12"), Tether' },
