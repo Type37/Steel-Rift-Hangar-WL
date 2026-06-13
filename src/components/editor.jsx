@@ -1165,6 +1165,7 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand, onAssignDrone
               padding: '7px 14px', cursor: 'pointer',
               fontFamily: 'var(--font-stencil)', fontSize: 12, fontWeight: 700,
               letterSpacing: '0.12em', textTransform: 'uppercase',
+              minWidth: 84, boxSizing: 'border-box', textAlign: 'center',
             }}
           >
             {eq ? 'Remove' : 'Add'}
@@ -1308,6 +1309,7 @@ function DefRow({ def, mech, onToggle, atLimit }) {
               padding: '7px 14px', cursor: blockedByLimit ? 'not-allowed' : 'pointer',
               fontFamily: 'var(--font-stencil)', fontSize: 12, fontWeight: 700,
               letterSpacing: '0.12em', textTransform: 'uppercase',
+              minWidth: 84, boxSizing: 'border-box', textAlign: 'center',
             }}
           >
             {eq ? 'Remove' : 'Add'}

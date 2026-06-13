@@ -908,12 +908,15 @@ export function SupportDetailView({ assetName, customName, loadout, onSetLoadout
         />
       )}
 
-      {/* If asset itself has a garrison trait (e.g. Heavy Tank shared Garrison), show picker here */}
+      {/* If the asset itself carries the garrison trait, show the picker here.
+          Multi-unit assets (e.g. the Infantry Outpost's 2 Bunkers) garrison
+          their squad count PER unit, so scale by unitCount: 2 Bunkers ×
+          6 squads = 12 total. */}
       {a.stats?.Traits && /Garrison/i.test(a.stats.Traits) && (
         <GarrisonRef
           traitStr={a.stats.Traits}
           garrisonLoadout={garrisonLoadout}
-          garrisonCount={garrisonCount}
+          garrisonCount={garrisonCount * (a.unitCount || 1)}
           onSetGarrisonLoadout={onSetGarrisonLoadout}
         />
       )}
@@ -1087,7 +1090,7 @@ function GarrisonRef({ traitStr, garrisonLoadout, garrisonCount = 1, onSetGarris
           }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap', marginBottom: 2 }}>
-                <span style={{ fontWeight: 600, fontSize: 12.5 }}>{sq.name}</span>
+                <span style={{ fontWeight: 600, fontSize: 12.5 }}>{sq.name}{infMatch ? ' Infantry Squad' : ''}</span>
                 <span style={{ color: 'var(--mute)', fontSize: 10.5 }}>
                   SPD {sq.spd} · ARM {sq.arm} · STR {sq.str}
                 </span>

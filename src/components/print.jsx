@@ -803,7 +803,7 @@ function UnitSubCard({ parent, parentName, sub, count, flavor }) {
   return (
     <div className="game-card-inner">
       <header className="card-name-band">
-        {sub.name}
+        {sub.name}{flavor === 'garrison' && INFANTRY_SQUADS.some(s => s.name === sub.name) ? ' Infantry Squad' : ''}
         {count > 1 && (
           <span style={{ marginLeft: 6, color: 'var(--rust)', fontFamily: 'var(--font-mono)', fontSize: '11pt' }}>
             ×{count}
