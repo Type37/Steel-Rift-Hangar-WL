@@ -1414,6 +1414,20 @@ button:not(:disabled):active {
 .summary-def-text {
   color: #4a4339;
 }
+.summary-def-italic {
+  font-style: italic;
+  color: #6e6552;
+}
+.summary-benefit-list {
+  margin: 2pt 0 0;
+  padding-left: 11pt;
+  color: #4a4339;
+}
+.summary-benefit-list li { margin-bottom: 1.5pt; }
+.summary-benefit-gate {
+  font-weight: 700;
+  color: #7a5000;
+}
 
 /* The 3 x 3 card grid. 2.5 x 3.5 in cards = 7.5 x 10.5 in spread.
    Letter page minus 0.25 in margins gives 8 x 10.5 in usable, so

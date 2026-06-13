@@ -209,9 +209,13 @@ export async function instantiateStarterList(list) {
   const teamAssignments = {};
 
   list.teams.forEach(({ teamName, mechIndices }) => {
+    // selectedTeams is an array of team NAME strings (matches setSelectedTeams
+    // in App.jsx), not team definition objects.
     const def = TEAMS.find(t => t.name === teamName);
-    if (def && !selectedTeams.find(t => t.name === teamName)) selectedTeams.push(def);
-    teamAssignments[teamName] = mechIndices.map(i => mechsWithIds[i].id);
+    if (def && !selectedTeams.includes(teamName)) selectedTeams.push(teamName);
+    // Assignment IDs are namespaced ("hev:<uuid>") so the team picker can tell
+    // HE-Vs from support assets and resolve each chip back to its mech.
+    teamAssignments[teamName] = mechIndices.map(i => `hev:${mechsWithIds[i].id}`);
   });
 
   let factionLogo = null;

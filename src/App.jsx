@@ -370,6 +370,31 @@ export default function App() {
               )}
             </ForceSection>
 
+            {/* Teams section — sits between Roster and Support */}
+            <ForceSection
+              title="Teams"
+              count={selectedTeams.length}
+              max={teamMax}
+              addLabel="Browse"
+              onAdd={() => setSideTab('teams')}
+            >
+              {selectedTeams.length === 0 ? (
+                <EmptyHint>No teams enlisted.</EmptyHint>
+              ) : (
+                selectedTeams.map(name => (
+                  <TeamSummaryCard
+                    key={name}
+                    teamName={name}
+                    mechs={mechs}
+                    assignments={teamAssignments[name] || []}
+                    onClick={() => { setSideTab('teams'); setFocusTeamName(name); }}
+                    onRemove={() => toggleTeam(name)}
+                    onAssign={assignToTeam}
+                  />
+                ))
+              )}
+            </ForceSection>
+
             {/* Support section */}
             <ForceSection
               title="Support"
@@ -401,31 +426,6 @@ export default function App() {
                     />
                   );
                 })
-              )}
-            </ForceSection>
-
-            {/* Teams section */}
-            <ForceSection
-              title="Teams"
-              count={selectedTeams.length}
-              max={teamMax}
-              addLabel="Browse"
-              onAdd={() => setSideTab('teams')}
-            >
-              {selectedTeams.length === 0 ? (
-                <EmptyHint>No teams enlisted.</EmptyHint>
-              ) : (
-                selectedTeams.map(name => (
-                  <TeamSummaryCard
-                    key={name}
-                    teamName={name}
-                    mechs={mechs}
-                    assignments={teamAssignments[name] || []}
-                    onClick={() => { setSideTab('teams'); setFocusTeamName(name); }}
-                    onRemove={() => toggleTeam(name)}
-                    onAssign={assignToTeam}
-                  />
-                ))
               )}
             </ForceSection>
 

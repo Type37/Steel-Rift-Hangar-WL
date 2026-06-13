@@ -310,7 +310,19 @@ function SummaryPage({
             {teamDefs.map(t => (
               <div key={t.name} className="summary-def">
                 <span className="summary-def-name">{t.name}</span>
-                <div className="summary-def-text">{t.blurb}</div>
+                {t.blurb && <div className="summary-def-text summary-def-italic">{t.blurb}</div>}
+                {t.benefitsList ? (
+                  <ul className="summary-benefit-list">
+                    {t.benefitsList.map((g, i) => (
+                      <li key={i}>
+                        <span className="summary-benefit-gate">{g.gate}</span>{' '}
+                        {g.items.join('; ')}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  t.benefits && <div className="summary-def-text">{t.benefits}</div>
+                )}
               </div>
             ))}
           </section>
