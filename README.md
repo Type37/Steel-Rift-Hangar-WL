@@ -26,13 +26,23 @@ Add teams up to your mission limit. Eligibility is checked per HE-V — wrong-cl
 All secondary agendas — faction, universal, and team-specific — with live qualification checks. Unqualified agendas are separated and grayed below the qualifying ones.
 
 **Support assets**
-Off-table and on-table assets, up to the mission limit. Full stats and rules expand inline. Orbital Stockpiles bumps Limited trait values in amber on qualifying assets.
+Off-table strikes and on-table squadrons/garrisons, up to the mission limit. Full stats and rules expand inline. Squadron and garrison pickers let you assemble the unit sub-type by sub-type, with each sub-unit weapon's damage and traits shown. Bunker garrisons scale to their full squad count. Orbital Stockpiles bumps Limited trait values in amber on qualifying assets.
+
+**Starter lists**
+One-click load of pre-built forces from the boxed sets — Authority, Freelance, and Corporate rulebook starters, plus the Cerberus Gunslinger and Akamatsu Assassination team boxes. Each loads the full force: faction, perks, mechs, team assignments, support, and the faction logo.
 
 **Mission sizes**
 Recon / Strike / Battle / All-Out War presets set tonnage, support cap, agenda count, and team allowances. Custom tonnage cap available.
 
-**Print**
-Poker (2.5×3.5″, 9-up) and Tarot (2.75×4.75″, 4-up) card sizes. Toggle from the top bar.
+**Print — tabletop-ready cards**
+The deck prints first, every time: one game card per HE-V, support sub-unit, and garrison squad, in Poker (2.5×3.5″, 9-up) or Tarot (2.75×4.75″, 4-up) sizes for standard sleeves (toggle in the print bar).
+
+- A heavily-loaded unit that won't fit one face **spills onto a continuation card** rather than clipping.
+- Every **Limited (X)** weapon, upgrade, and off-table strike prints **tick-off bubbles** for in-game use tracking; team and perk bonuses (Berserker Nitro Boost, Fire Support Cluster Rockets, Orbital Stockpiles) adjust the counts.
+- Off-table strikes get a **per-turn usage tracker** and a full-text rules explainer.
+- HE-V cards show their **team membership**; sub-unit cards spell out **every trait** (with the shared infantry/vehicle set explained once on the back).
+- A stack of identical support sub-units prints as **one card with a numbered HP row per model**.
+- The back **reference page** collects force identity, agendas (with a "pick N" reminder and a pick bubble each, sized to the mission), faction perks, team benefits, upgrade rules, and the trait glossary — flowing onto extra pages for large forces.
 
 **Loadout catalog**
 Search by name across the active tab. Sort weapons by cost or name.
@@ -70,7 +80,6 @@ Push to `main`. The workflow at `.github/workflows/static.yml` builds and deploy
 ## Known gaps
 
 - Ultralight HE-Vs as team members aren't modeled.
-- Garrison and some edge-case Support Asset interactions aren't implemented.
 - Team eligibility covers weight class, required weapons, and upgrade constraints but isn't exhaustive — cross-check against the printed team card.
 - Titan-Killers agenda eligibility depends on the opponent's list, so it can't be checked at build time.
 
