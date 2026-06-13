@@ -1,5 +1,5 @@
 import React from 'react';
-import { WC, MISSIONS, RANGED, MELEE, UPGRADES, DEFENSIVE, FACTIONS, TEAMS, UNIVERSAL_AGENDAS, INFANTRY_SQUADS, POWER_SUIT_SQUADS, VEHICLE_WEAPONS } from '../data';
+import { WC, MISSIONS, RANGED, MELEE, UPGRADES, DEFENSIVE, FACTIONS, TEAMS, UNIVERSAL_AGENDAS, INFANTRY_SQUADS, POWER_SUIT_SQUADS, VEHICLE_WEAPONS, INFANTRY_SHARED_TRAITS } from '../data';
 import { calcMech, valForClass, totalWeaponCost, findAsset, findWeapon } from '../calc';
 import { GLOSSARY, resolveTraitDefs } from '../glossary';
 import { collectTraits } from './ui';
@@ -102,6 +102,79 @@ function mechSpillItems(mech) {
   return items;
 }
 
+// The full trait string a sub-unit / garrison card should explain: its own
+// traits, the shared traits it inherits (infantry squads share a fixed set;
+// vehicle/air sub-units inherit the parent asset's), and its weapons' traits.
+function subunitTraitString(sub, parent, flavor) {
+  const weaponGroups = parseSubunitWeapons(sub.weapons || '');
+  const sharedTraits = flavor === 'garrison'
+    ? INFANTRY_SHARED_TRAITS
+    : (parent?.stats?.Traits || '');
+  return [
+    sharedTraits,
+    sub.traits && sub.traits !== '—' ? sub.traits : '',
+    ...weaponGroups.map(g => findVehicleWeapon(g.name)?.traits || ''),
+  ].filter(Boolean).join(', ');
+}
+
+// The DISTINCTIVE traits of a sub-unit (its own + its weapons') — i.e. not the
+// shared traits every squad/sub-unit of its kind has. These get spelled out on
+// the card; the shared traits are listed by name and explained once on the
+// summary's "Traits in Play" so they don't repeat across every squad's cards.
+function subunitDistinctiveTraitString(sub) {
+  const weaponGroups = parseSubunitWeapons(sub.weapons || '');
+  return [
+    sub.traits && sub.traits !== '—' ? sub.traits : '',
+    ...weaponGroups.map(g => findVehicleWeapon(g.name)?.traits || ''),
+  ].filter(Boolean).join(', ');
+}
+
+// Resolved, deduped definitions for the distinctive traits, each with an
+// estimated height so they can be paginated across continuation cards.
+function subunitTraitItems(sub) {
+  return resolveTraitDefs(subunitDistinctiveTraitString(sub)).map(d => ({
+    ...d,
+    height: estimateLines(`${d.title}: ${d.text}`) * EST_LINE + 3,
+  }));
+}
+
+// Height of the always-on-front sections of a sub-unit card (name, stats,
+// pips, weapons table, and the full trait-names line).
+function subunitFrontHeight(sub, parent, flavor) {
+  let h = 20 + 30;
+  const arm = parseInt(sub.arm, 10) || 0;
+  const str = parseInt(sub.str, 10) || 0;
+  if (arm > 0 || str > 0) h += 18 + Math.max(Math.ceil(arm / 5), Math.ceil(str / 6), 1) * 12;
+  const rows = parseSubunitWeapons(sub.weapons || '').reduce((n, g) => n + 1 + g.alts.length, 0);
+  if (rows) h += 16 + rows * 13;
+  h += 14 + estimateLines(subunitTraitString(sub, parent, flavor), EST_CPL) * EST_LINE; // TRAITS heading + names line
+  return h;
+}
+
+// Push a sub-unit / garrison card to the deck, splitting onto continuation
+// cards when its trait definitions overflow one face (mirrors the HE-V split).
+function pushUnitCard(deck, base, sub, parent, flavor, cardCapacity) {
+  const items = subunitTraitItems(sub);
+  const front = subunitFrontHeight(sub, parent, flavor);
+  const spill = items.reduce((s, it) => s + it.height, 0) + (items.length ? 14 : 0);
+  if (items.length === 0 || front + spill <= cardCapacity) {
+    deck.push({ ...base, part: 'full', traitItems: items });
+    return;
+  }
+  deck.push({ ...base, part: 'front' });
+  const contCap = cardCapacity - 30;
+  let page = [], used = 0;
+  items.forEach(it => {
+    if (page.length && used + it.height > contCap) {
+      deck.push({ ...base, part: 'cont', traitItems: page });
+      page = []; used = 0;
+    }
+    page.push(it);
+    used += it.height;
+  });
+  if (page.length) deck.push({ ...base, part: 'cont', traitItems: page });
+}
+
 // ============================================================
 // PRINT VIEW
 // 2.5" x 3.5" game cards arranged 3 x 3 per Letter page, matching
@@ -188,13 +261,13 @@ export function PrintView({
       Object.entries(counts).forEach(([subName, count]) => {
         const sub = a.subunits.find(s => s.name === subName);
         if (!sub) return;
-        deck.push({
+        pushUnitCard(deck, {
           kind: 'subunit',
           parent: a,
           parentName: supportNicknames[name] || a.name,
           sub,
           count,
-        });
+        }, sub, a, 'subunit', cardCapacity);
       });
     }
 
@@ -211,13 +284,13 @@ export function PrintView({
       Object.entries(squadCounts).forEach(([squadName, count]) => {
         const squad = findSquadDef(squadName);
         if (!squad) return;
-        deck.push({
+        pushUnitCard(deck, {
           kind: 'garrison',
           parent: a,
           parentName: supportNicknames[name] || a.name,
           squad,
           count,
-        });
+        }, squad, a, 'garrison', cardCapacity);
       });
     }
   });
@@ -234,6 +307,14 @@ export function PrintView({
   supportAssets.forEach(n => {
     const a = findAsset(n);
     collectTraits(a?.stats?.Traits || '').forEach(t => traitsUsed.add(t));
+  });
+  // Sub-unit / garrison traits (incl. the shared infantry/vehicle set) so the
+  // summary's Traits in Play explains them once instead of on every squad card.
+  deck.forEach(slot => {
+    if (slot.kind !== 'subunit' && slot.kind !== 'garrison') return;
+    const u = slot.sub || slot.squad;
+    if (u) collectTraits(subunitTraitString(u, slot.parent, slot.kind === 'garrison' ? 'garrison' : 'subunit'))
+      .forEach(t => traitsUsed.add(t));
   });
 
   // Everything that isn't a card lives on a single combined page at the very
@@ -297,8 +378,8 @@ export function PrintView({
             {page.map((slot, ci) => (
               <div key={ci} className="game-card">
                 {slot.kind === 'hev' && <HEVCard mech={slot.mech} index={slot.idx} part={slot.part} items={slot.items} />}
-                {slot.kind === 'subunit' && <UnitSubCard parent={slot.parent} parentName={slot.parentName} sub={slot.sub} count={slot.count} flavor="subunit" />}
-                {slot.kind === 'garrison' && <UnitSubCard parent={slot.parent} parentName={slot.parentName} sub={slot.squad} count={slot.count} flavor="garrison" />}
+                {slot.kind === 'subunit' && <UnitSubCard parent={slot.parent} parentName={slot.parentName} sub={slot.sub} count={slot.count} flavor="subunit" part={slot.part} traitItems={slot.traitItems} />}
+                {slot.kind === 'garrison' && <UnitSubCard parent={slot.parent} parentName={slot.parentName} sub={slot.squad} count={slot.count} flavor="garrison" part={slot.part} traitItems={slot.traitItems} />}
               </div>
             ))}
             {Array.from({ length: perPage - page.length }).map((_, i) => (
@@ -405,13 +486,21 @@ function SummaryPage({
 
         {agendas.length > 0 && (
           <section className="summary-sec">
-            <h2 className="summary-h2">Secondary Agendas</h2>
+            <h2 className="summary-h2">
+              Secondary Agendas
+              {!useCustom && MISSIONS[mission]?.agendas != null && (
+                <span className="summary-h2-note">pick {MISSIONS[mission].agendas}</span>
+              )}
+            </h2>
             {agendas.map((a, i) => (
-              <div key={i} className="summary-def">
-                <span className="summary-def-name">{a.name}</span>
-                <span className="summary-def-src">{a.source}</span>
-                {a.req && <span className="summary-def-req"> — requires {a.req}</span>}
-                <div className="summary-def-text">{a.text}</div>
+              <div key={i} className="summary-def summary-agenda-row">
+                <span className="agenda-pick-bubble" aria-hidden="true" />
+                <div className="summary-agenda-body">
+                  <span className="summary-def-name">{a.name}</span>
+                  <span className="summary-def-src">{a.source}</span>
+                  {a.req && <span className="summary-def-req"> — requires {a.req}</span>}
+                  <div className="summary-def-text">{a.text}</div>
+                </div>
               </div>
             ))}
           </section>
@@ -769,12 +858,16 @@ function PipBlock({ kind, total }) {
 // HE-V cards, with the parent asset name in the class band so the
 // player knows which support stack the unit belongs to.
 // ============================================================
-function UnitSubCard({ parent, parentName, sub, count, flavor }) {
+function UnitSubCard({ parent, parentName, sub, count, flavor, part = 'full', traitItems = [] }) {
+  const isCont = part === 'cont';   // continuation card: a slice of trait defs
+  const isFront = part === 'front';  // primary card: stats/weapons, no trait defs
   const armVal = parseInt(sub.arm, 10) || 0;
   const strVal = parseInt(sub.str, 10) || 0;
   const spdVal = sub.spd || '';
   const weaponGroups = parseSubunitWeapons(sub.weapons || '');
   const flavorLabel = flavor === 'garrison' ? 'GARRISON' : (parent?.kind || '').toUpperCase();
+  const nameSuffix = flavor === 'garrison' && INFANTRY_SQUADS.some(s => s.name === sub.name) ? ' Infantry Squad' : '';
+  const traitNames = subunitTraitString(sub, parent, flavor);
 
   // Flatten to weapon rows for the standard 4-column table, mirroring the
   // HE-V card. Alternates ("X or Y") become their own indented "or" rows.
@@ -803,80 +896,109 @@ function UnitSubCard({ parent, parentName, sub, count, flavor }) {
   return (
     <div className="game-card-inner">
       <header className="card-name-band">
-        {sub.name}{flavor === 'garrison' && INFANTRY_SQUADS.some(s => s.name === sub.name) ? ' Infantry Squad' : ''}
-        {count > 1 && (
+        {sub.name}{nameSuffix}
+        {isCont && <span className="card-cont-flag">CONT'D</span>}
+        {count > 1 && !isCont && (
           <span style={{ marginLeft: 6, color: 'var(--rust)', fontFamily: 'var(--font-mono)', fontSize: '11pt' }}>
             ×{count}
           </span>
         )}
       </header>
 
-      {/* Class + stats row — same structure as the HE-V card so the stats
-          table doesn't stretch to fill the whole card. */}
-      <div className="card-row card-row-id">
-        <div className="card-class-band">{flavorLabel} · {parentName}</div>
-        <table className="card-stats-table">
-          <thead>
-            <tr><th>SPD</th><th>Def</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>{spdVal || '—'}</td><td>4+</td></tr>
-          </tbody>
-        </table>
-      </div>
+      {!isCont && (
+        <>
+          {/* Class + stats row — same structure as the HE-V card so the stats
+              table doesn't stretch to fill the whole card. */}
+          <div className="card-row card-row-id">
+            <div className="card-class-band">{flavorLabel} · {parentName}</div>
+            <table className="card-stats-table">
+              <thead>
+                <tr><th>SPD</th><th>Def</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>{spdVal || '—'}</td><td>4+</td></tr>
+              </tbody>
+            </table>
+          </div>
 
-      {/* Armor + Structure pips */}
-      {(armVal > 0 || strVal > 0) && (
-        <div className="card-row-damage">
-          {armVal > 0 && (
-            <div className="card-armor-col">
-              <div className="hp-heading">ARMOR</div>
-              <PipBlock kind="armor" total={armVal} />
+          {/* Armor + Structure pips */}
+          {(armVal > 0 || strVal > 0) && (
+            <div className="card-row-damage">
+              {armVal > 0 && (
+                <div className="card-armor-col">
+                  <div className="hp-heading">ARMOR</div>
+                  <PipBlock kind="armor" total={armVal} />
+                </div>
+              )}
+              {strVal > 0 && (
+                <div className="card-structure-col">
+                  <div className="card-structure-stack">
+                    <div className="hp-heading">STRUCTURE</div>
+                    <PipBlock kind="structure" total={strVal} />
+                  </div>
+                </div>
+              )}
             </div>
           )}
-          {strVal > 0 && (
-            <div className="card-structure-col">
-              <div className="card-structure-stack">
-                <div className="hp-heading">STRUCTURE</div>
-                <PipBlock kind="structure" total={strVal} />
-              </div>
+
+          {/* Weapons — identical table format to the HE-V card. */}
+          {weaponRows.length > 0 && (
+            <table className="card-weapons-table">
+              <thead>
+                <tr>
+                  <th className="card-weapons-th">WEAPONS</th>
+                  <th className="num">Dmg</th>
+                  <th className="num">Rng</th>
+                  <th>Traits</th>
+                </tr>
+              </thead>
+              <tbody>
+                {weaponRows.map((w, i) => (
+                  <tr key={i}>
+                    <td>{w.name}</td>
+                    <td className="num">{w.dmg}</td>
+                    <td className="num">{w.range}</td>
+                    <td className="card-traits">
+                      {w.traits}
+                      <LimitedBubbles count={w.limited} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+
+          {/* TRAITS: every trait the unit has, by name (shared ones are
+              explained once on the summary's Traits in Play), then full
+              definitions for its distinctive traits. */}
+          <div className="card-section-heading">TRAITS</div>
+          {traitNames && <div className="card-trait-names">{traitNames}</div>}
+          {part === 'full' && traitItems.length > 0 && (
+            <div className="card-trait-defs">
+              {traitItems.map(d => (
+                <div key={d.key} className="card-trait-def-entry">
+                  <span className="card-trait-def-name">{d.title}:</span> {d.text}
+                </div>
+              ))}
             </div>
           )}
-        </div>
+          {isFront && (
+            <div className="card-cont-note">▸ Trait rules on next card</div>
+          )}
+        </>
       )}
 
-      {/* Weapons — identical table format to the HE-V card. */}
-      {weaponRows.length > 0 && (
-        <table className="card-weapons-table">
-          <thead>
-            <tr>
-              <th className="card-weapons-th">WEAPONS</th>
-              <th className="num">Dmg</th>
-              <th className="num">Rng</th>
-              <th>Traits</th>
-            </tr>
-          </thead>
-          <tbody>
-            {weaponRows.map((w, i) => (
-              <tr key={i}>
-                <td>{w.name}</td>
-                <td className="num">{w.dmg}</td>
-                <td className="num">{w.range}</td>
-                <td className="card-traits">
-                  {w.traits}
-                  <LimitedBubbles count={w.limited} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-
-      {/* Sub-unit traits */}
-      {sub.traits && sub.traits !== '—' && (
+      {/* Continuation face: the next slice of distinctive trait definitions. */}
+      {isCont && traitItems.length > 0 && (
         <>
           <div className="card-section-heading">TRAITS</div>
-          <div className="card-upgrades-list">{sub.traits}</div>
+          <div className="card-trait-defs">
+            {traitItems.map(d => (
+              <div key={d.key} className="card-trait-def-entry">
+                <span className="card-trait-def-name">{d.title}:</span> {d.text}
+              </div>
+            ))}
+          </div>
         </>
       )}
     </div>
