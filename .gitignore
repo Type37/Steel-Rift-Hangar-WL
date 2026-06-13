@@ -13,3 +13,7 @@ yarn-error.log*
 .vscode
 .claude
 mockups
+
+# Source rulebook PDFs + art extracted from them — reference only, do not publish
+*.pdf
+extracted-weapons/

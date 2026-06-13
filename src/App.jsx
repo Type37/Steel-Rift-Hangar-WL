@@ -3,7 +3,7 @@ const BASE = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '/');
 const asset = (p) => `${BASE}${p.replace(/^\//, '')}`;
 import { TEAMS, MISSIONS, MISSION_ORDER, FACTION_LOGOS, FREEFORM_MISSION, FACTIONS } from './data';
 import { POOL_NAMES } from './callsigns';
-import { calcMech, newMech, findAsset, effectivePerks, mechQualifiesForTeam, teamsForMech } from './calc';
+import { calcMech, newMech, findAsset, effectivePerks, mechQualifiesForTeam, teamsForMech, teamFitForMech } from './calc';
 import { WC } from './data';
 
 import { Navbar, BottomBar, MechCard, EmptyRoster, SupportRosterCard } from './components/chrome';
@@ -913,10 +913,13 @@ function TeamSummaryCard({ teamName, mechs = [], assignments = [], onClick, onRe
             const qualifiedReqIdx = isHev ? mechQualifiesForTeam(m, team) : -1;
             const qualified = qualifiedReqIdx >= 0;
             const matchedReq = qualified ? team.req[qualifiedReqIdx] : null;
+            const fit = isHev && !qualified ? teamFitForMech(m, team) : null;
             const tooltip = isHev
               ? (qualified
                   ? `Qualifies: ${matchedReq?.reqText || matchedReq?.cls || ''}`
-                  : 'Does not satisfy any requirement row for this team')
+                  : fit?.classOk
+                    ? `Needs: ${fit.missing.join(', ')}`
+                    : 'Wrong weight class for this team')
               : undefined;
             return (
               <span
@@ -931,7 +934,7 @@ function TeamSummaryCard({ teamName, mechs = [], assignments = [], onClick, onRe
                     : (qualified ? 'var(--olive)' : 'var(--mute)'),
                   color: 'var(--surface)',
                   padding: '2px 6px',
-                  outline: qualified ? '1px solid rgba(241,234,218,0.4)' : 'none',
+                  outline: qualified ? '1px solid rgba(236,236,234,0.4)' : 'none',
                 }}
               >
                 {isHev && (
@@ -1089,14 +1092,14 @@ function FirstRunBriefing({ onAdd, simpleMode }) {
         Pick a mission size, add HE-Vs, load them out.
       </p>
       <button onClick={onAdd} className="add-btn cta-mech cta-pulse" style={{
-        background: 'var(--rust)', color: 'var(--surface)', border: 'none',
+        background: 'var(--rust-bright)', color: 'var(--ink)', border: 'none',
         padding: '15px 26px', cursor: 'pointer',
         fontFamily: 'var(--font-stencil)', fontSize: 15, fontWeight: 700,
         letterSpacing: '0.16em', textTransform: 'uppercase',
         display: 'inline-flex', alignItems: 'center', gap: 11,
         boxShadow: '0 3px 0 var(--rust-deep)',
       }}>
-        <img src={`${(import.meta.env.BASE_URL || '/').replace(/\/+$/, '/')}icons/hev.svg`} alt="" className="cta-mech-icon" style={{ width: 26, height: 26 }} />
+        <img src={`${(import.meta.env.BASE_URL || '/').replace(/\/+$/, '/')}icons/hev.svg`} alt="" className="cta-mech-icon icon-dark" style={{ width: 26, height: 26 }} />
         Add Your First HE-V
       </button>
     </div>

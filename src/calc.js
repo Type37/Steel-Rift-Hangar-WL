@@ -234,6 +234,61 @@ export const checkMechAgainstReq = (m, req) => {
   return true;
 };
 
+// Human-readable list of what a mech is MISSING to satisfy one req row.
+// Assumes the row's class already matches (caller checks clsMatch). Returns
+// [] when the mech fully satisfies the row.
+const missingForReq = (m, req) => {
+  const miss = [];
+  const have = n => m.upgrades.includes(n) || m.defensive.includes(n) || m.weapons.some(w => w.name === n);
+  if (req.needs) {
+    if (req.needsAny) {
+      if (!req.needs.some(have)) miss.push(`one of: ${req.needs.join(', ')}`);
+    } else {
+      req.needs.forEach(n => { if (!have(n)) miss.push(n); });
+    }
+  }
+  if (req.needsDefensive && m.defensive.length === 0) miss.push('a Defensive Config');
+  if (req.melee && !m.weapons.some(w => MELEE.find(x => x.name === w.name))) miss.push('a Melee weapon');
+  if (req.noReach && m.weapons.some(w => { const d = MELEE.find(x => x.name === w.name); return d && /Reach/i.test(d.traits); }))
+    miss.push('remove Reach weapon');
+  if (req.noDup) { const seen = new Set(); for (const w of m.weapons) { if (seen.has(w.name)) { miss.push('remove duplicate weapon'); break; } seen.add(w.name); } }
+  if (req.shortMeleeOnly && !m.weapons.every(w => { const d = findWeapon(w.name); return !d || /Short|Melee/i.test(d.traits); }))
+    miss.push('only Short/Melee weapons');
+  if (req.noBlast && m.weapons.some(w => { const d = findWeapon(w.name); return d && /Blast/i.test(d.traits); }))
+    miss.push('remove Blast weapon');
+  if (req.reinforced) { const wc = WC[m.weightClass]; if (m.armor <= wc.baseArmor && m.structure <= wc.baseStructure) miss.push('reinforce Armor or Structure'); }
+  if (req.stripped) { const wc = WC[m.weightClass]; if (!(m.armor < wc.baseArmor && m.structure < wc.baseStructure)) miss.push('strip Armor & Structure'); }
+  if (req.noStripped) { const wc = WC[m.weightClass]; if (m.armor < wc.baseArmor || m.structure < wc.baseStructure) miss.push('must not be Stripped'); }
+  if (req.hasDrone && (!m.drones || Object.keys(m.drones).length === 0)) miss.push('an AI Drone');
+  return miss;
+};
+
+// For a mech + team: can this mech's weight CLASS ever fill a row in this team,
+// and if so what's the closest-to-qualifying row + what it still needs.
+//   classOk false  → wrong weight class; can never join this team.
+//   classOk true, missing []      → fully qualifies.
+//   classOk true, missing [..]     → eligible class but needs the listed gear.
+export const teamFitForMech = (m, team) => {
+  if (!team || !Array.isArray(team.req)) return { classOk: false, reqIdx: -1, missing: [] };
+  const rows = team.req
+    .map((req, i) => ({ req, i }))
+    .filter(({ req }) => req.cls !== 'UL HE-V or Assault Vehicle Squadron' && clsMatch(req.cls, m.weightClass));
+  if (!rows.length) return { classOk: false, reqIdx: -1, missing: [] };
+  let best = null;
+  for (const { req, i } of rows) {
+    const missing = missingForReq(m, req);
+    if (!best || missing.length < best.missing.length) best = { classOk: true, reqIdx: i, missing };
+    if (best.missing.length === 0) break;
+  }
+  return best;
+};
+
+// Weight-class labels a team will accept (for "wrong class" messaging).
+export const teamAcceptedClasses = (team) =>
+  [...new Set((team?.req || [])
+    .filter(r => r.cls !== 'UL HE-V or Assault Vehicle Squadron')
+    .map(r => r.cls))];
+
 // Given a mech and a team definition, return the first req row index this
 // mech satisfies, or -1 if none. Used to flag assigned HE-V chips with a
 // qualification badge so the player gets visible confirmation that the

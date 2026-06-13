@@ -114,7 +114,7 @@ export function BottomBar({
                           background: blockFilled
                             ? (over ? 'var(--rust)' : 'var(--olive)')
                             : blockPartial
-                              ? (over ? 'rgba(168,51,12,0.4)' : 'rgba(79,97,50,0.4)')
+                              ? (over ? 'rgba(232,163,23,0.4)' : 'rgba(79,97,50,0.4)')
                               : 'var(--rule)',
                         }}
                       />
@@ -190,7 +190,7 @@ export function BottomBar({
           className={`add-btn bottombar-add-mech cta-mech ${mechCount === 0 ? 'cta-pulse' : ''}`}
           title="Add a new HE-V"
         >
-          <img src={asset('icons/hev.svg')} alt="" className="cta-mech-icon" />
+          <img src={asset('icons/hev.svg')} alt="" className="cta-mech-icon icon-dark" />
           <Plus size={12} strokeWidth={2.5} />
           HE-V
         </button>
@@ -307,7 +307,7 @@ export function MechCard({ mech, index, active, onSelect, assignedTo, qualifying
     >
       {!active && <HoverEditHint />}
       <span className="roster-num" style={{
-        color: active ? 'rgba(241,234,218,0.7)' : 'var(--mute)',
+        color: active ? 'rgba(236,236,234,0.7)' : 'var(--mute)',
       }}>
         {String(index + 1).padStart(2, '0')}
       </span>
@@ -329,13 +329,13 @@ export function MechCard({ mech, index, active, onSelect, assignedTo, qualifying
         </div>
         <div className="mono" style={{
           fontSize: 11.5,
-          color: active ? 'rgba(241,234,218,0.65)' : 'var(--mute)',
+          color: active ? 'rgba(236,236,234,0.65)' : 'var(--mute)',
           letterSpacing: '0.06em', marginTop: 2,
         }}>
           {wc.abbr} · {stats.weaponsSlots + stats.upgradesSlots}/{wc.slots} slots
           {stats.overTons && (
             <span style={{
-              marginLeft: 6, color: active ? '#ffb89c' : 'var(--rust)', fontWeight: 700,
+              marginLeft: 6, color: active ? '#ffd98a' : 'var(--rust)', fontWeight: 700,
             }}>
               over!
             </span>
@@ -344,7 +344,7 @@ export function MechCard({ mech, index, active, onSelect, assignedTo, qualifying
             <span style={{
               marginLeft: 6,
               padding: '0 5px',
-              background: active ? 'rgba(241,234,218,0.18)' : 'var(--olive)',
+              background: active ? 'rgba(236,236,234,0.18)' : 'var(--olive)',
               color: active ? 'var(--surface)' : 'var(--surface)',
               fontWeight: 700, fontSize: 10,
               letterSpacing: '0.04em',
@@ -362,9 +362,9 @@ export function MechCard({ mech, index, active, onSelect, assignedTo, qualifying
                 key={w.name + w.count}
                 className="loadout-chip loadout-chip-weapon"
                 style={{
-                  background: active ? 'rgba(241,234,218,0.12)' : 'rgba(79,97,50,0.12)',
-                  color: active ? 'rgba(241,234,218,0.85)' : 'var(--olive)',
-                  borderColor: active ? 'rgba(241,234,218,0.2)' : 'rgba(79,97,50,0.3)',
+                  background: active ? 'rgba(236,236,234,0.12)' : 'rgba(79,97,50,0.12)',
+                  color: active ? 'rgba(236,236,234,0.85)' : 'var(--olive)',
+                  borderColor: active ? 'rgba(236,236,234,0.2)' : 'rgba(79,97,50,0.3)',
                 }}
               >
                 {w.count > 1 ? `${w.count}× ` : ''}{w.name}
@@ -375,9 +375,9 @@ export function MechCard({ mech, index, active, onSelect, assignedTo, qualifying
                 key={u}
                 className="loadout-chip loadout-chip-upgrade"
                 style={{
-                  background: active ? 'rgba(241,234,218,0.08)' : 'rgba(138,90,9,0.1)',
-                  color: active ? 'rgba(241,234,218,0.65)' : 'var(--perk)',
-                  borderColor: active ? 'rgba(241,234,218,0.15)' : 'rgba(138,90,9,0.25)',
+                  background: active ? 'rgba(236,236,234,0.08)' : 'rgba(138,90,9,0.1)',
+                  color: active ? 'rgba(236,236,234,0.65)' : 'var(--perk)',
+                  borderColor: active ? 'rgba(236,236,234,0.15)' : 'rgba(138,90,9,0.25)',
                 }}
               >
                 {u}
@@ -394,7 +394,7 @@ export function MechCard({ mech, index, active, onSelect, assignedTo, qualifying
           }}>
             <span className="mono" style={{
               fontSize: 9.5, letterSpacing: '0.12em', textTransform: 'uppercase',
-              color: active ? 'rgba(241,234,218,0.4)' : 'var(--mute)',
+              color: active ? 'rgba(236,236,234,0.4)' : 'var(--mute)',
               marginRight: 2, flexShrink: 0,
             }}>
               TEAMS
@@ -415,7 +415,7 @@ export function MechCard({ mech, index, active, onSelect, assignedTo, qualifying
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                       width: 18, height: 18,
                       background: isAssigned
-                        ? (active ? 'rgba(241,234,218,0.25)' : 'var(--olive)')
+                        ? (active ? 'rgba(236,236,234,0.25)' : 'var(--olive)')
                         : 'transparent',
                       borderRadius: 2,
                       flexShrink: 0,
@@ -443,12 +443,12 @@ export function MechCard({ mech, index, active, onSelect, assignedTo, qualifying
       <div style={{ textAlign: 'right' }}>
         <div className="mono" style={{
           fontSize: 18, fontWeight: 700,
-          color: stats.overTons ? (active ? '#ffb89c' : 'var(--rust)') : (active ? 'var(--surface)' : 'var(--ink)'),
+          color: stats.overTons ? (active ? '#ffd98a' : 'var(--rust)') : (active ? 'var(--surface)' : 'var(--ink)'),
         }}>
           {stats.totalUsed}t
         </div>
         <div className="mono" style={{
-          fontSize: 10.5, color: active ? 'rgba(241,234,218,0.55)' : 'var(--mute)',
+          fontSize: 10.5, color: active ? 'rgba(236,236,234,0.55)' : 'var(--mute)',
         }}>
           / {wc.tons}t
         </div>
@@ -646,14 +646,14 @@ export function EmptyRoster({ onAdd }) {
       </div>
       <div style={{ marginTop: 14 }}>
         <button onClick={onAdd} className="add-btn cta-mech cta-pulse" style={{
-          background: 'var(--rust)', color: 'var(--surface)', border: 'none',
+          background: 'var(--rust-bright)', color: 'var(--ink)', border: 'none',
           padding: '13px 22px', cursor: 'pointer',
           fontFamily: 'var(--font-stencil)', fontSize: 14, fontWeight: 700,
           letterSpacing: '0.16em', textTransform: 'uppercase',
           display: 'inline-flex', alignItems: 'center', gap: 9,
           boxShadow: '0 2px 0 var(--rust-deep)',
         }}>
-          <img src={asset('icons/hev.svg')} alt="" className="cta-mech-icon" />
+          <img src={asset('icons/hev.svg')} alt="" className="cta-mech-icon icon-dark" />
           <Plus size={13} strokeWidth={2.5} />
           Add HE-V
         </button>

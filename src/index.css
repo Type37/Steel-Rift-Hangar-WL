@@ -1,12 +1,12 @@
 /* ============================================================
    THE FORGE global styles
-   - Warm parchment background, deep ink text
+   - Cool concrete-grey background, neutral near-black ink
    - Chakra Petch reserved for big banner headings only
    - Schibsted Grotesk for stencil/uppercase labels
    - Space Grotesk for body
    - JetBrains Mono for data
    - Terminal Grotesque for the WarLore wordmark
-   - Single rust accent for actions, olive for positive
+   - Single hazard-amber accent for actions, olive for positive
    ============================================================ */
 
 /* Terminal Grotesque — Tyler Finck, SIL OFL 1.1 (Velvetyne / StudioTriple).
@@ -29,18 +29,24 @@
 }
 
 :root {
-  --bg:           #e8dfc9;
-  --bg-deep:      #ddd2b6;
-  --surface:      #f1eada;
-  --surface-2:    #ebe2c9;
-  --ink:          #15110d;
-  --ink-2:        #4a4339;
-  --mute:         #6e6552;
-  --rule:         #b8aa86;
-  --rule-strong:  #8c7e5f;
-  --rust:         #a8330c;
-  --rust-deep:    #6e1f06;
-  --rust-bright:  #c44518;
+  /* Cool concrete greys — no warm cast (replaces the parchment/beige). */
+  --bg:           #d9d9d6;
+  --bg-deep:      #c7c8c4;
+  --surface:      #ececea;
+  --surface-2:    #e0e1de;
+  --ink:          #1a1a18;
+  --ink-2:        #44443f;
+  --mute:         #6c6c66;
+  --rule:         #bdbeb8;
+  --rule-strong:  #8d8e87;
+  /* Hazard amber accent (replaces the clay/coral rust). --rust is kept
+     deep so it stays AA-legible as text on the light concrete surfaces
+     and takes light text as a fill, exactly as the old rust did; the
+     bright hazard tone lives in --rust-bright for hero CTAs + dark-surface
+     accents (always paired with dark/ink text). */
+  --rust:         #7a5000;
+  --rust-deep:    #543700;
+  --rust-bright:  #e8a317;
   --olive:        #4f6132;
   --olive-deep:   #344020;
   --steel:        #2a3640;
@@ -143,7 +149,7 @@ body {
 }
 
 a { color: var(--rust); }
-a:hover { color: var(--rust-bright); }
+a:hover { color: var(--rust-deep); }
 
 /* Scrollbars */
 .scroll::-webkit-scrollbar { width: 11px; height: 11px; }
@@ -163,7 +169,7 @@ input.txt, textarea.txt {
   font-family: var(--font-display);
   transition: border-color 100ms, background 100ms;
 }
-input.txt:hover, textarea.txt:hover { background: #f6efdf; }
+input.txt:hover, textarea.txt:hover { background: #f3f3f1; }
 input.txt:focus, textarea.txt:focus { border-color: var(--ink); }
 input.txt::placeholder, textarea.txt::placeholder { color: var(--mute); }
 textarea.txt { min-height: 60px; resize: vertical; }
@@ -360,7 +366,7 @@ button:not(:disabled):active {
 }
 .cta-mech:hover:not(:disabled) {
   background: var(--rust-bright) !important;
-  box-shadow: 0 4px 0 var(--rust-deep), 0 6px 14px rgba(168, 51, 12, 0.35);
+  box-shadow: 0 4px 0 var(--rust-deep), 0 6px 14px rgba(232,163,23, 0.35);
   transform: translateY(-2px);
 }
 .cta-mech:active:not(:disabled) {
@@ -519,14 +525,14 @@ button:not(:disabled):active {
   background: var(--ink);
   color: var(--surface);
 }
-.mission-popover-item.is-active .mono { color: rgba(241, 234, 218, 0.7) !important; }
+.mission-popover-item.is-active .mono { color: rgba(236,236,234, 0.7) !important; }
 
 /* Add HE-V CTA: rust solid with shadow lift, the primary action */
 .bottombar-add-mech {
   min-height: 36px;
-  background: var(--rust);
-  color: var(--surface);
-  border: 2px solid var(--rust);
+  background: var(--rust-bright);
+  color: var(--ink);
+  border: 2px solid var(--rust-bright);
   padding: 5px 14px;
   cursor: pointer;
   font-family: var(--font-body);
@@ -540,11 +546,10 @@ button:not(:disabled):active {
   white-space: nowrap;
   border-radius: 5px;
   box-shadow: 0 2px 0 var(--rust-deep);
-  transition: background 110ms, box-shadow 80ms, transform 80ms;
+  transition: filter 110ms, box-shadow 80ms, transform 80ms;
 }
 .bottombar-add-mech:hover {
-  background: var(--rust-bright);
-  border-color: var(--rust-bright);
+  filter: brightness(1.06);
   box-shadow: 0 3px 0 var(--rust-deep);
 }
 .bottombar-add-mech:active {
@@ -642,14 +647,14 @@ button:not(:disabled):active {
   border-color: var(--ink);
 }
 .util-btn-print:hover {
-  background: #2d2620;
+  background: #2e2e2b;
   border-color: var(--ink);
 }
 
 /* Pulsing glow for empty-roster prompts that want attention */
 @keyframes cta-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(168, 51, 12, 0.55); }
-  50%      { box-shadow: 0 0 0 10px rgba(168, 51, 12, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(232,163,23, 0.55); }
+  50%      { box-shadow: 0 0 0 10px rgba(232,163,23, 0); }
 }
 .cta-pulse {
   /* Pulse a handful of times to draw the eye on an empty roster, then
@@ -757,7 +762,7 @@ button:not(:disabled):active {
   border-top-width: 4px;
 }
 .faction-tile-authorities:hover {
-  background: #ede9d2;
+  background: #e2e4df;
   border-color: var(--olive-deep);
 }
 .faction-tile-authorities.is-active {
@@ -772,7 +777,7 @@ button:not(:disabled):active {
   border-top-width: 4px;
 }
 .faction-tile-corporations:hover {
-  background: #e1ddc7;
+  background: #dcdde1;
   border-color: var(--steel-deep);
 }
 .faction-tile-corporations.is-active {
@@ -787,7 +792,7 @@ button:not(:disabled):active {
   border-top-width: 4px;
 }
 .faction-tile-freelancers:hover {
-  background: #efd6c8;
+  background: #e7dcda;
   border-color: var(--crimson-deep);
 }
 .faction-tile-freelancers.is-active {
@@ -810,7 +815,7 @@ button:not(:disabled):active {
   color: var(--ink-2);
 }
 .faction-tile.is-active .faction-tile-blurb {
-  color: rgba(241, 234, 218, 0.78);
+  color: rgba(236,236,234, 0.78);
 }
 @media (max-width: 540px) {
   .drag-source { cursor: grab; }
@@ -847,7 +852,7 @@ button:not(:disabled):active {
 .tok:hover, .tok:focus {
   color: var(--rust);
   border-bottom-color: var(--rust);
-  background: rgba(168, 51, 12, 0.06);
+  background: rgba(232,163,23, 0.06);
   outline: none;
 }
 .tok.active {
@@ -933,20 +938,19 @@ button:not(:disabled):active {
   color: var(--rust-bright);
 }
 .navbar-buynow {
-  background: var(--rust);
-  color: #fff;
+  background: var(--rust-bright);
+  color: var(--ink);
   text-decoration: none;
   font-family: var(--font-body);
   font-weight: 700;
   font-size: 15px;
   padding: 8px 18px;
-  border: 2px solid var(--rust);
+  border: 2px solid var(--rust-bright);
   border-radius: 0;
-  transition: background 110ms, color 110ms, border-color 110ms, transform 80ms;
+  transition: filter 110ms, transform 80ms;
 }
 .navbar-buynow:hover {
-  background: var(--rust-bright);
-  border-color: var(--rust-bright);
+  filter: brightness(1.06);
 }
 .navbar-buynow:active {
   transform: translateY(1px);
@@ -1096,7 +1100,7 @@ button:not(:disabled):active {
   background: var(--surface); color: var(--ink);
   border: 1.5px solid var(--rule-strong); border-radius: 3px;
 }
-.loadout-search:focus { outline: none; border-color: var(--rust); box-shadow: 0 0 0 2px rgba(168,51,12,0.12); }
+.loadout-search:focus { outline: none; border-color: var(--rust); box-shadow: 0 0 0 2px rgba(232,163,23,0.12); }
 .loadout-search-clear {
   margin-left: -34px; width: 24px; height: 24px; border: none; background: none;
   cursor: pointer; color: var(--mute); font-size: 18px; line-height: 1;
@@ -1223,7 +1227,7 @@ button:not(:disabled):active {
   align-items: start;
 }
 .agenda-entry {
-  border-left: 3px solid #a8330c;
+  border-left: 3px solid #b07400;
   padding-left: 10pt;
 }
 .agenda-entry-head {
@@ -1242,7 +1246,7 @@ button:not(:disabled):active {
 }
 .agenda-entry-source {
   font-size: 8pt;
-  color: #a8330c;
+  color: #7a5000;
   font-family: 'Schibsted Grotesk', sans-serif;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -1639,7 +1643,7 @@ button:not(:disabled):active {
   letter-spacing: 0.10em;
   text-transform: uppercase;
   margin: 0.18in 0 0.06in;
-  color: #b04020;
+  color: #7a5000;
 }
 .print-ref-section { margin-bottom: 0.18in; page-break-inside: avoid; }
 .print-ref-dl {

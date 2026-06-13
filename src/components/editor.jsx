@@ -183,7 +183,7 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", setWeaponSort
               >
                 <span className="stencil" style={{
                   fontSize: 13,
-                  color: active ? 'var(--mute)' : 'rgba(241,234,218,0.5)',
+                  color: active ? 'var(--mute)' : 'rgba(236,236,234,0.5)',
                 }}>
                   {c}
                 </span>
@@ -192,7 +192,7 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", setWeaponSort
                 </span>
                 <span className="mono" style={{
                   fontSize: 10.5, letterSpacing: '0.1em',
-                  color: active ? 'var(--mute)' : 'rgba(241,234,218,0.45)',
+                  color: active ? 'var(--mute)' : 'rgba(236,236,234,0.45)',
                   textTransform: 'uppercase',
                 }}>
                   {w.slots} slots
@@ -847,12 +847,40 @@ function EquippedRuleRow({ name, text }) {
 // CATALOG ROWS
 // ============================================================
 
+const WEAPON_ICONS = {
+  'Rotary Cannon':    'p10_01_Rotary_Cannon.png',
+  'Autocannon':       'p10_02_Autocannon.png',
+  'Harpoon Gun':      'p10_03_Harpoon_Gun.png',
+  'Laser':            'p10_04_Laser.png',
+  'Arc Gun':          'p10_05_Arc_Gun.png',
+  'Rail Gun':         'p10_06_Rail_Gun.png',
+  'Particle Cannon':  'p10_07_Particle_Cannon.png',
+  'Submunitions':     'p10_08_Submunitions.png',
+  'Mag Tether':       'p10_09_Mag_Tether.png',
+  'Shot Cannon':      'p10_10_Shot_Cannon.png',
+  'Howitzer':         'p10_11_Howitzer.png',
+  'Shock Net':        'p10_12_Shock_Net.png',
+  'Pulse Salvo':      'p10_13_Pulse_Salvo.png',
+  'AA Missiles':      'p10_14_Lens.png',
+  'Cluster Rockets':  'p10_15_Rockets.png',
+  'Rocket Pack':      'p10_15_Rockets.png',
+  'Missiles':         'p10_16_Missiles.png',
+  'Mega Glaive':      'p11_01_Mega_Glaive.png',
+  'Demolition Cutter':'p11_03_Demolition_Cutter.png',
+  'Combat Blade':     'p11_04_Combat_Blade.png',
+  'Mass Tetsubo':     'p11_05_Mass_Tetsubo.png',
+  'Plasma Blade':     'p11_06_Plasma_Blade.png',
+  'Impact Hammer':    'p11_07_Impact_Hammer.png',
+};
+
 function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle }) {
   const cls = mech.weightClass;
   const base = valForClass(weapon.cost, cls);
   const dmg = valForClass(weapon.dmg, cls);
   const available = base !== '-' && base != null;
   const count = equipped?.count || 0;
+  const iconFile = WEAPON_ICONS[weapon.name];
+  const iconSrc = iconFile ? asset(`weapon-icons/${iconFile}`) : null;
   const total = available ? totalWeaponCost(weapon, cls, count) : 0;
   const next = available ? copyCost(base, count + 1) : null;
 
@@ -917,7 +945,7 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
         <RowExpand open={expanded} onClick={onToggle} />
 
         {/* Name + DMG + traits */}
-        <div className="weapon-row-name-block" style={{ minWidth: 0, flex: 1 }}>
+        <div className="weapon-row-name-block" style={{ minWidth: 0, flex: 1, display: 'flex', alignItems: 'center', gap: 6 }}>
           <div style={{ minWidth: 0, flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, flexWrap: 'wrap' }}>
               <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--ink)' }}>{weapon.name}</span>
@@ -932,6 +960,13 @@ function WeaponRow({ weapon, mech, equipped, onAdd, onRemove, expanded, onToggle
               <TraitList traits={weapon.traits} />
             </div>
           </div>
+          {iconSrc && (
+            <img
+              src={iconSrc}
+              alt=""
+              style={{ height: 40, width: 40, objectFit: 'contain', opacity: 0.35, flexShrink: 0, mixBlendMode: 'multiply' }}
+            />
+          )}
         </div>
 
         {/* Cost + controls: display:contents on desktop so they slot into the 7-col grid.
@@ -1247,6 +1282,11 @@ function DefRow({ def, mech, onToggle, atLimit }) {
             {!available && (
               <span className="mono" style={{ fontSize: 11, color: 'var(--mute)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                 Not available at {WC[cls].abbr}
+              </span>
+            )}
+            {blockedByLimit && (
+              <span className="mono" style={{ fontSize: 10.5, color: 'var(--rust)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                Slot full — remove one to swap
               </span>
             )}
             {def.mod?.armor && (

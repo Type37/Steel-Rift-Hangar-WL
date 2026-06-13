@@ -29,6 +29,16 @@ export const POOLS = {
     'Coywolf', 'Jackal', 'Honey-Badger', 'Marten', 'Stoat', 'Quoll',
   ],
 
+  // Mixed — eclectic English callsigns. Restored verbatim from the
+  // pre-"Iter 22" source after the Mixed pool was deleted (0ae9740).
+  Mixed: [
+    'Atlas', 'Blackvein', 'Cascade', 'Dover', 'Ember', 'Foxglove',
+    'Gravewright', 'Hangfire', 'Ironwake', 'Jasper', 'Kestrel', 'Longshore',
+    'Marrow', 'Northstar', 'Outrider', 'Pall', 'Quickstrike', 'Reverie',
+    'Silt-7', 'Tower', 'Undertow', 'Verdict', 'Whitlow', 'Xerxes',
+    'Yardarm', 'Zenith', 'Coalbite', 'Mockingbird', 'Slate', 'Vagrant',
+    'Brindle', 'Cinder', 'Dustwell', 'Furrow', 'Glasswort', 'Hush',
+  ],
 
   '🎌': [
     // Gravity Rush — Nevi names

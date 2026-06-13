@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Check, Plus, Minus } from 'lucide-react';
 import { OFF_TABLE_ASSETS, ADVANCED_ASSETS, FACTIONS, FACTION_LOGOS, TEAMS, VEHICLE_WEAPONS, INFANTRY_SQUADS, INFANTRY_SHARED_TRAITS, POWER_SUIT_SQUADS, POWER_SUIT_SHARED_TRAITS, UNIVERSAL_AGENDAS } from '../data';
-import { checkTeamEligibility, slotsForBand, findAsset, mechQualifiesForTeam } from '../calc';
+import { checkTeamEligibility, slotsForBand, findAsset, mechQualifiesForTeam, teamFitForMech, teamAcceptedClasses } from '../calc';
 import { SectionTitle, Chip, TextButton, TraitList, RowExpand, InlineTraitGlossary, RulesText, collectTraits, HoverEditHint, BuyButton } from './ui';
 import { Tooltip } from './tooltip';
 
@@ -341,6 +341,7 @@ function TeamRow({
         kind: 'hev',
         mech: m,
         qualifiedReqIdx: mechQualifiesForTeam(m, team),
+        fit: teamFitForMech(m, team),
       };
     } else if (id.startsWith('support:')) {
       const name = id.slice(8);
@@ -602,16 +603,20 @@ function AssignmentStrip({
   // Available units: HE-Vs always eligible; support assets only if team has a support slot req.
   const SUPPORT_SLOT_NAMES = ['UL HE-V Squadron', 'Assault Vehicle Squadron'];
   const teamHasSupportSlot = team.req.some(r => r.cls === 'UL HE-V or Assault Vehicle Squadron');
+  const acceptedClasses = teamAcceptedClasses(team);
   const candidates = [];
   mechs.forEach(m => {
     const id = `hev:${m.id}`;
     if (!assignedIds.includes(id)) {
+      const fit = teamFitForMech(m, team);
       candidates.push({
         id,
         label: m.name || `${m.weightClass.toUpperCase()} HE-V`,
         kind: 'hev',
         cls: m.weightClass,
         tons: m.armor + m.structure,
+        classOk: fit.classOk,
+        missing: fit.missing,
       });
     }
   });
@@ -651,6 +656,12 @@ function AssignmentStrip({
         const matchedReqText = qualified
           ? team.req[u.qualifiedReqIdx]?.reqText || team.req[u.qualifiedReqIdx]?.cls
           : null;
+        const fit = u.fit || { classOk: false, missing: [] };
+        const notMet = isHev && !qualified;
+        const shortReason = !notMet ? null
+          : (fit.classOk ? `needs ${fit.missing[0]}${fit.missing.length > 1 ? ` +${fit.missing.length - 1}` : ''}` : 'wrong class');
+        const fullReason = !notMet ? null
+          : (fit.classOk ? `Needs: ${fit.missing.join(', ')}` + (editable ? ' · click to edit' : '') : 'Wrong weight class for this team');
         return (
           <span
             key={u.id}
@@ -659,7 +670,7 @@ function AssignmentStrip({
               isHev
                 ? (qualified
                     ? `Qualifies: ${matchedReqText}` + (editable ? ' · click to edit' : '')
-                    : 'Does not satisfy any requirement row for this team')
+                    : fullReason)
                 : undefined
             }
             className={editable ? 'has-edit-hint-inline' : ''}
@@ -675,7 +686,7 @@ function AssignmentStrip({
               letterSpacing: '0.04em', textTransform: 'uppercase',
               cursor: editable ? 'pointer' : 'default',
               transition: 'filter 100ms ease-out',
-              outline: qualified ? '1px solid rgba(241,234,218,0.4)' : 'none',
+              outline: qualified ? '1px solid rgba(236,236,234,0.4)' : 'none',
             }}
           >
             {/* Qualification badge: green ✓ if this HE-V matches a req row,
@@ -697,13 +708,18 @@ function AssignmentStrip({
               </span>
             )}
             {u.label}
+            {notMet && shortReason && (
+              <span style={{ fontSize: 9, fontWeight: 700, color: '#ffd98a', textTransform: 'none', letterSpacing: 0, marginLeft: 2 }}>
+                ({shortReason})
+              </span>
+            )}
             {editable && <HoverEditHint size="sm" />}
             <button
               onClick={(e) => { e.stopPropagation(); onUnassign?.(u.id); }}
               title="Remove from team"
               style={{
                 background: 'transparent', border: 'none',
-                color: 'rgba(241,234,218,0.85)',
+                color: 'rgba(236,236,234,0.85)',
                 padding: '0 4px', cursor: 'pointer',
                 fontSize: 13, lineHeight: 1,
               }}
@@ -758,40 +774,62 @@ function AssignmentStrip({
           maxHeight: 280, overflowY: 'auto',
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.18)',
         }}>
-          {candidates.map(c => (
+          {[...candidates]
+            .sort((a, b) => ((a.kind === 'hev' && !a.classOk) ? 1 : 0) - ((b.kind === 'hev' && !b.classOk) ? 1 : 0))
+            .map(c => {
+            const wrongClass = c.kind === 'hev' && !c.classOk;
+            const incomplete = c.kind === 'hev' && c.classOk && c.missing && c.missing.length > 0;
+            const qualifies  = c.kind === 'hev' && c.classOk && (!c.missing || c.missing.length === 0);
+            const badgeColor = wrongClass ? 'var(--mute)' : (c.kind === 'support' ? 'var(--steel)' : 'var(--olive)');
+            return (
             <button
               key={c.id}
-              onClick={() => {
-                onAssign?.(team.name, c.id);
-                setPickerOpen(false);
-              }}
+              disabled={wrongClass}
+              onClick={wrongClass ? undefined : () => { onAssign?.(team.name, c.id); setPickerOpen(false); }}
+              title={wrongClass
+                ? `${c.cls} can't join — this team takes ${acceptedClasses.join(' / ')}`
+                : incomplete ? `Eligible, but needs: ${c.missing.join(', ')}` : undefined}
               style={{
                 display: 'flex', alignItems: 'center', gap: 8,
                 width: '100%',
                 background: 'transparent', border: 'none',
                 borderBottom: '1px solid var(--rule)',
                 padding: '8px 12px',
-                cursor: 'pointer',
+                cursor: wrongClass ? 'not-allowed' : 'pointer',
                 fontFamily: 'var(--font-body)',
-                fontSize: 13, color: 'var(--ink)',
+                fontSize: 13, color: wrongClass ? 'var(--mute)' : 'var(--ink)',
+                opacity: wrongClass ? 0.6 : 1,
                 textAlign: 'left',
               }}
             >
               <span style={{
                 fontSize: 9.5,
                 padding: '1px 5px',
-                border: '1px solid ' + (c.kind === 'support' ? 'var(--steel)' : 'var(--olive)'),
-                color: c.kind === 'support' ? 'var(--steel)' : 'var(--olive)',
+                border: '1px solid ' + badgeColor,
+                color: badgeColor,
                 fontFamily: 'var(--font-body)', fontWeight: 700,
                 letterSpacing: '0.06em', textTransform: 'uppercase',
-                flexShrink: 0,
+                flexShrink: 0, alignSelf: 'flex-start', marginTop: 1,
               }}>
                 {c.kind === 'hev' ? (c.cls || 'HE-V') : 'ASSET'}
               </span>
-              <span style={{ flex: 1 }}>{c.label}</span>
-              {c.tons && <span style={{ fontSize: 10.5, color: 'var(--mute)' }}>{c.tons}t</span>}
+              <span style={{ flex: 1, minWidth: 0 }}>
+                {c.label}
+                {wrongClass && (
+                  <span style={{ display: 'block', fontSize: 10, color: 'var(--mute)' }}>
+                    Wrong class — takes {acceptedClasses.join(' / ')}
+                  </span>
+                )}
+                {incomplete && (
+                  <span style={{ display: 'block', fontSize: 10, color: 'var(--rust)' }}>
+                    needs: {c.missing.join(', ')}
+                  </span>
+                )}
+              </span>
+              {qualifies && <span title="Meets a requirement row" style={{ color: 'var(--olive)', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>✓</span>}
+              {c.tons && <span style={{ fontSize: 10.5, color: 'var(--mute)', flexShrink: 0 }}>{c.tons}t</span>}
             </button>
-          ))}
+          );})}
         </div>
       )}
     </div>
