@@ -26,6 +26,9 @@
   font-weight: 400;
   letter-spacing: 0.04em;
   text-transform: none;
+  background: #000;
+  color: #e8a317 !important;
+  padding: 1px 4px;
 }
 
 :root {
