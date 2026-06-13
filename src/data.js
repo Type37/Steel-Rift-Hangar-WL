@@ -266,7 +266,7 @@ export const ADVANCED_ASSETS = [
       { name: 'Rifleman', spd: '6"', arm: '2', str: '1', weapons: 'UL Autocannon, UL Grenades', traits: 'Suppressive Fire' },
     ],
     stats: { 'All models': 'Auxiliary Unit (Ultralight), Squadron, Close Support, All-Terrain',
-             'Upgrade Pod': 'Short Range Missile Pack (3×(X), Smart, Limited 2, Short 12\") · Cluster Rockets (5×(X), Blast 3\", Light, Limited 2) · Launch Gear (JUMP +2\")' },
+             'Upgrade Pod': 'Short Range Missile Pack (3×(X), Smart, Limited 2, Short 12\"); Cluster Rockets (5×(X), Blast 3\", Light, Limited 2); Launch Gear (JUMP +2\")' },
   },
 ];
 

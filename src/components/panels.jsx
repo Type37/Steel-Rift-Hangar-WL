@@ -53,7 +53,7 @@ export function SupportPanel({ selected, onToggle, onInspect, limit, simpleMode 
 
       {!simpleMode && (
         <>
-          <SubHeader>Advanced (Vehicles · Air · Garrisons)</SubHeader>
+          <SubHeader>Advanced (Vehicles, Air, Garrisons)</SubHeader>
           <div style={{ borderTop: '1.5px solid var(--ink)', borderBottom: '1.5px solid var(--ink)' }}>
             {ADVANCED_ASSETS.map(a => (
               <SupportRow key={a.name} a={a} eq={selected.includes(a.name)}
@@ -661,7 +661,7 @@ function AssignmentStrip({
         const shortReason = !notMet ? null
           : (fit.classOk ? `needs ${fit.missing[0]}${fit.missing.length > 1 ? ` +${fit.missing.length - 1}` : ''}` : 'wrong class');
         const fullReason = !notMet ? null
-          : (fit.classOk ? `Needs: ${fit.missing.join(', ')}` + (editable ? ' · click to edit' : '') : 'Wrong weight class for this team');
+          : (fit.classOk ? `Needs: ${fit.missing.join(', ')}` + (editable ? ' — click to edit' : '') : 'Wrong weight class for this team');
         return (
           <span
             key={u.id}
@@ -669,7 +669,7 @@ function AssignmentStrip({
             title={
               isHev
                 ? (qualified
-                    ? `Qualifies: ${matchedReqText}` + (editable ? ' · click to edit' : '')
+                    ? `Qualifies: ${matchedReqText}` + (editable ? ' — click to edit' : '')
                     : fullReason)
                 : undefined
             }
@@ -999,6 +999,34 @@ function parseWeapons(str) {
     .filter(Boolean);
 }
 
+// Render a sub-unit / squad weapons string with each weapon's DMG + traits
+// resolved from VEHICLE_WEAPONS, so names like "Infantry Rifles, Missile
+// Launcher" aren't shown bare without stats.
+function SubunitWeaponList({ weapons, size = 11 }) {
+  const names = parseWeapons(weapons);
+  if (names.length === 0) {
+    return <span style={{ fontSize: size, color: 'var(--ink-2)' }}>{weapons}</span>;
+  }
+  return (
+    <span style={{ display: 'inline-flex', flexWrap: 'wrap', gap: 8, alignItems: 'baseline' }}>
+      {names.map((wname, i) => {
+        const wdef = findVehicleWeapon(wname);
+        return (
+          <span key={i} style={{ display: 'inline-flex', gap: 4, alignItems: 'baseline', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: size, color: 'var(--ink-2)', fontWeight: 600 }}>{wname}</span>
+            {wdef && (
+              <span style={{ fontSize: size - 1.5, color: 'var(--mute)', display: 'inline-flex', gap: 4, alignItems: 'baseline', flexWrap: 'wrap' }}>
+                <span>DMG {wdef.dmg}</span>
+                {wdef.traits && <TraitList traits={wdef.traits} />}
+              </span>
+            )}
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
 // Garrison reference: show infantry or power suit squad options inline.
 function GarrisonRef({ traitStr, garrisonLoadout, garrisonCount = 1, onSetGarrisonLoadout }) {
   const infMatch = traitStr && traitStr.match(/Garrison\s*\(\s*(\d+)\s*Infantry/i);
@@ -1063,7 +1091,7 @@ function GarrisonRef({ traitStr, garrisonLoadout, garrisonCount = 1, onSetGarris
                 <span style={{ color: 'var(--mute)', fontSize: 10.5 }}>
                   SPD {sq.spd} · ARM {sq.arm} · STR {sq.str}
                 </span>
-                <span style={{ fontSize: 11, color: 'var(--ink-2)' }}>{sq.weapons}</span>
+                <SubunitWeaponList weapons={sq.weapons} size={11} />
               </div>
               {sq.traits && (
                 <div style={{ fontSize: 11 }}>
@@ -1160,7 +1188,7 @@ function OneEachPicker({ asset: a, loadout, onChange }) {
                       border: `2px solid ${isSel ? 'var(--rust)' : 'var(--rule-strong)'}`,
                       background: isSel ? 'var(--rust)' : 'transparent',
                     }} />
-                    <span style={{ fontWeight: 600, fontSize: 13 }}>{su.weapons}</span>
+                    <SubunitWeaponList weapons={su.weapons} size={13} />
                     {su.traits && su.traits !== '—' && (
                       <span style={{ fontSize: 11, color: 'var(--mute)' }}>{su.traits}</span>
                     )}

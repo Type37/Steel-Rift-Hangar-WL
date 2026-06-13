@@ -361,7 +361,7 @@ export function MechEditor({ mech, mechIndex, weaponSort = "cost", setWeaponSort
                   borderTop: '2px solid var(--rule)', borderBottom: '1px solid var(--rule)',
                   background: 'var(--bg)',
                 }}>
-                  AI Companion Drones <span style={{ fontWeight: 400 }}>· Compact · assign to a weapon or upgrade</span>
+                  AI Companion Drones <span style={{ fontWeight: 400 }}>— Compact, assign to a weapon or upgrade</span>
                 </div>
                 {drones.map(u => (
                   <UpgradeRow key={u.name} upgrade={u} mech={mech} onToggle={toggleUpgrade} onAssignDrone={assignDrone}
@@ -1114,8 +1114,7 @@ function UpgradeRow({ upgrade, mech, onToggle, expanded, onExpand, onAssignDrone
 
           </div>
           {!expanded && (
-            <div style={{ fontSize: 12.5, color: 'var(--ink-2)', marginTop: 2,
-              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ fontSize: 12.5, color: 'var(--ink-2)', marginTop: 2, lineHeight: 1.4 }}>
               {upgrade.rule}
             </div>
           )}

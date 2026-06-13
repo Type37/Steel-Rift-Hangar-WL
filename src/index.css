@@ -1057,25 +1057,33 @@ button:not(:disabled):active {
   display: inline-flex;
   align-self: center;
   border: 1px solid var(--rule-strong);
-  border-radius: 4px;
+  border-radius: 5px;
   overflow: hidden;
+  background: var(--bg-deep, #15110d);
 }
 .print-size-toggle button {
   font-family: var(--font-stencil);
   font-size: 10.5px;
+  font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  padding: 5px 10px;
-  background: var(--surface);
-  color: var(--ink-2);
+  padding: 6px 12px;
+  background: transparent;
+  color: var(--mute);
   border: none;
   border-right: 1px solid var(--rule-strong);
   cursor: pointer;
+  transition: background 120ms, color 120ms, box-shadow 120ms;
+  /* default (off) reads as recessed */
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.35);
 }
 .print-size-toggle button:last-child { border-right: none; }
+.print-size-toggle button:hover { color: var(--ink-2); }
 .print-size-toggle button.is-active {
-  background: var(--ink);
-  color: var(--surface);
+  /* on = green and raised */
+  background: #3f7d3a;
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 /* ── Site footer credit bar (uniformity with the Pacific Command builder) ── */
@@ -1679,6 +1687,16 @@ button:not(:disabled):active {
   border-bottom: 0.4pt solid #444;
 }
 .card-weapons-table th.num { text-align: center; padding-left: 0; padding-right: 0; }
+/* The "WEAPONS" column header doubles as the section label — bolded with a
+   highlight behind it instead of a separate heading row above the table. */
+.card-weapons-table th.card-weapons-th {
+  font-weight: 700;
+  font-size: 7pt;
+  letter-spacing: 0.04em;
+  background: #ddd;
+  padding-top: 1.5pt;
+  padding-bottom: 1.5pt;
+}
 .card-weapons-table td {
   padding: 1pt 2pt 1pt 4pt;
   border-bottom: 0.25pt solid #aaa;

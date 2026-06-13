@@ -13,6 +13,7 @@ yarn-error.log*
 .vscode
 .claude
 mockups
+default-lists.md
 
 # Source rulebook PDFs + art extracted from them — reference only, do not publish
 *.pdf

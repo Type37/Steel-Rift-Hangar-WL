@@ -901,7 +901,7 @@ function TeamSummaryCard({ teamName, mechs = [], assignments = [], onClick, onRe
                 {/* Constraints on second line */}
                 {constraints.length > 0 && (
                   <div style={{ fontSize: 11.5, color: 'var(--mute)', lineHeight: 1.4 }}>
-                    {constraints.join(' · ')}
+                    {constraints.join(', ')}
                   </div>
                 )}
               </div>

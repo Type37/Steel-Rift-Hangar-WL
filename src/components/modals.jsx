@@ -605,7 +605,7 @@ export function ListsModal({ open, onClose, currentState, onLoad }) {
                   {list.label}
                 </div>
                 <div style={{ fontSize: 11.5, color: 'var(--mute)', marginTop: 2 }}>
-                  {list.faction} · {list.perks.join(' / ')}
+                  {list.faction}{list.perks.length ? `, ${list.perks.join(' / ')}` : ''}
                 </div>
               </div>
               <button
@@ -680,7 +680,7 @@ export function ListsModal({ open, onClose, currentState, onLoad }) {
             {sortedNames.map(name => {
               const list = lists[name];
               const ago = list.savedAt ? new Date(list.savedAt).toLocaleDateString() : '';
-              const summary = `${list.mechs?.length || 0} HE-V · ${list.supportAssets?.length || 0} support · ${list.faction || 'no faction'}`;
+              const summary = `${list.mechs?.length || 0} HE-V, ${list.supportAssets?.length || 0} support, ${list.faction || 'no faction'}`;
               return (
                 <div key={name} style={{
                   display: 'grid',
@@ -700,7 +700,7 @@ export function ListsModal({ open, onClose, currentState, onLoad }) {
                     <div className="mono" style={{
                       fontSize: 11, color: 'var(--mute)', marginTop: 2,
                     }}>
-                      {summary}{ago ? ` · saved ${ago}` : ''}
+                      {summary}{ago ? `, saved ${ago}` : ''}
                     </div>
                   </div>
                   {confirmDelete === name ? (

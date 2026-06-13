@@ -270,6 +270,8 @@ export function PrintView({
           <div className="print-preview-toolbar-left">
             <span className="print-preview-toolbar-title">Print Preview</span>
             <span className="print-preview-toolbar-meta">{pages.length + (hasSummary ? 1 : 0)} pages</span>
+          </div>
+          <div className="print-preview-toolbar-right">
             <div className="print-size-toggle" role="group" aria-label="Card size">
               <button
                 className={cardSize === 'poker' ? 'is-active' : ''}
@@ -284,8 +286,6 @@ export function PrintView({
                 Tarot · 4/pg
               </button>
             </div>
-          </div>
-          <div className="print-preview-toolbar-right">
             <button className="add-btn" onClick={() => window.print()}>
               Print
             </button>
@@ -517,7 +517,7 @@ function HEVCard({ mech, index, part = 'full', items = [] }) {
       count,
       dmg: isMelee ? meleeDamage(w, cls) : `${dmg}`,
       range,
-      traits: filterDisplayTraits(w.traits),
+      traits: filterDisplayTraits(w.traits, cls),
     };
   }).filter(Boolean);
 
@@ -587,11 +587,10 @@ function HEVCard({ mech, index, part = 'full', items = [] }) {
           {/* Weapons table */}
           {weapons.length > 0 && (
             <>
-              <div className="card-section-heading">WEAPONS</div>
               <table className="card-weapons-table">
                 <thead>
                   <tr>
-                    <th>Weapon</th>
+                    <th className="card-weapons-th">WEAPONS</th>
                     <th className="num">Dmg</th>
                     <th className="num">Rng</th>
                     <th>Traits</th>
@@ -945,13 +944,13 @@ function UnitSubCard({ parent, parentName, sub, count, flavor }) {
               return (
                 <div key={i} style={{ marginBottom: 1 }}>
                   <strong>{g.name}</strong>
-                  {def && <span style={{ color: '#555' }}> · DMG {def.dmg}</span>}
-                  {def?.traits && <span style={{ color: '#555' }}> · {def.traits}</span>}
+                  {def && <span style={{ color: '#555' }}>, DMG {def.dmg}</span>}
+                  {def?.traits && <span style={{ color: '#555' }}>, {def.traits}</span>}
                   {altDefs.map((alt, ai) => (
                     <div key={ai} style={{ marginLeft: 8 }}>
                       or <strong>{alt.name}</strong>
-                      {alt.def && <span style={{ color: '#555' }}> · DMG {alt.def.dmg}</span>}
-                      {alt.def?.traits && <span style={{ color: '#555' }}> · {alt.def.traits}</span>}
+                      {alt.def && <span style={{ color: '#555' }}>, DMG {alt.def.dmg}</span>}
+                      {alt.def?.traits && <span style={{ color: '#555' }}>, {alt.def.traits}</span>}
                     </div>
                   ))}
                 </div>
@@ -1013,11 +1012,28 @@ function meleeDamage(w, cls) {
   const idx = ['Light', 'Medium', 'Heavy', 'Ultraheavy'].indexOf(cls);
   return parts[idx] || parts[0];
 }
-function filterDisplayTraits(traits) {
+// Build the traits string for a weapon on a specific class's card. Per-class
+// slashed values like "Melee (3/3/4/4)" or "Reach (1/2/2/3)" are collapsed to
+// the single value for this class ("Melee (4)", "Reach (2)"); a "-" value drops
+// the trait entirely. Limited and Short are omitted (Short feeds the Rng column).
+function filterDisplayTraits(traits, cls) {
   if (!traits) return '';
+  const idx = ['Light', 'Medium', 'Heavy', 'Ultraheavy'].indexOf(cls);
   return traits
     .split(/,\s*/)
     .filter(t => !/Limited\s*\(/i.test(t) && !/Short\s*\(/i.test(t))
+    .map(t => {
+      let dropped = false;
+      const resolved = t.replace(/\(([^)]*)\)/g, (m, inner) => {
+        if (!inner.includes('/')) return m; // single value — leave as-is
+        const parts = inner.split('/');
+        const val = (idx >= 0 && parts[idx] != null ? parts[idx] : parts[0]).trim();
+        if (val === '-' || val === '') dropped = true;
+        return `(${val})`;
+      });
+      return dropped ? null : resolved;
+    })
+    .filter(Boolean)
     .join(', ');
 }
 
