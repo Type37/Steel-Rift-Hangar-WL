@@ -376,21 +376,30 @@ function SummaryPage({
         {offTableSupport.length > 0 && (
           <section className="summary-sec">
             <h2 className="summary-h2">Off-Table Support</h2>
-            {offTableSupport.map(({ name, asset, nickname }) => (
-              <div key={name} className="summary-def summary-support">
-                <span className="summary-def-name">{nickname || asset.name}</span>
-                <span className="summary-def-src">{asset.kind} · {asset.cost}t</span>
-                {asset.fullDesc && <div className="summary-def-text">{asset.fullDesc}</div>}
-                <div className="summary-turn-track" aria-label="Turn used">
-                  {[1, 2, 3, 4, 5, 6].map(n => (
-                    <div key={n} className={`turn-cell${n === 6 ? ' turn-cell-dim' : ''}`}>
-                      <div className="turn-num">{n}</div>
-                      <div className="turn-bubble" />
-                    </div>
-                  ))}
+            {offTableSupport.map(({ name, asset, nickname }) => {
+              // Off-table assets are Limited (3), usable once per turn — bumped
+              // to 4 by the Orbital Stockpiles perk.
+              const baseLimited = limitedCount(asset.stats?.Traits) || 3;
+              const lim = baseLimited + (perks.includes('Orbital Stockpiles') ? 1 : 0);
+              return (
+                <div key={name} className="summary-def summary-support">
+                  <span className="summary-def-name">{nickname || asset.name}</span>
+                  <span className="summary-def-src">{asset.kind} · {asset.cost}t</span>
+                  {asset.fullDesc && <div className="summary-def-text">{asset.fullDesc}</div>}
+                  <div className="summary-limited-note">
+                    Limited ({lim}), usable once per turn{perks.includes('Orbital Stockpiles') ? ' (Orbital Stockpiles)' : ''}
+                  </div>
+                  <div className="summary-turn-track" aria-label="Turn used">
+                    {[1, 2, 3, 4, 5, 6].map(n => (
+                      <div key={n} className={`turn-cell${n === 6 ? ' turn-cell-dim' : ''}`}>
+                        <div className="turn-num">{n}</div>
+                        <div className="turn-bubble" />
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </section>
         )}
 
@@ -510,6 +519,7 @@ function HEVCard({ mech, index, part = 'full', items = [] }) {
       dmg: isMelee ? meleeDamage(w, cls) : `${dmg}`,
       range,
       traits: filterDisplayTraits(w.traits, cls),
+      limited: limitedCount(w.traits, cls) * (count || 1),
     };
   }).filter(Boolean);
 
@@ -594,7 +604,10 @@ function HEVCard({ mech, index, part = 'full', items = [] }) {
                       <td>{w.count > 1 ? `${w.name} ×${w.count}` : w.name}</td>
                       <td className="num">{w.dmg}</td>
                       <td className="num">{w.range}</td>
-                      <td className="card-traits">{w.traits}</td>
+                      <td className="card-traits">
+                        {w.traits}
+                        <LimitedBubbles count={w.limited} />
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -625,6 +638,7 @@ function HEVCard({ mech, index, part = 'full', items = [] }) {
                     <div key={u.name} className="card-upgrade-def-entry">
                       <span className="card-trait-def-name">{u.name}{suffix}:</span>{' '}
                       <span className="card-upgrade-def-rule">{u.rule}</span>
+                      <LimitedBubbles count={limitedCount(u.rule, cls)} />
                     </div>
                   );
                 })}
@@ -681,6 +695,7 @@ function HEVCard({ mech, index, part = 'full', items = [] }) {
                     <div key={u.name} className="card-upgrade-def-entry">
                       <span className="card-trait-def-name">{u.name}:</span>{' '}
                       <span className="card-upgrade-def-rule">{u.rule}</span>
+                      <LimitedBubbles count={limitedCount(u.rule, cls)} />
                     </div>
                   ))}
                 </div>
@@ -771,6 +786,7 @@ function UnitSubCard({ parent, parentName, sub, count, flavor }) {
       dmg: def?.dmg || '—',
       range: inferRange(def?.traits),
       traits: filterDisplayTraits(def?.traits),
+      limited: limitedCount(def?.traits),
     });
     g.alts.forEach(altName => {
       const adef = findVehicleWeapon(altName);
@@ -779,6 +795,7 @@ function UnitSubCard({ parent, parentName, sub, count, flavor }) {
         dmg: adef?.dmg || '—',
         range: inferRange(adef?.traits),
         traits: filterDisplayTraits(adef?.traits),
+        limited: limitedCount(adef?.traits),
       });
     });
   });
@@ -845,7 +862,10 @@ function UnitSubCard({ parent, parentName, sub, count, flavor }) {
                 <td>{w.name}</td>
                 <td className="num">{w.dmg}</td>
                 <td className="num">{w.range}</td>
-                <td className="card-traits">{w.traits}</td>
+                <td className="card-traits">
+                  {w.traits}
+                  <LimitedBubbles count={w.limited} />
+                </td>
               </tr>
             ))}
           </tbody>
@@ -927,6 +947,34 @@ function filterDisplayTraits(traits, cls) {
     })
     .filter(Boolean)
     .join(', ');
+}
+
+// Extract the Limited (X) value from a trait/rule string, resolved per class
+// (e.g. Mine Drone Carrier's "Limited (1/2/3/3)"). Returns 0 if none.
+function limitedCount(text, cls) {
+  if (!text) return 0;
+  const m = text.match(/Limited\s*\(([^)]+)\)/i);
+  if (!m) return 0;
+  const inner = m[1].trim();
+  if (inner.includes('/')) {
+    const idx = ['Light', 'Medium', 'Heavy', 'Ultraheavy'].indexOf(cls);
+    const v = parseInt((idx >= 0 ? inner.split('/')[idx] : inner.split('/')[0]), 10);
+    return isNaN(v) ? 0 : v;
+  }
+  const v = parseInt(inner, 10);
+  return isNaN(v) ? 0 : v;
+}
+
+// A row of N open bubbles for ticking off uses of a Limited (X) item in play.
+function LimitedBubbles({ count }) {
+  if (!count || count < 1) return null;
+  return (
+    <span className="limited-bubbles" aria-label={`Limited ${count}`}>
+      {Array.from({ length: count }).map((_, i) => (
+        <span key={i} className="limited-bubble" />
+      ))}
+    </span>
+  );
 }
 
 // ============================================================
