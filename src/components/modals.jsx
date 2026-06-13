@@ -3,6 +3,7 @@ import { X, Dices, Info, ChevronDown } from 'lucide-react';
 import { WC, WC_ORDER, FACTION_LOGOS } from '../data';
 import { POOL_NAMES, rollCallsign } from '../callsigns';
 import { Modal, FieldLabel, PrimaryButton, TextButton, Chip } from './ui';
+import { STARTER_LISTS, instantiateStarterList } from '../starter-lists';
 
 // Resolve absolute asset path through Vite's base
 const BASE = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '/');
@@ -590,6 +591,44 @@ export function ListsModal({ open, onClose, currentState, onLoad }) {
   return (
     <Modal open={open} onClose={onClose} title="Saved Lists" maxWidth={620}>
       <div style={{ padding: '18px 22px 22px', maxHeight: '70vh', overflowY: 'auto' }}>
+        {/* Starter lists */}
+        <FieldLabel>Starter lists</FieldLabel>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 20 }}>
+          {STARTER_LISTS.map(list => (
+            <div key={list.id} style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+              border: '1.5px solid var(--rule)', padding: '10px 14px',
+              background: 'var(--bg-deep)',
+            }}>
+              <div style={{ minWidth: 0 }}>
+                <div className="display" style={{ fontSize: 13, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+                  {list.label}
+                </div>
+                <div style={{ fontSize: 11.5, color: 'var(--mute)', marginTop: 2 }}>
+                  {list.faction} · {list.perks.join(' / ')}
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  if (!confirm('Load this starter list? Your current force will be replaced.')) return;
+                  onLoad(instantiateStarterList(list));
+                  onClose();
+                }}
+                className="add-btn"
+                style={{
+                  flexShrink: 0, background: 'var(--rust)', color: 'var(--surface)', border: 'none',
+                  padding: '6px 14px', cursor: 'pointer',
+                  fontFamily: 'var(--font-stencil)', fontSize: 11, fontWeight: 700,
+                  letterSpacing: '0.12em', textTransform: 'uppercase',
+                }}
+              >
+                Load
+              </button>
+            </div>
+          ))}
+        </div>
+        <div style={{ height: 1, background: 'var(--rule)', marginBottom: 18 }} />
+
         {/* Save current */}
         <FieldLabel>Save current build</FieldLabel>
         <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
