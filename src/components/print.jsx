@@ -174,16 +174,9 @@ export function PrintView({
     if (!a) return;
 
     const hasSubunits = a.subunits && a.subunits.length > 0;
-    if (!hasSubunits) {
-      // Off-table strike or singular asset: keep the existing one-card
-      // summary path.
-      deck.push({
-        kind: 'support',
-        asset: a,
-        customName: supportNicknames[name],
-        loadout: supportLoadouts[name],
-      });
-    } else {
+    // Off-table / no-subunit assets get NO deck card — they print as a
+    // full-text explainer with a turn tracker on the summary page instead.
+    if (hasSubunits) {
       // On-table squadron: one card per unique sub-unit type that's
       // actually picked, with the count badge on the card.
       const loadout = supportLoadouts[name] || [];
@@ -304,7 +297,6 @@ export function PrintView({
             {page.map((slot, ci) => (
               <div key={ci} className="game-card">
                 {slot.kind === 'hev' && <HEVCard mech={slot.mech} index={slot.idx} part={slot.part} items={slot.items} />}
-                {slot.kind === 'support' && <SupportCard asset={slot.asset} customName={slot.customName} loadout={slot.loadout} />}
                 {slot.kind === 'subunit' && <UnitSubCard parent={slot.parent} parentName={slot.parentName} sub={slot.sub} count={slot.count} flavor="subunit" />}
                 {slot.kind === 'garrison' && <UnitSubCard parent={slot.parent} parentName={slot.parentName} sub={slot.squad} count={slot.count} flavor="garrison" />}
               </div>
@@ -756,120 +748,6 @@ function PipBlock({ kind, total }) {
 }
 
 // ============================================================
-// SUPPORT CARD (2.5" x 3.5")
-// ============================================================
-function SupportCard({ asset: a, customName, loadout }) {
-  const stats = a.stats || {};
-  const traitStr = stats.Traits || stats.traits || '';
-  const perModelKey = Object.keys(stats).find(k => /per/i.test(k));
-  const perModelVal = perModelKey ? stats[perModelKey] : null;
-
-  // Parse ARM and STR from per-model stat string e.g. "SPD 8\", ARM 3, STR 2"
-  const armMatch = perModelVal && perModelVal.match(/ARM\s*(\d+)/i);
-  const strMatch = perModelVal && perModelVal.match(/STR\s*(\d+)/i);
-  const spdMatch = perModelVal && perModelVal.match(/SPD\s*([^,]+)/i);
-  const armVal = armMatch ? parseInt(armMatch[1]) : null;
-  const strVal = strMatch ? parseInt(strMatch[1]) : null;
-  const spdVal = spdMatch ? spdMatch[1].trim() : null;
-
-  // For off-table assets, pull Damage stat
-  const dmgVal = stats.Damage || stats.damage || null;
-  const weaponsVal = stats.Weapons || stats.weapons || null;
-
-  // Roll up the loadout
-  const loadoutBreakdown = (() => {
-    if (!loadout || loadout.length === 0) return null;
-    const counts = loadout.reduce((acc, n) => { acc[n] = (acc[n] || 0) + 1; return acc; }, {});
-    return Object.entries(counts);
-  })();
-
-  return (
-    <div className="game-card-inner">
-      <header className="card-name-band">{customName || a.name}</header>
-      <div className="card-row card-row-id">
-        <div className="card-class-band">
-          {a.kind.toUpperCase()} · {a.cost}t
-        </div>
-      </div>
-
-      {/* Stats row — SPD + Defend-On for on-table, Damage for off-table */}
-      {(spdVal || dmgVal) && (
-        <table className="card-stats-table" style={{ marginBottom: 2 }}>
-          <thead>
-            <tr>
-              {spdVal && <th>SPD</th>}
-              {dmgVal && <th>DMG</th>}
-              {spdVal && <th>Def</th>}
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              {spdVal && <td>{spdVal}</td>}
-              {dmgVal && <td>{dmgVal}</td>}
-              {spdVal && <td>4+</td>}
-            </tr>
-          </tbody>
-        </table>
-      )}
-
-      {/* Armor + Structure pips for on-table units */}
-      {(armVal || strVal) && (
-        <div className="card-row-damage" style={{ marginTop: 4 }}>
-          {armVal && (
-            <div className="card-armor-col">
-              <div className="hp-heading">ARMOR</div>
-              <PipBlock kind="armor" total={armVal} />
-            </div>
-          )}
-          {strVal && (
-            <div className="card-structure-col">
-              <div className="card-structure-stack">
-                <div className="hp-heading">STRUCTURE</div>
-                <PipBlock kind="structure" total={strVal} />
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Loadout for sub-unit pickers */}
-      {loadoutBreakdown && (
-        <>
-          <div className="card-section-heading">LOADOUT</div>
-          <ul className="card-loadout-list">
-            {loadoutBreakdown.map(([n, c]) => (
-              <li key={n}><strong>{c}×</strong> {n}</li>
-            ))}
-          </ul>
-        </>
-      )}
-
-      {/* Weapons */}
-      {weaponsVal && (
-        <>
-          <div className="card-section-heading">WEAPONS</div>
-          <div className="card-upgrades-list">{weaponsVal}</div>
-        </>
-      )}
-
-      {/* Traits */}
-      {traitStr && (
-        <>
-          <div className="card-section-heading">TRAITS</div>
-          <div className="card-upgrades-list">{traitStr}</div>
-        </>
-      )}
-
-      {a.fullDesc && (
-        <div className="card-support-rules" style={{ fontSize: '6.5pt', marginTop: 4, color: '#555' }}>
-          {a.fullDesc}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ============================================================
 // UNIT SUB-CARD
 // One card per sub-unit type (vehicle in a squadron, infantry squad
 // in a garrison, etc.). Same physical card size and structure as the
@@ -883,6 +761,28 @@ function UnitSubCard({ parent, parentName, sub, count, flavor }) {
   const weaponGroups = parseSubunitWeapons(sub.weapons || '');
   const flavorLabel = flavor === 'garrison' ? 'GARRISON' : (parent?.kind || '').toUpperCase();
 
+  // Flatten to weapon rows for the standard 4-column table, mirroring the
+  // HE-V card. Alternates ("X or Y") become their own indented "or" rows.
+  const weaponRows = [];
+  weaponGroups.forEach(g => {
+    const def = findVehicleWeapon(g.name);
+    weaponRows.push({
+      name: g.name,
+      dmg: def?.dmg || '—',
+      range: inferRange(def?.traits),
+      traits: filterDisplayTraits(def?.traits),
+    });
+    g.alts.forEach(altName => {
+      const adef = findVehicleWeapon(altName);
+      weaponRows.push({
+        name: `or ${altName}`,
+        dmg: adef?.dmg || '—',
+        range: inferRange(adef?.traits),
+        traits: filterDisplayTraits(adef?.traits),
+      });
+    });
+  });
+
   return (
     <div className="game-card-inner">
       <header className="card-name-band">
@@ -893,71 +793,63 @@ function UnitSubCard({ parent, parentName, sub, count, flavor }) {
           </span>
         )}
       </header>
-      <div className="card-row card-row-id">
-        <div className="card-class-band">
-          {flavorLabel} · {parentName}
-        </div>
-      </div>
 
-      {/* Stats line: SPD + Defend-On (Auxiliary units defend on 4+ standard) */}
-      <table className="card-stats-table" style={{ marginBottom: 2 }}>
-        <thead>
-          <tr>
-            <th>SPD</th>
-            <th>Def</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>{spdVal || '—'}</td>
-            <td>4+</td>
-          </tr>
-        </tbody>
-      </table>
+      {/* Class + stats row — same structure as the HE-V card so the stats
+          table doesn't stretch to fill the whole card. */}
+      <div className="card-row card-row-id">
+        <div className="card-class-band">{flavorLabel} · {parentName}</div>
+        <table className="card-stats-table">
+          <thead>
+            <tr><th>SPD</th><th>Def</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>{spdVal || '—'}</td><td>4+</td></tr>
+          </tbody>
+        </table>
+      </div>
 
       {/* Armor + Structure pips */}
-      <div className="card-row-damage" style={{ marginTop: 4 }}>
-        {armVal > 0 && (
-          <div className="card-armor-col">
-            <div className="hp-heading">ARMOR</div>
-            <PipBlock kind="armor" total={armVal} />
-          </div>
-        )}
-        {strVal > 0 && (
-          <div className="card-structure-col">
-            <div className="card-structure-stack">
-              <div className="hp-heading">STRUCTURE</div>
-              <PipBlock kind="structure" total={strVal} />
+      {(armVal > 0 || strVal > 0) && (
+        <div className="card-row-damage">
+          {armVal > 0 && (
+            <div className="card-armor-col">
+              <div className="hp-heading">ARMOR</div>
+              <PipBlock kind="armor" total={armVal} />
             </div>
-          </div>
-        )}
-      </div>
+          )}
+          {strVal > 0 && (
+            <div className="card-structure-col">
+              <div className="card-structure-stack">
+                <div className="hp-heading">STRUCTURE</div>
+                <PipBlock kind="structure" total={strVal} />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
-      {/* Weapons with damage + traits looked up from VEHICLE_WEAPONS */}
-      {weaponGroups.length > 0 && (
-        <>
-          <div className="card-section-heading">WEAPONS</div>
-          <div className="card-upgrades-list">
-            {weaponGroups.map((g, i) => {
-              const def = findVehicleWeapon(g.name);
-              const altDefs = g.alts.map(a => ({ name: a, def: findVehicleWeapon(a) }));
-              return (
-                <div key={i} style={{ marginBottom: 1 }}>
-                  <strong>{g.name}</strong>
-                  {def && <span style={{ color: '#555' }}>, DMG {def.dmg}</span>}
-                  {def?.traits && <span style={{ color: '#555' }}>, {def.traits}</span>}
-                  {altDefs.map((alt, ai) => (
-                    <div key={ai} style={{ marginLeft: 8 }}>
-                      or <strong>{alt.name}</strong>
-                      {alt.def && <span style={{ color: '#555' }}>, DMG {alt.def.dmg}</span>}
-                      {alt.def?.traits && <span style={{ color: '#555' }}>, {alt.def.traits}</span>}
-                    </div>
-                  ))}
-                </div>
-              );
-            })}
-          </div>
-        </>
+      {/* Weapons — identical table format to the HE-V card. */}
+      {weaponRows.length > 0 && (
+        <table className="card-weapons-table">
+          <thead>
+            <tr>
+              <th className="card-weapons-th">WEAPONS</th>
+              <th className="num">Dmg</th>
+              <th className="num">Rng</th>
+              <th>Traits</th>
+            </tr>
+          </thead>
+          <tbody>
+            {weaponRows.map((w, i) => (
+              <tr key={i}>
+                <td>{w.name}</td>
+                <td className="num">{w.dmg}</td>
+                <td className="num">{w.range}</td>
+                <td className="card-traits">{w.traits}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
 
       {/* Sub-unit traits */}
