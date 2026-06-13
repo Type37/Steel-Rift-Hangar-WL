@@ -325,11 +325,19 @@ export default function App() {
             borderRight: '1.5px solid var(--rule-strong)',
             padding: '18px 16px 24px',
           }}>
-            {/* Force summary heading */}
+            {/* Force summary heading — shows the chosen faction logo when set */}
             <div className="stencil" style={{
               fontSize: 11, color: 'var(--mute)', letterSpacing: '0.22em',
               marginBottom: 18, paddingBottom: 8, borderBottom: '1px solid var(--rule)',
+              display: 'flex', alignItems: 'center', gap: 10,
             }}>
+              {factionLogo && (
+                <img
+                  src={factionLogo}
+                  alt=""
+                  style={{ height: 28, width: 28, objectFit: 'contain', flexShrink: 0 }}
+                />
+              )}
               YOUR FORCE
             </div>
 

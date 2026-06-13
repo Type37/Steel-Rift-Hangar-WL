@@ -86,6 +86,39 @@ export const STARTER_LISTS = [
     ],
   },
 
+  // ── CERBERUS ───────────────────────────────────────────────────────────────
+  // Freelance Gunslinger Team box · 4 mechs (Chesty Light, 2× Ermey Medium, Zuma Heavy)
+  {
+    id: 'cerberus',
+    label: 'Cerberus Gunslinger Team',
+    faction: 'Freelancers',
+    perks: [],
+    mission: 'Battle',
+    supportAssets: [],
+    factionLogoFile: 'faction-logos/freelancers/cerberus-group.png',
+    mechs: [
+      { _team: 0, name: 'Chesty', weightClass: 'Light',
+        weapons: [{ name: 'Arc Gun', count: 1 }, { name: 'Shot Cannon', count: 1 }],
+        upgrades: ['Coolant Tanks', 'Haptic Suit', 'Jump Jets'],
+        defensive: [], drones: {} },
+      { _team: 0, name: 'Ermey 1', weightClass: 'Medium',
+        weapons: [{ name: 'Basic Melee Weapon', count: 1 }, { name: 'Mag Tether', count: 1 }, { name: 'Rotary Cannon', count: 1 }],
+        upgrades: ['Haptic Suit', 'Jump Jets'],
+        defensive: [], drones: {} },
+      { _team: 0, name: 'Ermey 2', weightClass: 'Medium',
+        weapons: [{ name: 'Shot Cannon', count: 2 }],
+        upgrades: ['Coolant Tanks', 'Haptic Suit', 'Jump Jets'],
+        defensive: [], drones: {} },
+      { _team: 0, name: 'Zuma', weightClass: 'Heavy',
+        weapons: [{ name: 'Plasma Blade', count: 1 }, { name: 'Rotary Cannon', count: 1 }, { name: 'Shot Cannon', count: 1 }],
+        upgrades: ['Coolant Tanks', 'Haptic Suit', 'Jump Jets'],
+        defensive: [], drones: {} },
+    ],
+    teams: [
+      { teamName: 'Gunslinger Team', mechIndices: [0, 1, 2, 3] },
+    ],
+  },
+
   // ── AKAMATSU ───────────────────────────────────────────────────────────────
   // Akamatsu Assassination Team box · 4 mechs (2 Light Haro, 2 Medium Kenshiro)
   {

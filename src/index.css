@@ -1327,6 +1327,94 @@ button:not(:disabled):active {
 }
 .print-italic { font-style: italic; color: #555; }
 
+/* ---- Combined summary / reference page (single page at the end) ----
+   Everything that isn't a card — force identity, agendas, faction perks,
+   teams, upgrades, traits — packed into a dense two-column flow so it
+   fits on one Letter page. */
+.print-summary-page {
+  padding: 0.4in 0.45in;
+  font-family: 'Schibsted Grotesk', system-ui, sans-serif;
+  color: #15110d;
+}
+.summary-head {
+  display: flex;
+  align-items: center;
+  gap: 12pt;
+  border-bottom: 2px solid #15110d;
+  padding-bottom: 8pt;
+  margin-bottom: 12pt;
+}
+.summary-logo {
+  width: 0.7in;
+  height: 0.7in;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.summary-eyebrow {
+  font-family: var(--font-body), ui-monospace, monospace;
+  font-size: 8pt;
+  letter-spacing: 0.2em;
+  color: #777;
+}
+.summary-name {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 22pt;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  line-height: 1.05;
+}
+.summary-meta {
+  font-size: 9pt;
+  color: #4a4339;
+  margin-top: 2pt;
+}
+.summary-cols {
+  column-count: 2;
+  column-gap: 0.35in;
+  font-size: 7.6pt;
+  line-height: 1.42;
+}
+.summary-sec {
+  break-inside: avoid;
+  margin-bottom: 9pt;
+}
+.summary-h2 {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 10pt;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #15110d;
+  border-bottom: 1px solid #b07400;
+  padding-bottom: 2pt;
+  margin: 0 0 4pt;
+}
+.summary-def {
+  margin-bottom: 4pt;
+  break-inside: avoid;
+}
+.summary-def-name {
+  font-weight: 700;
+  color: #15110d;
+}
+.summary-def-src {
+  font-size: 6.6pt;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7a5000;
+  margin-left: 5pt;
+}
+.summary-def-req {
+  font-size: 6.8pt;
+  font-style: italic;
+  color: #6e6552;
+}
+.summary-def-text {
+  color: #4a4339;
+}
+
 /* The 3 x 3 card grid. 2.5 x 3.5 in cards = 7.5 x 10.5 in spread.
    Letter page minus 0.25 in margins gives 8 x 10.5 in usable, so
    the grid sits centered and tight. */

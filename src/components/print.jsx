@@ -145,13 +145,25 @@ export function PrintView({
     collectTraits(a?.stats?.Traits || '').forEach(t => traitsUsed.add(t));
   });
 
+  // Everything that isn't a card lives on a single combined page at the very
+  // end. Work out up front whether there's anything to show there.
+  const agendaList = computeQualifiedAgendas(mechs, faction, selectedTeams);
+  const upgradesUsed = new Set();
+  mechs.forEach(m => m.upgrades.forEach(u => upgradesUsed.add(u)));
+  const hasSummary =
+    agendaList.length > 0 ||
+    (faction && perks.length > 0) ||
+    selectedTeams.length > 0 ||
+    traitsUsed.size > 0 ||
+    upgradesUsed.size > 0;
+
   return (
     <div className={previewMode ? 'print-preview-mode' : 'print-only'}>
       {previewMode && (
         <div className="print-preview-toolbar no-print">
           <div className="print-preview-toolbar-left">
             <span className="print-preview-toolbar-title">Print Preview</span>
-            <span className="print-preview-toolbar-meta">{pages.length + 2} pages</span>
+            <span className="print-preview-toolbar-meta">{pages.length + (hasSummary ? 1 : 0)} pages</span>
             <div className="print-size-toggle" role="group" aria-label="Card size">
               <button
                 className={cardSize === 'poker' ? 'is-active' : ''}
@@ -179,25 +191,7 @@ export function PrintView({
       )}
 
       <div className={previewMode ? 'print-preview-pages' : ''}>
-      <div className="print-page print-cover">
-        <ForceHeader
-          forceName={forceName}
-          mission={mission}
-          useCustom={useCustom}
-          cap={cap}
-          totalTons={totalTons}
-          mechCount={mechs.length}
-          supportCount={supportAssets.length}
-          faction={faction}
-          perks={perks}
-          teams={selectedTeams}
-          factionLogo={factionLogo}
-        />
-      </div>
-
-      {/* AGENDA PAGE — always page 1 after cover */}
-      <AgendaPage mechs={mechs} faction={faction} selectedTeams={selectedTeams} />
-
+      {/* CARDS FIRST — the printed deck always leads. */}
       {pages.map((page, pi) => (
         <div key={pi} className="print-page print-cards-page">
           <div className={`page-card-grid ${cardSize === 'tarot' ? 'tarot' : ''}`}>
@@ -216,16 +210,25 @@ export function PrintView({
         </div>
       ))}
 
-      {(traitsUsed.size > 0 || (faction && perks.length > 0) || selectedTeams.length > 0) && (
-        <div className="print-page print-ref-page">
-          <ReferencePage
-            faction={faction}
-            perks={perks}
-            teams={selectedTeams}
-            traits={Array.from(traitsUsed).sort()}
-            mechs={mechs}
-          />
-        </div>
+      {/* Everything else — force identity, agendas, faction rules, teams,
+          upgrades, traits — packed onto a single reference page at the end. */}
+      {hasSummary && (
+        <SummaryPage
+          forceName={forceName}
+          mission={mission}
+          useCustom={useCustom}
+          cap={cap}
+          totalTons={totalTons}
+          mechCount={mechs.length}
+          supportCount={supportAssets.length}
+          faction={faction}
+          perks={perks}
+          teams={selectedTeams}
+          factionLogo={factionLogo}
+          mechs={mechs}
+          agendas={agendaList}
+          traits={Array.from(traitsUsed).sort()}
+        />
       )}
       </div>
     </div>
@@ -233,50 +236,114 @@ export function PrintView({
 }
 
 // ============================================================
-// FORCE HEADER (cover sheet)
+// SUMMARY PAGE (single combined back page)
+// Force identity + agendas + faction perks + teams + upgrades + traits,
+// all packed onto one Letter page in a dense two-column flow.
 // ============================================================
-function ForceHeader({
-  forceName, mission, useCustom, cap, totalTons,
-  mechCount, supportCount, faction, perks, teams, factionLogo,
+function SummaryPage({
+  forceName, mission, useCustom, cap, totalTons, mechCount, supportCount,
+  faction, perks, teams, factionLogo, mechs, agendas, traits,
 }) {
+  const factionData = faction ? FACTIONS[faction] : null;
+
+  const teamDefs = teams
+    .map(name => TEAMS.find(t => t.name === name))
+    .filter(Boolean);
+
+  const upgradesUsed = new Set();
+  mechs.forEach(m => m.upgrades.forEach(u => upgradesUsed.add(u)));
+  const upgradeDefs = Array.from(upgradesUsed)
+    .map(name => UPGRADES.find(u => u.name === name))
+    .filter(Boolean);
+
   return (
-    <div className="print-cover-inner">
-      {factionLogo && (
-        <img src={factionLogo} alt="" className="print-faction-logo" />
-      )}
-      <div className="print-force-id">
-        <div className="print-force-eyebrow">FORCE ROSTER</div>
-        <div className="print-force-name">
-          {forceName || 'Unnamed Force'}
-        </div>
-        <div className="print-force-meta">
-          {mission}{useCustom ? '' : ' Mission'} · {totalTons} / {cap} tons · {mechCount} HE-V{mechCount === 1 ? '' : 's'} · {supportCount} support
+    <div className="print-page print-summary-page">
+      {/* Force identity banner */}
+      <div className="summary-head">
+        {factionLogo && (
+          <img src={factionLogo} alt="" className="summary-logo" />
+        )}
+        <div className="summary-head-text">
+          <div className="summary-eyebrow">FORCE ROSTER</div>
+          <div className="summary-name">{forceName || 'Unnamed Force'}</div>
+          <div className="summary-meta">
+            {mission}{useCustom ? '' : ' Mission'} · {totalTons} / {cap}t · {mechCount} HE-V{mechCount === 1 ? '' : 's'} · {supportCount} support
+            {faction ? ` · ${faction}` : ''}
+          </div>
         </div>
       </div>
 
-      {faction && (
-        <div className="print-block">
-          <div className="print-block-label">Faction</div>
-          <div className="print-block-value">{faction}</div>
-          {perks.length > 0 && (
-            <div className="print-block-sub">
-              Perks: {perks.join(' · ')}
-            </div>
-          )}
-          {FACTIONS[faction]?.agenda && (
-            <div className="print-block-sub print-italic">
-              Agenda: {FACTIONS[faction].agenda}
-            </div>
-          )}
-        </div>
-      )}
+      <div className="summary-cols">
+        {agendas.length > 0 && (
+          <section className="summary-sec">
+            <h2 className="summary-h2">Secondary Agendas</h2>
+            {agendas.map((a, i) => (
+              <div key={i} className="summary-def">
+                <span className="summary-def-name">{a.name}</span>
+                <span className="summary-def-src">{a.source}</span>
+                {a.req && <span className="summary-def-req"> — requires {a.req}</span>}
+                <div className="summary-def-text">{a.text}</div>
+              </div>
+            ))}
+          </section>
+        )}
 
-      {teams.length > 0 && (
-        <div className="print-block">
-          <div className="print-block-label">HE-V Teams</div>
-          <div className="print-block-value">{teams.join(' · ')}</div>
-        </div>
-      )}
+        {factionData && perks.length > 0 && (
+          <section className="summary-sec">
+            <h2 className="summary-h2">{faction} Perks</h2>
+            {perks.map(perkName => {
+              const def = findPerk(factionData, perkName);
+              if (!def) return null;
+              return (
+                <div key={perkName} className="summary-def">
+                  <span className="summary-def-name">{perkName}</span>
+                  <div className="summary-def-text">{def.text}</div>
+                </div>
+              );
+            })}
+          </section>
+        )}
+
+        {teamDefs.length > 0 && (
+          <section className="summary-sec">
+            <h2 className="summary-h2">HE-V Teams</h2>
+            {teamDefs.map(t => (
+              <div key={t.name} className="summary-def">
+                <span className="summary-def-name">{t.name}</span>
+                <div className="summary-def-text">{t.blurb}</div>
+              </div>
+            ))}
+          </section>
+        )}
+
+        {upgradeDefs.length > 0 && (
+          <section className="summary-sec">
+            <h2 className="summary-h2">Upgrade Rules</h2>
+            {upgradeDefs.map(u => (
+              <div key={u.name} className="summary-def">
+                <span className="summary-def-name">{u.name}</span>
+                <div className="summary-def-text">{u.rule}</div>
+              </div>
+            ))}
+          </section>
+        )}
+
+        {traits.length > 0 && (
+          <section className="summary-sec">
+            <h2 className="summary-h2">Traits in Play</h2>
+            {traits.map(t => {
+              const def = GLOSSARY[t];
+              if (!def) return null;
+              return (
+                <div key={t} className="summary-def">
+                  <span className="summary-def-name">{def.title}</span>
+                  <div className="summary-def-text">{def.text}</div>
+                </div>
+              );
+            })}
+          </section>
+        )}
+      </div>
     </div>
   );
 }
@@ -719,90 +786,6 @@ function chunk(arr, n) {
   return out;
 }
 
-// ============================================================
-// REFERENCE PAGE
-// ============================================================
-function ReferencePage({ faction, perks, teams, traits, mechs }) {
-  const upgradesUsed = new Set();
-  mechs.forEach(m => m.upgrades.forEach(u => upgradesUsed.add(u)));
-  const upgradeDefs = Array.from(upgradesUsed)
-    .map(name => UPGRADES.find(u => u.name === name))
-    .filter(Boolean);
-
-  const teamDefs = teams
-    .map(name => TEAMS.find(t => t.name === name))
-    .filter(Boolean);
-
-  const factionData = faction ? FACTIONS[faction] : null;
-
-  return (
-    <div className="print-ref">
-      <h1 className="print-ref-h1">Reference</h1>
-
-      {factionData && perks.length > 0 && (
-        <section className="print-ref-section">
-          <h2 className="print-ref-h2">{faction} Perks</h2>
-          <dl className="print-ref-dl">
-            {perks.map(perkName => {
-              const perkDef = findPerk(factionData, perkName);
-              if (!perkDef) return null;
-              return (
-                <React.Fragment key={perkName}>
-                  <dt>{perkName}</dt>
-                  <dd>{perkDef.text}</dd>
-                </React.Fragment>
-              );
-            })}
-          </dl>
-        </section>
-      )}
-
-      {teamDefs.length > 0 && (
-        <section className="print-ref-section">
-          <h2 className="print-ref-h2">HE-V Teams</h2>
-          {teamDefs.map(t => (
-            <div key={t.name} className="print-ref-team">
-              <div className="print-ref-team-name">{t.name}</div>
-              <div className="print-ref-team-blurb">{t.blurb}</div>
-            </div>
-          ))}
-        </section>
-      )}
-
-      {upgradeDefs.length > 0 && (
-        <section className="print-ref-section">
-          <h2 className="print-ref-h2">Upgrade Rules</h2>
-          <dl className="print-ref-dl">
-            {upgradeDefs.map(u => (
-              <React.Fragment key={u.name}>
-                <dt>{u.name}</dt>
-                <dd>{u.rule}</dd>
-              </React.Fragment>
-            ))}
-          </dl>
-        </section>
-      )}
-
-      {traits.length > 0 && (
-        <section className="print-ref-section">
-          <h2 className="print-ref-h2">Traits in Play</h2>
-          <dl className="print-ref-dl print-ref-dl-2col">
-            {traits.map(t => {
-              const def = GLOSSARY[t];
-              if (!def) return null;
-              return (
-                <React.Fragment key={t}>
-                  <dt>{def.title}</dt>
-                  <dd>{def.text}</dd>
-                </React.Fragment>
-              );
-            })}
-          </dl>
-        </section>
-      )}
-    </div>
-  );
-}
 
 function findPerk(factionData, name) {
   for (const group of Object.values(factionData.perks || {})) {
@@ -846,12 +829,10 @@ function filterDisplayTraits(traits) {
 }
 
 // ============================================================
-// AGENDA PAGE — page 1 after cover
-// Shows every secondary agenda the force qualifies for,
-// with full verbatim text. No summaries.
+// AGENDAS — every secondary agenda the force qualifies for, with full
+// verbatim text. Computation only; rendering happens on the SummaryPage.
 // ============================================================
-
-function AgendaPage({ mechs, faction, selectedTeams }) {
+function computeQualifiedAgendas(mechs, faction, selectedTeams) {
   const lightCount  = mechs.filter(m => m.weightClass === 'Light').length;
   const mediumCount = mechs.filter(m => m.weightClass === 'Medium').length;
   const heavyCount  = mechs.filter(m => m.weightClass === 'Heavy').length;
@@ -895,28 +876,5 @@ function AgendaPage({ mechs, faction, selectedTeams }) {
     });
   });
 
-  if (qualified.length === 0) return null;
-
-  return (
-    <div className="print-page print-agenda-page">
-      <div className="agenda-page-header">
-        <div className="agenda-page-title">Secondary Agendas</div>
-        <div className="agenda-page-sub">{qualified.length} available for this force</div>
-      </div>
-      <div className="agenda-list">
-        {qualified.map((a, i) => (
-          <div key={i} className="agenda-entry">
-            <div className="agenda-entry-head">
-              <span className="agenda-entry-name">{a.name}</span>
-              <span className="agenda-entry-source">{a.source}</span>
-            </div>
-            {a.req && (
-              <div className="agenda-entry-req">Requires: {a.req}</div>
-            )}
-            <div className="agenda-entry-text">{a.text}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+  return qualified;
 }
