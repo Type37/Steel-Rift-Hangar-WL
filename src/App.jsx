@@ -304,6 +304,7 @@ export default function App() {
         forceName={forceName} mission={mission} customTons={customTons}
         mechs={mechs} supportAssets={supportAssets}
         faction={faction} perks={perks} selectedTeams={selectedTeams}
+        teamAssignments={teamAssignments}
         activePerks={activePerks}
         simpleMode={simpleMode}
         factionLogo={factionLogo}

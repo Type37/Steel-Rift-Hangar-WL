@@ -140,11 +140,14 @@ function subunitTraitItems(sub) {
 
 // Height of the always-on-front sections of a sub-unit card (name, stats,
 // pips, weapons table, and the full trait-names line).
-function subunitFrontHeight(sub, parent, flavor) {
+function subunitFrontHeight(sub, parent, flavor, count = 1) {
   let h = 20 + 30;
   const arm = parseInt(sub.arm, 10) || 0;
   const str = parseInt(sub.str, 10) || 0;
-  if (arm > 0 || str > 0) h += 18 + Math.max(Math.ceil(arm / 5), Math.ceil(str / 6), 1) * 12;
+  if (arm > 0 || str > 0) {
+    const pipRows = Math.max(Math.ceil(arm / 5), Math.ceil(str / 6), 1);
+    h += count > 1 ? 14 + count * (pipRows * 11 + 3) : 18 + pipRows * 12;
+  }
   const rows = parseSubunitWeapons(sub.weapons || '').reduce((n, g) => n + 1 + g.alts.length, 0);
   if (rows) h += 16 + rows * 13;
   h += 14 + estimateLines(subunitTraitString(sub, parent, flavor), EST_CPL) * EST_LINE; // TRAITS heading + names line
@@ -155,7 +158,7 @@ function subunitFrontHeight(sub, parent, flavor) {
 // cards when its trait definitions overflow one face (mirrors the HE-V split).
 function pushUnitCard(deck, base, sub, parent, flavor, cardCapacity) {
   const items = subunitTraitItems(sub);
-  const front = subunitFrontHeight(sub, parent, flavor);
+  const front = subunitFrontHeight(sub, parent, flavor, base.count || 1);
   const spill = items.reduce((s, it) => s + it.height, 0) + (items.length ? 14 : 0);
   if (items.length === 0 || front + spill <= cardCapacity) {
     deck.push({ ...base, part: 'full', traitItems: items });
@@ -187,6 +190,7 @@ function pushUnitCard(deck, base, sub, parent, flavor, cardCapacity) {
 export function PrintView({
   forceName, mission, customTons, mechs,
   supportAssets, faction, perks, selectedTeams, simpleMode,
+  teamAssignments = {},
   factionLogo, supportNicknames = {}, supportLoadouts = {}, activePerks = [],
   garrisonLoadouts = {},
   previewMode = false, onClosePreview,
@@ -195,6 +199,17 @@ export function PrintView({
   // (4 per sheet, fits standard tarot sleeves and gives loaded mechs more room).
   const [cardSize, setCardSize] = React.useState('poker');
   const perPage = cardSize === 'tarot' ? 4 : 9;
+
+  // Per-mech team membership and team sizes, used to (a) badge each HE-V card
+  // with its team and (b) apply team-conditional Limited bonuses (Berserker
+  // Nitro Boost, Fire Support Cluster Rockets).
+  const teamSizes = {};
+  Object.entries(teamAssignments).forEach(([tn, ids]) => {
+    teamSizes[tn] = (ids || []).filter(id => typeof id === 'string' && id.startsWith('hev:')).length;
+  });
+  const teamsForMech = (mechId) => Object.entries(teamAssignments)
+    .filter(([, ids]) => (ids || []).includes(`hev:${mechId}`))
+    .map(([tn]) => tn);
 
   const useCustom = mission === 'Custom';
   const cap = useCustom ? customTons : MISSIONS[mission].tons;
@@ -377,7 +392,7 @@ export function PrintView({
           <div className={`page-card-grid ${cardSize === 'tarot' ? 'tarot' : ''}`}>
             {page.map((slot, ci) => (
               <div key={ci} className="game-card">
-                {slot.kind === 'hev' && <HEVCard mech={slot.mech} index={slot.idx} part={slot.part} items={slot.items} />}
+                {slot.kind === 'hev' && <HEVCard mech={slot.mech} index={slot.idx} part={slot.part} items={slot.items} mechTeams={teamsForMech(slot.mech.id)} teamSizes={teamSizes} />}
                 {slot.kind === 'subunit' && <UnitSubCard parent={slot.parent} parentName={slot.parentName} sub={slot.sub} count={slot.count} flavor="subunit" part={slot.part} traitItems={slot.traitItems} />}
                 {slot.kind === 'garrison' && <UnitSubCard parent={slot.parent} parentName={slot.parentName} sub={slot.squad} count={slot.count} flavor="garrison" part={slot.part} traitItems={slot.traitItems} />}
               </div>
@@ -581,7 +596,7 @@ function SummaryPage({
 // ============================================================
 // HE-V CARD (2.5" x 3.5")
 // ============================================================
-function HEVCard({ mech, index, part = 'full', items = [] }) {
+function HEVCard({ mech, index, part = 'full', items = [], mechTeams = [], teamSizes = {} }) {
   const wc = WC[mech.weightClass];
   const cls = mech.weightClass;
   const isCont = part === 'cont';   // continuation card: a slice of upgrades/rules
@@ -608,7 +623,7 @@ function HEVCard({ mech, index, part = 'full', items = [] }) {
       dmg: isMelee ? meleeDamage(w, cls) : `${dmg}`,
       range,
       traits: filterDisplayTraits(w.traits, cls),
-      limited: limitedCount(w.traits, cls) * (count || 1),
+      limited: teamLimitedOverride(name, limitedCount(w.traits, cls), cls, mechTeams, teamSizes) * (count || 1),
     };
   }).filter(Boolean);
 
@@ -630,6 +645,10 @@ function HEVCard({ mech, index, part = 'full', items = [] }) {
         {mech.name || `${cls.toUpperCase()} HE-V`}
         {isCont && <span className="card-cont-flag">CONT'D</span>}
       </header>
+
+      {!isCont && mechTeams.length > 0 && (
+        <div className="card-team-badge">{mechTeams.join(' · ')}</div>
+      )}
 
       {!isCont && (
         <>
@@ -727,7 +746,7 @@ function HEVCard({ mech, index, part = 'full', items = [] }) {
                     <div key={u.name} className="card-upgrade-def-entry">
                       <span className="card-trait-def-name">{u.name}{suffix}:</span>{' '}
                       <span className="card-upgrade-def-rule">{u.rule}</span>
-                      <LimitedBubbles count={limitedCount(u.rule, cls)} />
+                      <LimitedBubbles count={teamLimitedOverride(u.name, limitedCount(u.rule, cls), cls, mechTeams, teamSizes)} />
                     </div>
                   );
                 })}
@@ -784,7 +803,7 @@ function HEVCard({ mech, index, part = 'full', items = [] }) {
                     <div key={u.name} className="card-upgrade-def-entry">
                       <span className="card-trait-def-name">{u.name}:</span>{' '}
                       <span className="card-upgrade-def-rule">{u.rule}</span>
-                      <LimitedBubbles count={limitedCount(u.rule, cls)} />
+                      <LimitedBubbles count={teamLimitedOverride(u.name, limitedCount(u.rule, cls), cls, mechTeams, teamSizes)} />
                     </div>
                   ))}
                 </div>
@@ -921,8 +940,10 @@ function UnitSubCard({ parent, parentName, sub, count, flavor, part = 'full', tr
             </table>
           </div>
 
-          {/* Armor + Structure pips */}
-          {(armVal > 0 || strVal > 0) && (
+          {/* HP. One model → labelled ARMOR/STRUCTURE blocks. Multiple models
+              of the same type (e.g. 6 Infantry Rifle squads) → one numbered
+              HP row per model on this single card, so each is tracked. */}
+          {(armVal > 0 || strVal > 0) && count <= 1 && (
             <div className="card-row-damage">
               {armVal > 0 && (
                 <div className="card-armor-col">
@@ -939,6 +960,22 @@ function UnitSubCard({ parent, parentName, sub, count, flavor, part = 'full', tr
                 </div>
               )}
             </div>
+          )}
+          {(armVal > 0 || strVal > 0) && count > 1 && (
+            <>
+              <div className="card-section-heading">
+                MODELS{armVal > 0 ? ' · A' : ''}{strVal > 0 ? ' · S' : ''}
+              </div>
+              <div className="card-model-grid">
+                {Array.from({ length: count }).map((_, i) => (
+                  <div key={i} className="card-model-row">
+                    <span className="card-model-num">{i + 1}</span>
+                    {armVal > 0 && <PipBlock kind="armor" total={armVal} />}
+                    {strVal > 0 && <PipBlock kind="structure" total={strVal} />}
+                  </div>
+                ))}
+              </div>
+            </>
           )}
 
           {/* Weapons — identical table format to the HE-V card. */}
@@ -1085,6 +1122,22 @@ function limitedCount(text, cls) {
   }
   const v = parseInt(inner, 10);
   return isNaN(v) ? 0 : v;
+}
+
+// Apply team-conditional bonuses to an item's per-copy Limited value:
+//   Berserker Team  — UH Nitro Boost → Limited 2 at 3+ members; Heavy at 4.
+//   Fire Support    — Light Cluster Rockets → +1 Limited at 4 members.
+function teamLimitedOverride(name, base, cls, mechTeams = [], teamSizes = {}) {
+  let v = base;
+  if (mechTeams.includes('Berserker Team') && name === 'Nitro Boost') {
+    const sz = teamSizes['Berserker Team'] || 0;
+    if ((cls === 'Ultraheavy' && sz >= 3) || (cls === 'Heavy' && sz >= 4)) v = Math.max(v, 2);
+  }
+  if (mechTeams.includes('Fire Support Team') && name === 'Cluster Rockets' && cls === 'Light') {
+    const sz = teamSizes['Fire Support Team'] || 0;
+    if (sz >= 4) v = base + 1;
+  }
+  return v;
 }
 
 // A row of N open bubbles for ticking off uses of a Limited (X) item in play.

@@ -1198,6 +1198,10 @@ button:not(:disabled):active {
     page-break-after: auto;
     break-after: auto;
   }
+  /* Summary/reference page is allowed to flow across multiple printed pages;
+     fill each page's columns top-to-bottom rather than balancing one tall box. */
+  .print-summary-page { break-inside: auto; }
+  .summary-cols { column-fill: auto; }
 }
 
 
@@ -1335,10 +1339,11 @@ button:not(:disabled):active {
 }
 .print-italic { font-style: italic; color: #555; }
 
-/* ---- Combined summary / reference page (single page at the end) ----
-   Everything that isn't a card — force identity, agendas, faction perks,
-   teams, upgrades, traits — packed into a dense two-column flow so it
-   fits on one Letter page. */
+/* ---- Combined summary / reference page (at the end) ----
+   Everything that isn't a card — force identity, off-table support, agendas,
+   faction perks, teams, upgrades, traits — in a dense two-column flow. It
+   targets one Letter page but is free to wrap onto 2-3 pages for big forces;
+   sections never split mid-block (break-inside: avoid). */
 .print-summary-page {
   padding: 0.4in 0.45in;
   font-family: 'Schibsted Grotesk', system-ui, sans-serif;
@@ -1562,6 +1567,38 @@ button:not(:disabled):active {
   color: #b07400;
   text-align: right;
 }
+/* Per-model HP rows for a stack of identical support sub-units. */
+.card-model-grid {
+  padding: 1pt 4pt 0;
+}
+.card-model-row {
+  display: flex;
+  align-items: center;
+  gap: 5pt;
+  margin-bottom: 1.5pt;
+}
+.card-model-num {
+  font-family: var(--font-body), ui-monospace, monospace;
+  font-size: 6.5pt;
+  font-weight: 700;
+  color: #6e6552;
+  width: 9pt;
+  flex-shrink: 0;
+  text-align: right;
+}
+.card-model-row .hp-container { padding-top: 0; }
+
+/* Team membership badge under an HE-V card's name band. */
+.card-team-badge {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 6.8pt;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #7a5000;
+  padding: 1pt 4pt 0;
+}
+
 /* Compact full trait-names line on sub-unit cards (shared traits included). */
 .card-trait-names {
   font-size: 6.5pt;
