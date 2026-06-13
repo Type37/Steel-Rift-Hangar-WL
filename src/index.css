@@ -1429,6 +1429,36 @@ button:not(:disabled):active {
   color: #7a5000;
 }
 
+/* Off-table support: full-text explainer + per-turn usage tracker. */
+.summary-support { margin-bottom: 7pt; }
+.summary-turn-track {
+  display: flex;
+  gap: 5pt;
+  margin-top: 3pt;
+}
+.turn-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1pt;
+}
+.turn-num {
+  font-family: var(--font-body), ui-monospace, monospace;
+  font-size: 6.5pt;
+  font-weight: 700;
+  color: #4a4339;
+  line-height: 1;
+}
+.turn-bubble {
+  width: 11pt;
+  height: 11pt;
+  border: 1px solid #15110d;
+  border-radius: 50%;
+  background: #fff;
+}
+.turn-cell-dim .turn-num { color: #a89f8c; }
+.turn-cell-dim .turn-bubble { border-color: #b8b0a0; }
+
 /* The 3 x 3 card grid. 2.5 x 3.5 in cards = 7.5 x 10.5 in spread.
    Letter page minus 0.25 in margins gives 8 x 10.5 in usable, so
    the grid sits centered and tight. */

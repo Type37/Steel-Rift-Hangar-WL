@@ -150,12 +150,20 @@ export function PrintView({
   const agendaList = computeQualifiedAgendas(mechs, faction, selectedTeams);
   const upgradesUsed = new Set();
   mechs.forEach(m => m.upgrades.forEach(u => upgradesUsed.add(u)));
+
+  // Off-table support assets (no sub-units) get a full-text explainer plus a
+  // per-turn usage tracker on the summary page rather than a deck card.
+  const offTableSupport = supportAssets
+    .map(name => ({ name, asset: findAsset(name), nickname: supportNicknames[name] }))
+    .filter(x => x.asset && (!x.asset.subunits || x.asset.subunits.length === 0));
+
   const hasSummary =
     agendaList.length > 0 ||
     (faction && perks.length > 0) ||
     selectedTeams.length > 0 ||
     traitsUsed.size > 0 ||
-    upgradesUsed.size > 0;
+    upgradesUsed.size > 0 ||
+    offTableSupport.length > 0;
 
   return (
     <div className={previewMode ? 'print-preview-mode' : 'print-only'}>
@@ -227,6 +235,7 @@ export function PrintView({
           factionLogo={factionLogo}
           mechs={mechs}
           agendas={agendaList}
+          offTableSupport={offTableSupport}
           traits={Array.from(traitsUsed).sort()}
         />
       )}
@@ -242,7 +251,7 @@ export function PrintView({
 // ============================================================
 function SummaryPage({
   forceName, mission, useCustom, cap, totalTons, mechCount, supportCount,
-  faction, perks, teams, factionLogo, mechs, agendas, traits,
+  faction, perks, teams, factionLogo, mechs, agendas, offTableSupport = [], traits,
 }) {
   const factionData = faction ? FACTIONS[faction] : null;
 
@@ -274,6 +283,27 @@ function SummaryPage({
       </div>
 
       <div className="summary-cols">
+        {offTableSupport.length > 0 && (
+          <section className="summary-sec">
+            <h2 className="summary-h2">Off-Table Support</h2>
+            {offTableSupport.map(({ name, asset, nickname }) => (
+              <div key={name} className="summary-def summary-support">
+                <span className="summary-def-name">{nickname || asset.name}</span>
+                <span className="summary-def-src">{asset.kind} · {asset.cost}t</span>
+                {asset.fullDesc && <div className="summary-def-text">{asset.fullDesc}</div>}
+                <div className="summary-turn-track" aria-label="Turn used">
+                  {[1, 2, 3, 4, 5, 6].map(n => (
+                    <div key={n} className={`turn-cell${n === 6 ? ' turn-cell-dim' : ''}`}>
+                      <div className="turn-num">{n}</div>
+                      <div className="turn-bubble" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </section>
+        )}
+
         {agendas.length > 0 && (
           <section className="summary-sec">
             <h2 className="summary-h2">Secondary Agendas</h2>
