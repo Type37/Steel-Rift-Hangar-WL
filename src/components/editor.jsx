@@ -861,7 +861,6 @@ const WEAPON_ICONS = {
   'Howitzer':         'p10_11_Howitzer.png',
   'Shock Net':        'p10_12_Shock_Net.png',
   'Pulse Salvo':      'p10_13_Pulse_Salvo.png',
-  'AA Missiles':      'p10_14_Lens.png',
   'Cluster Rockets':  'p10_15_Rockets.png',
   'Rocket Pack':      'p10_15_Rockets.png',
   'Missiles':         'p10_16_Missiles.png',
