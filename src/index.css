@@ -1485,6 +1485,28 @@ button:not(:disabled):active {
 }
 .game-card-blank { outline: 1px dashed #ccc; }
 
+/* Continuation-card markers: a flag in the name band and a pointer on the
+   primary card telling the player the upgrades/rules continue overleaf. */
+.card-cont-flag {
+  margin-left: 6px;
+  font-family: var(--font-body), ui-monospace, monospace;
+  font-size: 6.5pt;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #b07400;
+  vertical-align: middle;
+}
+.card-cont-note {
+  margin-top: auto;
+  padding-top: 4pt;
+  font-family: var(--font-body), ui-monospace, monospace;
+  font-size: 6.8pt;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #b07400;
+  text-align: right;
+}
+
 /* Tarot-size cards: 2.75" x 4.75" (fits standard tarot penny sleeves),
    2x2 = 4 per Letter sheet. Gives loaded HE-Vs ~36% more height. */
 .page-card-grid.tarot {

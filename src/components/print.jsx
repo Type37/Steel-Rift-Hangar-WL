@@ -33,12 +33,82 @@ function parseSubunitWeapons(str) {
   }).filter(g => g.name);
 }
 
+// Class-specific special-rule text, shared by the HE-V card and the overflow
+// estimator so both agree on how much space the rules consume.
+const FRAGILE_INTERNALS_TEXT = 'Whenever this Unit suffers Structure Damage, the Target Commander rolls 1D6 per point of Structure Damage lost. On a 5+, the Unit suffers one additional point of Damage. This does not trigger further Fragile Internals rolls.';
+const BACKUP_SYSTEMS_TEXT = 'Whenever this Unit suffers Structure Damage, the Target Commander rolls 1D6 per point of Structure Damage lost. On a 5+, a point of Damage is ignored and the Structure is not reduced.';
+
+// Resolve a mech's upgrade + defensive configs to their data definitions
+// (filtering out ones unavailable to its class).
+function resolveMechUpgrades(mech) {
+  const cls = mech.weightClass;
+  const upgrades = mech.upgrades
+    .map(n => UPGRADES.find(u => u.name === n))
+    .filter(u => u && valForClass(u.cost, cls) !== '-');
+  const defensive = mech.defensive
+    .map(n => DEFENSIVE.find(d => d.name === n))
+    .filter(d => d && valForClass(d.cost, cls) !== '-');
+  return [...upgrades, ...defensive];
+}
+
+// Rough height estimates (pt). Used ONLY to decide when a loaded HE-V
+// overflows its card face and to paginate the spill across continuation
+// cards; not a pixel-accurate layout.
+const EST_LINE = 8.6, EST_CPL = 44;
+function estimateLines(text, charsPerLine = EST_CPL) {
+  if (!text) return 0;
+  return Math.max(1, Math.ceil(text.length / charsPerLine));
+}
+
+// Height of the sections that always stay on the primary card:
+// name band, class/stats row, armor/structure pips, and the weapons table.
+function mechFrontHeight(mech) {
+  const cls = mech.weightClass;
+  let front = 20 + 30;
+  const armorRows = Math.ceil((mech.armor || 0) / 5);
+  const structRows = Math.ceil((mech.structure || 0) / 6);
+  front += 18 + Math.max(armorRows, structRows, 1) * 12;
+  const weaponCount = mech.weapons.filter(w => {
+    const wd = findWeapon(w.name);
+    return wd && valForClass(wd.cost, cls) !== '-';
+  }).length;
+  if (weaponCount) front += 16 + weaponCount * 13;
+  return front;
+}
+
+// The spillable items — each upgrade/defensive config and each class special
+// rule — with an estimated height, so they can be packed onto continuation
+// cards. Order is preserved (upgrades first, then special rules).
+function mechSpillItems(mech) {
+  const cls = mech.weightClass;
+  const items = [];
+  resolveMechUpgrades(mech).forEach(u => {
+    const drones = mech.drones || {};
+    const droneEntries = Object.entries(drones).filter(([, target]) => target === u.name);
+    const suffix = droneEntries.length ? ` [${droneEntries.map(([d]) => d).join(', ')}]` : '';
+    items.push({
+      kind: 'upgrade',
+      name: u.name + suffix,
+      rule: u.rule,
+      height: estimateLines(`${u.name}: ${u.rule}`) * EST_LINE + 3,
+    });
+  });
+  if (cls === 'Light') {
+    items.push({ kind: 'special', name: 'Fragile Internals', rule: FRAGILE_INTERNALS_TEXT, height: estimateLines(FRAGILE_INTERNALS_TEXT) * EST_LINE + 6 });
+  }
+  if (cls === 'Ultraheavy') {
+    items.push({ kind: 'special', name: 'Backup Systems Engage', rule: BACKUP_SYSTEMS_TEXT, height: estimateLines(BACKUP_SYSTEMS_TEXT) * EST_LINE + 6 });
+  }
+  return items;
+}
+
 // ============================================================
 // PRINT VIEW
 // 2.5" x 3.5" game cards arranged 3 x 3 per Letter page, matching
-// the original Death Ray Designs Hangar layout. After all the cards,
-// a reference section prints faction perks, teams, traits, and upgrade
-// rules on full-width pages.
+// the original Death Ray Designs Hangar layout. Heavily-loaded HE-Vs that
+// don't fit on one face spill their upgrades + special rules onto a
+// continuation card in the next slot. After all the cards, a single combined
+// reference page prints agendas, perks, teams, traits, and upgrade rules.
 // ============================================================
 
 export function PrintView({
@@ -63,8 +133,36 @@ export function PrintView({
   // its standalone card (off-table strikes) or one card per unique
   // sub-unit type (vehicle squadrons, air squadrons, etc.) plus one card
   // per unique garrison squad type held inside that asset.
+  //
+  // A heavily-loaded HE-V whose content won't fit on one face spills its
+  // upgrades + special rules onto a continuation card placed in the next
+  // slot ("front" + "cont"); everything else prints as a single "full" card.
+  const cardCapacity = cardSize === 'tarot' ? 340 : 248;
   const deck = [];
-  mechs.forEach((m, i) => deck.push({ kind: 'hev', mech: m, idx: i }));
+  mechs.forEach((m, i) => {
+    const front = mechFrontHeight(m);
+    const items = mechSpillItems(m);
+    const spill = items.reduce((s, it) => s + it.height, 0) + (items.length ? 14 : 0);
+    // Fits on one face → single card.
+    if (spill <= 24 || front + spill <= cardCapacity) {
+      deck.push({ kind: 'hev', mech: m, idx: i, part: 'full' });
+      return;
+    }
+    // Overflows → primary card with stats/weapons, then pack the upgrade/rule
+    // items onto as many continuation cards as it takes.
+    deck.push({ kind: 'hev', mech: m, idx: i, part: 'front' });
+    const contCap = cardCapacity - 30; // name band + section heading allowance
+    let page = [], used = 0;
+    items.forEach(it => {
+      if (page.length && used + it.height > contCap) {
+        deck.push({ kind: 'hev', mech: m, idx: i, part: 'cont', items: page });
+        page = []; used = 0;
+      }
+      page.push(it);
+      used += it.height;
+    });
+    if (page.length) deck.push({ kind: 'hev', mech: m, idx: i, part: 'cont', items: page });
+  });
 
   // Track which asset names we've already emitted garrison cards for, so
   // duplicate asset entries (taking 2 of the same Outpost) don't emit
@@ -205,7 +303,7 @@ export function PrintView({
           <div className={`page-card-grid ${cardSize === 'tarot' ? 'tarot' : ''}`}>
             {page.map((slot, ci) => (
               <div key={ci} className="game-card">
-                {slot.kind === 'hev' && <HEVCard mech={slot.mech} index={slot.idx} />}
+                {slot.kind === 'hev' && <HEVCard mech={slot.mech} index={slot.idx} part={slot.part} items={slot.items} />}
                 {slot.kind === 'support' && <SupportCard asset={slot.asset} customName={slot.customName} loadout={slot.loadout} />}
                 {slot.kind === 'subunit' && <UnitSubCard parent={slot.parent} parentName={slot.parentName} sub={slot.sub} count={slot.count} flavor="subunit" />}
                 {slot.kind === 'garrison' && <UnitSubCard parent={slot.parent} parentName={slot.parentName} sub={slot.squad} count={slot.count} flavor="garrison" />}
@@ -393,9 +491,11 @@ function SummaryPage({
 // ============================================================
 // HE-V CARD (2.5" x 3.5")
 // ============================================================
-function HEVCard({ mech, index }) {
+function HEVCard({ mech, index, part = 'full', items = [] }) {
   const wc = WC[mech.weightClass];
   const cls = mech.weightClass;
+  const isCont = part === 'cont';   // continuation card: a slice of upgrades/rules
+  const isFront = part === 'front';  // primary card of a split: no upgrades/rules
   const move = movDefault(cls);
   const jumpVal = jumpDefault(cls, mech);
   const def = defDefault(cls);
@@ -433,129 +533,180 @@ function HEVCard({ mech, index }) {
 
   return (
     <div className="game-card-inner">
-      {/* Header band */}
+      {/* Header band — continuation cards flag themselves so the pair reads
+          as one unit. */}
       <header className="card-name-band">
         {mech.name || `${cls.toUpperCase()} HE-V`}
+        {isCont && <span className="card-cont-flag">CONT'D</span>}
       </header>
 
-      {/* Class + stats row */}
-      <div className="card-row card-row-id">
-        <div className="card-class-band">{cls.toUpperCase()} HE-V</div>
-        <table className="card-stats-table">
-          <thead>
-            <tr><th>Tng</th><th>Mov</th><th>Jmp</th><th>Def</th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>{equippedTons}t</td>
-              <td>{move}"</td>
-              <td>{jumpVal != null ? `${jumpVal}"` : '—'}</td>
-              <td>{def}+</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      {/* Damage row: ARMOR | STRUCTURE + CRIT legend */}
-      <div className="card-row-damage">
-        <div className="card-armor-col">
-          <div className="hp-heading">ARMOR</div>
-          <PipBlock kind="armor" total={mech.armor} />
-        </div>
-        <div className="card-structure-col">
-          <div className="card-structure-stack">
-            <div className="hp-heading">STRUCTURE</div>
-            <PipBlock kind="structure" total={mech.structure} />
-          </div>
-          <div className="card-crit">
-            <div className="card-crit-heading">CRIT</div>
-            <table className="table-crit">
+      {!isCont && (
+        <>
+          {/* Class + stats row */}
+          <div className="card-row card-row-id">
+            <div className="card-class-band">{cls.toUpperCase()} HE-V</div>
+            <table className="card-stats-table">
+              <thead>
+                <tr><th>Tng</th><th>Mov</th><th>Jmp</th><th>Def</th></tr>
+              </thead>
               <tbody>
-                <tr><td><strong>(M)</strong>ove</td><td className="num">-1</td></tr>
-                <tr><td><strong>(D)</strong>mg</td><td className="num">-1</td></tr>
-                <tr><td><strong>(Ø)</strong>rders</td><td className="num">-1</td></tr>
+                <tr>
+                  <td>{equippedTons}t</td>
+                  <td>{move}"</td>
+                  <td>{jumpVal != null ? `${jumpVal}"` : '—'}</td>
+                  <td>{def}+</td>
+                </tr>
               </tbody>
             </table>
           </div>
-        </div>
-      </div>
 
-      {/* Weapons table */}
-      {weapons.length > 0 && (
-        <>
-          <div className="card-section-heading">WEAPONS</div>
-          <table className="card-weapons-table">
-            <thead>
-              <tr>
-                <th>Weapon</th>
-                <th className="num">Dmg</th>
-                <th className="num">Rng</th>
-                <th>Traits</th>
-              </tr>
-            </thead>
-            <tbody>
-              {weapons.map((w, i) => (
-                <tr key={i}>
-                  <td>{w.count > 1 ? `${w.name} ×${w.count}` : w.name}</td>
-                  <td className="num">{w.dmg}</td>
-                  <td className="num">{w.range}</td>
-                  <td className="card-traits">{w.traits}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {/* Damage row: ARMOR | STRUCTURE + CRIT legend */}
+          <div className="card-row-damage">
+            <div className="card-armor-col">
+              <div className="hp-heading">ARMOR</div>
+              <PipBlock kind="armor" total={mech.armor} />
+            </div>
+            <div className="card-structure-col">
+              <div className="card-structure-stack">
+                <div className="hp-heading">STRUCTURE</div>
+                <PipBlock kind="structure" total={mech.structure} />
+              </div>
+              <div className="card-crit">
+                <div className="card-crit-heading">CRIT</div>
+                <table className="table-crit">
+                  <tbody>
+                    <tr><td><strong>(M)</strong>ove</td><td className="num">-1</td></tr>
+                    <tr><td><strong>(D)</strong>mg</td><td className="num">-1</td></tr>
+                    <tr><td><strong>(Ø)</strong>rders</td><td className="num">-1</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          {/* Weapons table */}
+          {weapons.length > 0 && (
+            <>
+              <div className="card-section-heading">WEAPONS</div>
+              <table className="card-weapons-table">
+                <thead>
+                  <tr>
+                    <th>Weapon</th>
+                    <th className="num">Dmg</th>
+                    <th className="num">Rng</th>
+                    <th>Traits</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {weapons.map((w, i) => (
+                    <tr key={i}>
+                      <td>{w.count > 1 ? `${w.name} ×${w.count}` : w.name}</td>
+                      <td className="num">{w.dmg}</td>
+                      <td className="num">{w.range}</td>
+                      <td className="card-traits">{w.traits}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          )}
+
+          {/* When the upgrades/rules have spilled to a continuation card, leave
+              a pointer so the player knows to grab the next card. */}
+          {isFront && (
+            <div className="card-cont-note">▸ Upgrades &amp; special rules on next card</div>
+          )}
         </>
       )}
 
-      {/* Upgrades with rule text */}
-      {(upgrades.length > 0 || defensive.length > 0) && (
+      {/* Full (un-split) card: all upgrades + special rules inline. */}
+      {part === 'full' && (
         <>
-          <div className="card-section-heading">UPGRADES</div>
-          <div className="card-upgrade-defs">
-            {[...upgrades, ...defensive].map(u => {
-              const drones = mech.drones || {};
-              const droneEntries = Object.entries(drones).filter(([, target]) => target === u.name);
-              const suffix = droneEntries.length > 0 ? ` [${droneEntries.map(([d]) => d).join(', ')}]` : '';
-              return (
-                <div key={u.name} className="card-upgrade-def-entry">
-                  <span className="card-trait-def-name">{u.name}{suffix}:</span>{' '}
-                  <span className="card-upgrade-def-rule">{u.rule}</span>
+          {(upgrades.length > 0 || defensive.length > 0) && (
+            <>
+              <div className="card-section-heading">UPGRADES</div>
+              <div className="card-upgrade-defs">
+                {[...upgrades, ...defensive].map(u => {
+                  const drones = mech.drones || {};
+                  const droneEntries = Object.entries(drones).filter(([, target]) => target === u.name);
+                  const suffix = droneEntries.length > 0 ? ` [${droneEntries.map(([d]) => d).join(', ')}]` : '';
+                  return (
+                    <div key={u.name} className="card-upgrade-def-entry">
+                      <span className="card-trait-def-name">{u.name}{suffix}:</span>{' '}
+                      <span className="card-upgrade-def-rule">{u.rule}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          {/* SPECIAL RULES: class-specific unit keywords only (Fragile Internals,
+              Backup Systems Engage). The weapon-trait glossary (Smart, Blast, AP…)
+              is intentionally NOT repeated here — it lives once on the reference
+              sheet so loaded cards don't overflow. Per-weapon values (e.g.
+              AP (1/1/2/3)) still print inline in the weapons table above. */}
+          {(() => {
+            const entries = [];
+            if (cls === 'Light') {
+              entries.push(
+                <div key="fragile" className="card-trait-def-entry">
+                  <span className="card-trait-def-name">Fragile Internals:</span>{' '}
+                  {FRAGILE_INTERNALS_TEXT}
                 </div>
               );
-            })}
-          </div>
+            }
+            if (cls === 'Ultraheavy') {
+              entries.push(
+                <div key="backup" className="card-trait-def-entry">
+                  <span className="card-trait-def-name">Backup Systems Engage:</span>{' '}
+                  {BACKUP_SYSTEMS_TEXT}
+                </div>
+              );
+            }
+            if (entries.length === 0) return null;
+            return (
+              <>
+                <div className="card-section-heading">SPECIAL RULES</div>
+                <div className="card-trait-defs">{entries}</div>
+              </>
+            );
+          })()}
         </>
       )}
 
-      {/* SPECIAL RULES: class-specific unit keywords only (Fragile Internals,
-          Backup Systems Engage). The weapon-trait glossary (Smart, Blast, AP…)
-          is intentionally NOT repeated here — it lives once on the reference
-          sheet so loaded cards don't overflow. Per-weapon values (e.g.
-          AP (1/1/2/3)) still print inline in the weapons table above. */}
-      {(() => {
-        const entries = [];
-        // Class-specific keyword rules
-        if (cls === 'Light') {
-          entries.push(
-            <div key="fragile" className="card-trait-def-entry">
-              <span className="card-trait-def-name">Fragile Internals:</span>{' '}
-              Whenever this Unit suffers Structure Damage, the Target Commander rolls 1D6 per point of Structure Damage lost. On a 5+, the Unit suffers one additional point of Damage. This does not trigger further Fragile Internals rolls.
-            </div>
-          );
-        }
-        if (cls === 'Ultraheavy') {
-          entries.push(
-            <div key="backup" className="card-trait-def-entry">
-              <span className="card-trait-def-name">Backup Systems Engage:</span>{' '}
-              Whenever this Unit suffers Structure Damage, the Target Commander rolls 1D6 per point of Structure Damage lost. On a 5+, a point of Damage is ignored and the Structure is not reduced.
-            </div>
-          );
-        }
-        if (entries.length === 0) return null;
+      {/* Continuation card: just the slice of upgrade/special items packed
+          onto this face by the deck builder. */}
+      {isCont && (() => {
+        const ups = items.filter(it => it.kind === 'upgrade');
+        const specials = items.filter(it => it.kind === 'special');
         return (
           <>
-            <div className="card-section-heading">SPECIAL RULES</div>
-            <div className="card-trait-defs">{entries}</div>
+            {ups.length > 0 && (
+              <>
+                <div className="card-section-heading">UPGRADES</div>
+                <div className="card-upgrade-defs">
+                  {ups.map(u => (
+                    <div key={u.name} className="card-upgrade-def-entry">
+                      <span className="card-trait-def-name">{u.name}:</span>{' '}
+                      <span className="card-upgrade-def-rule">{u.rule}</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+            {specials.length > 0 && (
+              <>
+                <div className="card-section-heading">SPECIAL RULES</div>
+                <div className="card-trait-defs">
+                  {specials.map(s => (
+                    <div key={s.name} className="card-trait-def-entry">
+                      <span className="card-trait-def-name">{s.name}:</span> {s.rule}
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </>
         );
       })()}
