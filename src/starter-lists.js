@@ -4,6 +4,9 @@
 
 import { TEAMS, WC } from './data';
 
+const BASE = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '/');
+const asset = (p) => `${BASE}${p.replace(/^\//, '')}`;
+
 export const STARTER_LISTS = [
   // ── AUTHORITY ──────────────────────────────────────────────────────────────
   // Protectivist / Strategic Energy Reserves · Battle 200t
@@ -83,6 +86,39 @@ export const STARTER_LISTS = [
     ],
   },
 
+  // ── AKAMATSU ───────────────────────────────────────────────────────────────
+  // Akamatsu Assassination Team box · 4 mechs (2 Light Haro, 2 Medium Kenshiro)
+  {
+    id: 'akamatsu',
+    label: 'Akamatsu Assassination Team',
+    faction: 'Corporations',
+    perks: [],
+    mission: 'Battle',
+    supportAssets: [],
+    factionLogoFile: 'faction-logos/corporations/akamatsu.png',
+    mechs: [
+      { _team: 0, name: 'Haro 1', weightClass: 'Light',
+        weapons: [{ name: 'Combat Blade', count: 1 }],
+        upgrades: ['Directional Thruster', 'High Speed Servos', 'Jump Jets'],
+        defensive: [], drones: {} },
+      { _team: 0, name: 'Haro 2', weightClass: 'Light',
+        weapons: [{ name: 'Combat Blade', count: 1 }],
+        upgrades: ['Directional Thruster', 'High Speed Servos', 'Jump Jets'],
+        defensive: [], drones: {} },
+      { _team: 0, name: 'Kenshiro 1', weightClass: 'Medium',
+        weapons: [{ name: 'Plasma Blade', count: 1 }],
+        upgrades: ['Directional Thruster', 'High Speed Servos', 'Jump Jets'],
+        defensive: ['Extra Plating'], drones: {} },
+      { _team: 0, name: 'Kenshiro 2', weightClass: 'Medium',
+        weapons: [{ name: 'Plasma Blade', count: 1 }],
+        upgrades: ['Directional Thruster', 'High Speed Servos', 'Jump Jets'],
+        defensive: ['Extra Plating'], drones: {} },
+    ],
+    teams: [
+      { teamName: 'Assassination Team', mechIndices: [0, 1, 2, 3] },
+    ],
+  },
+
   // ── CORPORATE ──────────────────────────────────────────────────────────────
   // Embedded Informants / Outrageous Support Budget · Battle 200t
   // Assassination Team (4-mech) + Heavy brawler + Medium rail
@@ -126,7 +162,9 @@ export const STARTER_LISTS = [
 ];
 
 // Convert a starter list definition into a full app state blob ready for onLoad().
-export function instantiateStarterList(list) {
+// Async so it can fetch the faction logo and convert it to a data URL (matching
+// what FactionLogoPicker does), ensuring the logo persists in localStorage.
+export async function instantiateStarterList(list) {
   const mechsWithIds = list.mechs.map(({ _team, ...m }) => ({
     ...m,
     id: crypto.randomUUID(),
@@ -143,13 +181,28 @@ export function instantiateStarterList(list) {
     teamAssignments[teamName] = mechIndices.map(i => mechsWithIds[i].id);
   });
 
+  let factionLogo = null;
+  if (list.factionLogoFile) {
+    try {
+      const res = await fetch(asset(list.factionLogoFile));
+      const blob = await res.blob();
+      factionLogo = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(blob);
+      });
+    } catch (e) {
+      factionLogo = asset(list.factionLogoFile);
+    }
+  }
+
   return {
     forceName: list.label,
     mission: list.mission,
     faction: list.faction,
     perks: list.perks,
     subPerkSelections: {},
-    factionLogo: null,
+    factionLogo,
     mechs: mechsWithIds,
     supportAssets: list.supportAssets || [],
     selectedTeams,

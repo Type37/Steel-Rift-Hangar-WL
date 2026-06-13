@@ -609,9 +609,9 @@ export function ListsModal({ open, onClose, currentState, onLoad }) {
                 </div>
               </div>
               <button
-                onClick={() => {
+                onClick={async () => {
                   if (!confirm('Load this starter list? Your current force will be replaced.')) return;
-                  onLoad(instantiateStarterList(list));
+                  onLoad(await instantiateStarterList(list));
                   onClose();
                 }}
                 className="add-btn"
