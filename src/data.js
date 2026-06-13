@@ -140,9 +140,9 @@ export const ADVANCED_ASSETS = [
   },
   { name: 'LAS-Wing Transport Squadron',  cost: 10, kind: 'Air',
     summary: 'Air-deliver Infantry, Power Suits, or a UL HE-V Squadron.',
-    fullDesc: 'A Squadron of LAS-Wing Transports, all of the same type. Garrisoned units are placed off-table until they perform a MUSTER Order. All Transports share Auxiliary Unit (Light), Flying, Flying Squadron, Vulnerable, Yielding.',
+    fullDesc: 'A Squadron of 3 LAS-Wing Transports, all of the same type. Garrisoned units are placed off-table until they perform a MUSTER Order. All Transports share Auxiliary Unit (Light), Flying, Flying Squadron, Vulnerable, Yielding.',
     stats: { 'Per model': 'SPD 12", ARM 1, STR 2', Weapons: 'Rotary Cannon (each)', Traits: 'Auxiliary Unit (Light), Flying, Flying Squadron, Vulnerable, Yielding' },
-    unitCount: 4,
+    unitCount: 3,
     pickRule: 'allSame',
     subunits: [
       { name: 'Infantry Air Transport', spd: '12"', arm: '1', str: '2',

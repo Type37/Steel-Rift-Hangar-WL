@@ -50,7 +50,7 @@ export function Navbar() {
 // BOTTOM BAR: force name + mission selection + the two big CTAs
 // ============================================================
 export function BottomBar({
-  forceName, onForceName, onPrint, onOptions, onLists, onAbout,
+  forceName, onForceName, onPrint, onOptions, onLists,
   mission, customTons, onMission, onCustomTons,
   totalTons, supportCount, mechCount,
   onAddMech, onAddSupport,
@@ -226,12 +226,7 @@ export function BottomBar({
           <Printer size={13} strokeWidth={2.25} />
           <span className="util-label">Print</span>
         </button>
-        <button onClick={onAbout} className="add-btn util-btn" title="About this builder" style={{ minWidth: 28, fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 13 }}>
-          ?
-        </button>
       </div>
-      {/* Site footer — game credits + links, matching the Pacific Command
-          builder for uniformity across WarLore's tools. */}
       <div className="bottombar-credit">
         <span className="bbc-game">Steel Rift</span>
         <span className="bbc-sep">·</span>
@@ -241,7 +236,7 @@ export function BottomBar({
         <span className="bbc-sep">·</span>
         <a href="https://github.com/Type37/Steel-Rift-Hangar-WL" target="_blank" rel="noreferrer">Source on GitHub</a>
         <span className="bbc-sep">·</span>
-        <button type="button" className="bbc-linkbtn" onClick={onAbout}>About</button>
+        <a href="https://bsky.app/profile/warlore.bsky.social" target="_blank" rel="noreferrer">Questions? Comments? Contact me here.</a>
         <span className="bbc-builder">Builder by <a href="https://linktr.ee/warlore" target="_blank" rel="noreferrer" className="warlore-mark">WarLore</a></span>
       </div>
     </div>
