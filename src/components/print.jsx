@@ -198,6 +198,22 @@ export function PrintView({
   // Card size: 'poker' = 2.5x3.5" (9 per Letter sheet), 'tarot' = 2.75x4.75"
   // (4 per sheet, fits standard tarot sleeves and gives loaded mechs more room).
   const [cardSize, setCardSize] = React.useState('poker');
+
+  // Screen-only: shrink the 8.5in preview pages to fit narrow screens so the
+  // preview never scrolls sideways. @media print resets the zoom to 1.
+  const pagesRef = React.useRef(null);
+  const [pageZoom, setPageZoom] = React.useState(1);
+  React.useLayoutEffect(() => {
+    if (!previewMode) return;
+    const el = pagesRef.current;
+    if (!el) return;
+    const PAGE = 816;
+    const measure = () => setPageZoom(Math.min(1, (el.clientWidth - 24) / PAGE));
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [previewMode]);
   const perPage = cardSize === 'tarot' ? 4 : 9;
 
   // Per-mech team membership and team sizes, used to (a) badge each HE-V card
@@ -385,7 +401,8 @@ export function PrintView({
         </div>
       )}
 
-      <div className={previewMode ? 'print-preview-pages' : ''}>
+      <div className={previewMode ? 'print-preview-pages' : ''} ref={pagesRef}
+        style={previewMode ? { '--page-zoom': pageZoom } : undefined}>
       {/* CARDS FIRST — the printed deck always leads. */}
       {pages.map((page, pi) => (
         <div key={pi} className="print-page print-cards-page">

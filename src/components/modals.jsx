@@ -639,6 +639,7 @@ export function ListsModal({ open, onClose, currentState, onLoad }) {
             placeholder="List name"
             style={{
               flex: 1,
+              minWidth: 0,
               border: '1.5px solid var(--rule-strong)',
               background: 'var(--surface)',
               padding: '8px 10px',

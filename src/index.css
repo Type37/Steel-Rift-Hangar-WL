@@ -1051,6 +1051,15 @@ button:not(:disabled):active {
 .print-preview-toolbar-right {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
+}
+.print-preview-toolbar { flex-wrap: wrap; }
+.print-preview-pages .print-page { zoom: var(--page-zoom, 1); }
+@media print { .print-preview-pages .print-page { zoom: 1 !important; } }
+/* Phones: the five workshop tabs wrap instead of scrolling sideways. */
+@media (max-width: 420px) {
+  .workshop-tabs { flex-wrap: wrap; }
+  .workshop-tab { flex: 1 1 auto; }
 }
 /* Poker / Tarot segmented control. */
 .print-size-toggle {

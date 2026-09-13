@@ -423,7 +423,7 @@ function TeamRow({
       }}
     >
       <div style={{
-        display: 'grid', gridTemplateColumns: 'auto auto 1fr auto auto', alignItems: 'center', gap: 12,
+        display: 'grid', gridTemplateColumns: 'auto auto minmax(0, 1fr) auto auto', alignItems: 'center', gap: 12,
         padding: '12px 12px',
       }}>
         <RowExpand open={open} onClick={() => setOpen(o => !o)} />
